@@ -1,0 +1,15 @@
+Grammar
+=======
+
+David F. Houghton
+19 Feb, 2011
+
+This is an experiment to create in Java something like the Grammar facilities
+of Perl 6 or the recursive regexes of Perl 5.10+. It will parse by recursive
+decent, will produce ASTs, will be genericized to handle arbitrary symbol
+sequences, will parse alternates concurrently, and will return multiple ASTs for
+ambiguous sequences.
+
+This is idle itch scratching. I aim to make it robust and well-tested but I make no
+guarantees. If you want robust, seasoned code, or code distilled from thousands of
+hours of academic research, try ANTLR or Parboiled or something such
