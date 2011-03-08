@@ -13,3 +13,8 @@ ambiguous sequences.
 This is idle itch scratching. I aim to make it robust and well-tested but I make no
 guarantees. If you want robust, seasoned code, or code distilled from thousands of
 hours of academic research, try ANTLR or Parboiled or something such
+
+Other Stuff
+-----------
+This software is distributed under the terms of the FSF Lesser Gnu 
+Public License (see lgpl.txt).
