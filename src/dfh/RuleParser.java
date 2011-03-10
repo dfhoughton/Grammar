@@ -6,10 +6,7 @@ package dfh;
  * <b>Creation date:</b> Feb 19, 2011
  * 
  * @author David Houghton
- * 
- * @param <K>
- *            type of object over which rules are defined
  */
-public class LeafRuleFactory<K> {
+public class RuleParser {
 
 }
