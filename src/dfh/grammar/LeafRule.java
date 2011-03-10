@@ -1,4 +1,4 @@
-package dfh;
+package dfh.grammar;
 
 /**
  * {@link Rule} defined over sequence of terminal objects rather than other

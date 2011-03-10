@@ -1,4 +1,4 @@
-package dfh;
+package dfh.grammar;
 
 import java.io.Serializable;
 

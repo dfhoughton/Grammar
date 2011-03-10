@@ -1,4 +1,4 @@
-package dfh;
+package dfh.grammar;
 
 /**
  * Node in an AST tree.
