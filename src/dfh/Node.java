@@ -6,35 +6,32 @@ package dfh;
  * <b>Creation date:</b> Feb 19, 2011
  * 
  * @author David Houghton
- * 
- * @param <K>
- *            type of object over which tree is defined
  */
-public class Node<K> {
-	private final Rule<K> r;
+public class Node {
+	private final Rule r;
 	private final int start, end;
-	private final Node<K> parent;
-	
-	public Node(Rule<K> r, int start, int end, Node<K> parent) {
+	private final Node parent;
+
+	public Node(Rule r, int start, int end, Node parent) {
 		this.r = r;
 		this.start = start;
 		this.end = end;
 		this.parent = parent;
 	}
-	
-	public Rule<K> rule() {
+
+	public Rule rule() {
 		return r;
 	}
-	
+
 	public int start() {
 		return start;
 	}
-	
+
 	public int end() {
 		return end;
 	}
-	
-	public Node<K> parent() {
+
+	public Node parent() {
 		return parent;
 	}
 }

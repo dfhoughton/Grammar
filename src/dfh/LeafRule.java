@@ -7,11 +7,8 @@ package dfh;
  * <b>Creation date:</b> Feb 19, 2011
  * 
  * @author David Houghton
- * 
- * @param <K>
- *            type of object over which Rule is defined
  */
-public class LeafRule<K> extends Rule<K> {
+public class LeafRule extends Rule {
 
 	private static final long serialVersionUID = 1L;
 

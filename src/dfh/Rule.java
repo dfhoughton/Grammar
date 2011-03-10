@@ -7,11 +7,8 @@ import java.io.Serializable;
  * <b>Creation date:</b> Feb 19, 2011
  * 
  * @author David Houghton
- * 
- * @param <K>
- *            type of object over which Rule is defined
  */
-public class Rule<K> implements Serializable {
+public class Rule implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private final String label;
