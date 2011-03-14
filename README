@@ -6,13 +6,15 @@ David F. Houghton
 
 This is an experiment to create in Java something like the Grammar facilities
 of Perl 6 or the recursive regexes of Perl 5.10+. It will parse by recursive
-decent, will produce ASTs, will be genericized to handle arbitrary symbol
-sequences, will parse alternates concurrently, and will return multiple ASTs for
-ambiguous sequences.
+decent, producing ASTs.
 
-This is idle itch scratching. I aim to make it robust and well-tested but I make no
+This is idle itch scratching. I am writing this because it's more fun than figuring
+out how to use someone else's library. Also, I need recursive matching for a current
+project, so now's a good time. I aim to make it robust and well-tested but I make no
 guarantees. If you want robust, seasoned code, or code distilled from thousands of
-hours of academic research, try ANTLR or Parboiled or something such
+hours of academic research, try ANTLR or Parboiled or something such. I confess I read
+none of the relevant research nor studied anyone else's algorithms before I started this,
+so a good bit of wheel re-invention is likely embodied in this code.
 
 Other Stuff
 -----------
