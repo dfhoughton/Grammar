@@ -11,7 +11,7 @@ import java.util.List;
  * @author David Houghton
  */
 public class GroupFragment extends RepeatableRuleFragment {
-	private List<List<RuleFragment>> alternates = new LinkedList<List<RuleFragment>>();
+	List<List<RuleFragment>> alternates = new LinkedList<List<RuleFragment>>();
 	private List<RuleFragment> currentSequence = new LinkedList<RuleFragment>();
 	{
 		alternates.add(currentSequence);

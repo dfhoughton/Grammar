@@ -2,6 +2,14 @@ package dfh.grammar;
 
 import java.io.Serializable;
 
+/**
+ * A rule identifier.
+ * <p>
+ * <b>Creation date:</b> Mar 14, 2011
+ * 
+ * @author David Houghton
+ * 
+ */
 public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		Serializable {
 	private static final long serialVersionUID = 1L;
@@ -47,4 +55,25 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 			comparison = id.compareTo(o.id);
 		return comparison;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (o == this)
+			return true;
+		if (o instanceof Label) {
+			Label l = (Label) o;
+			if (l.t == t) {
+				return l.id.equals(id);
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return t.hashCode() ^ id.hashCode();
+	}
+
 }

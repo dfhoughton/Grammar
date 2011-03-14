@@ -21,12 +21,6 @@ public class RuleParser {
 	public static final Pattern labelPattern = Pattern
 			.compile("([<(])(\\w++)([>)])");
 	/**
-	 * {@link #labelPattern} augmented to include the zero-width assertion
-	 * prefixes -- <code>t</code> or <code>f</code>.
-	 */
-	public static final Pattern subrulePattern = Pattern.compile("[tf]?"
-			+ labelPattern);
-	/**
 	 * Pattern that defines a rule as "<"<name>">" "=" <remainder>
 	 */
 	public static final Pattern basePattern = Pattern.compile("\\s*+"
@@ -237,30 +231,15 @@ public class RuleParser {
 
 	private static RuleFragment nextRule(String body, int[] offset, char bracket)
 			throws GrammarException {
-		Matcher m = subrulePattern.matcher(body.substring(offset[0]));
+		Matcher m = labelPattern.matcher(body.substring(offset[0]));
 		if (m.lookingAt()) {
 			String s = m.group();
 			offset[0] += s.length();
 			char c1 = s.charAt(0), c2 = s.charAt(s.length() - 1);
-			Boolean isTrue = null;
-			if (c1 == 't') {
-				isTrue = true;
-				c1 = s.charAt(1);
-			} else if (c1 == 'f') {
-				isTrue = false;
-				c1 = s.charAt(1);
-			}
 			if (c1 == '(' && c2 == ')') {
-				String id = s.substring(isTrue == null ? 1 : 2, s.length() - 1);
-				if (isTrue == null)
-					return new Label(Label.Type.terminal, id);
-				else
-					return new AssertionFragment(id, isTrue);
+				String id = s.substring(1, s.length() - 1);
+				return new Label(Label.Type.terminal, id);
 			} else if (c1 == '<' && c2 == '>') {
-				if (isTrue != null)
-					throw new GrammarException(
-							"assertion prefix can only be attached to terminal rule: "
-									+ s);
 				String id = s.substring(1, s.length() - 1);
 				if (id.equals(ROOT))
 					return new Label(Label.Type.root, id);

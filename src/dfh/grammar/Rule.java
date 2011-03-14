@@ -8,17 +8,18 @@ import java.io.Serializable;
  * 
  * @author David Houghton
  */
-public class Rule implements Serializable {
+public abstract class Rule implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private final String label;
+	final Label label;
 
-	public Rule(String label) {
+	public Rule(Label label) {
 		this.label = label;
 	}
 
-	public String label() {
+	public Label label() {
 		return label;
 	}
 
+	public abstract Matcher matcher(char[] cs, int offset, Node parent);
 }
