@@ -11,6 +11,19 @@ public class Node {
 	private final Rule r;
 	private final int start, end;
 	private final Node parent;
+	/**
+	 * Used as a placeholder in offset cache.
+	 */
+	public static final Node dummy = new Node();
+
+	/**
+	 * Makes a dummy node.
+	 */
+	private Node() {
+		r = null;
+		start = end = -1;
+		parent = null;
+	}
 
 	public Node(Rule r, int start, int end, Node parent) {
 		this.r = r;

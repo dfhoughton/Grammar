@@ -10,7 +10,7 @@ package dfh.grammar;
  */
 public class RepeatableRuleFragment implements RuleFragment {
 
-	private Repetition rep = Repetition.NONE;
+	Repetition rep = Repetition.NONE;
 
 	public void setRepetition(Repetition rep) {
 		this.rep = rep;

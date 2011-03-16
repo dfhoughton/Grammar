@@ -1,6 +1,5 @@
 package dfh.grammar;
 
-import java.util.Map;
 
 /**
  * An object associated with a {@link Rule} that can iterate over and return all
@@ -17,7 +16,7 @@ public interface Matcher {
 	 * @param offsetCache
 	 * @return next parse tree or null if no parse tree is possible
 	 */
-	public Node match(Map<Label, Map<Integer, Node>> offsetCache);
+	public Node match();
 
 	public boolean hasNext();
 

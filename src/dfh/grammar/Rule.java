@@ -1,6 +1,7 @@
 package dfh.grammar;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * <p>
@@ -21,5 +22,5 @@ public abstract class Rule implements Serializable {
 		return label;
 	}
 
-	public abstract Matcher matcher(char[] cs, int offset, Node parent);
+	public abstract Matcher matcher(char[] cs, int offset, Node parent, Map<Label, Map<Integer, Node>> cache);
 }

@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,10 @@ public class Grammar implements Serializable {
 	private final Label root;
 	private final Map<Label, Rule> rules;
 	private final Map<String, Label> terminalLabelMap;
+	/**
+	 * Keeps track of terminals not defined in initial rule set.
+	 */
+	private final HashSet<Label> undefinedTerminals;
 
 	public Grammar(InputStream in) throws GrammarException, IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -52,17 +57,47 @@ public class Grammar implements Serializable {
 		if (r == null)
 			throw new GrammarException("no root rule found");
 		this.root = r;
-		rules = new HashMap<Label, Rule>(map.size());
+		// make space for anonymous rules
+		rules = new HashMap<Label, Rule>(map.size() * 2);
 		Set<Label> allLabels = new HashSet<Label>(map.size()), terminals = new HashSet<Label>(
 				map.size()), knownLabels = new HashSet<Label>(map.keySet());
-		for (Entry<Label, List<RuleFragment>> e : map.entrySet()) {
-			rules.put(e.getKey(), parseRule(e.getKey(), e.getValue()));
-			Set<Label> labels = allLabels(e.getValue());
-			allLabels.addAll(labels);
-			for (Label l : labels) {
-				if (l.t == Type.terminal)
-					terminals.add(l);
+		boolean firstPass = true; // we collect terminals on first pass
+		while (!map.isEmpty()) {
+			int size = map.size();
+			for (Iterator<Entry<Label, List<RuleFragment>>> i = map.entrySet()
+					.iterator(); i.hasNext();) {
+				Entry<Label, List<RuleFragment>> e = i.next();
+				Set<Label> labels = allLabels(e.getValue());
+				boolean defined = allLabels.isEmpty();
+				if (defined) {
+					terminals.add(e.getKey());
+					allLabels.add(e.getKey());
+				} else {
+					defined = true;
+					for (Label l : labels) {
+						if (!(rules.containsKey(l) || terminals.contains(l))) {
+							defined = false;
+							break;
+						}
+					}
+				}
+				if (defined) {
+					// if all the constituents of a rule are defined, we define
+					// the rule
+					rules.put(e.getKey(), parseRule(e.getKey(), e.getValue()));
+					allLabels.addAll(labels);
+					allLabels.add(e.getKey());
+					for (Label l : labels) {
+						if (l.t == Type.terminal)
+							terminals.add(l);
+					}
+					i.remove();
+				}
 			}
+			if (!firstPass && map.size() == size)
+				throw new GrammarException(
+						"impossible co-dependencies exist in rule set");
+			firstPass = false;
 		}
 		terminalLabelMap = new HashMap<String, Label>(terminals.size());
 		for (Label l : terminals)
@@ -80,6 +115,8 @@ public class Grammar implements Serializable {
 				b.append(", ").append(s);
 			throw new GrammarException("undefined rules: " + b);
 		}
+		terminals.removeAll(rules.keySet());
+		undefinedTerminals = new HashSet<Label>(terminals);
 	}
 
 	/**
@@ -119,8 +156,7 @@ public class Grammar implements Serializable {
 	private Rule parseRule(Label l, List<RuleFragment> value) {
 		if (l.t == Type.terminal)
 			return new LeafRule(l, ((Regex) value.get(0)).re);
-		// TODO finish other types
-		return null;
+		return new SequenceRule(l, value, rules);
 	}
 
 	public Node matches(String s) throws GrammarException {
@@ -136,11 +172,13 @@ public class Grammar implements Serializable {
 	 * @return
 	 * @throws GrammarException
 	 */
-	private Node matches(String s, int offset) throws GrammarException {
+	public Node matches(String s, int offset) throws GrammarException {
+		checkComplete();
 		Map<Label, Map<Integer, Node>> cache = offsetCache();
-		Matcher m = rules.get(root).matcher(s.toCharArray(), offset, null);
+		Matcher m = rules.get(root).matcher(s.toCharArray(), offset, null,
+				cache);
 		do {
-			Node n = m.match(cache);
+			Node n = m.match();
 			if (n.end() == s.length())
 				return n;
 			if (m.hasNext())
@@ -151,16 +189,38 @@ public class Grammar implements Serializable {
 		return null;
 	}
 
-	public Node lookingAt(String s) {
+	/**
+	 * Checks to make sure all rules have been defined.
+	 * 
+	 * @throws GrammarException
+	 */
+	private void checkComplete() throws GrammarException {
+		if (!undefinedTerminals.isEmpty()) {
+			LinkedList<Label> list = new LinkedList<Label>(undefinedTerminals);
+			Collections.sort(list);
+			StringBuilder b = new StringBuilder(
+					"terminal rules remaining undefined: ");
+			b.append(list.pollFirst().id);
+			for (Label l : list) {
+				b.append(", ");
+				b.append(l.id);
+			}
+			throw new GrammarException(b.toString());
+		}
+	}
+
+	public Node lookingAt(String s) throws GrammarException {
 		return lookingAt(s, 0);
 	}
 
-	public Node lookingAt(String s, final int offset) {
-		Matcher m = rules.get(root).matcher(s.toCharArray(), offset, null);
-		return m.match(offsetCache());
+	public Node lookingAt(String s, final int offset) throws GrammarException {
+		checkComplete();
+		Matcher m = rules.get(root).matcher(s.toCharArray(), offset, null,
+				offsetCache());
+		return m.match();
 	}
 
-	public Node find(String s) {
+	public Node find(String s) throws GrammarException {
 		return find(s, 0);
 	}
 
@@ -170,13 +230,15 @@ public class Grammar implements Serializable {
 	 * @param s
 	 * @param offset
 	 * @return
+	 * @throws GrammarException
 	 */
-	public Node find(String s, final int offset) {
+	public Node find(String s, final int offset) throws GrammarException {
+		checkComplete();
 		Map<Label, Map<Integer, Node>> cache = offsetCache();
 		char[] chars = s.toCharArray();
 		for (int i = offset; i < s.length(); i++) {
-			Matcher m = rules.get(root).matcher(chars, i, null);
-			Node n = m.match(cache);
+			Matcher m = rules.get(root).matcher(chars, i, null, cache);
+			Node n = m.match();
 			if (n != null)
 				return n;
 		}
