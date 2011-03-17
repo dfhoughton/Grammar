@@ -76,4 +76,14 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		return t.hashCode() ^ id.hashCode();
 	}
 
+	@Override
+	public String stringify() {
+		StringBuilder b = new StringBuilder();
+		b.append(t == Type.terminal ? '(' : '<');
+		b.append(id);
+		b.append(t == Type.terminal ? ')' : '>');
+		appendSuffix(b);
+		return b.toString();
+	}
+
 }

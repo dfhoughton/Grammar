@@ -9,8 +9,10 @@ package dfh.grammar;
  */
 public class Node {
 	private final Rule r;
-	private final int start, end;
+	private final int start;
+	private int end;
 	private final Node parent;
+	private Node[] children;
 	/**
 	 * Used as a placeholder in offset cache.
 	 */
@@ -23,13 +25,18 @@ public class Node {
 		r = null;
 		start = end = -1;
 		parent = null;
+		setChildren(null);
+	}
+
+	public Node(Rule r, int start, Node parent) {
+		this.r = r;
+		this.start = start;
+		this.parent = parent;
 	}
 
 	public Node(Rule r, int start, int end, Node parent) {
-		this.r = r;
-		this.start = start;
-		this.end = end;
-		this.parent = parent;
+		this(r, start, parent);
+		setEnd(end);
 	}
 
 	public Rule rule() {
@@ -44,7 +51,19 @@ public class Node {
 		return end;
 	}
 
+	void setEnd(int end) {
+		this.end = end;
+	}
+
 	public Node parent() {
 		return parent;
+	}
+
+	void setChildren(Node[] children) {
+		this.children = children;
+	}
+
+	public Node[] children() {
+		return children;
 	}
 }

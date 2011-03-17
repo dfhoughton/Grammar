@@ -1,6 +1,5 @@
 package dfh.grammar;
 
-
 /**
  * An object associated with a {@link Rule} that can iterate over and return all
  * the possible parse trees starting at a given offset in the string.
@@ -18,7 +17,9 @@ public interface Matcher {
 	 */
 	public Node match();
 
-	public boolean hasNext();
-
-	public void iterate() throws GrammarException;
+	/**
+	 * @return whether the sequence this matcher is iterating over has reached
+	 *         its end
+	 */
+	public boolean mightHaveNext();
 }

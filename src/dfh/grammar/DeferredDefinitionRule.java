@@ -4,7 +4,13 @@ import java.util.Map;
 
 /**
  * A rule undefined at the time of grammar compilation. It will always
- * correspond to a terminal rule. <b>Creation date:</b> Mar 16, 2011
+ * correspond to a terminal rule. This class exists so that a {@link Grammar}
+ * can be compiled and then certain rules dynamically loaded in later.
+ * <p>
+ * This is similar to Perl's <code>AUTOLOAD</code> mechanism or a function
+ * prototype.
+ * <p>
+ * <b>Creation date:</b> Mar 16, 2011
  * 
  * @author David Houghton
  * 
@@ -20,10 +26,10 @@ public class DeferredDefinitionRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(char[] cs, int offset, Node parent) {
+	public Matcher matcher(char[] cs, int offset, Node parent,
+			Map<Label, Map<Integer, Node>> cache) {
 		if (r == null)
 			r = rules.get(label);
-		return r.matcher(cs, offset, parent);
+		return r.matcher(cs, offset, parent, cache);
 	}
-
 }

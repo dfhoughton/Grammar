@@ -5,82 +5,76 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import javax.swing.text.Segment;
+import dfh.grammar.Label.Type;
 
 public class SequenceRule extends Rule {
 	private static final long serialVersionUID = 1L;
 	private final Rule[] sequence;
 
-	private class SequenceMatcher implements Matcher {
-		private final Segment segment;
-		private final int offset;
-		private final Node parent;
-		private final char[] cs;
+	class SequenceMatcher extends NonterminalMatcher {
 		Queue<Matcher> matcherStack = new LinkedList<Matcher>();
 		Queue<Node> nodeStack = new LinkedList<Node>();
-		private Node next;
-		private boolean done = false;
-		private final Map<Label, Map<Integer, Node>> cache;
-		private final Map<Integer, Node> subcache;
 
-		public SequenceMatcher(char[] cs, int offset, Node parent, Map<Label, Map<Integer, Node>> cache) {
-			this.cs = cs;
-			this.segment = new Segment(cs, offset, cs.length - offset);
-			this.offset = offset;
-			this.parent = parent;
-			this.cache = cache;
-			this.subcache = cache.get(label);
+		public SequenceMatcher(char[] cs, int offset, Node parent,
+				Map<Label, Map<Integer, Node>> cache) {
+			super(cs, offset, parent, cache, label);
 		}
 
 		@Override
-		public Node match() {
-			boolean alreadyMatched = subcache.containsKey(offset);
-			if (alreadyMatched && subcache.get(offset) == null)
-				return null;
-			if (next == null)
-				fetchNext();
-			if (!alreadyMatched)
-				subcache.put(offset, next == null ? null : Node.dummy);
-			Node n = next;
-			next = null;
-			return n;
-		}
-
-		@Override
-		public boolean hasNext() {
-			if (done)
-				return false;
-			if (next == null)
-				fetchNext();
-			return next != null;
-		}
-
-		private void fetchNext() {
-			if (nodeStack.size() == 0)
-				fetchFirst();
-			else {
+		protected void fetchNext() {
+			if (nodeStack.size() > 0)
 				nodeStack.remove();
-				while (nodeStack.size() < sequence.length) {
-					Matcher m = matcherStack.peek();
-					if (m.hasNext()) {
-						m.iterate();
-						nodeStack.add(m.match());
+			next = new Node(SequenceRule.this, offset, parent);
+			while (nodeStack.size() < sequence.length) {
+				Matcher m;
+				if (matcherStack.isEmpty()) {
+					m = sequence[0].matcher(cs, offset, next, cache);
+					matcherStack.add(m);
+				} else
+					m = matcherStack.peek();
+				Node n = m.match();
+				if (n == null) {
+					matcherStack.remove();
+					nodeStack.remove();
+					if (matcherStack.isEmpty()) {
+						done = true;
+						next = null;
+						if (!subCache.containsKey(offset))
+							subCache.put(offset, null);
+						break;
+					}
+				} else {
+					nodeStack.add(n);
+					if (nodeStack.size() < sequence.length) {
+						m = sequence[nodeStack.size()].matcher(cs, n.end(),
+								next, cache);
+						matcherStack.add(m);
 					}
 				}
 			}
+			if (next != null) {
+				next.setEnd(nodeStack.peek().end());
+				Node[] children = matcherStack
+						.toArray(new Node[sequence.length]);
+				next.setChildren(children);
+				if (!subCache.containsKey(offset))
+					subCache.put(offset, Node.dummy);
+			}
 		}
+	}
 
-		private void fetchFirst() {
-			// TODO Auto-generated method stub
-			
+	/**
+	 * @param list
+	 * @return label for synthetic node
+	 */
+	public static Label label(List<RuleFragment> list) {
+		StringBuilder b = new StringBuilder();
+		for (RuleFragment rf : list) {
+			if (b.length() > 0)
+				b.append(' ');
+			b.append(rf.stringify());
 		}
-
-		@Override
-		public void iterate() throws GrammarException {
-			if (!done)
-				fetchNext();
-		}
-
+		return new Label(Type.nonTerminal, b.toString());
 	}
 
 	public SequenceRule(Label label, List<RuleFragment> list,
@@ -97,6 +91,7 @@ public class SequenceRule extends Rule {
 				if (r == null) {
 					// undefined terminal
 					r = new DeferredDefinitionRule(l, rules);
+					rules.put(r.label(), r);
 				}
 			} else {
 				GroupFragment gf = (GroupFragment) rrf;
@@ -105,12 +100,12 @@ public class SequenceRule extends Rule {
 				if (r == null) {
 					r = new AlternationRule(l1, gf, rules);
 					rules.put(l1, r);
+					rules.put(r.label(), r);
 				}
 			}
-			rules.put(r.label(), r);
 			if (rrf.rep != Repetition.NONE) {
-				Label l = RepetitionRule.label(r, rrf.rep);
-				RepetitionRule rr = new RepetitionRule(l, r);
+				Label l = new Label(Type.nonTerminal, rrf.stringify());
+				RepetitionRule rr = new RepetitionRule(l, r, rrf.rep);
 				rules.put(l, rr);
 				r = rr;
 			}
@@ -119,9 +114,9 @@ public class SequenceRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(char[] cs, int offset, Node parent,Map<Label, Map<Integer, Node>> cache) {
-		// TODO Auto-generated method stub
-		return new SequenceMatcher(cs, offset, parent,cache);
+	public Matcher matcher(char[] cs, int offset, Node parent,
+			Map<Label, Map<Integer, Node>> cache) {
+		return new SequenceMatcher(cs, offset, parent, cache);
 	}
 
 }

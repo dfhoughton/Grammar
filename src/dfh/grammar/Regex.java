@@ -8,4 +8,9 @@ public class Regex implements RuleFragment {
 	public Regex(String re) {
 		this.re = Pattern.compile(re);
 	}
+
+	@Override
+	public String stringify() {
+		return re.toString();
+	}
 }

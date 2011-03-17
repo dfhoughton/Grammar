@@ -37,6 +37,11 @@ public class Grammar implements Serializable {
 	 */
 	private final HashSet<Label> undefinedTerminals;
 
+	/**
+	 * @param in
+	 * @throws GrammarException
+	 * @throws IOException
+	 */
 	public Grammar(InputStream in) throws GrammarException, IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		String line = null;
@@ -177,15 +182,13 @@ public class Grammar implements Serializable {
 		Map<Label, Map<Integer, Node>> cache = offsetCache();
 		Matcher m = rules.get(root).matcher(s.toCharArray(), offset, null,
 				cache);
-		do {
+		while (m.mightHaveNext()) {
 			Node n = m.match();
+			if (n == null)
+				break;
 			if (n.end() == s.length())
 				return n;
-			if (m.hasNext())
-				m.iterate();
-			else
-				break;
-		} while (true);
+		}
 		return null;
 	}
 
