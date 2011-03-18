@@ -3,7 +3,6 @@ package dfh.grammar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import dfh.grammar.Label.Type;
 
@@ -12,8 +11,8 @@ public class SequenceRule extends Rule {
 	private final Rule[] sequence;
 
 	class SequenceMatcher extends NonterminalMatcher {
-		Queue<Matcher> matcherStack = new LinkedList<Matcher>();
-		Queue<Node> nodeStack = new LinkedList<Node>();
+		LinkedList<Matcher> matcherStack = new LinkedList<Matcher>();
+		LinkedList<Node> nodeStack = new LinkedList<Node>();
 
 		public SequenceMatcher(char[] cs, int offset, Node parent,
 				Map<Label, Map<Integer, Node>> cache) {
@@ -23,7 +22,7 @@ public class SequenceRule extends Rule {
 		@Override
 		protected void fetchNext() {
 			if (nodeStack.size() > 0)
-				nodeStack.remove();
+				nodeStack.removeLast();
 			next = new Node(SequenceRule.this, offset, parent);
 			while (nodeStack.size() < sequence.length) {
 				Matcher m;
@@ -31,11 +30,12 @@ public class SequenceRule extends Rule {
 					m = sequence[0].matcher(cs, offset, next, cache);
 					matcherStack.add(m);
 				} else
-					m = matcherStack.peek();
+					m = matcherStack.peekLast();
 				Node n = m.match();
 				if (n == null) {
-					matcherStack.remove();
-					nodeStack.remove();
+					matcherStack.removeLast();
+					if (!nodeStack.isEmpty())
+						nodeStack.removeLast();
 					if (matcherStack.isEmpty()) {
 						done = true;
 						next = null;
@@ -53,8 +53,8 @@ public class SequenceRule extends Rule {
 				}
 			}
 			if (next != null) {
-				next.setEnd(nodeStack.peek().end());
-				Node[] children = matcherStack
+				next.setEnd(nodeStack.peekLast().end());
+				Node[] children = nodeStack
 						.toArray(new Node[sequence.length]);
 				next.setChildren(children);
 				if (!subCache.containsKey(offset))

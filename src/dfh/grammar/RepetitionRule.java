@@ -2,7 +2,6 @@ package dfh.grammar;
 
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 
 /**
  * Rule to handle all the various repetition options.
@@ -19,7 +18,7 @@ public class RepetitionRule extends Rule {
 
 	private abstract class GreedyAndPossessive extends NonterminalMatcher {
 
-		protected Queue<Node> matched;
+		protected LinkedList<Node> matched;
 
 		protected GreedyAndPossessive(char[] cs, int offset, Node parent,
 				Map<Label, Map<Integer, Node>> cache, Label label) {
@@ -79,8 +78,8 @@ public class RepetitionRule extends Rule {
 	}
 
 	private class StingyMatcher extends NonterminalMatcher {
-		private Queue<Matcher> matchers = new LinkedList<Matcher>();
-		private Queue<Node> nodes = new LinkedList<Node>();
+		private LinkedList<Matcher> matchers = new LinkedList<Matcher>();
+		private LinkedList<Node> nodes = new LinkedList<Node>();
 
 		protected StingyMatcher(char[] cs, int offset, Node parent,
 				Map<Label, Map<Integer, Node>> cache, Label label) {
@@ -92,14 +91,14 @@ public class RepetitionRule extends Rule {
 		protected void fetchNext() {
 			next = new Node(RepetitionRule.this, offset, parent);
 			while (next != null || nodes.size() < repetition.bottom) {
-				Matcher m = matchers.peek();
+				Matcher m = matchers.peekLast();
 				if (m.mightHaveNext()) {
 					Node n = m.match();
 					if (n == null) {
 						decrement();
 					} else {
 						if (nodes.size() == repetition.top)
-							nodes.remove();
+							nodes.removeLast();
 						nodes.add(n);
 						if (nodes.size() < repetition.top)
 							matchers.add(r.matcher(cs, n.end(), next, cache));
@@ -111,14 +110,14 @@ public class RepetitionRule extends Rule {
 		}
 
 		private void decrement() {
-			matchers.remove();
+			matchers.removeLast();
 			if (matchers.isEmpty()) {
 				done = true;
 				next = null;
 				matchers = null;
 				nodes = null;
 			} else {
-				nodes.remove();
+				nodes.removeLast();
 			}
 		}
 

@@ -66,4 +66,26 @@ public class Node {
 	public Node[] children() {
 		return children;
 	}
+
+	@Override
+	public String toString() {
+		if (this == dummy)
+			return "[DUMMY]";
+		StringBuilder b = new StringBuilder();
+		b.append('[').append(r.label).append(' ');
+		b.append(start).append(", ").append(end);
+		if (children != null && children.length > 0) {
+			b.append(' ');
+			boolean nonInitial = false;
+			for (Node n : children) {
+				if (nonInitial)
+					b.append(", ");
+				else
+					nonInitial = true;
+				b.append(n);
+			}
+		}
+		b.append(']');
+		return b.toString();
+	}
 }
