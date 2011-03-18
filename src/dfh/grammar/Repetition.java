@@ -42,4 +42,35 @@ public class Repetition {
 		this.top = top;
 		this.bottom = bottom;
 	}
+
+	@Override
+	public String toString() {
+		if (top == bottom) {
+			if (top == 1)
+				return "";
+			return "{" + top + "}";
+		}
+		StringBuilder b = new StringBuilder();
+		if (top == Integer.MAX_VALUE) {
+			if (bottom == 0)
+				b.append('*');
+			else if (bottom == 1)
+				b.append('+');
+			else
+				b.append('{').append(bottom).append(",}");
+		} else if (top == 1)
+			b.append('?');
+		else {
+			if (bottom == 0)
+				b.append("{,").append(top).append('}');
+			else
+				b.append('{').append(bottom).append(',').append(top)
+						.append('}');
+		}
+		if (t == Type.possessive)
+			b.append('+');
+		else if (t == Type.stingy)
+			b.append('?');
+		return b.toString();
+	}
 }

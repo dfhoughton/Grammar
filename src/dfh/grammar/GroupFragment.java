@@ -54,7 +54,7 @@ public class GroupFragment extends RepeatableRuleFragment {
 	public String stringify() {
 		StringBuilder b = new StringBuilder();
 		boolean nonInitial = false;
-		b.append('(');
+		b.append('[');
 		for (List<RuleFragment> alternate : alternates) {
 			if (nonInitial)
 				b.append('|');
@@ -62,8 +62,8 @@ public class GroupFragment extends RepeatableRuleFragment {
 				nonInitial = true;
 			stringifySequence(b, alternate);
 		}
-		b.append(')');
-		appendSuffix(b);
+		b.append(']');
+		b.append(rep);
 		return b.toString();
 	}
 
@@ -89,5 +89,30 @@ public class GroupFragment extends RepeatableRuleFragment {
 		while (i.hasNext())
 			clone.alternates.add(i.next());
 		return clone;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+		b.append('[');
+		for (List<RuleFragment> alternate: alternates) {
+			if (b.length() > 1)
+				b.append('|');
+			appendAlternate(b, alternate);
+		}
+		b.append(']');
+		b.append(rep);
+		return b.toString();
+	}
+
+	private void appendAlternate(StringBuilder b, List<RuleFragment> alternate) {
+		boolean nonFirst = false;
+		for (RuleFragment rf: alternate) {
+			if (nonFirst)
+				b.append(' ');
+			else
+				nonFirst = true;
+			b.append(rf);
+		}
 	}
 }

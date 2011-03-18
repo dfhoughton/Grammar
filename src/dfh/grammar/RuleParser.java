@@ -30,10 +30,6 @@ public class RuleParser {
 	 */
 	public static final Pattern repetitionPattern = Pattern
 			.compile("(?:([?*+]|\\{\\d*+(?:,\\d*+)?\\})([+?]?+))?+");
-	/**
-	 * Label of root rule.
-	 */
-	public static final String ROOT = "ROOT";
 
 	/**
 	 * Parses a line of the string representation of a grammar. Does
@@ -64,7 +60,7 @@ public class RuleParser {
 			List<RuleFragment> parse = new LinkedList<RuleFragment>();
 			Type t;
 			if (isAngle) {
-				if (id.equals(ROOT)) {
+				if (id.equals(Label.ROOT)) {
 					t = Type.root;
 				} else
 					t = Type.nonTerminal;
@@ -241,7 +237,7 @@ public class RuleParser {
 				return new Label(Label.Type.terminal, id);
 			} else if (c1 == '<' && c2 == '>') {
 				String id = s.substring(1, s.length() - 1);
-				if (id.equals(ROOT))
+				if (id.equals(Label.ROOT))
 					return new Label(Label.Type.root, id);
 				else
 					return new Label(Label.Type.nonTerminal, id);

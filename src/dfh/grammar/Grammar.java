@@ -1,9 +1,13 @@
 package dfh.grammar;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,6 +32,62 @@ import dfh.grammar.Label.Type;
  * @author David Houghton
  */
 public class Grammar implements Serializable {
+	/**
+	 * Basic line iterator interface so we can write basically the same
+	 * constructor for any sort of input.
+	 * <p>
+	 * <b>Creation date:</b> Mar 18, 2011
+	 * 
+	 * @author David Houghton
+	 * 
+	 */
+	private interface LineReader {
+		String readLine() throws IOException;
+
+		int lineNumber();
+	}
+
+	private static class BReader implements LineReader {
+		private final BufferedReader reader;
+		int lineNumber = 0;
+
+		BReader(BufferedReader reader) {
+			this.reader = reader;
+		}
+
+		@Override
+		public String readLine() throws IOException {
+			lineNumber++;
+			return reader.readLine();
+		}
+
+		@Override
+		public int lineNumber() {
+			return lineNumber;
+		}
+	}
+
+	private static class AReader implements LineReader {
+		private final String[] lines;
+		int index = 0;
+
+		AReader(String[] lines) {
+			this.lines = lines;
+		}
+
+		@Override
+		public String readLine() throws IOException {
+			if (index == lines.length)
+				return null;
+			return lines[index++];
+		}
+
+		@Override
+		public int lineNumber() {
+			return index;
+		}
+	}
+
 	private static final long serialVersionUID = 1L;
 	private final Label root;
 	private final Map<Label, Rule> rules;
@@ -37,27 +97,45 @@ public class Grammar implements Serializable {
 	 */
 	private final HashSet<Label> undefinedTerminals;
 
+	public Grammar(String[] lines) throws GrammarException, IOException {
+		this(new AReader(lines));
+	}
+
+	public Grammar(File f) throws GrammarException, FileNotFoundException,
+			IOException {
+		this(new FileReader(f));
+	}
+
+	public Grammar(InputStream is) throws GrammarException, IOException {
+		this(new InputStreamReader(is));
+	}
+
+	public Grammar(Reader r) throws GrammarException, IOException {
+		this(new BufferedReader(r));
+	}
+
+	public Grammar(BufferedReader r) throws GrammarException, IOException {
+		this(new BReader(r));
+	}
+
 	/**
 	 * @param in
 	 * @throws GrammarException
 	 * @throws IOException
 	 */
-	public Grammar(InputStream in) throws GrammarException, IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+	private Grammar(LineReader reader) throws GrammarException, IOException {
 		String line = null;
 		Map<Label, List<RuleFragment>> map = new HashMap<Label, List<RuleFragment>>();
-		int lineNumber = 1;
 		Label r = null;
 		while ((line = reader.readLine()) != null) {
 			List<RuleFragment> list = RuleParser.parse(line);
 			Label l = (Label) list.remove(0);
 			if (map.containsKey(l))
 				throw new GrammarException("rule " + l + " redefined at line "
-						+ lineNumber);
+						+ reader.lineNumber());
 			map.put(l, list);
 			if (l.t == Type.root)
 				r = l;
-			lineNumber++;
 		}
 		if (r == null)
 			throw new GrammarException("no root rule found");
@@ -73,14 +151,14 @@ public class Grammar implements Serializable {
 					.iterator(); i.hasNext();) {
 				Entry<Label, List<RuleFragment>> e = i.next();
 				Set<Label> labels = allLabels(e.getValue());
-				boolean defined = allLabels.isEmpty();
+				boolean defined = labels.isEmpty();
 				if (defined) {
 					terminals.add(e.getKey());
 					allLabels.add(e.getKey());
 				} else {
 					defined = true;
 					for (Label l : labels) {
-						if (!(rules.containsKey(l) || terminals.contains(l))) {
+						if (!(rules.containsKey(l) || l.t == Type.terminal)) {
 							defined = false;
 							break;
 						}

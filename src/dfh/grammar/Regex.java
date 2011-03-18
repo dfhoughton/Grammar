@@ -13,4 +13,9 @@ public class Regex implements RuleFragment {
 	public String stringify() {
 		return re.toString();
 	}
+
+	@Override
+	public String toString() {
+		return re.toString();
+	}
 }

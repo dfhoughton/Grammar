@@ -13,6 +13,10 @@ import java.io.Serializable;
 public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		Serializable {
 	private static final long serialVersionUID = 1L;
+	/**
+	 * label reserved for root rule label
+	 */
+	public static final String ROOT = "ROOT";
 
 	public enum Type {
 		/**
@@ -45,7 +49,7 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 
 	public Label(Type t, String id) {
 		this.t = t;
-		this.id = t == Type.root ? null : id;
+		this.id = id;
 	}
 
 	@Override
@@ -82,8 +86,19 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		b.append(t == Type.terminal ? '(' : '<');
 		b.append(id);
 		b.append(t == Type.terminal ? ')' : '>');
-		appendSuffix(b);
+		b.append(rep);
 		return b.toString();
+	}
+
+	@Override
+	public String toString() {
+		switch (t) {
+		case terminal:
+			return '(' + id + ')' + rep;
+		case root:
+		default:
+			return '<' + id + '>' + rep;
+		}
 	}
 
 }
