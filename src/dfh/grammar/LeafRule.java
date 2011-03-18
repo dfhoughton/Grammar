@@ -46,6 +46,11 @@ public class LeafRule extends Rule {
 		public boolean mightHaveNext() {
 			return cache.containsKey(offset);
 		}
+
+		@Override
+		public String toString() {
+			return "M:" + LeafRule.this;
+		}
 	}
 
 	private static final long serialVersionUID = 1L;

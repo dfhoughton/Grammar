@@ -260,14 +260,7 @@ public class Grammar implements Serializable {
 		Map<Label, Map<Integer, Node>> cache = offsetCache();
 		Matcher m = rules.get(root).matcher(s.toCharArray(), offset, null,
 				cache);
-		while (m.mightHaveNext()) {
-			Node n = m.match();
-			if (n == null)
-				break;
-			if (n.end() == s.length())
-				return n;
-		}
-		return null;
+		return m.match();
 	}
 
 	/**

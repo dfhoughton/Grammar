@@ -14,6 +14,7 @@ public abstract class NonterminalMatcher implements Matcher {
 	protected boolean done = false;
 	protected final Map<Label, Map<Integer, Node>> cache;
 	protected final Map<Integer, Node> subCache;
+	private final Label label;
 
 	protected NonterminalMatcher(char[] cs, int offset, Node parent,
 			Map<Label, Map<Integer, Node>> cache, Label label) {
@@ -21,6 +22,7 @@ public abstract class NonterminalMatcher implements Matcher {
 		this.offset = offset;
 		this.parent = parent;
 		this.cache = cache;
+		this.label = label;
 		this.subCache = cache.get(label);
 	}
 
@@ -49,4 +51,8 @@ public abstract class NonterminalMatcher implements Matcher {
 		return next != null;
 	}
 
+	@Override
+	public String toString() {
+		return "M:" + label.id;
+	}
 }
