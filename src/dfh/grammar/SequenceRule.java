@@ -57,8 +57,6 @@ public class SequenceRule extends Rule {
 				Node[] children = nodeStack
 						.toArray(new Node[sequence.length]);
 				next.setChildren(children);
-				if (!subCache.containsKey(offset))
-					subCache.put(offset, Node.dummy);
 			}
 		}
 	}

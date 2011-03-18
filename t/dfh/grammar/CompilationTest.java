@@ -7,14 +7,14 @@ public class CompilationTest {
 	public void compile() {
 		String[] rules = {
 				//
-				"<ROOT> = <a> (s) <b>", //
+				"<ROOT> = <a> | <b>", //
 				"<a> = (foo) (s) (bar)",//
 				"<b> = (quux) (s) (baz)",//
-				"(s) = \\s++",//
-				"(foo) = foo",//
-				"(bar) = bar",//
-				"(quux) = quux",//
-				"(baz) = baz",//
+				"(s) =\\s++",//
+				"(foo) =foo",//
+				"(bar) =bar",//
+				"(quux) =quux",//
+				"(baz) =baz",//
 		};
 		try {
 			@SuppressWarnings("unused")

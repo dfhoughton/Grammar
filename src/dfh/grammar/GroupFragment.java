@@ -14,9 +14,6 @@ import java.util.List;
 public class GroupFragment extends RepeatableRuleFragment {
 	List<List<RuleFragment>> alternates = new LinkedList<List<RuleFragment>>();
 	private List<RuleFragment> currentSequence = new LinkedList<RuleFragment>();
-	{
-		alternates.add(currentSequence);
-	}
 
 	public GroupFragment(List<RuleFragment> list) {
 		currentSequence.addAll(list);
@@ -36,8 +33,10 @@ public class GroupFragment extends RepeatableRuleFragment {
 	public void newSequence() throws GrammarException {
 		if (currentSequence.isEmpty())
 			throw new GrammarException("empty alternate");
-		else
+		else {
+			alternates.add(currentSequence);
 			currentSequence = new LinkedList<RuleFragment>();
+		}
 	}
 
 	/**
@@ -48,6 +47,8 @@ public class GroupFragment extends RepeatableRuleFragment {
 	public void done() throws GrammarException {
 		if (currentSequence.isEmpty())
 			throw new GrammarException("empty alternate");
+		alternates.add(currentSequence);
+		currentSequence = null;
 	}
 
 	@Override
@@ -95,7 +96,7 @@ public class GroupFragment extends RepeatableRuleFragment {
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		b.append('[');
-		for (List<RuleFragment> alternate: alternates) {
+		for (List<RuleFragment> alternate : alternates) {
 			if (b.length() > 1)
 				b.append('|');
 			appendAlternate(b, alternate);
@@ -107,7 +108,7 @@ public class GroupFragment extends RepeatableRuleFragment {
 
 	private void appendAlternate(StringBuilder b, List<RuleFragment> alternate) {
 		boolean nonFirst = false;
-		for (RuleFragment rf: alternate) {
+		for (RuleFragment rf : alternate) {
 			if (nonFirst)
 				b.append(' ');
 			else

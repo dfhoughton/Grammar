@@ -20,7 +20,7 @@ public class AlternationRule extends Rule {
 		@Override
 		protected void fetchNext() {
 			if (mostRecent == null)
-				mostRecent = alternates[index++].matcher(cs, index, parent,
+				mostRecent = alternates[index++].matcher(cs, offset, parent,
 						cache);
 			Node child = null;
 			OUTER: while (mostRecent.mightHaveNext()

@@ -12,7 +12,7 @@ public class SimpleMatchTest {
 	public static void setUpBeforeClass() throws Exception {
 		String[] rules = {
 				//
-				"<ROOT> = <a> (s) <b>", //
+				"<ROOT> = <a> | <b>", //
 				"<a> = (foo) (s) (bar)",//
 				"<b> = (quux) (s) (baz)",//
 				"(s) =\\s++",//
