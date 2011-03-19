@@ -28,7 +28,15 @@ public class SimpleMatchTest {
 	public void aTest() {
 		String s = "foo bar";
 		Node n = g.matches(s);
+		System.out.println(n);
 		assertNotNull("found 'foo bar'", n);
 	}
 
+	@Test
+	public void bTest() {
+		String s = "quux baz";
+		Node n = g.matches(s);
+		System.out.println(n);
+		assertNotNull("found 'quux baz'", n);
+	}
 }

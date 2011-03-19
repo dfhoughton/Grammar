@@ -30,7 +30,7 @@ public class AlternationRule extends Rule {
 					if (child != null)
 						break OUTER;
 				}
-				mostRecent = alternates[index++].matcher(cs, index, parent,
+				mostRecent = alternates[index++].matcher(cs, offset, parent,
 						cache);
 			}
 			if (child == null) {
