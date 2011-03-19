@@ -41,6 +41,21 @@ public class SimpleMatchTest {
 	}
 
 	@Test
+	public void abTest() {
+		String s = "quux baz  foo bar";
+		int count = 0;
+		for (int offset = 0; offset < s.length();) {
+			Node n = g.find(s, offset);
+			if (n == null)
+				break;
+			offset = n.end();
+			System.out.println(n);
+			count++;
+		}
+		assertTrue("found both matches in " + s, count == 2);
+	}
+
+	@Test
 	public void failureTest() {
 		String s = "quwerewr";
 		Node n = g.matches(s);

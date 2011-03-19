@@ -21,5 +21,5 @@ public interface Matcher {
 	 * @return whether the sequence this matcher is iterating over has reached
 	 *         its end
 	 */
-	public boolean mightHaveNext();
+	boolean mightHaveNext();
 }

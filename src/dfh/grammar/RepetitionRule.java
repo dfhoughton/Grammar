@@ -16,30 +16,55 @@ public class RepetitionRule extends Rule {
 	private final Rule r;
 	private final Repetition repetition;
 
-	private abstract class GreedyAndPossessive extends NonterminalMatcher {
+	abstract class GreedyAndPossessive extends NonterminalMatcher {
 
 		protected LinkedList<Node> matched;
+		protected LinkedList<Matcher> matchers;
+		private final boolean backtracks;
 
 		protected GreedyAndPossessive(char[] cs, int offset, Node parent,
-				Map<Label, Map<Integer, Node>> cache, Label label) {
+				Map<Label, Map<Integer, Node>> cache, Label label,
+				boolean backtracks) {
 			super(cs, offset, parent, cache, label);
+			this.backtracks = backtracks;
 		}
 
 		protected void initialize() {
 			matched = new LinkedList<Node>();
-			int start = offset;
+			matchers = new LinkedList<Matcher>();
 			while (matched.size() < repetition.top) {
-				Matcher m = r.matcher(cs, start, parent, cache);
-				Node n = m.match();
-				if (n == null)
+				if (grab())
 					break;
-				else {
-					start = n.end();
-					matched.add(n);
-				}
 			}
-			if (matched.size() < repetition.bottom)
+			if (matched.size() < repetition.bottom) {
 				matched.clear();
+				if (backtracks) {
+					matchers.clear();
+					matchers = null;
+				}
+			} else if (!backtracks) {
+				matchers.clear();
+				matchers = null;
+			}
+		}
+
+		protected boolean grab() {
+			int start = matched.isEmpty() ? offset : matched.peekLast().end();
+			Matcher m;
+			if (matchers.size() > matched.size())
+				m = matchers.peekLast();
+			else {
+				m = r.matcher(cs, start, parent, cache);
+				matchers.add(m);
+			}
+			Node n = m.match();
+			if (n == null) {
+				matchers.removeLast();
+				return true;
+			} else {
+				matched.add(n);
+				return false;
+			}
 		}
 
 	}
@@ -55,15 +80,26 @@ public class RepetitionRule extends Rule {
 	class GreedyMatcher extends GreedyAndPossessive {
 		protected GreedyMatcher(char[] cs, int offset, Node parent,
 				Map<Label, Map<Integer, Node>> cache, Label label) {
-			super(cs, offset, parent, cache, label);
+			super(cs, offset, parent, cache, label, true);
 		}
 
 		@Override
 		protected void fetchNext() {
 			if (matched == null)
 				initialize();
-			else
+			else {
 				matched.remove();
+				// see if we can find some other way forward
+				while (!matchers.isEmpty() && matched.size() < repetition.top) {
+					if (grab())
+						break;
+				}
+				if (matched.size() < repetition.bottom) {
+					matched.clear();
+					matchers.clear();
+					matchers = null;
+				}
+			}
 			if (matched.isEmpty()) {
 				next = null;
 				done = true;
@@ -127,7 +163,7 @@ public class RepetitionRule extends Rule {
 
 		protected PossessiveMatcher(char[] cs, int offset, Node parent,
 				Map<Label, Map<Integer, Node>> cache, Label label) {
-			super(cs, offset, parent, cache, label);
+			super(cs, offset, parent, cache, label, false);
 		}
 
 		@Override
