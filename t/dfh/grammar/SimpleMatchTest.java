@@ -39,4 +39,12 @@ public class SimpleMatchTest {
 		System.out.println(n);
 		assertNotNull("found 'quux baz'", n);
 	}
+
+	@Test
+	public void failureTest() {
+		String s = "quwerewr";
+		Node n = g.matches(s);
+		System.out.println(n);
+		assertNull("recognized non-match for " + s, n);
+	}
 }
