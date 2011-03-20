@@ -13,13 +13,13 @@ import java.util.regex.Pattern;
  */
 public class LeafRule extends Rule {
 	private class LeafMatcher implements Matcher {
-		private final Node parent;
+		private final Match parent;
 		private final int offset;
 		private final CharSequence chars;
-		private Map<Integer, Node> cache;
+		private Map<Integer, Match> cache;
 
-		public LeafMatcher(CharSequence s, int offset, Node parent,
-				Map<Label, Map<Integer, Node>> cache) {
+		public LeafMatcher(CharSequence s, int offset, Match parent,
+				Map<Label, Map<Integer, Match>> cache) {
 			this.chars = s;
 			this.parent = parent;
 			this.offset = offset;
@@ -27,7 +27,7 @@ public class LeafRule extends Rule {
 		}
 
 		@Override
-		public Node match() {
+		public Match match() {
 			if (cache.containsKey(offset)) {
 				return cache.get(offset);
 			}
@@ -35,9 +35,9 @@ public class LeafRule extends Rule {
 			m.region(offset, chars.length());
 			m.useTransparentBounds(true);
 			m.useAnchoringBounds(false);
-			Node n = null;
+			Match n = null;
 			if (m.lookingAt())
-				n = new Node(LeafRule.this, offset, m.end(), parent);
+				n = new Match(LeafRule.this, offset, m.end(), parent);
 			cache.put(offset, n);
 			return n;
 		}
@@ -67,8 +67,8 @@ public class LeafRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence s, final int offset, Node parent,
-			Map<Label, Map<Integer, Node>> cache) {
+	public Matcher matcher(CharSequence s, final int offset, Match parent,
+			Map<Label, Map<Integer, Match>> cache) {
 		return new LeafMatcher(s, offset, parent, cache);
 	}
 }

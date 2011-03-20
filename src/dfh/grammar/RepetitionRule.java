@@ -18,19 +18,19 @@ public class RepetitionRule extends Rule {
 
 	abstract class GreedyAndPossessive extends NonterminalMatcher {
 
-		protected LinkedList<Node> matched;
+		protected LinkedList<Match> matched;
 		protected LinkedList<Matcher> matchers;
 		private final boolean backtracks;
 
-		protected GreedyAndPossessive(CharSequence cs, int offset, Node parent,
-				Map<Label, Map<Integer, Node>> cache, Label label,
-				boolean backtracks) {
+		protected GreedyAndPossessive(CharSequence cs, int offset,
+				Match parent, Map<Label, Map<Integer, Match>> cache,
+				Label label, boolean backtracks) {
 			super(cs, offset, parent, cache, label);
 			this.backtracks = backtracks;
 		}
 
 		protected void initialize() {
-			matched = new LinkedList<Node>();
+			matched = new LinkedList<Match>();
 			matchers = new LinkedList<Matcher>();
 			while (matched.size() < repetition.top) {
 				if (grab())
@@ -57,7 +57,7 @@ public class RepetitionRule extends Rule {
 				m = r.matcher(cs, start, parent, cache);
 				matchers.add(m);
 			}
-			Node n = m.match();
+			Match n = m.match();
 			if (n == null) {
 				matchers.removeLast();
 				return true;
@@ -80,8 +80,8 @@ public class RepetitionRule extends Rule {
 	 * 
 	 */
 	class GreedyMatcher extends GreedyAndPossessive {
-		protected GreedyMatcher(CharSequence cs, int offset, Node parent,
-				Map<Label, Map<Integer, Node>> cache, Label label) {
+		protected GreedyMatcher(CharSequence cs, int offset, Match parent,
+				Map<Label, Map<Integer, Match>> cache, Label label) {
 			super(cs, offset, parent, cache, label, true);
 		}
 
@@ -106,8 +106,8 @@ public class RepetitionRule extends Rule {
 				next = null;
 				done = true;
 			} else {
-				Node[] children = matched.toArray(new Node[matched.size()]);
-				next = new Node(RepetitionRule.this, offset, parent);
+				Match[] children = matched.toArray(new Match[matched.size()]);
+				next = new Match(RepetitionRule.this, offset, parent);
 				next.setChildren(children);
 				next.setEnd(matched.peek().end());
 			}
@@ -117,21 +117,21 @@ public class RepetitionRule extends Rule {
 
 	private class StingyMatcher extends NonterminalMatcher {
 		private LinkedList<Matcher> matchers = new LinkedList<Matcher>();
-		private LinkedList<Node> nodes = new LinkedList<Node>();
+		private LinkedList<Match> nodes = new LinkedList<Match>();
 
-		protected StingyMatcher(CharSequence cs, int offset, Node parent,
-				Map<Label, Map<Integer, Node>> cache, Label label) {
+		protected StingyMatcher(CharSequence cs, int offset, Match parent,
+				Map<Label, Map<Integer, Match>> cache, Label label) {
 			super(cs, offset, parent, cache, label);
 			matchers.add(r.matcher(cs, offset, parent, cache));
 		}
 
 		@Override
 		protected void fetchNext() {
-			next = new Node(RepetitionRule.this, offset, parent);
+			next = new Match(RepetitionRule.this, offset, parent);
 			while (next != null || nodes.size() < repetition.bottom) {
 				Matcher m = matchers.peekLast();
 				if (m.mightHaveNext()) {
-					Node n = m.match();
+					Match n = m.match();
 					if (n == null) {
 						decrement();
 					} else {
@@ -168,8 +168,8 @@ public class RepetitionRule extends Rule {
 
 	private class PossessiveMatcher extends GreedyAndPossessive {
 
-		protected PossessiveMatcher(CharSequence cs, int offset, Node parent,
-				Map<Label, Map<Integer, Node>> cache, Label label) {
+		protected PossessiveMatcher(CharSequence cs, int offset, Match parent,
+				Map<Label, Map<Integer, Match>> cache, Label label) {
 			super(cs, offset, parent, cache, label, false);
 		}
 
@@ -182,8 +182,9 @@ public class RepetitionRule extends Rule {
 					matched = null;
 					next = null;
 				} else {
-					next = new Node(RepetitionRule.this, offset, parent);
-					Node[] children = matched.toArray(new Node[matched.size()]);
+					next = new Match(RepetitionRule.this, offset, parent);
+					Match[] children = matched
+							.toArray(new Match[matched.size()]);
 					next.setChildren(children);
 					next.setEnd(matched.peek().end());
 				}
@@ -203,8 +204,8 @@ public class RepetitionRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence cs, int offset, Node parent,
-			Map<Label, Map<Integer, Node>> cache) {
+	public Matcher matcher(CharSequence cs, int offset, Match parent,
+			Map<Label, Map<Integer, Match>> cache) {
 		switch (repetition.t) {
 		case possessive:
 			return new PossessiveMatcher(cs, offset, parent, cache, label);

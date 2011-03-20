@@ -28,7 +28,7 @@ public class SimpleMatchTest {
 	public void aTest() {
 		String s = "foo bar";
 		Matcher m = g.matches(s);
-		Node n = m.match();
+		Match n = m.match();
 		System.out.println(n);
 		assertNotNull("found 'foo bar'", n);
 	}
@@ -37,7 +37,7 @@ public class SimpleMatchTest {
 	public void bTest() {
 		String s = "quux baz";
 		Matcher m = g.matches(s);
-		Node n = m.match();
+		Match n = m.match();
 		System.out.println(n);
 		assertNotNull("found 'quux baz'", n);
 	}
@@ -47,7 +47,7 @@ public class SimpleMatchTest {
 		String s = "quux baz  foo bar";
 		int count = 0;
 		Matcher m = g.find(s);
-		Node n;
+		Match n;
 		while (count < 3 && (n = m.match()) != null) {
 			System.out.println(n);
 			count++;
@@ -59,7 +59,7 @@ public class SimpleMatchTest {
 	public void failureTest() {
 		String s = "quwerewr";
 		Matcher m = g.matches(s);
-		Node n = m.match();
+		Match n = m.match();
 		System.out.println(n);
 		assertNull("recognized non-match for " + s, n);
 	}

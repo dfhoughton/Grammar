@@ -12,10 +12,10 @@ public class SequenceRule extends Rule {
 
 	class SequenceMatcher extends NonterminalMatcher {
 		LinkedList<Matcher> matcherStack = new LinkedList<Matcher>();
-		LinkedList<Node> nodeStack = new LinkedList<Node>();
+		LinkedList<Match> nodeStack = new LinkedList<Match>();
 
-		public SequenceMatcher(CharSequence cs, int offset, Node parent,
-				Map<Label, Map<Integer, Node>> cache) {
+		public SequenceMatcher(CharSequence cs, int offset, Match parent,
+				Map<Label, Map<Integer, Match>> cache) {
 			super(cs, offset, parent, cache, label);
 		}
 
@@ -35,7 +35,7 @@ public class SequenceRule extends Rule {
 					return;
 				}
 			}
-			next = new Node(SequenceRule.this, offset, parent);
+			next = new Match(SequenceRule.this, offset, parent);
 			while (nodeStack.size() < sequence.length) {
 				Matcher m;
 				if (matcherStack.isEmpty()) {
@@ -43,7 +43,7 @@ public class SequenceRule extends Rule {
 					matcherStack.add(m);
 				} else
 					m = matcherStack.peekLast();
-				Node n = m.match();
+				Match n = m.match();
 				if (n == null) {
 					matcherStack.removeLast();
 					if (!nodeStack.isEmpty())
@@ -66,7 +66,8 @@ public class SequenceRule extends Rule {
 			}
 			if (next != null) {
 				next.setEnd(nodeStack.peekLast().end());
-				Node[] children = nodeStack.toArray(new Node[sequence.length]);
+				Match[] children = nodeStack
+						.toArray(new Match[sequence.length]);
 				next.setChildren(children);
 			}
 		}
@@ -128,8 +129,8 @@ public class SequenceRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence cs, int offset, Node parent,
-			Map<Label, Map<Integer, Node>> cache) {
+	public Matcher matcher(CharSequence cs, int offset, Match parent,
+			Map<Label, Map<Integer, Match>> cache) {
 		return new SequenceMatcher(cs, offset, parent, cache);
 	}
 

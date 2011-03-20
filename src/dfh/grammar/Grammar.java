@@ -269,20 +269,19 @@ public class Grammar implements Serializable {
 	public Matcher matches(final CharSequence s, final int offset,
 			final boolean noOverlap) throws GrammarException {
 		checkComplete();
-		final Map<Label, Map<Integer, Node>> cache = offsetCache();
-		final Matcher m = rules.get(root).matcher(s, offset,
-				null, cache);
+		final Map<Label, Map<Integer, Match>> cache = offsetCache();
+		final Matcher m = rules.get(root).matcher(s, offset, null, cache);
 		return new Matcher() {
 			boolean matchedOnce = false;
-			Node next = fetchNext();
+			Match next = fetchNext();
 
 			@Override
 			public boolean mightHaveNext() {
 				return noOverlap && matchedOnce || next != null;
 			}
 
-			private Node fetchNext() {
-				Node n;
+			private Match fetchNext() {
+				Match n;
 				while ((n = m.match()) != null) {
 					if (n.end() == s.length())
 						return n;
@@ -291,9 +290,9 @@ public class Grammar implements Serializable {
 			}
 
 			@Override
-			public synchronized Node match() {
+			public synchronized Match match() {
 				if (mightHaveNext()) {
-					Node n = next;
+					Match n = next;
 					next = fetchNext();
 					matchedOnce = true;
 					return n;
@@ -332,7 +331,8 @@ public class Grammar implements Serializable {
 		return lookingAt(s, 0, true);
 	}
 
-	public Matcher lookingAt(CharSequence s, int offset) throws GrammarException {
+	public Matcher lookingAt(CharSequence s, int offset)
+			throws GrammarException {
 		return lookingAt(s, offset, true);
 	}
 
@@ -344,8 +344,8 @@ public class Grammar implements Serializable {
 	public Matcher lookingAt(final CharSequence s, final int offset,
 			final boolean noOverlap) throws GrammarException {
 		checkComplete();
-		final Matcher m = rules.get(root).matcher(s, offset,
-				null, offsetCache());
+		final Matcher m = rules.get(root).matcher(s, offset, null,
+				offsetCache());
 		// synchronization wrappers
 		return noOverlap ? new Matcher() {
 			boolean matchedOnce = false;
@@ -361,8 +361,8 @@ public class Grammar implements Serializable {
 			}
 
 			@Override
-			public synchronized Node match() {
-				Node n = m.match();
+			public synchronized Match match() {
+				Match n = m.match();
 				matchedOnce = true;
 				return n;
 			}
@@ -379,7 +379,7 @@ public class Grammar implements Serializable {
 			}
 
 			@Override
-			public synchronized Node match() {
+			public synchronized Match match() {
 				return m.match();
 			}
 		};
@@ -393,7 +393,8 @@ public class Grammar implements Serializable {
 		return find(s, offset, true);
 	}
 
-	public Matcher find(CharSequence s, boolean allowOverlap) throws GrammarException {
+	public Matcher find(CharSequence s, boolean allowOverlap)
+			throws GrammarException {
 		return find(s, 0, !allowOverlap);
 	}
 
@@ -408,27 +409,27 @@ public class Grammar implements Serializable {
 	public Matcher find(final CharSequence s, final int offset,
 			final boolean noOverlap) throws GrammarException {
 		checkComplete();
-		final Map<Label, Map<Integer, Node>> cache = offsetCache();
+		final Map<Label, Map<Integer, Match>> cache = offsetCache();
 		return new Matcher() {
 			int index = offset;
 			boolean firstMatch = true;
 			Matcher m = rules.get(root).matcher(s, index, null, cache);
-			Node next = fetchNext();
+			Match next = fetchNext();
 
 			@Override
-			public synchronized Node match() {
+			public synchronized Match match() {
 				if (mightHaveNext()) {
-					Node n = next;
+					Match n = next;
 					next = fetchNext();
 					return n;
 				}
 				return null;
 			}
 
-			private Node fetchNext() {
+			private Match fetchNext() {
 				boolean firstNull = true;
 				while (true) {
-					Node n;
+					Match n;
 					if (firstMatch) {
 						n = m.match();
 						firstMatch = false;
@@ -469,11 +470,11 @@ public class Grammar implements Serializable {
 	 * @return map from labels to sets of offsets where the associated rules are
 	 *         known not to match
 	 */
-	private Map<Label, Map<Integer, Node>> offsetCache() {
-		Map<Label, Map<Integer, Node>> offsetCache = new HashMap<Label, Map<Integer, Node>>(
+	private Map<Label, Map<Integer, Match>> offsetCache() {
+		Map<Label, Map<Integer, Match>> offsetCache = new HashMap<Label, Map<Integer, Match>>(
 				rules.size());
 		for (Label l : rules.keySet()) {
-			offsetCache.put(l, new TreeMap<Integer, Node>());
+			offsetCache.put(l, new TreeMap<Integer, Match>());
 		}
 		return offsetCache;
 	}

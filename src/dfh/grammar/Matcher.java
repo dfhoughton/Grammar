@@ -19,7 +19,7 @@ public interface Matcher {
 	 * @param offsetCache
 	 * @return next parse tree or null if no parse tree is possible
 	 */
-	public Node match();
+	public Match match();
 
 	/**
 	 * Tests whether iteration is possible without iterating. For most purposes
@@ -27,7 +27,7 @@ public interface Matcher {
 	 * instead:
 	 * 
 	 * <pre>
-	 * Node n;
+	 * Match n;
 	 * while ((n = m.match()) != null) {
 	 * 	// do something with n
 	 * }

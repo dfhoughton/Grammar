@@ -5,19 +5,19 @@ import java.util.Map;
 public abstract class NonterminalMatcher implements Matcher {
 
 	protected final int offset;
-	protected final Node parent;
+	protected final Match parent;
 
 	protected abstract void fetchNext();
 
 	protected final CharSequence cs;
-	protected Node next;
+	protected Match next;
 	protected boolean done = false;
-	protected final Map<Label, Map<Integer, Node>> cache;
-	protected final Map<Integer, Node> subCache;
+	protected final Map<Label, Map<Integer, Match>> cache;
+	protected final Map<Integer, Match> subCache;
 	private final Label label;
 
-	protected NonterminalMatcher(CharSequence cs2, int offset, Node parent,
-			Map<Label, Map<Integer, Node>> cache, Label label) {
+	protected NonterminalMatcher(CharSequence cs2, int offset, Match parent,
+			Map<Label, Map<Integer, Match>> cache, Label label) {
 		this.cs = cs2;
 		this.offset = offset;
 		this.parent = parent;
@@ -27,7 +27,7 @@ public abstract class NonterminalMatcher implements Matcher {
 	}
 
 	@Override
-	public Node match() {
+	public Match match() {
 		if (done)
 			return null;
 		boolean alreadyMatched = subCache.containsKey(offset);
@@ -36,8 +36,8 @@ public abstract class NonterminalMatcher implements Matcher {
 		if (next == null)
 			fetchNext();
 		if (!alreadyMatched)
-			subCache.put(offset, next == null ? null : Node.dummy);
-		Node n = next;
+			subCache.put(offset, next == null ? null : Match.dummy);
+		Match n = next;
 		next = null;
 		return n;
 	}
