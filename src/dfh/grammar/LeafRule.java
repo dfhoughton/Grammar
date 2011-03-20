@@ -51,6 +51,11 @@ public class LeafRule extends Rule {
 		public String toString() {
 			return "M:" + LeafRule.this;
 		}
+
+		@Override
+		public Rule rule() {
+			return LeafRule.this;
+		}
 	}
 
 	private static final long serialVersionUID = 1L;

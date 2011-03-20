@@ -20,17 +20,17 @@ public class AlternationRule extends Rule {
 		@Override
 		protected void fetchNext() {
 			if (mostRecent == null)
-				mostRecent = alternates[index++].matcher(cs, offset, parent,
+				mostRecent = alternates[index].matcher(cs, offset, parent,
 						cache);
 			Node child = null;
 			OUTER: while (mostRecent.mightHaveNext()
-					|| index < alternates.length) {
+					|| ++index < alternates.length) {
 				while (mostRecent.mightHaveNext()) {
 					child = mostRecent.match();
 					if (child != null)
 						break OUTER;
 				}
-				mostRecent = alternates[index++].matcher(cs, offset, parent,
+				mostRecent = alternates[index].matcher(cs, offset, parent,
 						cache);
 			}
 			if (child == null) {
@@ -42,6 +42,11 @@ public class AlternationRule extends Rule {
 				next.setChildren(children);
 				next.setEnd(child.end());
 			}
+		}
+
+		@Override
+		public Rule rule() {
+			return AlternationRule.this;
 		}
 	}
 

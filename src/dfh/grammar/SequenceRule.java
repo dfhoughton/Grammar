@@ -21,8 +21,20 @@ public class SequenceRule extends Rule {
 
 		@Override
 		protected void fetchNext() {
-			if (nodeStack.size() > 0)
-				nodeStack.removeLast();
+			if (nodeStack.size() > 0) {
+				while (!nodeStack.isEmpty()) {
+					nodeStack.removeLast();
+					if (matcherStack.peekLast().rule() instanceof LeafRule)
+						matcherStack.removeLast();
+					else
+						break;
+				}
+				if (matcherStack.isEmpty()) {
+					next = null;
+					done = true;
+					return;
+				}
+			}
 			next = new Node(SequenceRule.this, offset, parent);
 			while (nodeStack.size() < sequence.length) {
 				Matcher m;
@@ -54,10 +66,14 @@ public class SequenceRule extends Rule {
 			}
 			if (next != null) {
 				next.setEnd(nodeStack.peekLast().end());
-				Node[] children = nodeStack
-						.toArray(new Node[sequence.length]);
+				Node[] children = nodeStack.toArray(new Node[sequence.length]);
 				next.setChildren(children);
 			}
+		}
+
+		@Override
+		public Rule rule() {
+			return SequenceRule.this;
 		}
 	}
 

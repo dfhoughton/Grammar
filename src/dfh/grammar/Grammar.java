@@ -242,7 +242,7 @@ public class Grammar implements Serializable {
 		return new SequenceRule(l, value, rules);
 	}
 
-	public Node matches(String s) throws GrammarException {
+	public Matcher matches(String s) throws GrammarException {
 		return matches(s, 0);
 	}
 
@@ -255,12 +255,44 @@ public class Grammar implements Serializable {
 	 * @return
 	 * @throws GrammarException
 	 */
-	public Node matches(String s, int offset) throws GrammarException {
+	public Matcher matches(final String s, final int offset)
+			throws GrammarException {
 		checkComplete();
-		Map<Label, Map<Integer, Node>> cache = offsetCache();
-		Matcher m = rules.get(root).matcher(s.toCharArray(), offset, null,
-				cache);
-		return m.match();
+		final Map<Label, Map<Integer, Node>> cache = offsetCache();
+		final Matcher m = rules.get(root).matcher(s.toCharArray(), offset,
+				null, cache);
+		return new Matcher() {
+			Node next = fetchNext();
+
+			@Override
+			public boolean mightHaveNext() {
+				return next != null;
+			}
+
+			private Node fetchNext() {
+				Node n;
+				while ((n = m.match()) != null) {
+					if (n.end() == s.length())
+						return n;
+				}
+				return null;
+			}
+
+			@Override
+			public synchronized Node match() {
+				if (mightHaveNext()) {
+					Node n = next;
+					next = fetchNext();
+					return n;
+				}
+				return null;
+			}
+
+			@Override
+			public Rule rule() {
+				return null;
+			}
+		};
 	}
 
 	/**
@@ -283,18 +315,36 @@ public class Grammar implements Serializable {
 		}
 	}
 
-	public Node lookingAt(String s) throws GrammarException {
+	public Matcher lookingAt(String s) throws GrammarException {
 		return lookingAt(s, 0);
 	}
 
-	public Node lookingAt(String s, final int offset) throws GrammarException {
+	public Matcher lookingAt(final String s, final int offset)
+			throws GrammarException {
 		checkComplete();
-		Matcher m = rules.get(root).matcher(s.toCharArray(), offset, null,
-				offsetCache());
-		return m.match();
+		final Matcher m = rules.get(root).matcher(s.toCharArray(), offset,
+				null, offsetCache());
+		// synchronization wrapper
+		return new Matcher() {
+
+			@Override
+			public Rule rule() {
+				return m.rule();
+			}
+
+			@Override
+			public synchronized boolean mightHaveNext() {
+				return m.mightHaveNext();
+			}
+
+			@Override
+			public synchronized Node match() {
+				return m.match();
+			}
+		};
 	}
 
-	public Node find(String s) throws GrammarException {
+	public Matcher find(String s) throws GrammarException {
 		return find(s, 0);
 	}
 
@@ -306,17 +356,49 @@ public class Grammar implements Serializable {
 	 * @return
 	 * @throws GrammarException
 	 */
-	public Node find(String s, final int offset) throws GrammarException {
+	public Matcher find(final String s, final int offset)
+			throws GrammarException {
 		checkComplete();
-		Map<Label, Map<Integer, Node>> cache = offsetCache();
-		char[] chars = s.toCharArray();
-		for (int i = offset; i < s.length(); i++) {
-			Matcher m = rules.get(root).matcher(chars, i, null, cache);
-			Node n = m.match();
-			if (n != null)
-				return n;
-		}
-		return null;
+		final Map<Label, Map<Integer, Node>> cache = offsetCache();
+		final char[] chars = s.toCharArray();
+		return new Matcher() {
+			int index = offset;
+			Matcher m = rules.get(root).matcher(chars, index, null, cache);
+			Node next = fetchNext();
+
+			@Override
+			public synchronized Node match() {
+				if (mightHaveNext()) {
+					Node n = next;
+					next = fetchNext();
+					return n;
+				}
+				return null;
+			}
+
+			private Node fetchNext() {
+				while (true) {
+					Node n = m.match();
+					if (n != null)
+						return n;
+					index++;
+					if (index == s.length())
+						break;
+					m = rules.get(root).matcher(chars, index, null, cache);
+				}
+				return null;
+			}
+
+			@Override
+			public boolean mightHaveNext() {
+				return next != null;
+			}
+
+			@Override
+			public Rule rule() {
+				return null;
+			}
+		};
 	}
 
 	/**

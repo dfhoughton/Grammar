@@ -67,11 +67,13 @@ public class RepetitionRule extends Rule {
 			}
 		}
 
+		@Override
+		public Rule rule() {
+			return RepetitionRule.this;
+		}
 	}
 
 	/**
-	 * TODO: make this iterate over the matches of sub-rules
-	 * <p>
 	 * <b>Creation date:</b> Mar 17, 2011
 	 * 
 	 * @author David Houghton
@@ -155,6 +157,11 @@ public class RepetitionRule extends Rule {
 			} else {
 				nodes.removeLast();
 			}
+		}
+
+		@Override
+		public Rule rule() {
+			return RepetitionRule.this;
 		}
 
 	}
