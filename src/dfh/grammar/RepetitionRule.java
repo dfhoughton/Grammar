@@ -189,7 +189,7 @@ public class RepetitionRule extends Rule {
 					Match[] children = matched
 							.toArray(new Match[matched.size()]);
 					next.setChildren(children);
-					next.setEnd(matched.peek().end());
+					next.setEnd(matched.peekLast().end());
 				}
 			} else {
 				done = true;
