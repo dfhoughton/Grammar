@@ -37,7 +37,7 @@ public class LeafRule extends Rule {
 			m.useAnchoringBounds(false);
 			Node n = null;
 			if (m.lookingAt())
-				n = new Node(LeafRule.this, offset, m.end() + offset, parent);
+				n = new Node(LeafRule.this, offset, m.end(), parent);
 			cache.put(offset, n);
 			return n;
 		}
