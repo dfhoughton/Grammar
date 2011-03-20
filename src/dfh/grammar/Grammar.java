@@ -129,6 +129,8 @@ public class Grammar implements Serializable {
 		Label r = null;
 		while ((line = reader.readLine()) != null) {
 			List<RuleFragment> list = RuleParser.parse(line);
+			if (list == null)
+				continue; // blank line or comment
 			Label l = (Label) list.remove(0);
 			if (map.containsKey(l))
 				throw new GrammarException("rule " + l + " redefined at line "

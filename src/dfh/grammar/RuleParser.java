@@ -32,6 +32,12 @@ public class RuleParser {
 			.compile("(?:([?*+]|\\{\\d*+(?:,\\d*+)?\\})([+?]?+))?+");
 
 	/**
+	 * Pattern for comments and blank lines.
+	 */
+	public static final Pattern ignorePattern = Pattern
+			.compile("^\\s*+(?:#.*)?$");
+
+	/**
 	 * Parses a line of the string representation of a grammar. Does
 	 * tokenization and parsing but does not check completeness of rule set.
 	 * 
@@ -43,6 +49,8 @@ public class RuleParser {
 	public static List<RuleFragment> parse(String line) throws GrammarException {
 		if (line == null)
 			throw new GrammarException("cannot parse nulls");
+		if (ignorePattern.matcher(line).matches())
+			return null;
 		Matcher m = basePattern.matcher(line);
 		if (m.matches()) {
 			boolean isAngle = m.group(1).equals("<");
