@@ -119,4 +119,37 @@ public class RepetitionTest {
 		assertNotNull("greedy asterisk allowed backtracking", n);
 	}
 
+	@Test
+	public void countTest() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = (a){3}",//
+				"(a) =a",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "aaaaa";
+		Matcher m = g.lookingAt(s);
+		Match n = m.match();
+		System.out.println(n);
+		assertTrue("matched an exact number", n.end() == 3);
+	}
+
+	@Test
+	public void noLowerLimitCountTest() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = <a> <b>",//
+				"<a> = (a){,2}",//
+				"<b> = (a) (b)",//
+				"(a) =a",//
+				"(b) =b",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "aab";
+		Matcher m = g.lookingAt(s);
+		Match n = m.match();
+		System.out.println(n);
+		assertNotNull("{,2} worked", n);
+	}
+
 }
