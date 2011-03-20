@@ -90,11 +90,14 @@ public class RepetitionRule extends Rule {
 			if (matched == null)
 				initialize();
 			else {
-				matched.remove();
+				matched.removeLast();
 				// see if we can find some other way forward
-				while (!matchers.isEmpty() && matched.size() < repetition.top) {
-					if (grab())
-						break;
+				if (!(matchers.peekLast().rule() instanceof LeafRule)) {
+					while (!matchers.isEmpty()
+							&& matched.size() < repetition.top) {
+						if (grab())
+							break;
+					}
 				}
 				if (matched.size() < repetition.bottom) {
 					matched.clear();

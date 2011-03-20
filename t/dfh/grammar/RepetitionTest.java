@@ -84,7 +84,7 @@ public class RepetitionTest {
 	}
 
 	@Test
-	public void greedTest() throws GrammarException, IOException {
+	public void possessivenessTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
 				"<ROOT> = <a> <b>",//
@@ -98,7 +98,25 @@ public class RepetitionTest {
 		Matcher m = g.lookingAt(s);
 		Match n = m.match();
 		System.out.println(n);
-		assertNull("greediness caused match to fail", n);
+		assertNull("possessiveness caused match to fail", n);
+	}
+
+	@Test
+	public void greedTest() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = <a> <b>",//
+				"<a> = (a)+",//
+				"<b> = (a) (b)",//
+				"(a) =a",//
+				"(b) =b",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "aab";
+		Matcher m = g.lookingAt(s);
+		Match n = m.match();
+		System.out.println(n);
+		assertNotNull("greedy asterisk allowed backtracking", n);
 	}
 
 }
