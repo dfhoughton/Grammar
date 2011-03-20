@@ -9,16 +9,16 @@ public abstract class NonterminalMatcher implements Matcher {
 
 	protected abstract void fetchNext();
 
-	protected final char[] cs;
+	protected final CharSequence cs;
 	protected Node next;
 	protected boolean done = false;
 	protected final Map<Label, Map<Integer, Node>> cache;
 	protected final Map<Integer, Node> subCache;
 	private final Label label;
 
-	protected NonterminalMatcher(char[] cs, int offset, Node parent,
+	protected NonterminalMatcher(CharSequence cs2, int offset, Node parent,
 			Map<Label, Map<Integer, Node>> cache, Label label) {
-		this.cs = cs;
+		this.cs = cs2;
 		this.offset = offset;
 		this.parent = parent;
 		this.cache = cache;

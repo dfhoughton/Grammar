@@ -14,7 +14,7 @@ public class SequenceRule extends Rule {
 		LinkedList<Matcher> matcherStack = new LinkedList<Matcher>();
 		LinkedList<Node> nodeStack = new LinkedList<Node>();
 
-		public SequenceMatcher(char[] cs, int offset, Node parent,
+		public SequenceMatcher(CharSequence cs, int offset, Node parent,
 				Map<Label, Map<Integer, Node>> cache) {
 			super(cs, offset, parent, cache, label);
 		}
@@ -128,7 +128,7 @@ public class SequenceRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(char[] cs, int offset, Node parent,
+	public Matcher matcher(CharSequence cs, int offset, Node parent,
 			Map<Label, Map<Integer, Node>> cache) {
 		return new SequenceMatcher(cs, offset, parent, cache);
 	}

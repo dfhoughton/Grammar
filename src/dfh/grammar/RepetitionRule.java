@@ -22,7 +22,7 @@ public class RepetitionRule extends Rule {
 		protected LinkedList<Matcher> matchers;
 		private final boolean backtracks;
 
-		protected GreedyAndPossessive(char[] cs, int offset, Node parent,
+		protected GreedyAndPossessive(CharSequence cs, int offset, Node parent,
 				Map<Label, Map<Integer, Node>> cache, Label label,
 				boolean backtracks) {
 			super(cs, offset, parent, cache, label);
@@ -80,7 +80,7 @@ public class RepetitionRule extends Rule {
 	 * 
 	 */
 	class GreedyMatcher extends GreedyAndPossessive {
-		protected GreedyMatcher(char[] cs, int offset, Node parent,
+		protected GreedyMatcher(CharSequence cs, int offset, Node parent,
 				Map<Label, Map<Integer, Node>> cache, Label label) {
 			super(cs, offset, parent, cache, label, true);
 		}
@@ -119,7 +119,7 @@ public class RepetitionRule extends Rule {
 		private LinkedList<Matcher> matchers = new LinkedList<Matcher>();
 		private LinkedList<Node> nodes = new LinkedList<Node>();
 
-		protected StingyMatcher(char[] cs, int offset, Node parent,
+		protected StingyMatcher(CharSequence cs, int offset, Node parent,
 				Map<Label, Map<Integer, Node>> cache, Label label) {
 			super(cs, offset, parent, cache, label);
 			matchers.add(r.matcher(cs, offset, parent, cache));
@@ -168,7 +168,7 @@ public class RepetitionRule extends Rule {
 
 	private class PossessiveMatcher extends GreedyAndPossessive {
 
-		protected PossessiveMatcher(char[] cs, int offset, Node parent,
+		protected PossessiveMatcher(CharSequence cs, int offset, Node parent,
 				Map<Label, Map<Integer, Node>> cache, Label label) {
 			super(cs, offset, parent, cache, label, false);
 		}
@@ -203,7 +203,7 @@ public class RepetitionRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(char[] cs, int offset, Node parent,
+	public Matcher matcher(CharSequence cs, int offset, Node parent,
 			Map<Label, Map<Integer, Node>> cache) {
 		switch (repetition.t) {
 		case possessive:

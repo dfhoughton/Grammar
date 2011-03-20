@@ -12,7 +12,7 @@ public class AlternationRule extends Rule {
 		int index = 0;
 		Matcher mostRecent = null;
 
-		public AlternationMatcher(char[] cs, int offset, Node parent,
+		public AlternationMatcher(CharSequence cs, int offset, Node parent,
 				Map<Label, Map<Integer, Node>> cache) {
 			super(cs, offset, parent, cache, label);
 		}
@@ -113,7 +113,7 @@ public class AlternationRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(char[] cs, int offset, Node parent,
+	public Matcher matcher(CharSequence cs, int offset, Node parent,
 			Map<Label, Map<Integer, Node>> cache) {
 		return new AlternationMatcher(cs, offset, parent, cache);
 	}

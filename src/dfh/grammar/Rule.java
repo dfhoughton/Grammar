@@ -22,7 +22,7 @@ public abstract class Rule implements Serializable {
 		return label;
 	}
 
-	public abstract Matcher matcher(char[] cs, int offset, Node parent,
+	public abstract Matcher matcher(CharSequence s, int offset, Node parent,
 			Map<Label, Map<Integer, Node>> cache);
 
 	@Override

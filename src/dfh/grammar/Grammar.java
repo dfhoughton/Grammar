@@ -244,15 +244,15 @@ public class Grammar implements Serializable {
 		return new SequenceRule(l, value, rules);
 	}
 
-	public Matcher matches(String s) throws GrammarException {
+	public Matcher matches(CharSequence s) throws GrammarException {
 		return matches(s, 0, true);
 	}
 
-	public Matcher matches(String s, int offset) throws GrammarException {
+	public Matcher matches(CharSequence s, int offset) throws GrammarException {
 		return matches(s, offset, true);
 	}
 
-	public Matcher matches(String s, boolean allowOverlap)
+	public Matcher matches(CharSequence s, boolean allowOverlap)
 			throws GrammarException {
 		return matches(s, 0, !allowOverlap);
 	}
@@ -266,11 +266,11 @@ public class Grammar implements Serializable {
 	 * @return
 	 * @throws GrammarException
 	 */
-	public Matcher matches(final String s, final int offset,
+	public Matcher matches(final CharSequence s, final int offset,
 			final boolean noOverlap) throws GrammarException {
 		checkComplete();
 		final Map<Label, Map<Integer, Node>> cache = offsetCache();
-		final Matcher m = rules.get(root).matcher(s.toCharArray(), offset,
+		final Matcher m = rules.get(root).matcher(s, offset,
 				null, cache);
 		return new Matcher() {
 			boolean matchedOnce = false;
@@ -328,23 +328,23 @@ public class Grammar implements Serializable {
 		}
 	}
 
-	public Matcher lookingAt(String s) throws GrammarException {
+	public Matcher lookingAt(CharSequence s) throws GrammarException {
 		return lookingAt(s, 0, true);
 	}
 
-	public Matcher lookingAt(String s, int offset) throws GrammarException {
+	public Matcher lookingAt(CharSequence s, int offset) throws GrammarException {
 		return lookingAt(s, offset, true);
 	}
 
-	public Matcher lookingAt(String s, boolean allowOverlap)
+	public Matcher lookingAt(CharSequence s, boolean allowOverlap)
 			throws GrammarException {
 		return lookingAt(s, 0, !allowOverlap);
 	}
 
-	public Matcher lookingAt(final String s, final int offset,
+	public Matcher lookingAt(final CharSequence s, final int offset,
 			final boolean noOverlap) throws GrammarException {
 		checkComplete();
-		final Matcher m = rules.get(root).matcher(s.toCharArray(), offset,
+		final Matcher m = rules.get(root).matcher(s, offset,
 				null, offsetCache());
 		// synchronization wrappers
 		return noOverlap ? new Matcher() {
@@ -385,15 +385,15 @@ public class Grammar implements Serializable {
 		};
 	}
 
-	public Matcher find(String s) throws GrammarException {
+	public Matcher find(CharSequence s) throws GrammarException {
 		return find(s, 0, true);
 	}
 
-	public Matcher find(String s, int offset) throws GrammarException {
+	public Matcher find(CharSequence s, int offset) throws GrammarException {
 		return find(s, offset, true);
 	}
 
-	public Matcher find(String s, boolean allowOverlap) throws GrammarException {
+	public Matcher find(CharSequence s, boolean allowOverlap) throws GrammarException {
 		return find(s, 0, !allowOverlap);
 	}
 
@@ -405,15 +405,14 @@ public class Grammar implements Serializable {
 	 * @return
 	 * @throws GrammarException
 	 */
-	public Matcher find(final String s, final int offset,
+	public Matcher find(final CharSequence s, final int offset,
 			final boolean noOverlap) throws GrammarException {
 		checkComplete();
 		final Map<Label, Map<Integer, Node>> cache = offsetCache();
-		final char[] chars = s.toCharArray();
 		return new Matcher() {
 			int index = offset;
 			boolean firstMatch = true;
-			Matcher m = rules.get(root).matcher(chars, index, null, cache);
+			Matcher m = rules.get(root).matcher(s, index, null, cache);
 			Node next = fetchNext();
 
 			@Override
@@ -447,7 +446,7 @@ public class Grammar implements Serializable {
 					firstNull = false;
 					if (index == s.length())
 						break;
-					m = rules.get(root).matcher(chars, index, null, cache);
+					m = rules.get(root).matcher(s, index, null, cache);
 				}
 				return null;
 			}
