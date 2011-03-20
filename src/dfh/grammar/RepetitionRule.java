@@ -128,7 +128,7 @@ public class RepetitionRule extends Rule {
 		@Override
 		protected void fetchNext() {
 			next = new Match(RepetitionRule.this, offset, parent);
-			while (next != null || nodes.size() < repetition.bottom) {
+			while (next != null && nodes.size() < repetition.bottom) {
 				Matcher m = matchers.peekLast();
 				if (m.mightHaveNext()) {
 					Match n = m.match();
