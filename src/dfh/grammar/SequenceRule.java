@@ -12,7 +12,7 @@ public class SequenceRule extends Rule {
 
 	class SequenceMatcher extends NonterminalMatcher {
 		LinkedList<Matcher> matcherStack = new LinkedList<Matcher>();
-		LinkedList<Match> nodeStack = new LinkedList<Match>();
+		LinkedList<Match> matchStack = new LinkedList<Match>();
 
 		public SequenceMatcher(CharSequence cs, int offset, Match parent,
 				Map<Label, Map<Integer, Match>> cache) {
@@ -21,9 +21,9 @@ public class SequenceRule extends Rule {
 
 		@Override
 		protected void fetchNext() {
-			if (nodeStack.size() > 0) {
-				while (!nodeStack.isEmpty()) {
-					nodeStack.removeLast();
+			if (matchStack.size() > 0) {
+				while (!matchStack.isEmpty()) {
+					matchStack.removeLast();
 					if (matcherStack.peekLast().rule() instanceof LeafRule)
 						matcherStack.removeLast();
 					else
@@ -36,7 +36,7 @@ public class SequenceRule extends Rule {
 				}
 			}
 			next = new Match(SequenceRule.this, offset, parent);
-			while (nodeStack.size() < sequence.length) {
+			while (matchStack.size() < sequence.length) {
 				Matcher m;
 				if (matcherStack.isEmpty()) {
 					m = sequence[0].matcher(cs, offset, next, cache);
@@ -46,8 +46,8 @@ public class SequenceRule extends Rule {
 				Match n = m.match();
 				if (n == null) {
 					matcherStack.removeLast();
-					if (!nodeStack.isEmpty())
-						nodeStack.removeLast();
+					if (!matchStack.isEmpty())
+						matchStack.removeLast();
 					if (matcherStack.isEmpty()) {
 						done = true;
 						next = null;
@@ -56,17 +56,17 @@ public class SequenceRule extends Rule {
 						break;
 					}
 				} else {
-					nodeStack.add(n);
-					if (nodeStack.size() < sequence.length) {
-						m = sequence[nodeStack.size()].matcher(cs, n.end(),
+					matchStack.add(n);
+					if (matchStack.size() < sequence.length) {
+						m = sequence[matchStack.size()].matcher(cs, n.end(),
 								next, cache);
 						matcherStack.add(m);
 					}
 				}
 			}
 			if (next != null) {
-				next.setEnd(nodeStack.peekLast().end());
-				Match[] children = nodeStack
+				next.setEnd(matchStack.peekLast().end());
+				Match[] children = matchStack
 						.toArray(new Match[sequence.length]);
 				next.setChildren(children);
 			}

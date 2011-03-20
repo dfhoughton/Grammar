@@ -109,7 +109,7 @@ public class RepetitionRule extends Rule {
 				Match[] children = matched.toArray(new Match[matched.size()]);
 				next = new Match(RepetitionRule.this, offset, parent);
 				next.setChildren(children);
-				next.setEnd(matched.peek().end());
+				next.setEnd(matched.peekLast().end());
 			}
 		}
 
@@ -117,7 +117,7 @@ public class RepetitionRule extends Rule {
 
 	private class StingyMatcher extends NonterminalMatcher {
 		private LinkedList<Matcher> matchers = new LinkedList<Matcher>();
-		private LinkedList<Match> nodes = new LinkedList<Match>();
+		private LinkedList<Match> matches = new LinkedList<Match>();
 
 		protected StingyMatcher(CharSequence cs, int offset, Match parent,
 				Map<Label, Map<Integer, Match>> cache, Label label) {
@@ -128,23 +128,26 @@ public class RepetitionRule extends Rule {
 		@Override
 		protected void fetchNext() {
 			next = new Match(RepetitionRule.this, offset, parent);
-			while (next != null && nodes.size() < repetition.bottom) {
+			while (next != null && matches.size() < repetition.bottom) {
 				Matcher m = matchers.peekLast();
 				if (m.mightHaveNext()) {
 					Match n = m.match();
 					if (n == null) {
 						decrement();
 					} else {
-						if (nodes.size() == repetition.top)
-							nodes.removeLast();
-						nodes.add(n);
-						if (nodes.size() < repetition.top)
+						if (matches.size() == repetition.top)
+							matches.removeLast();
+						matches.add(n);
+						if (matches.size() < repetition.top)
 							matchers.add(r.matcher(cs, n.end(), next, cache));
 					}
 				} else {
 					decrement();
 				}
 			}
+			next.setEnd(matches.isEmpty() ? offset : matches.peekLast().end());
+			Match[] children = matches.toArray(new Match[matches.size()]);
+			next.setChildren(children);
 		}
 
 		private void decrement() {
@@ -153,9 +156,9 @@ public class RepetitionRule extends Rule {
 				done = true;
 				next = null;
 				matchers = null;
-				nodes = null;
+				matches = null;
 			} else {
-				nodes.removeLast();
+				matches.removeLast();
 			}
 		}
 
