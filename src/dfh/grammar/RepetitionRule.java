@@ -92,20 +92,18 @@ public class RepetitionRule extends Rule {
 			else {
 				matched.removeLast();
 				// see if we can find some other way forward
-				if (!(matchers.peekLast().rule() instanceof LeafRule)) {
+				if (matchers.peekLast().mightHaveNext()) {
 					while (!matchers.isEmpty()
 							&& matched.size() < repetition.top) {
 						if (grab())
 							break;
 					}
 				}
-				if (matched.size() < repetition.bottom) {
-					matched.clear();
-					matchers.clear();
-					matchers = null;
-				}
 			}
-			if (matched.isEmpty()) {
+			if (matched.size() < repetition.bottom) {
+				matched.clear();
+				matchers.clear();
+				matchers = null;
 				next = null;
 				done = true;
 			} else {

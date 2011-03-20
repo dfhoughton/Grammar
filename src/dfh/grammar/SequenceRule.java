@@ -24,10 +24,10 @@ public class SequenceRule extends Rule {
 			if (matchStack.size() > 0) {
 				while (!matchStack.isEmpty()) {
 					matchStack.removeLast();
-					if (matcherStack.peekLast().rule() instanceof LeafRule)
-						matcherStack.removeLast();
-					else
+					if (matcherStack.peekLast().mightHaveNext())
 						break;
+					else
+						matcherStack.removeLast();
 				}
 				if (matcherStack.isEmpty()) {
 					next = null;
@@ -51,6 +51,7 @@ public class SequenceRule extends Rule {
 					if (matcherStack.isEmpty()) {
 						done = true;
 						next = null;
+						// TODO try commenting this out, believe it's redundant
 						if (!subCache.containsKey(offset))
 							subCache.put(offset, null);
 						break;

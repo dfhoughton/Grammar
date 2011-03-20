@@ -152,4 +152,22 @@ public class RepetitionTest {
 		assertNotNull("{,2} worked", n);
 	}
 
+	@Test
+	public void subgroupTest() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = [ <a> | <b> ]{2} <b>",//
+				"<a> = (a){,2}",//
+				"<b> = (a) (b)",//
+				"(a) =a",//
+				"(b) =b",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "aabb";
+		Matcher m = g.lookingAt(s);
+		Match n = m.match();
+		System.out.println(n);
+		assertNotNull("[]{2} worked", n);
+	}
+
 }

@@ -17,6 +17,7 @@ public class LeafRule extends Rule {
 		private final int offset;
 		private final CharSequence chars;
 		private Map<Integer, Match> cache;
+		private boolean fresh = true;
 
 		public LeafMatcher(CharSequence s, int offset, Match parent,
 				Map<Label, Map<Integer, Match>> cache) {
@@ -39,12 +40,13 @@ public class LeafRule extends Rule {
 			if (m.lookingAt())
 				n = new Match(LeafRule.this, offset, m.end(), parent);
 			cache.put(offset, n);
+			fresh = false;
 			return n;
 		}
 
 		@Override
 		public boolean mightHaveNext() {
-			return cache.containsKey(offset);
+			return fresh;
 		}
 
 		@Override

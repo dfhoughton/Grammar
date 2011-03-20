@@ -145,8 +145,6 @@ public class RuleParser {
 					+ "' in " + body);
 		if (parse.isEmpty())
 			throw new GrammarException("empty rule body: " + body);
-		if (gf != null)
-			gf.done();
 		return parse;
 	}
 
