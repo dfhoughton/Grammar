@@ -243,7 +243,16 @@ public class Grammar implements Serializable {
 	}
 
 	public Matcher matches(String s) throws GrammarException {
-		return matches(s, 0);
+		return matches(s, 0, true);
+	}
+
+	public Matcher matches(String s, int offset) throws GrammarException {
+		return matches(s, offset, true);
+	}
+
+	public Matcher matches(String s, boolean allowOverlap)
+			throws GrammarException {
+		return matches(s, 0, !allowOverlap);
 	}
 
 	/**
@@ -255,18 +264,19 @@ public class Grammar implements Serializable {
 	 * @return
 	 * @throws GrammarException
 	 */
-	public Matcher matches(final String s, final int offset)
-			throws GrammarException {
+	public Matcher matches(final String s, final int offset,
+			final boolean noOverlap) throws GrammarException {
 		checkComplete();
 		final Map<Label, Map<Integer, Node>> cache = offsetCache();
 		final Matcher m = rules.get(root).matcher(s.toCharArray(), offset,
 				null, cache);
 		return new Matcher() {
+			boolean matchedOnce = false;
 			Node next = fetchNext();
 
 			@Override
 			public boolean mightHaveNext() {
-				return next != null;
+				return noOverlap && matchedOnce || next != null;
 			}
 
 			private Node fetchNext() {
@@ -283,6 +293,7 @@ public class Grammar implements Serializable {
 				if (mightHaveNext()) {
 					Node n = next;
 					next = fetchNext();
+					matchedOnce = true;
 					return n;
 				}
 				return null;
@@ -316,16 +327,44 @@ public class Grammar implements Serializable {
 	}
 
 	public Matcher lookingAt(String s) throws GrammarException {
-		return lookingAt(s, 0);
+		return lookingAt(s, 0, true);
 	}
 
-	public Matcher lookingAt(final String s, final int offset)
+	public Matcher lookingAt(String s, int offset) throws GrammarException {
+		return lookingAt(s, offset, true);
+	}
+
+	public Matcher lookingAt(String s, boolean allowOverlap)
 			throws GrammarException {
+		return lookingAt(s, 0, !allowOverlap);
+	}
+
+	public Matcher lookingAt(final String s, final int offset,
+			final boolean noOverlap) throws GrammarException {
 		checkComplete();
 		final Matcher m = rules.get(root).matcher(s.toCharArray(), offset,
 				null, offsetCache());
-		// synchronization wrapper
-		return new Matcher() {
+		// synchronization wrappers
+		return noOverlap ? new Matcher() {
+			boolean matchedOnce = false;
+
+			@Override
+			public Rule rule() {
+				return m.rule();
+			}
+
+			@Override
+			public synchronized boolean mightHaveNext() {
+				return matchedOnce ? false : m.mightHaveNext();
+			}
+
+			@Override
+			public synchronized Node match() {
+				Node n = m.match();
+				matchedOnce = true;
+				return n;
+			}
+		} : new Matcher() {
 
 			@Override
 			public Rule rule() {
@@ -345,7 +384,15 @@ public class Grammar implements Serializable {
 	}
 
 	public Matcher find(String s) throws GrammarException {
-		return find(s, 0);
+		return find(s, 0, true);
+	}
+
+	public Matcher find(String s, int offset) throws GrammarException {
+		return find(s, offset, true);
+	}
+
+	public Matcher find(String s, boolean allowOverlap) throws GrammarException {
+		return find(s, 0, !allowOverlap);
 	}
 
 	/**
@@ -356,13 +403,14 @@ public class Grammar implements Serializable {
 	 * @return
 	 * @throws GrammarException
 	 */
-	public Matcher find(final String s, final int offset)
-			throws GrammarException {
+	public Matcher find(final String s, final int offset,
+			final boolean noOverlap) throws GrammarException {
 		checkComplete();
 		final Map<Label, Map<Integer, Node>> cache = offsetCache();
 		final char[] chars = s.toCharArray();
 		return new Matcher() {
 			int index = offset;
+			boolean firstMatch = true;
 			Matcher m = rules.get(root).matcher(chars, index, null, cache);
 			Node next = fetchNext();
 
@@ -377,11 +425,24 @@ public class Grammar implements Serializable {
 			}
 
 			private Node fetchNext() {
+				boolean firstNull = true;
 				while (true) {
-					Node n = m.match();
-					if (n != null)
+					Node n;
+					if (firstMatch) {
+						n = m.match();
+						firstMatch = false;
+					} else if (firstNull && noOverlap)
+						n = null;
+					else
+						n = m.match();
+					if (n != null) {
+						if (noOverlap)
+							index = n.end();
 						return n;
-					index++;
+					}
+					if (!(firstNull && noOverlap))
+						index++;
+					firstNull = false;
 					if (index == s.length())
 						break;
 					m = rules.get(root).matcher(chars, index, null, cache);
