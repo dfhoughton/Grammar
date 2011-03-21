@@ -299,11 +299,6 @@ public class Grammar implements Serializable {
 				}
 				return null;
 			}
-
-			@Override
-			public Rule rule() {
-				return null;
-			}
 		};
 	}
 
@@ -351,11 +346,6 @@ public class Grammar implements Serializable {
 			boolean matchedOnce = false;
 
 			@Override
-			public Rule rule() {
-				return m.rule();
-			}
-
-			@Override
 			public synchronized boolean mightHaveNext() {
 				return matchedOnce ? false : m.mightHaveNext();
 			}
@@ -367,11 +357,6 @@ public class Grammar implements Serializable {
 				return n;
 			}
 		} : new Matcher() {
-
-			@Override
-			public Rule rule() {
-				return m.rule();
-			}
 
 			@Override
 			public synchronized boolean mightHaveNext() {
@@ -455,11 +440,6 @@ public class Grammar implements Serializable {
 			@Override
 			public boolean mightHaveNext() {
 				return next != null;
-			}
-
-			@Override
-			public Rule rule() {
-				return null;
 			}
 		};
 	}

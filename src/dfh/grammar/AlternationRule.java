@@ -43,11 +43,6 @@ public class AlternationRule extends Rule {
 				next.setEnd(child.end());
 			}
 		}
-
-		@Override
-		public Rule rule() {
-			return AlternationRule.this;
-		}
 	}
 
 	private final Rule[] alternates;

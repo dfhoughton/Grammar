@@ -37,9 +37,4 @@ public interface Matcher {
 	 *         its end
 	 */
 	boolean mightHaveNext();
-
-	/**
-	 * @return the {@link Rule} that generated this {@link Matcher}
-	 */
-	public Rule rule();
 }

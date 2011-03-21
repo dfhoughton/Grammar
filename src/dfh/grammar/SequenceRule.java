@@ -51,9 +51,9 @@ public class SequenceRule extends Rule {
 					if (matcherStack.isEmpty()) {
 						done = true;
 						next = null;
-						// TODO try commenting this out, believe it's redundant
-						if (!subCache.containsKey(offset))
-							subCache.put(offset, null);
+						// redundant, I believe
+						// if (!subCache.containsKey(offset))
+						// subCache.put(offset, null);
 						break;
 					}
 				} else {
@@ -71,11 +71,6 @@ public class SequenceRule extends Rule {
 						.toArray(new Match[sequence.length]);
 				next.setChildren(children);
 			}
-		}
-
-		@Override
-		public Rule rule() {
-			return SequenceRule.this;
 		}
 	}
 

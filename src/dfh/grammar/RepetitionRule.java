@@ -66,11 +66,6 @@ public class RepetitionRule extends Rule {
 				return false;
 			}
 		}
-
-		@Override
-		public Rule rule() {
-			return RepetitionRule.this;
-		}
 	}
 
 	/**
@@ -89,7 +84,13 @@ public class RepetitionRule extends Rule {
 		protected void fetchNext() {
 			if (matched == null)
 				initialize();
-			else {
+			else if (matched.isEmpty()) {
+				matchers.clear();
+				matchers = null;
+				next = null;
+				done = true;
+				return;
+			} else {
 				matched.removeLast();
 				// see if we can find some other way forward
 				if (matchers.peekLast().mightHaveNext()) {
@@ -110,7 +111,8 @@ public class RepetitionRule extends Rule {
 				Match[] children = matched.toArray(new Match[matched.size()]);
 				next = new Match(RepetitionRule.this, offset, parent);
 				next.setChildren(children);
-				next.setEnd(matched.peekLast().end());
+				next.setEnd(matched.isEmpty() ? offset : matched.peekLast()
+						.end());
 			}
 		}
 
@@ -162,12 +164,6 @@ public class RepetitionRule extends Rule {
 				matches.removeLast();
 			}
 		}
-
-		@Override
-		public Rule rule() {
-			return RepetitionRule.this;
-		}
-
 	}
 
 	private class PossessiveMatcher extends GreedyAndPossessive {
