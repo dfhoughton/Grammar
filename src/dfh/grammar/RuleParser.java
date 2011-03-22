@@ -148,6 +148,8 @@ public class RuleParser {
 				Repetition rep = getRepetition(body, offset);
 				r.setRepetition(rep);
 				add(parse, gf, r);
+			} else if (c == '#') {
+				break;
 			} else {
 				RuleFragment r = nextRule(body, offset, bracket);
 				if (r instanceof RepeatableRuleFragment) {
@@ -162,6 +164,8 @@ public class RuleParser {
 					+ "' in " + body);
 		if (parse.isEmpty())
 			throw new GrammarException("empty rule body: " + body);
+		if (gf != null)
+			gf.done();
 		return parse;
 	}
 
