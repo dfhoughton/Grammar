@@ -132,10 +132,7 @@ public class RuleParser {
 					}
 				} else {
 					r.setRepetition(rep);
-					if (gf == null)
-						parse.add(r);
-					else
-						gf.add(r);
+					add(parse, gf, r);
 				}
 			} else if (c == '|') {
 				if (gf == null) {
@@ -145,16 +142,19 @@ public class RuleParser {
 				} else
 					gf.newSequence();
 				offset[0]++;
+			} else if (c == '"' || c == '\'') {
+				String literal = getLiteral(body, offset, c);
+				RepeatableRuleFragment r = new LiteralFragment(literal);
+				Repetition rep = getRepetition(body, offset);
+				r.setRepetition(rep);
+				add(parse, gf, r);
 			} else {
 				RuleFragment r = nextRule(body, offset, bracket);
 				if (r instanceof RepeatableRuleFragment) {
 					Repetition rep = getRepetition(body, offset);
 					((RepeatableRuleFragment) r).setRepetition(rep);
 				}
-				if (gf == null)
-					parse.add(r);
-				else
-					gf.add(r);
+				add(parse, gf, r);
 			}
 		}
 		if (bracket > 0)
@@ -163,6 +163,39 @@ public class RuleParser {
 		if (parse.isEmpty())
 			throw new GrammarException("empty rule body: " + body);
 		return parse;
+	}
+
+	private static void add(List<RuleFragment> parse, GroupFragment gf,
+			RuleFragment r) {
+		if (gf == null)
+			parse.add(r);
+		else
+			gf.add(r);
+	}
+
+	/**
+	 * @param body
+	 * @param offset
+	 * @return quote delimited String literal
+	 */
+	private static String getLiteral(String body, int[] offset, char delimiter) {
+		boolean escaped = false;
+		int start = offset[0] + 1;
+		while (offset[0] < body.length()) {
+			offset[0]++;
+			char c = body.charAt(offset[0]);
+			if (escaped)
+				escaped = false;
+			else if (c == '\\')
+				escaped = true;
+			else if (c == delimiter)
+				break;
+		}
+		if (offset[0] == body.length())
+			throw new GrammarException("could not find closing \" in " + body);
+		String s = body.substring(start, offset[0]);
+		offset[0]++;
+		return s;
 	}
 
 	private static Repetition getRepetition(String body, int[] offset)

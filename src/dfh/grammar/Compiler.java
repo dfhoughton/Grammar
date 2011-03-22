@@ -217,8 +217,19 @@ public class Compiler {
 		}
 		if (r instanceof SequenceRule)
 			return new SequenceRule(label, ((SequenceRule) r).sequence);
+		if (r instanceof LiteralRule)
+			return new LiteralRule(label, ((LiteralRule) r).literal);
 		throw new GrammarException("unanticipated rule type: "
 				+ r.getClass().getName());
+	}
+
+	private Rule redundancyCheck(Rule r) {
+		String id = r.uniqueId();
+		if (redundancyMap.containsKey(id))
+			return redundancyMap.get(id);
+		else
+			redundancyMap.put(id, r);
+		return r;
 	}
 
 	/**
@@ -235,12 +246,17 @@ public class Compiler {
 				return r;
 			Label label = new Label(Type.nonTerminal, l.toString());
 			r = new RepetitionRule(label, r, l.rep);
-			String id = r.uniqueId();
-			if (redundancyMap.containsKey(id))
-				return redundancyMap.get(id);
-			else
-				redundancyMap.put(id, r);
-			return r;
+			return redundancyCheck(r);
+		} else if (rf instanceof LiteralFragment) {
+			LiteralFragment lf = (LiteralFragment) rf;
+			Label l = new Label(Type.terminal, '"' + lf.literal + '"');
+			Rule r = new LiteralRule(l, lf.literal);
+			r = redundancyCheck(r);
+			if (lf.rep.redundant())
+				return r;
+			l = new Label(Type.nonTerminal, lf.toString());
+			r = new RepetitionRule(l, r, lf.rep);
+			return redundancyCheck(r);
 		}
 		GroupFragment gf = (GroupFragment) rf;
 		if (gf.alternates.size() == 1) {
@@ -252,12 +268,7 @@ public class Compiler {
 					Label l = new Label(Type.nonTerminal, r.label().toString()
 							+ gf.rep);
 					r = new RepetitionRule(l, r, gf.rep);
-					String id = r.uniqueId();
-					if (redundancyMap.containsKey(id))
-						return redundancyMap.get(id);
-					else
-						redundancyMap.put(id, r);
-					return r;
+					return redundancyCheck(r);
 				}
 			}
 			return makeSequence(gf.alternates.get(0));
@@ -283,21 +294,12 @@ public class Compiler {
 		b.append(']');
 		Label l = new Label(Type.nonTerminal, b.toString());
 		Rule r = new AlternationRule(l, alternates);
-		String id = r.uniqueId();
-		if (redundancyMap.containsKey(id))
-			r = redundancyMap.get(id);
-		else
-			redundancyMap.put(id, r);
+		r = redundancyCheck(r);
 		if (gf.rep.redundant())
 			return r;
 		l = new Label(Type.nonTerminal, l.toString() + gf.rep);
 		r = new RepetitionRule(l, r, gf.rep);
-		id = r.uniqueId();
-		if (redundancyMap.containsKey(id))
-			r = redundancyMap.get(id);
-		else
-			redundancyMap.put(id, r);
-		return r;
+		return redundancyCheck(r);
 	}
 
 	private Rule makeSequence(Label label, List<RuleFragment> fragments) {
@@ -329,12 +331,7 @@ public class Compiler {
 		b.append(']');
 		Label l = new Label(Type.nonTerminal, b.toString());
 		Rule r = new SequenceRule(l, sequence);
-		String id = r.uniqueId();
-		if (redundancyMap.containsKey(id))
-			r = redundancyMap.get(id);
-		else
-			redundancyMap.put(id, r);
-		return r;
+		return redundancyCheck(r);
 	}
 
 	public Map<Label, Rule> rules() {

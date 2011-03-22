@@ -134,7 +134,6 @@ public class RepetitionRule extends Rule {
 			}
 			if (matched.size() < repetition.bottom) {
 				matched.clear();
-				matchers.clear();
 				matchers = null;
 				next = null;
 				done = true;
