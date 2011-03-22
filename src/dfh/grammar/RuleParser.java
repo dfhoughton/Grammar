@@ -118,11 +118,25 @@ public class RuleParser {
 				break;
 			} else if (c == '[') {
 				offset[0]++;
-				RepeatableRuleFragment r = new GroupFragment(parseBody(body,
-						offset, ']'));
+				GroupFragment r = new GroupFragment(
+						parseBody(body, offset, ']'));
+				if (r.alternates.isEmpty())
+					throw new GrammarException("empty group  in " + body);
 				Repetition rep = getRepetition(body, offset);
-				r.setRepetition(rep);
-				addFragment(parse, gf, r);
+				if (rep.redundant() && r.alternates.size() == 1) {
+					if (gf == null)
+						parse.addAll(r.alternates.get(0));
+					else {
+						for (RuleFragment rf : r.alternates.get(0))
+							gf.add(rf);
+					}
+				} else {
+					r.setRepetition(rep);
+					if (gf == null)
+						parse.add(r);
+					else
+						gf.add(r);
+				}
 			} else if (c == '|') {
 				if (gf == null) {
 					gf = new GroupFragment(parse);
@@ -137,7 +151,10 @@ public class RuleParser {
 					Repetition rep = getRepetition(body, offset);
 					((RepeatableRuleFragment) r).setRepetition(rep);
 				}
-				addFragment(parse, gf, r);
+				if (gf == null)
+					parse.add(r);
+				else
+					gf.add(r);
 			}
 		}
 		if (bracket > 0)
@@ -221,14 +238,6 @@ public class RuleParser {
 			offset[0] += m.group().length();
 		}
 		return r;
-	}
-
-	private static void addFragment(List<RuleFragment> parse, GroupFragment gf,
-			RuleFragment r) {
-		if (gf == null)
-			parse.add(r);
-		else
-			gf.add(r);
 	}
 
 	private static RuleFragment nextRule(String body, int[] offset, char bracket)

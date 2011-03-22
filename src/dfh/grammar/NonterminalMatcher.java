@@ -28,26 +28,50 @@ public abstract class NonterminalMatcher implements Matcher {
 
 	@Override
 	public Match match() {
+		System.err.println("match " + this.getClass().getSimpleName() + " "
+				+ identify() + " at '" + cs.subSequence(offset, cs.length())
+				+ "'");
 		if (done)
 			return null;
 		boolean alreadyMatched = subCache.containsKey(offset);
-		if (alreadyMatched && subCache.get(offset) == null)
+		if (alreadyMatched && subCache.get(offset) == null) {
+			System.err.println("m " + this + " "
+					+ this.getClass().getSimpleName().substring(0, 2)
+					+ " returning null" + " at '"
+					+ cs.subSequence(offset, cs.length()) + "'");
 			return null;
+		}
 		if (next == null)
 			fetchNext();
 		if (!alreadyMatched)
 			subCache.put(offset, next == null ? null : Match.dummy);
 		Match n = next;
 		next = null;
+		System.err.println("m "
+				+ this
+				+ " "
+				+ this.getClass().getSimpleName().substring(0, 2)
+				+ " returning "
+				+ (n == null ? "null" : cs.subSequence(n.start(), n.end())
+						+ " (" + n + ")" + " at '"
+						+ cs.subSequence(offset, cs.length()) + "'"));
 		return n;
 	}
 
 	@Override
 	public boolean mightHaveNext() {
-		if (done)
+		System.err.println("mightHaveNext " + this.getClass().getSimpleName()
+				+ " " + identify() + " at '"
+				+ cs.subSequence(offset, cs.length()) + "'");
+		if (done) {
+			System.err.println("mhn " + this + " returning false" + " at '"
+					+ cs.subSequence(offset, cs.length()) + "'");
 			return false;
+		}
 		if (next == null)
 			fetchNext();
+		System.err.println("mhn " + this + " returning " + (next != null)
+				+ " at '" + cs.subSequence(offset, cs.length()) + "'");
 		return next != null;
 	}
 

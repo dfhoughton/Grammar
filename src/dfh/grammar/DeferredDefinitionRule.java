@@ -32,4 +32,9 @@ public class DeferredDefinitionRule extends Rule {
 			r = rules.get(label);
 		return r.matcher(cs, offset, parent, cache);
 	}
+
+	@Override
+	protected String uniqueId() {
+		return "({DEFERRED}" + label + ")";
+	}
 }

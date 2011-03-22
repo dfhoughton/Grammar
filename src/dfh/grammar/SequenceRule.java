@@ -8,7 +8,7 @@ import dfh.grammar.Label.Type;
 
 public class SequenceRule extends Rule {
 	private static final long serialVersionUID = 1L;
-	private final Rule[] sequence;
+	final Rule[] sequence;
 
 	class SequenceMatcher extends NonterminalMatcher {
 		LinkedList<Matcher> matcherStack = new LinkedList<Matcher>();
@@ -45,10 +45,17 @@ public class SequenceRule extends Rule {
 					m = matcherStack.peekLast();
 				Match n = m.match();
 				if (n == null) {
+					System.err.println("fn " + identify()
+							+ " removing last matcher");
 					matcherStack.removeLast();
-					if (!matchStack.isEmpty())
+					if (!matchStack.isEmpty()) {
+						System.err.println("fn " + identify()
+								+ " removing last match");
 						matchStack.removeLast();
+					}
 					if (matcherStack.isEmpty()) {
+						System.err.println("fn " + identify()
+								+ " could not find a match");
 						done = true;
 						next = null;
 						// redundant, I believe
@@ -57,10 +64,15 @@ public class SequenceRule extends Rule {
 						break;
 					}
 				} else {
+					System.err.println("fn " + identify() + " adding "
+							+ cs.subSequence(n.start(), n.end()) + " (" + n
+							+ ")");
 					matchStack.add(n);
 					if (matchStack.size() < sequence.length) {
 						m = sequence[matchStack.size()].matcher(cs, n.end(),
 								next, cache);
+						System.err.println("fn " + identify()
+								+ " adding matcher " + m);
 						matcherStack.add(m);
 					}
 				}
@@ -71,6 +83,34 @@ public class SequenceRule extends Rule {
 						.toArray(new Match[sequence.length]);
 				next.setChildren(children);
 			}
+		}
+
+		@Override
+		public String identify() {
+			StringBuilder b = new StringBuilder(label.id);
+			boolean nonInitial = false;
+			b.append("{{");
+			for (Rule r : sequence) {
+				if (nonInitial)
+					b.append(' ');
+				else
+					nonInitial = true;
+				b.append(r);
+			}
+			b.append("}}");
+			if (matchStack != null) {
+				nonInitial = false;
+				b.append('[');
+				for (Match m : matchStack) {
+					if (nonInitial)
+						b.append(", ");
+					else
+						nonInitial = true;
+					b.append(cs.subSequence(m.start(), m.end()));
+				}
+				b.append(']');
+			}
+			return b.toString();
 		}
 	}
 
@@ -88,46 +128,35 @@ public class SequenceRule extends Rule {
 		return new Label(Type.nonTerminal, b.toString());
 	}
 
-	public SequenceRule(Label label, List<RuleFragment> list,
-			Map<Label, Rule> rules) {
+	public SequenceRule(Label l, List<Rule> list) {
+		this(l, list.toArray(new Rule[list.size()]));
+	}
+
+	public SequenceRule(Label label, Rule[] sequence) {
 		super(label);
-		sequence = new Rule[list.size()];
-		int index = 0;
-		for (RuleFragment rf : list) {
-			RepeatableRuleFragment rrf = (RepeatableRuleFragment) rf;
-			Rule r;
-			if (rrf instanceof Label) {
-				Label l = (Label) rrf;
-				r = rules.get(l);
-				if (r == null) {
-					// undefined terminal
-					r = new DeferredDefinitionRule(l, rules);
-					rules.put(r.label(), r);
-				}
-			} else {
-				GroupFragment gf = (GroupFragment) rrf;
-				Label l1 = AlternationRule.label(gf);
-				r = rules.get(l1);
-				if (r == null) {
-					r = new AlternationRule(l1, gf, rules);
-					rules.put(l1, r);
-					rules.put(r.label(), r);
-				}
-			}
-			if (rrf.rep != Repetition.NONE) {
-				Label l = new Label(Type.nonTerminal, rrf.stringify());
-				RepetitionRule rr = new RepetitionRule(l, r, rrf.rep);
-				rules.put(l, rr);
-				r = rr;
-			}
-			sequence[index++] = r;
-		}
+		this.sequence = sequence;
 	}
 
 	@Override
 	public Matcher matcher(CharSequence cs, int offset, Match parent,
 			Map<Label, Map<Integer, Match>> cache) {
 		return new SequenceMatcher(cs, offset, parent, cache);
+	}
+
+	@Override
+	protected String uniqueId() {
+		StringBuilder b = new StringBuilder();
+		b.append('[');
+		boolean nonInitial = false;
+		for (Rule r : sequence) {
+			if (nonInitial)
+				b.append(' ');
+			else
+				nonInitial = true;
+			b.append(r.uniqueId());
+		}
+		b.append(']');
+		return b.toString();
 	}
 
 }

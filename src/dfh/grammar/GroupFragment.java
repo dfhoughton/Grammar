@@ -94,6 +94,12 @@ public class GroupFragment extends RepeatableRuleFragment {
 
 	@Override
 	public String toString() {
+		return alternateString() + rep;
+	}
+
+	String alternateString() {
+		if (alternates.size() == 1 && alternates.get(0).size() == 1)
+			return alternates.get(0).get(0).toString();
 		StringBuilder b = new StringBuilder();
 		b.append('[');
 		for (List<RuleFragment> alternate : alternates) {
@@ -102,7 +108,6 @@ public class GroupFragment extends RepeatableRuleFragment {
 			appendAlternate(b, alternate);
 		}
 		b.append(']');
-		b.append(rep);
 		return b.toString();
 	}
 

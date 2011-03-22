@@ -16,7 +16,7 @@ public class Repetition {
 	/**
 	 * The repetition type of unmodified rules.
 	 */
-	public static final Repetition NONE = new Repetition(Type.possessive, 1, 1);
+	public static final Repetition NONE = new Repetition(Type.greedy, 1, 1);
 	public static final Repetition ASTERISK = new Repetition(Type.greedy, 0,
 			Integer.MAX_VALUE);
 	public static final Repetition PLUS = new Repetition(Type.greedy, 1,
@@ -72,5 +72,12 @@ public class Repetition {
 		else if (t == Type.stingy)
 			b.append('?');
 		return b.toString();
+	}
+
+	/**
+	 * @return whether this is a pointless repetition
+	 */
+	public boolean redundant() {
+		return top == 1 && bottom == 1 && t != Type.possessive;
 	}
 }

@@ -29,6 +29,7 @@ public class LeafRule extends Rule {
 
 		@Override
 		public Match match() {
+			fresh = false;
 			if (cache.containsKey(offset)) {
 				return cache.get(offset);
 			}
@@ -40,7 +41,6 @@ public class LeafRule extends Rule {
 			if (m.lookingAt())
 				n = new Match(LeafRule.this, offset, m.end(), parent);
 			cache.put(offset, n);
-			fresh = false;
 			return n;
 		}
 
@@ -52,6 +52,11 @@ public class LeafRule extends Rule {
 		@Override
 		public String toString() {
 			return "M:" + LeafRule.this;
+		}
+
+		@Override
+		public String identify() {
+			return label.toString();
 		}
 	}
 
@@ -67,5 +72,10 @@ public class LeafRule extends Rule {
 	public Matcher matcher(CharSequence s, final int offset, Match parent,
 			Map<Label, Map<Integer, Match>> cache) {
 		return new LeafMatcher(s, offset, parent, cache);
+	}
+
+	@Override
+	protected String uniqueId() {
+		return "(?:" + p.toString() + ")";
 	}
 }

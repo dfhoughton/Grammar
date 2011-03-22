@@ -29,4 +29,9 @@ public abstract class Rule implements Serializable {
 	public String toString() {
 		return label.id;
 	}
+
+	/**
+	 * @return label-free id used to recognize redundancy during compilation
+	 */
+	protected abstract String uniqueId();
 }

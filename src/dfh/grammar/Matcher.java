@@ -37,4 +37,9 @@ public interface Matcher {
 	 *         its end
 	 */
 	boolean mightHaveNext();
+
+	/**
+	 * @return stringification useful in debugging
+	 */
+	String identify();
 }

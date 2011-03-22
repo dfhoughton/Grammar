@@ -13,13 +13,39 @@ import java.util.Map;
  */
 public class RepetitionRule extends Rule {
 	private static final long serialVersionUID = 1L;
-	private final Rule r;
-	private final Repetition repetition;
+	final Rule r;
+	final Repetition repetition;
 
-	abstract class GreedyAndPossessive extends NonterminalMatcher {
-
+	private abstract class RepetitionMatcher extends NonterminalMatcher {
 		protected LinkedList<Match> matched;
 		protected LinkedList<Matcher> matchers;
+
+		public RepetitionMatcher(CharSequence cs, int offset, Match parent,
+				Map<Label, Map<Integer, Match>> cache, Label label) {
+			super(cs, offset, parent, cache, label);
+		}
+
+		@Override
+		public String identify() {
+			StringBuilder b = new StringBuilder(label.id);
+			if (matched != null) {
+				boolean nonInitial = false;
+				b.append('[');
+				for (Match m : matched) {
+					if (nonInitial)
+						b.append(", ");
+					else
+						nonInitial = true;
+					b.append(cs.subSequence(m.start(), m.end()));
+				}
+				b.append(']');
+			}
+			return b.toString();
+		}
+	}
+
+	private abstract class GreedyAndPossessive extends RepetitionMatcher {
+
 		private final boolean backtracks;
 
 		protected GreedyAndPossessive(CharSequence cs, int offset,
@@ -74,7 +100,7 @@ public class RepetitionRule extends Rule {
 	 * @author David Houghton
 	 * 
 	 */
-	class GreedyMatcher extends GreedyAndPossessive {
+	private class GreedyMatcher extends GreedyAndPossessive {
 		protected GreedyMatcher(CharSequence cs, int offset, Match parent,
 				Map<Label, Map<Integer, Match>> cache, Label label) {
 			super(cs, offset, parent, cache, label, true);
@@ -94,11 +120,15 @@ public class RepetitionRule extends Rule {
 				matched.removeLast();
 				// see if we can find some other way forward
 				if (matchers.peekLast().mightHaveNext()) {
-					while (!matchers.isEmpty()
-							&& matched.size() < repetition.top) {
+					while (!(matchers.isEmpty() || matched.size() == repetition.top)) {
 						if (grab())
 							break;
 					}
+				} else {
+					matchers.removeLast();
+					if (!matchers.isEmpty()
+							&& matchers.peekLast().mightHaveNext())
+						fetchNext();
 				}
 			}
 			if (matched.size() < repetition.bottom) {
@@ -118,38 +148,38 @@ public class RepetitionRule extends Rule {
 
 	}
 
-	private class StingyMatcher extends NonterminalMatcher {
-		private LinkedList<Matcher> matchers = new LinkedList<Matcher>();
-		private LinkedList<Match> matches = new LinkedList<Match>();
+	private class StingyMatcher extends RepetitionMatcher {
 
 		protected StingyMatcher(CharSequence cs, int offset, Match parent,
 				Map<Label, Map<Integer, Match>> cache, Label label) {
 			super(cs, offset, parent, cache, label);
+			matchers = new LinkedList<Matcher>();
+			matched = new LinkedList<Match>();
 			matchers.add(r.matcher(cs, offset, parent, cache));
 		}
 
 		@Override
 		protected void fetchNext() {
 			next = new Match(RepetitionRule.this, offset, parent);
-			while (next != null && matches.size() < repetition.bottom) {
+			while (next != null && matched.size() < repetition.bottom) {
 				Matcher m = matchers.peekLast();
 				if (m.mightHaveNext()) {
 					Match n = m.match();
 					if (n == null) {
 						decrement();
 					} else {
-						if (matches.size() == repetition.top)
-							matches.removeLast();
-						matches.add(n);
-						if (matches.size() < repetition.top)
+						if (matched.size() == repetition.top)
+							matched.removeLast();
+						matched.add(n);
+						if (matched.size() < repetition.top)
 							matchers.add(r.matcher(cs, n.end(), next, cache));
 					}
 				} else {
 					decrement();
 				}
 			}
-			next.setEnd(matches.isEmpty() ? offset : matches.peekLast().end());
-			Match[] children = matches.toArray(new Match[matches.size()]);
+			next.setEnd(matched.isEmpty() ? offset : matched.peekLast().end());
+			Match[] children = matched.toArray(new Match[matched.size()]);
 			next.setChildren(children);
 		}
 
@@ -159,9 +189,9 @@ public class RepetitionRule extends Rule {
 				done = true;
 				next = null;
 				matchers = null;
-				matches = null;
+				matched = null;
 			} else {
-				matches.removeLast();
+				matched.removeLast();
 			}
 		}
 	}
@@ -216,4 +246,8 @@ public class RepetitionRule extends Rule {
 		}
 	}
 
+	@Override
+	protected String uniqueId() {
+		return r.uniqueId() + repetition;
+	}
 }

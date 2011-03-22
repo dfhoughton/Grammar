@@ -12,17 +12,10 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.regex.Pattern;
-
-import dfh.grammar.Label.Type;
 
 /**
  * Base class that parses strings according to a given set of rules.
@@ -33,18 +26,36 @@ import dfh.grammar.Label.Type;
  */
 public class Grammar implements Serializable {
 	/**
-	 * Basic line iterator interface so we can write basically the same
-	 * constructor for any sort of input.
+	 * Special debugging API.
 	 * <p>
-	 * <b>Creation date:</b> Mar 18, 2011
+	 * <b>Creation date:</b> Mar 21, 2011
 	 * 
 	 * @author David Houghton
 	 * 
 	 */
-	private interface LineReader {
-		String readLine() throws IOException;
+	private abstract class GrammarMatcher implements Matcher {
+		private final boolean noOverlap;
+		private final int offset;
 
-		int lineNumber();
+		protected GrammarMatcher(final int offset, final boolean noOverlap) {
+			this.offset = offset;
+			this.noOverlap = noOverlap;
+		}
+
+		protected abstract String name();
+
+		@Override
+		public String identify() {
+			StringBuilder b = new StringBuilder();
+			b.append(name());
+			if (offset > 0)
+				b.append(offset);
+			if (noOverlap) {
+				b.append("no overlap");
+			}
+			b.append(')');
+			return b.toString();
+		}
 	}
 
 	private static class BReader implements LineReader {
@@ -123,85 +134,12 @@ public class Grammar implements Serializable {
 	 * @throws GrammarException
 	 * @throws IOException
 	 */
-	private Grammar(LineReader reader) throws GrammarException, IOException {
-		String line = null;
-		Map<Label, List<RuleFragment>> map = new HashMap<Label, List<RuleFragment>>();
-		Label r = null;
-		while ((line = reader.readLine()) != null) {
-			List<RuleFragment> list = RuleParser.parse(line);
-			if (list == null)
-				continue; // blank line or comment
-			Label l = (Label) list.remove(0);
-			if (map.containsKey(l))
-				throw new GrammarException("rule " + l + " redefined at line "
-						+ reader.lineNumber());
-			map.put(l, list);
-			if (l.t == Type.root)
-				r = l;
-		}
-		if (r == null)
-			throw new GrammarException("no root rule found");
-		this.root = r;
-		// make space for anonymous rules
-		rules = new HashMap<Label, Rule>(map.size() * 2);
-		Set<Label> allLabels = new HashSet<Label>(map.size()), terminals = new HashSet<Label>(
-				map.size()), knownLabels = new HashSet<Label>(map.keySet());
-		boolean firstPass = true; // we collect terminals on first pass
-		while (!map.isEmpty()) {
-			int size = map.size();
-			for (Iterator<Entry<Label, List<RuleFragment>>> i = map.entrySet()
-					.iterator(); i.hasNext();) {
-				Entry<Label, List<RuleFragment>> e = i.next();
-				Set<Label> labels = allLabels(e.getValue());
-				boolean defined = labels.isEmpty();
-				if (defined) {
-					terminals.add(e.getKey());
-					allLabels.add(e.getKey());
-				} else {
-					defined = true;
-					for (Label l : labels) {
-						if (!(rules.containsKey(l) || l.t == Type.terminal)) {
-							defined = false;
-							break;
-						}
-					}
-				}
-				if (defined) {
-					// if all the constituents of a rule are defined, we define
-					// the rule
-					rules.put(e.getKey(), parseRule(e.getKey(), e.getValue()));
-					allLabels.addAll(labels);
-					allLabels.add(e.getKey());
-					for (Label l : labels) {
-						if (l.t == Type.terminal)
-							terminals.add(l);
-					}
-					i.remove();
-				}
-			}
-			if (!firstPass && map.size() == size)
-				throw new GrammarException(
-						"impossible co-dependencies exist in rule set");
-			firstPass = false;
-		}
-		terminalLabelMap = new HashMap<String, Label>(terminals.size());
-		for (Label l : terminals)
-			terminalLabelMap.put(l.id, l);
-		allLabels.removeAll(knownLabels);
-		allLabels.removeAll(terminals);
-		if (!allLabels.isEmpty()) {
-			// undefined rules; generate error message
-			LinkedList<String> list = new LinkedList<String>();
-			for (Label l : allLabels)
-				list.add(l.id);
-			Collections.sort(list);
-			StringBuilder b = new StringBuilder(list.pollFirst());
-			for (String s : list)
-				b.append(", ").append(s);
-			throw new GrammarException("undefined rules: " + b);
-		}
-		terminals.removeAll(rules.keySet());
-		undefinedTerminals = new HashSet<Label>(terminals);
+	public Grammar(LineReader reader) throws GrammarException, IOException {
+		Compiler c = new Compiler(reader);
+		root = c.root();
+		rules = c.rules();
+		terminalLabelMap = c.terminalLabelMap();
+		undefinedTerminals = c.undefinedTerminals();
 	}
 
 	/**
@@ -221,27 +159,6 @@ public class Grammar implements Serializable {
 			throw new GrammarException("terminal rule " + label
 					+ " already defined");
 		rules.put(l, new LeafRule(l, p));
-	}
-
-	private Set<Label> allLabels(List<RuleFragment> value) {
-		Set<Label> allLabels = new TreeSet<Label>();
-		for (RuleFragment rf : value) {
-			if (rf instanceof Label)
-				allLabels.add((Label) rf);
-			else if (rf instanceof GroupFragment) {
-				GroupFragment gf = (GroupFragment) rf;
-				for (List<RuleFragment> l : gf.alternates) {
-					allLabels.addAll(allLabels(l));
-				}
-			}
-		}
-		return allLabels;
-	}
-
-	private Rule parseRule(Label l, List<RuleFragment> value) {
-		if (l.t == Type.terminal)
-			return new LeafRule(l, ((Regex) value.get(0)).re);
-		return new SequenceRule(l, value, rules);
 	}
 
 	public Matcher matches(CharSequence s) throws GrammarException {
@@ -271,7 +188,7 @@ public class Grammar implements Serializable {
 		checkComplete();
 		final Map<Label, Map<Integer, Match>> cache = offsetCache();
 		final Matcher m = rules.get(root).matcher(s, offset, null, cache);
-		return new Matcher() {
+		return new GrammarMatcher(offset, noOverlap) {
 			boolean matchedOnce = false;
 			Match next = fetchNext();
 
@@ -298,6 +215,26 @@ public class Grammar implements Serializable {
 					return n;
 				}
 				return null;
+			}
+
+			@Override
+			public String identify() {
+				StringBuilder b = new StringBuilder();
+				b.append("matches(");
+				if (offset > 0)
+					b.append(offset);
+				if (noOverlap) {
+					if (offset > 0)
+						b.append(' ');
+					b.append("no overlap");
+				}
+				b.append(')');
+				return b.toString();
+			}
+
+			@Override
+			protected String name() {
+				return "matches";
 			}
 		};
 	}
@@ -341,8 +278,18 @@ public class Grammar implements Serializable {
 		checkComplete();
 		final Matcher m = rules.get(root).matcher(s, offset, null,
 				offsetCache());
+		abstract class LookingAtMatcher extends GrammarMatcher {
+			LookingAtMatcher(final int offset, final boolean NoOvlerlap) {
+				super(offset, NoOvlerlap);
+			}
+
+			@Override
+			public String name() {
+				return "lookingAt";
+			}
+		}
 		// synchronization wrappers
-		return noOverlap ? new Matcher() {
+		return noOverlap ? new LookingAtMatcher(offset, noOverlap) {
 			boolean matchedOnce = false;
 
 			@Override
@@ -356,7 +303,7 @@ public class Grammar implements Serializable {
 				matchedOnce = true;
 				return n;
 			}
-		} : new Matcher() {
+		} : new LookingAtMatcher(offset, noOverlap) {
 
 			@Override
 			public synchronized boolean mightHaveNext() {
@@ -395,7 +342,7 @@ public class Grammar implements Serializable {
 			final boolean noOverlap) throws GrammarException {
 		checkComplete();
 		final Map<Label, Map<Integer, Match>> cache = offsetCache();
-		return new Matcher() {
+		return new GrammarMatcher(offset, noOverlap) {
 			int index = offset;
 			boolean firstMatch = true;
 			Matcher m = rules.get(root).matcher(s, index, null, cache);
@@ -440,6 +387,11 @@ public class Grammar implements Serializable {
 			@Override
 			public boolean mightHaveNext() {
 				return next != null;
+			}
+
+			@Override
+			protected String name() {
+				return "find";
 			}
 		};
 	}
