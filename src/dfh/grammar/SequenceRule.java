@@ -114,20 +114,6 @@ public class SequenceRule extends Rule {
 		}
 	}
 
-	/**
-	 * @param list
-	 * @return label for synthetic node
-	 */
-	public static Label label(List<RuleFragment> list) {
-		StringBuilder b = new StringBuilder();
-		for (RuleFragment rf : list) {
-			if (b.length() > 0)
-				b.append(' ');
-			b.append(rf.stringify());
-		}
-		return new Label(Type.nonTerminal, b.toString());
-	}
-
 	public SequenceRule(Label l, List<Rule> list) {
 		this(l, list.toArray(new Rule[list.size()]));
 	}

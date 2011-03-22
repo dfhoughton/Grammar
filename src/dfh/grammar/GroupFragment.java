@@ -51,34 +51,6 @@ public class GroupFragment extends RepeatableRuleFragment {
 		currentSequence = null;
 	}
 
-	@Override
-	public String stringify() {
-		StringBuilder b = new StringBuilder();
-		boolean nonInitial = false;
-		b.append('[');
-		for (List<RuleFragment> alternate : alternates) {
-			if (nonInitial)
-				b.append('|');
-			else
-				nonInitial = true;
-			stringifySequence(b, alternate);
-		}
-		b.append(']');
-		b.append(rep);
-		return b.toString();
-	}
-
-	private void stringifySequence(StringBuilder b, List<RuleFragment> alternate) {
-		boolean nonInitial = false;
-		for (RuleFragment rf : alternate) {
-			if (nonInitial)
-				b.append(' ');
-			else
-				nonInitial = true;
-			b.append(rf.stringify());
-		}
-	}
-
 	/**
 	 * @return a lightweight clone of this fragment with the repetition set to
 	 *         <code>NONE</code>

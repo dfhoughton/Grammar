@@ -81,16 +81,6 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 	}
 
 	@Override
-	public String stringify() {
-		StringBuilder b = new StringBuilder();
-		b.append(t == Type.terminal ? '(' : '<');
-		b.append(id);
-		b.append(t == Type.terminal ? ')' : '>');
-		b.append(rep);
-		return b.toString();
-	}
-
-	@Override
 	public String toString() {
 		switch (t) {
 		case terminal:

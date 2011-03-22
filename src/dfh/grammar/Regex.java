@@ -10,11 +10,6 @@ public class Regex implements RuleFragment {
 	}
 
 	@Override
-	public String stringify() {
-		return re.toString();
-	}
-
-	@Override
 	public String toString() {
 		return re.toString();
 	}

@@ -9,8 +9,4 @@ package dfh.grammar;
  * 
  */
 public interface RuleFragment {
-	/**
-	 * @return BNF type representation of the fragment
-	 */
-	String stringify();
 }
