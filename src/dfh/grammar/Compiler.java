@@ -257,6 +257,11 @@ public class Compiler {
 			l = new Label(Type.nonTerminal, lf.toString());
 			r = new RepetitionRule(l, r, lf.rep);
 			return redundancyCheck(r);
+		} else if (rf instanceof BackReferenceFragment) {
+			BackReferenceFragment brf = (BackReferenceFragment) rf;
+			Label l = new Label(Type.terminal, rf.toString());
+			Rule r = new BackReferenceRule(l, brf.reference);
+			return redundancyCheck(r);
 		}
 		GroupFragment gf = (GroupFragment) rf;
 		if (gf.alternates.size() == 1) {

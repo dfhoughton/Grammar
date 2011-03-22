@@ -150,6 +150,23 @@ public class RuleParser {
 				add(parse, gf, r);
 			} else if (c == '#') {
 				break;
+			} else if (Character.isDigit(c)) {
+				int reference = getBackReference(body, offset);
+				Repetition rep = getRepetition(body, offset);
+				if (rep != Repetition.NONE)
+					throw new GrammarException(
+							"back reference cannot be modified with repetition suffixes");
+				if (gf == null) {
+					if (reference > parse.size())
+						throw new GrammarException("back reference "
+								+ reference + " is too big");
+				} else {
+					if (reference > gf.currentSequence.size())
+						throw new GrammarException("back reference "
+								+ reference + " is too big");
+				}
+				BackReferenceFragment brf = new BackReferenceFragment(reference);
+				add(parse, gf, brf);
 			} else {
 				RuleFragment r = nextRule(body, offset, bracket);
 				if (r instanceof RepeatableRuleFragment) {
@@ -167,6 +184,15 @@ public class RuleParser {
 		if (gf != null)
 			gf.done();
 		return parse;
+	}
+
+	private static int getBackReference(String body, int[] offset) {
+		int start = offset[0];
+		while (offset[0] < body.length()
+				&& Character.isDigit(body.charAt(offset[0]))) {
+			offset[0]++;
+		}
+		return Integer.parseInt(body.substring(start, offset[0]));
 	}
 
 	private static void add(List<RuleFragment> parse, GroupFragment gf,

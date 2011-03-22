@@ -4,15 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import dfh.grammar.Label.Type;
-
 public class SequenceRule extends Rule {
 	private static final long serialVersionUID = 1L;
 	final Rule[] sequence;
 
 	class SequenceMatcher extends NonterminalMatcher {
-		LinkedList<Matcher> matcherStack = new LinkedList<Matcher>();
-		LinkedList<Match> matchStack = new LinkedList<Match>();
+		LinkedList<Matcher> matchers = new LinkedList<Matcher>();
+		LinkedList<Match> matched = new LinkedList<Match>();
 
 		public SequenceMatcher(CharSequence cs, int offset, Match parent,
 				Map<Label, Map<Integer, Match>> cache) {
@@ -21,39 +19,39 @@ public class SequenceRule extends Rule {
 
 		@Override
 		protected void fetchNext() {
-			if (matchStack.size() > 0) {
-				while (!matchStack.isEmpty()) {
-					matchStack.removeLast();
-					if (matcherStack.peekLast().mightHaveNext())
+			if (matched.size() > 0) {
+				while (!matched.isEmpty()) {
+					matched.removeLast();
+					if (matchers.peekLast().mightHaveNext())
 						break;
 					else
-						matcherStack.removeLast();
+						matchers.removeLast();
 				}
-				if (matcherStack.isEmpty()) {
+				if (matchers.isEmpty()) {
 					next = null;
 					done = true;
 					return;
 				}
 			}
 			next = new Match(SequenceRule.this, offset, parent);
-			while (matchStack.size() < sequence.length) {
+			while (matched.size() < sequence.length) {
 				Matcher m;
-				if (matcherStack.isEmpty()) {
+				if (matchers.isEmpty()) {
 					m = sequence[0].matcher(cs, offset, next, cache, this);
-					matcherStack.add(m);
+					matchers.add(m);
 				} else
-					m = matcherStack.peekLast();
-				Match n = m.match();
+					m = matchers.peekLast();
+				Match n = m.mightHaveNext() ? m.match() : null;
 				if (n == null) {
 					System.err.println("fn " + identify()
 							+ " removing last matcher");
-					matcherStack.removeLast();
-					if (!matchStack.isEmpty()) {
+					matchers.removeLast();
+					if (!matched.isEmpty()) {
 						System.err.println("fn " + identify()
 								+ " removing last match");
-						matchStack.removeLast();
+						matched.removeLast();
 					}
-					if (matcherStack.isEmpty()) {
+					if (matchers.isEmpty()) {
 						System.err.println("fn " + identify()
 								+ " could not find a match");
 						done = true;
@@ -67,20 +65,19 @@ public class SequenceRule extends Rule {
 					System.err.println("fn " + identify() + " adding "
 							+ cs.subSequence(n.start(), n.end()) + " (" + n
 							+ ")");
-					matchStack.add(n);
-					if (matchStack.size() < sequence.length) {
-						m = sequence[matchStack.size()].matcher(cs, n.end(),
-								next, cache, this);
+					matched.add(n);
+					if (matched.size() < sequence.length) {
+						m = sequence[matched.size()].matcher(cs, n.end(), next,
+								cache, this);
 						System.err.println("fn " + identify()
 								+ " adding matcher " + m);
-						matcherStack.add(m);
+						matchers.add(m);
 					}
 				}
 			}
 			if (next != null) {
-				next.setEnd(matchStack.peekLast().end());
-				Match[] children = matchStack
-						.toArray(new Match[sequence.length]);
+				next.setEnd(matched.peekLast().end());
+				Match[] children = matched.toArray(new Match[sequence.length]);
 				next.setChildren(children);
 			}
 		}
@@ -98,10 +95,10 @@ public class SequenceRule extends Rule {
 				b.append(r);
 			}
 			b.append("}}");
-			if (matchStack != null) {
+			if (matched != null) {
 				nonInitial = false;
 				b.append('[');
-				for (Match m : matchStack) {
+				for (Match m : matched) {
 					if (nonInitial)
 						b.append(", ");
 					else

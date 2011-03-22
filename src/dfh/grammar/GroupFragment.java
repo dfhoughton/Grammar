@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class GroupFragment extends RepeatableRuleFragment {
 	List<List<RuleFragment>> alternates = new LinkedList<List<RuleFragment>>();
-	private List<RuleFragment> currentSequence = new LinkedList<RuleFragment>();
+	List<RuleFragment> currentSequence = new LinkedList<RuleFragment>();
 	private boolean did = false;
 
 	public GroupFragment(List<RuleFragment> list) {
