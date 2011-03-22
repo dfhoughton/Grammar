@@ -259,7 +259,7 @@ public class Compiler {
 			return redundancyCheck(r);
 		} else if (rf instanceof BackReferenceFragment) {
 			BackReferenceFragment brf = (BackReferenceFragment) rf;
-			Label l = new Label(Type.terminal, rf.toString());
+			Label l = new Label(Type.backreference, rf.toString());
 			Rule r = new BackReferenceRule(l, brf.reference);
 			return redundancyCheck(r);
 		}
