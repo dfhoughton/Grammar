@@ -1,0 +1,31 @@
+Grammar can handle the following:
+
+1) greedy, stingy, and possessive repetition
+2) '?', '+', '*', '{x}', '{x,y}', '{,x}', and '{x,}' repetition suffixes
+3) grouping
+     <rule> = [ <a> <b> ]++
+4) alternation
+     <rule> = <a> | <b>
+5) sequences
+     <rule> = <a> <b> <c>
+6) literals
+     <rule> = <a> "fred" <b>
+     <rule> = <a> 'fred' <b>
+7) blank lines and comments
+     <rule> = <a> | <b> # the '#' character begins a comment
+8) back references
+     <rule> = [ <a> | <b> ] <c> 1 # the digit is a one-based index of constituents of the same rule
+                                  # in this case '1' must match verbatim whatever '[ <a> | <b> ]' matched
+                                  # NOTE: back references can't take repetition suffixes
+9) terminal regular expressions
+     <rule> = <a> (s) <b>
+        (s) =\s++
+     # note the regular expression begins immediately after the '=' and you can't include comments
+     # except via the usual methods in regular expressions
+     # regular expression labels are enclosed in round brackets rather than angled
+10) reasonably thorough optimization and error checking
+11) memoization of matching success where possible -- actual matches are recorded for literals and regexes, success 
+    or failure for all other rules except back references, whose success or failure cannot easily be cached
+12) every Grammar must have a root rule, the basis of all matching, called ROOT; e.g.,
+     <ROOT> = <a> <b>
+13) all rule labels must be some sequence of \w characters
