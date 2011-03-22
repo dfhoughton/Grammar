@@ -249,7 +249,7 @@ public class Compiler {
 			return redundancyCheck(r);
 		} else if (rf instanceof LiteralFragment) {
 			LiteralFragment lf = (LiteralFragment) rf;
-			Label l = new Label(Type.terminal, '"' + lf.literal + '"');
+			Label l = new Label(Type.literal, '"' + lf.literal + '"');
 			Rule r = new LiteralRule(l, lf.literal);
 			r = redundancyCheck(r);
 			if (lf.rep.redundant())

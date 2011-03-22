@@ -25,10 +25,14 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		 */
 		terminal(2),
 		/**
+		 * Basically a string that must match literally.
+		 */
+		literal(3),
+		/**
 		 * This is a non-repeating identical match with an early constituent of
 		 * a sequence.
 		 */
-		backreference(3),
+		backreference(4),
 		/**
 		 * The root rule of the grammar. Every grammar must have one and only
 		 * one root and it can parse a string only if it passes the root rule.
@@ -92,6 +96,8 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 			return id;
 		case terminal:
 			return '(' + id + ')' + rep;
+		case literal:
+			return id;
 		case root:
 		default:
 			return '<' + id + '>' + rep;
