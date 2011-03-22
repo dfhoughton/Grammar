@@ -16,8 +16,16 @@ hours of academic research, try ANTLR or Parboiled or something such. I confess 
 none of the relevant research nor studied anyone else's algorithms before I started this,
 so a good bit of wheel re-invention is likely embodied in this code.
 
-NOTE: THIS CODE DOES NOT YET WORK!!! I've only just begun and much of it remains
-unwritten. I'll take this note away when it's working to some degree.
+Status
+------
+As of Tuesday, March 22, 2011 the code passes all tests.
+
+TODO
+----
+ * Document how to use grammars.
+ * Add tests for deferred rules.
+ * Add capability to use deferred terminal rules.
+ * Add capability to use Grammars as terminal rules in other grammars.
 
 Other Stuff
 -----------
