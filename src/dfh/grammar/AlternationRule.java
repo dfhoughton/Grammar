@@ -11,14 +11,14 @@ public class AlternationRule extends Rule {
 
 		public AlternationMatcher(CharSequence cs, int offset, Match parent,
 				Map<Label, Map<Integer, Match>> cache, Matcher master) {
-			super(cs, offset, parent, cache, AlternationRule.this.label, master);
+			super(cs, offset, parent, cache, AlternationRule.this.label);
 		}
 
 		@Override
 		protected void fetchNext() {
 			if (mostRecent == null) {
 				mostRecent = alternates[index].matcher(cs, offset, parent,
-						cache, master);
+						cache, this);
 				System.err.println("fn " + identify() + " doing first fetch");
 			}
 			Match child = null;
@@ -32,7 +32,7 @@ public class AlternationRule extends Rule {
 						break OUTER;
 				}
 				mostRecent = alternates[index].matcher(cs, offset, parent,
-						cache, master);
+						cache, this);
 				System.err.println("fn " + identify() + " index " + index);
 			}
 			if (child == null) {

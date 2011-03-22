@@ -15,8 +15,8 @@ public class SequenceRule extends Rule {
 		LinkedList<Match> matchStack = new LinkedList<Match>();
 
 		public SequenceMatcher(CharSequence cs, int offset, Match parent,
-				Map<Label, Map<Integer, Match>> cache, Matcher master) {
-			super(cs, offset, parent, cache, SequenceRule.this.label, master);
+				Map<Label, Map<Integer, Match>> cache) {
+			super(cs, offset, parent, cache, SequenceRule.this.label);
 		}
 
 		@Override
@@ -39,7 +39,7 @@ public class SequenceRule extends Rule {
 			while (matchStack.size() < sequence.length) {
 				Matcher m;
 				if (matcherStack.isEmpty()) {
-					m = sequence[0].matcher(cs, offset, next, cache, master);
+					m = sequence[0].matcher(cs, offset, next, cache, this);
 					matcherStack.add(m);
 				} else
 					m = matcherStack.peekLast();
@@ -70,7 +70,7 @@ public class SequenceRule extends Rule {
 					matchStack.add(n);
 					if (matchStack.size() < sequence.length) {
 						m = sequence[matchStack.size()].matcher(cs, n.end(),
-								next, cache, master);
+								next, cache, this);
 						System.err.println("fn " + identify()
 								+ " adding matcher " + m);
 						matcherStack.add(m);
@@ -140,7 +140,7 @@ public class SequenceRule extends Rule {
 	@Override
 	public Matcher matcher(CharSequence cs, int offset, Match parent,
 			Map<Label, Map<Integer, Match>> cache, Matcher master) {
-		return new SequenceMatcher(cs, offset, parent, cache, master);
+		return new SequenceMatcher(cs, offset, parent, cache);
 	}
 
 	@Override

@@ -15,17 +15,15 @@ public abstract class NonterminalMatcher implements Matcher {
 	protected final Map<Label, Map<Integer, Match>> cache;
 	protected final Map<Integer, Match> subCache;
 	protected final Label label;
-	protected final Matcher master;
 
 	protected NonterminalMatcher(CharSequence cs2, int offset, Match parent,
-			Map<Label, Map<Integer, Match>> cache, Label label, Matcher master) {
+			Map<Label, Map<Integer, Match>> cache, Label label) {
 		this.cs = cs2;
 		this.offset = offset;
 		this.parent = parent;
 		this.cache = cache;
 		this.label = label;
 		this.subCache = cache.get(label);
-		this.master = master;
 	}
 
 	@Override
