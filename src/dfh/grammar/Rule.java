@@ -22,8 +22,25 @@ public abstract class Rule implements Serializable {
 		return label;
 	}
 
+	/**
+	 * Creates a {@link Matcher} to keep track of backtracking and the matching
+	 * cache at this offset.
+	 * 
+	 * @param s
+	 *            sequence to match against
+	 * @param offset
+	 *            offset at which to begin the match
+	 * @param parent
+	 *            parent node for use in constructing the match tree
+	 * @param cache
+	 *            collection of offset matching caches
+	 * @param master
+	 *            reference to enclosing {@link Matcher} for use in
+	 *            backreference testing
+	 * @return
+	 */
 	public abstract Matcher matcher(CharSequence s, int offset, Match parent,
-			Map<Label, Map<Integer, Match>> cache);
+			Map<Label, Map<Integer, Match>> cache, Matcher master);
 
 	@Override
 	public String toString() {

@@ -70,7 +70,7 @@ public class LeafRule extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence s, final int offset, Match parent,
-			Map<Label, Map<Integer, Match>> cache) {
+			Map<Label, Map<Integer, Match>> cache, Matcher master) {
 		return new LeafMatcher(s, offset, parent, cache);
 	}
 

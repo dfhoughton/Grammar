@@ -187,7 +187,7 @@ public class Grammar implements Serializable {
 			final boolean noOverlap) throws GrammarException {
 		checkComplete();
 		final Map<Label, Map<Integer, Match>> cache = offsetCache();
-		final Matcher m = rules.get(root).matcher(s, offset, null, cache);
+		final Matcher m = rules.get(root).matcher(s, offset, null, cache, null);
 		return new GrammarMatcher(offset, noOverlap) {
 			boolean matchedOnce = false;
 			Match next = fetchNext();
@@ -277,7 +277,7 @@ public class Grammar implements Serializable {
 			final boolean noOverlap) throws GrammarException {
 		checkComplete();
 		final Matcher m = rules.get(root).matcher(s, offset, null,
-				offsetCache());
+				offsetCache(), null);
 		abstract class LookingAtMatcher extends GrammarMatcher {
 			LookingAtMatcher(final int offset, final boolean NoOvlerlap) {
 				super(offset, NoOvlerlap);
@@ -345,7 +345,7 @@ public class Grammar implements Serializable {
 		return new GrammarMatcher(offset, noOverlap) {
 			int index = offset;
 			boolean firstMatch = true;
-			Matcher m = rules.get(root).matcher(s, index, null, cache);
+			Matcher m = rules.get(root).matcher(s, index, null, cache, null);
 			Match next = fetchNext();
 
 			@Override
@@ -379,7 +379,7 @@ public class Grammar implements Serializable {
 					firstNull = false;
 					if (index == s.length())
 						break;
-					m = rules.get(root).matcher(s, index, null, cache);
+					m = rules.get(root).matcher(s, index, null, cache, null);
 				}
 				return null;
 			}
