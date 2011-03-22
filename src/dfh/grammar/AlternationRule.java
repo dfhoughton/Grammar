@@ -19,21 +19,17 @@ public class AlternationRule extends Rule {
 			if (mostRecent == null) {
 				mostRecent = alternates[index].matcher(cs, offset, parent,
 						cache, this);
-				System.err.println("fn " + identify() + " doing first fetch");
 			}
 			Match child = null;
 			OUTER: while (mostRecent.mightHaveNext()
 					|| ++index < alternates.length) {
 				while (mostRecent.mightHaveNext()) {
 					child = mostRecent.match();
-					System.err.println("fn " + identify() + " obtained child "
-							+ child);
 					if (child != null)
 						break OUTER;
 				}
 				mostRecent = alternates[index].matcher(cs, offset, parent,
 						cache, this);
-				System.err.println("fn " + identify() + " index " + index);
 			}
 			if (child == null) {
 				done = true;

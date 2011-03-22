@@ -43,34 +43,20 @@ public class SequenceRule extends Rule {
 					m = matchers.peekLast();
 				Match n = m.mightHaveNext() ? m.match() : null;
 				if (n == null) {
-					System.err.println("fn " + identify()
-							+ " removing last matcher");
 					matchers.removeLast();
 					if (!matched.isEmpty()) {
-						System.err.println("fn " + identify()
-								+ " removing last match");
 						matched.removeLast();
 					}
 					if (matchers.isEmpty()) {
-						System.err.println("fn " + identify()
-								+ " could not find a match");
 						done = true;
 						next = null;
-						// redundant, I believe
-						// if (!subCache.containsKey(offset))
-						// subCache.put(offset, null);
 						break;
 					}
 				} else {
-					System.err.println("fn " + identify() + " adding "
-							+ cs.subSequence(n.start(), n.end()) + " (" + n
-							+ ")");
 					matched.add(n);
 					if (matched.size() < sequence.length) {
 						m = sequence[matched.size()].matcher(cs, n.end(), next,
 								cache, this);
-						System.err.println("fn " + identify()
-								+ " adding matcher " + m);
 						matchers.add(m);
 					}
 				}
