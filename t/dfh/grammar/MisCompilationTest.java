@@ -154,4 +154,26 @@ public class MisCompilationTest {
 		}
 	}
 
+	@Test
+	public void cycleTest() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = <b>",//
+				"<b> = <a>",//
+		};
+		try {
+			Grammar g = new Grammar(rules);
+			g.find("foo bar");
+			g.defineTerminal("x", Pattern.compile("\\s++"));
+			org.junit.Assert.fail("did not discover missing rule");
+		} catch (Exception e) {
+			org.junit.Assert
+					.assertTrue(
+							"could not satisfy all dependencies",
+							e.getMessage().indexOf(
+									"could not satisfy all dependencies") > -1);
+		}
+	}
+
 }
