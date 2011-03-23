@@ -155,10 +155,11 @@ public class Grammar implements Serializable {
 		if (l == null)
 			throw new GrammarException("unknown terminal rule: " + label);
 		Rule r = rules.get(l);
-		if (r != null)
-			throw new GrammarException("terminal rule " + label
-					+ " already defined");
-		rules.put(l, new LeafRule(l, p));
+		if (r == null)
+			throw new GrammarException("rule " + label + " unused in grammar");
+		if (!(r instanceof DeferredDefinitionRule))
+			throw new GrammarException("rule " + label + " already defined");
+		((DeferredDefinitionRule) r).setRegex(p);
 	}
 
 	public Matcher matches(CharSequence s) throws GrammarException {

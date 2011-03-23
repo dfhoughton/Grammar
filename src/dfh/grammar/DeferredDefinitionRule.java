@@ -1,6 +1,7 @@
 package dfh.grammar;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * A rule undefined at the time of grammar compilation. It will always
@@ -36,5 +37,12 @@ public class DeferredDefinitionRule extends Rule {
 	@Override
 	protected String uniqueId() {
 		return "({DEFERRED}" + label + ")";
+	}
+
+	public void setRegex(Pattern p) {
+		if (r != null)
+			throw new GrammarException("rule " + label + "already defined");
+		LeafRule rule = new LeafRule(label, p);
+		r = rule;
 	}
 }
