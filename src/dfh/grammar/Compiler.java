@@ -29,7 +29,7 @@ import dfh.grammar.Label.Type;
 public class Compiler {
 	private HashMap<Label, Rule> rules;
 	private Map<String, Label> terminalLabelMap;
-	private Collection<Label> undefinedTerminals;
+	private Collection<Label> undefinedTerminals = new HashSet<Label>();
 	private Map<String, Rule> redundancyMap = new TreeMap<String, Rule>();
 	private List<String> redundantLabels = new LinkedList<String>();
 	private final Label root;
@@ -85,6 +85,7 @@ public class Compiler {
 				if (l.t == Type.terminal && !terminals.contains(l)) {
 					DeferredDefinitionRule ddr = new DeferredDefinitionRule(l,
 							rules);
+					undefinedTerminals.add(l);
 					rules.put(l, ddr);
 					terminals.add(l);
 					allLabels.add(l);
@@ -117,8 +118,7 @@ public class Compiler {
 				}
 			}
 			if (map.size() == size)
-				throw new GrammarException(
-						"impossible co-dependencies exist in rule set");
+				throw new GrammarException("could not satisfy all dependencies");
 
 			// now we generate all these rules
 
@@ -165,6 +165,8 @@ public class Compiler {
 		allLabels.removeAll(terminals);
 		if (!allLabels.isEmpty()) {
 			// undefined rules; generate error message
+			// I believe this is unreachable as this error will be caught
+			// earlier
 			LinkedList<String> list = new LinkedList<String>();
 			for (Label l : allLabels)
 				list.add(l.id);
@@ -179,10 +181,6 @@ public class Compiler {
 		redundancyMap.keySet().removeAll(redundantLabels);
 		for (Rule ru : redundancyMap.values())
 			rules.put(ru.label(), ru);
-
-		// and we prepare to receive definitions for any deferred rules
-		terminals.removeAll(rules.keySet());
-		undefinedTerminals = new HashSet<Label>(terminals);
 	}
 
 	private Rule parseRule(Label label, List<RuleFragment> fragments) {
