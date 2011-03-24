@@ -274,7 +274,12 @@ public class Compiler {
 					return redundancyCheck(r);
 				}
 			}
-			return makeSequence(gf.alternates.get(0));
+			Rule r = makeSequence(gf.alternates.get(0));
+			if (gf.rep.redundant())
+				return r;
+			Label l = new Label(Type.nonTerminal, r.label().toString() + gf.rep);
+			r = new RepetitionRule(l, r, gf.rep);
+			return redundancyCheck(r);
 		}
 		Rule[] alternates = new Rule[gf.alternates.size()];
 		int index = 0;
