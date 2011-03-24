@@ -120,8 +120,6 @@ public class RuleParser {
 				offset[0]++;
 				GroupFragment r = new GroupFragment(
 						parseBody(body, offset, ']'));
-				if (r.alternates.isEmpty())
-					throw new GrammarException("empty group  in " + body);
 				Repetition rep = getRepetition(body, offset);
 				if (rep.redundant() && r.alternates.size() == 1) {
 					if (gf == null)
@@ -152,6 +150,9 @@ public class RuleParser {
 				break;
 			} else if (Character.isDigit(c)) {
 				int reference = getBackReference(body, offset);
+				if (reference == 0)
+					throw new GrammarException(
+							"back references must be greater than 0");
 				Repetition rep = getRepetition(body, offset);
 				if (rep != Repetition.NONE)
 					throw new GrammarException(
@@ -211,17 +212,20 @@ public class RuleParser {
 	private static String getLiteral(String body, int[] offset, char delimiter) {
 		boolean escaped = false;
 		int start = offset[0] + 1;
-		while (offset[0] < body.length()) {
+		boolean found = false;
+		while (offset[0] + 1 < body.length()) {
 			offset[0]++;
 			char c = body.charAt(offset[0]);
 			if (escaped)
 				escaped = false;
 			else if (c == '\\')
 				escaped = true;
-			else if (c == delimiter)
+			else if (c == delimiter) {
+				found = true;
 				break;
+			}
 		}
-		if (offset[0] == body.length())
+		if (!found)
 			throw new GrammarException("could not find closing \" in " + body);
 		String s = body.substring(start, offset[0]);
 		offset[0]++;

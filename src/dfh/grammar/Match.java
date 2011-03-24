@@ -28,13 +28,13 @@ public class Match {
 		setChildren(null);
 	}
 
-	public Match(Rule r, int start, Match parent) {
+	Match(Rule r, int start, Match parent) {
 		this.r = r;
 		this.start = start;
 		this.parent = parent;
 	}
 
-	public Match(Rule r, int start, int end, Match parent) {
+	Match(Rule r, int start, int end, Match parent) {
 		this(r, start, parent);
 		setEnd(end);
 	}

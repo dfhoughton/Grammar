@@ -176,4 +176,300 @@ public class MisCompilationTest {
 		}
 	}
 
+	@Test
+	public void mismatchedBracketTest1() {
+		String[] rules = {
+				//
+				"<ROOT> = <a) | <b>", //
+				"<a> = <b>",//
+				"<b> = <a>",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover bad bracket");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue("ill-formed rule identifier", e
+					.getMessage().indexOf("ill-formed rule identifier") > -1);
+		}
+	}
+
+	@Test
+	public void mismatchedBracketTest2() {
+		String[] rules = {
+				//
+				"<ROOT> = (a> | <b>", //
+				"<a> = <b>",//
+				"<b> = <a>",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover bad bracket");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue("ill-formed rule identifier", e
+					.getMessage().indexOf("ill-formed rule identifier") > -1);
+		}
+	}
+
+	@Test
+	public void mismatchedBracketTest3() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"(a> = 'b'",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover bad bracket");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue("mismatched brackets in label", e
+					.getMessage().indexOf("mismatched brackets in label") > -1);
+		}
+	}
+
+	@Test
+	public void mismatchedBracketTest4() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a) = 'b'",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover bad bracket");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue("mismatched brackets in label", e
+					.getMessage().indexOf("mismatched brackets in label") > -1);
+		}
+	}
+
+	@Test
+	public void illFormedRule() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = asdfasdf",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not ill-formed rule");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue("ill-formed rule", e.getMessage()
+					.indexOf("ill-formed rule") > -1);
+		}
+	}
+
+	@Test
+	public void emptyGroup() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = 'b' []",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover empty group");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue("empty rule body", e.getMessage()
+					.indexOf("empty rule body") > -1);
+		}
+	}
+
+	@Test
+	public void emptyRuleBody() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = ",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover empty group");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue("empty rule body", e.getMessage()
+					.indexOf("empty rule body") > -1);
+		}
+	}
+
+	@Test
+	public void backReferenceRepetition() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = <b> 1++",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover repeated back reference");
+		} catch (Exception e) {
+			org.junit.Assert
+					.assertTrue(
+							"back reference cannot be modified with repetition suffixes",
+							e.getMessage()
+									.indexOf(
+											"back reference cannot be modified with repetition suffixes") > -1);
+		}
+	}
+
+	@Test
+	public void backReferenceRepetitionMiscount1() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = <b> 0",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover back reference miscount");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue(
+					"back references must be greater than 0",
+					e.getMessage().indexOf(
+							"back references must be greater than 0") > -1);
+		}
+	}
+
+	@Test
+	public void backReferenceRepetitionMiscount2() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = <b> 2",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover back reference miscount");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue("back reference too big", e
+					.getMessage().indexOf("too big") > -1);
+		}
+	}
+
+	@Test
+	public void backReferenceRepetitionMiscount3() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = [ <b> 0 ]++",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover back reference miscount");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue(
+					"back references must be greater than 0",
+					e.getMessage().indexOf(
+							"back references must be greater than 0") > -1);
+		}
+	}
+
+	@Test
+	public void backReferenceRepetitionMiscount4() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = [ <b> 2 ]++",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover back reference miscount");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue("back reference too big", e
+					.getMessage().indexOf("too big") > -1);
+		}
+	}
+
+	@Test
+	public void closingBracket() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = [ <b> 'q'",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover missing bracket");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue("could not find closing", e
+					.getMessage().indexOf("could not find closing") > -1);
+		}
+	}
+
+	@Test
+	public void closingQuote1() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = 'b",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover missing quote");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue("could not find closing quote", e
+					.getMessage().indexOf("could not find closing") > -1);
+		}
+	}
+
+	@Test
+	public void badCurlies1() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = 'b'{}",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover bad curly repetition");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue("bad repetition modifier", e
+					.getMessage().indexOf("bad repetition modifier") > -1);
+		}
+	}
+
+	@Test
+	public void badCurlies2() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = 'b'{,}",//
+				"<b> = 'a'",//
+		};
+		try {
+			@SuppressWarnings("unused")
+			Grammar g = new Grammar(rules);
+			org.junit.Assert.fail("did not discover bad curly repetition");
+		} catch (Exception e) {
+			org.junit.Assert.assertTrue("bad repetition modifier", e
+					.getMessage().indexOf("bad repetition modifier") > -1);
+		}
+	}
+
 }
