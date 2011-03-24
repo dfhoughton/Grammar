@@ -22,7 +22,7 @@ public class BackReferenceRule extends Rule {
 		private final int offset;
 		private final Match parent;
 		private final SequenceMatcher master;
-		private Match[] cache;
+		private boolean fresh = true;
 
 		public BackReferenceMatcher(CharSequence s, int offset, Match parent,
 				Map<Label, Map<Integer, Match>> cache, Matcher master) {
@@ -34,8 +34,8 @@ public class BackReferenceRule extends Rule {
 
 		@Override
 		public Match match() {
-			if (cache == null) {
-				cache = new Match[1];
+			if (fresh) {
+				fresh = false;
 				Match m = master.matched.get(index), n = null;
 				int delta = m.end() - m.start();
 				if (delta == 0) {
@@ -59,14 +59,14 @@ public class BackReferenceRule extends Rule {
 						}
 					}
 				}
-				cache[0] = n;
+				return n;
 			}
-			return cache[0];
+			return null;
 		}
 
 		@Override
 		public boolean mightHaveNext() {
-			return cache == null;
+			return fresh;
 		}
 
 		@Override
