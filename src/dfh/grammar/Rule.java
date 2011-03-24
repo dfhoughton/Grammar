@@ -1,7 +1,6 @@
 package dfh.grammar;
 
 import java.io.Serializable;
-import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -15,6 +14,7 @@ public abstract class Rule implements Serializable {
 
 	final Label label;
 	Grammar g;
+	int generation = -1;
 
 	public Rule(Label label) {
 		this.label = label;
@@ -128,4 +128,9 @@ public abstract class Rule implements Serializable {
 			g.trace.println(b);
 		}
 	}
+
+	/**
+	 * @return a String describing the rule
+	 */
+	public abstract String description();
 }

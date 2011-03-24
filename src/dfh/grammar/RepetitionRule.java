@@ -255,4 +255,20 @@ public class RepetitionRule extends Rule {
 	protected String uniqueId() {
 		return r.uniqueId() + repetition;
 	}
+
+	@Override
+	public String description() {
+		StringBuilder b = new StringBuilder();
+		if (r.generation == -1) {
+			if (r instanceof SequenceRule) {
+				b.append("[ ");
+				b.append(r.description());
+				b.append(" ]");
+			} else
+				b.append(r.description());
+		} else
+			b.append(r.label());
+		b.append(repetition);
+		return b.toString();
+	}
 }

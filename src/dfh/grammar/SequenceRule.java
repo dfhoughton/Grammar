@@ -128,4 +128,21 @@ public class SequenceRule extends Rule {
 		return b.toString();
 	}
 
+	@Override
+	public String description() {
+		StringBuilder b = new StringBuilder();
+		boolean nonInitial = false;
+		for (Rule r : sequence) {
+			if (nonInitial)
+				b.append(' ');
+			else
+				nonInitial = true;
+			if (r.generation == -1)
+				b.append(r.description());
+			else
+				b.append(r.label());
+		}
+		return b.toString();
+	}
+
 }

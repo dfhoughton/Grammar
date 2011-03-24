@@ -98,4 +98,9 @@ public class LiteralRule extends Rule {
 		return '"' + literal + '"';
 	}
 
+	@Override
+	public String description() {
+		return uniqueId();
+	}
+
 }

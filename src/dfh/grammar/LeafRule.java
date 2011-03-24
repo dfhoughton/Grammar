@@ -87,4 +87,9 @@ public class LeafRule extends Rule {
 	protected String uniqueId() {
 		return "(?:" + p.toString() + ")";
 	}
+
+	@Override
+	public String description() {
+		return p.toString();
+	}
 }

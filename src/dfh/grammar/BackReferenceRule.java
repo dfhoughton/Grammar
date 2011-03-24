@@ -93,4 +93,9 @@ public class BackReferenceRule extends Rule {
 		return Integer.toString(index + 1);
 	}
 
+	@Override
+	public String description() {
+		return label.toString();
+	}
+
 }

@@ -46,4 +46,9 @@ public class DeferredDefinitionRule extends Rule {
 		rule.g = g;
 		r = rule;
 	}
+
+	@Override
+	public String description() {
+		return r.description();
+	}
 }

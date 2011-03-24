@@ -10,13 +10,19 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
+
+import dfh.grammar.Label.Type;
 
 /**
  * Base class that parses strings according to a given set of rules.
@@ -430,5 +436,51 @@ public class Grammar implements Serializable {
 	 */
 	public void setTrace(PrintStream trace) {
 		this.trace = trace;
+	}
+
+	/**
+	 * @return canonical description of {@link Grammar}
+	 */
+	public String describe() {
+		List<Rule> ruleList = new ArrayList<Rule>(rules.values());
+		int maxLabel = -1;
+		for (Iterator<Rule> i = ruleList.iterator(); i.hasNext();) {
+			Rule r = i.next();
+			if (r.generation == -1) {
+				i.remove();
+				continue;
+			}
+			int l = r.label().toString().length();
+			if (l > maxLabel)
+				maxLabel = l;
+			if (r == rules.get(root))
+				i.remove();
+		}
+		String format = "%" + maxLabel + "s =";
+		// put rules in canonical order
+		Collections.sort(ruleList, new Comparator<Rule>() {
+			@Override
+			public int compare(Rule o1, Rule o2) {
+				int comparison = o2.generation - o1.generation;
+				if (comparison == 0)
+					comparison = o1.label().toString()
+							.compareTo(o2.label().toString());
+				return comparison;
+			}
+		});
+
+		StringBuilder b = new StringBuilder();
+		b.append(String.format(format, root));
+		b.append(' ');
+		b.append(rules.get(root).description());
+		b.append("\n\n");
+		for (Rule r : ruleList) {
+			b.append(String.format(format, r.label()));
+			if (r.label().t != Type.terminal)
+				b.append(' ');
+			b.append(r.description());
+			b.append("\n");
+		}
+		return b.toString();
 	}
 }

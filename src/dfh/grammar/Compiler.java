@@ -58,6 +58,7 @@ public class Compiler {
 		rules = new HashMap<Label, Rule>(map.size() * 2);
 		Set<Label> allLabels = new HashSet<Label>(map.size()), terminals = new HashSet<Label>(
 				map.size()), knownLabels = new HashSet<Label>(map.keySet());
+		int gen = 1;
 		// first we extract all the terminals we can
 		for (Iterator<Entry<Label, List<RuleFragment>>> i = map.entrySet()
 				.iterator(); i.hasNext();) {
@@ -69,6 +70,7 @@ public class Compiler {
 				knownLabels.add(l);
 				terminals.add(l);
 				Rule ru = new LeafRule(l, ((Regex) e.getValue().get(0)).re);
+				ru.generation = gen;
 				String id = ru.uniqueId();
 				Rule old = redundancyMap.get(id);
 				if (old == null) {
@@ -79,12 +81,14 @@ public class Compiler {
 			}
 		}
 		// now we extract all the deferred definition rules
+		gen = 0;
 		for (List<RuleFragment> list : map.values()) {
 			Set<Label> labels = allLabels(list);
 			for (Label l : labels) {
 				if (l.t == Type.terminal && !terminals.contains(l)) {
 					DeferredDefinitionRule ddr = new DeferredDefinitionRule(l,
 							rules);
+					ddr.generation = gen;
 					undefinedTerminals.add(l);
 					rules.put(l, ddr);
 					terminals.add(l);
@@ -94,6 +98,7 @@ public class Compiler {
 			}
 		}
 		// now we define the remainder
+		gen = 2;
 		while (!map.isEmpty()) {
 			int size = map.size();
 			// we process rules by generation, from less dependent to more, in
@@ -149,11 +154,14 @@ public class Compiler {
 			// now we make the rules
 			for (Sorter s : sorters) {
 				Entry<Label, List<RuleFragment>> e = s.e;
-				rules.put(e.getKey(), parseRule(e.getKey(), e.getValue()));
+				Rule ru = parseRule(e.getKey(), e.getValue());
+				ru.generation = gen;
+				rules.put(e.getKey(), ru);
 				Set<Label> labels = allLabels(e.getValue());
 				allLabels.addAll(labels);
 				allLabels.add(e.getKey());
 			}
+			gen++;
 		}
 
 		// now we look for errors

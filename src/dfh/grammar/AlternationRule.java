@@ -78,4 +78,26 @@ public class AlternationRule extends Rule {
 		b.append(']');
 		return b.toString();
 	}
+
+	@Override
+	public String description() {
+		StringBuilder b = new StringBuilder();
+		boolean nonInitial = false;
+		for (Rule r : alternates) {
+			if (nonInitial)
+				b.append(" | ");
+			else
+				nonInitial = true;
+			if (r.generation == -1) {
+				if (r instanceof SequenceRule) {
+					b.append("[ ");
+					b.append(r.description());
+					b.append(" ]");
+				} else
+					b.append(r.description());
+			} else
+				b.append(r.label());
+		}
+		return b.toString();
+	}
 }
