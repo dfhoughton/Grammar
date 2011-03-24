@@ -121,7 +121,8 @@ public class RuleParser {
 				GroupFragment r = new GroupFragment(
 						parseBody(body, offset, ']'));
 				Repetition rep = getRepetition(body, offset);
-				if (rep.redundant() && r.alternates.size() == 1) {
+				if (rep.redundant() && r.alternates.size() == 1
+						&& r.alternates.get(0).size() == 1) {
 					if (gf == null)
 						parse.addAll(r.alternates.get(0));
 					else {

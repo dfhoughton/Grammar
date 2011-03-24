@@ -22,12 +22,14 @@ public class AlternationRule extends Rule {
 			}
 			Match child = null;
 			OUTER: while (mostRecent.mightHaveNext()
-					|| ++index < alternates.length) {
+					|| index < alternates.length) {
 				while (mostRecent.mightHaveNext()) {
 					child = mostRecent.match();
 					if (child != null)
 						break OUTER;
 				}
+				if (++index == alternates.length)
+					break;
 				mostRecent = alternates[index].matcher(cs, offset, parent,
 						cache, this);
 			}

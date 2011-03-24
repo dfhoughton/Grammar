@@ -30,23 +30,27 @@ public class LeafRule extends Rule {
 		@Override
 		public Match match() {
 			LeafRule.this.matchTrace(this, chars, offset);
-			fresh = false;
-			CachedMatch cm = cache.get(offset);
-			if (cm != null) {
-				LeafRule.this.matchTrace(this, chars, offset, cm.m);
-				return cm.m;
+			if (fresh) {
+				fresh = false;
+				CachedMatch cm = cache.get(offset);
+				if (cm != null) {
+					LeafRule.this.matchTrace(this, chars, offset, cm.m);
+					return cm.m;
+				}
+				java.util.regex.Matcher m = p.matcher(chars);
+				m.region(offset, chars.length());
+				m.useTransparentBounds(true);
+				m.useAnchoringBounds(false);
+				Match n = null;
+				if (m.lookingAt())
+					n = new Match(LeafRule.this, offset, m.end(), parent);
+				cm = new CachedMatch(n);
+				cache.put(offset, cm);
+				LeafRule.this.matchTrace(this, chars, offset, n);
+				return n;
 			}
-			java.util.regex.Matcher m = p.matcher(chars);
-			m.region(offset, chars.length());
-			m.useTransparentBounds(true);
-			m.useAnchoringBounds(false);
-			Match n = null;
-			if (m.lookingAt())
-				n = new Match(LeafRule.this, offset, m.end(), parent);
-			cm = new CachedMatch(n);
-			cache.put(offset, cm);
-			LeafRule.this.matchTrace(this, chars, offset, n);
-			return n;
+			LeafRule.this.matchTrace(this, chars, offset, null);
+			return null;
 		}
 
 		@Override

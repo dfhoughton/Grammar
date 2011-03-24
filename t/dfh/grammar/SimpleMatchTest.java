@@ -22,7 +22,6 @@ public class SimpleMatchTest {
 				"(baz) =baz",//
 		};
 		g = new Grammar(rules);
-		g.setTrace(System.err);
 	}
 
 	@Test
