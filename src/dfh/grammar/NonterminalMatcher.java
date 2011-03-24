@@ -60,4 +60,9 @@ public abstract class NonterminalMatcher extends Matcher {
 	public String toString() {
 		return "M:" + rule.label().id;
 	}
+
+	@Override
+	Rule rule() {
+		return rule;
+	}
 }

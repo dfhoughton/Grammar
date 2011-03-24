@@ -69,6 +69,11 @@ public class LiteralRule extends Rule {
 		public String toString() {
 			return identify();
 		}
+
+		@Override
+		Rule rule() {
+			return LiteralRule.this;
+		}
 	}
 
 	/**

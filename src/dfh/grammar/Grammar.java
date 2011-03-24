@@ -57,6 +57,11 @@ public class Grammar implements Serializable {
 			b.append(')');
 			return b.toString();
 		}
+
+		@Override
+		Rule rule() {
+			return null;
+		}
 	}
 
 	private static class BReader implements LineReader {
@@ -109,10 +114,6 @@ public class Grammar implements Serializable {
 	 */
 	private final HashSet<Label> undefinedTerminals;
 	transient PrintStream trace;
-	/**
-	 * For creating a stack trace when debugging.
-	 */
-	transient LinkedList<Match> stack;
 
 	public Grammar(String[] lines) throws GrammarException, IOException {
 		this(new AReader(lines));
@@ -429,9 +430,5 @@ public class Grammar implements Serializable {
 	 */
 	public void setTrace(PrintStream trace) {
 		this.trace = trace;
-		if (trace == null)
-			stack = null;
-		else
-			stack = new LinkedList<Match>();
 	}
 }

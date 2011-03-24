@@ -1,6 +1,7 @@
 package dfh.grammar;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -64,8 +65,23 @@ public abstract class Rule implements Serializable {
 			StringBuilder b = new StringBuilder();
 			b.append(label());
 			locate(b, m.s, m.offset);
-			b.append("\n     ").append(m.parent);
+			stackTrace(b, m);
 			g.trace.println(b);
+		}
+	}
+
+	void stackTrace(StringBuilder b, Matcher m) {
+		b.append("\n     ");
+		while (true) {
+			b.append(m.rule().label());
+			b.append(' ');
+			b.append(m.offset);
+			if (m.master == null)
+				break;
+			else {
+				b.append(" :: ");
+				m = m.master;
+			}
 		}
 	}
 
@@ -98,7 +114,7 @@ public abstract class Rule implements Serializable {
 	void matchTrace(Matcher m, Match n) {
 		if (g.trace != null) {
 			StringBuilder b = new StringBuilder();
-			b.append("   ");
+			b.append("  ");
 			b.append(label());
 			locate(b, m.s, m.offset);
 			b.append(" returning ");
@@ -108,25 +124,8 @@ public abstract class Rule implements Serializable {
 				b.append(m.s.subSequence(n.start(), n.end()));
 				b.append('\'');
 			}
-			b.append("\n        ").append(m.parent);
+			stackTrace(b, m);
 			g.trace.println(b);
-			if (n == null)
-				g.stack.add(n);
 		}
-	}
-
-	/**
-	 * For use in {@link Matcher} during debugging.
-	 * 
-	 * @return whether we are debugging
-	 */
-	void push(Match m) {
-		if (g.trace != null)
-			g.stack.add(m);
-	}
-
-	void pop() {
-		if (g.trace != null)
-			g.stack.removeLast();
 	}
 }

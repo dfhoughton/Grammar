@@ -70,6 +70,11 @@ public class BackReferenceRule extends Rule {
 		public String identify() {
 			return label.toString();
 		}
+
+		@Override
+		Rule rule() {
+			return BackReferenceRule.this;
+		}
 	}
 
 	public BackReferenceRule(Label label, int index) {
