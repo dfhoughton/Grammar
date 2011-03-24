@@ -28,11 +28,14 @@ public class LiteralRule extends Rule {
 
 		@Override
 		public Match match() {
+			LiteralRule.this.matchTrace(this, s, offset);
 			if (fresh) {
 				fresh = false;
 				CachedMatch cm = cache.get(offset);
-				if (cm != null)
+				if (cm != null) {
+					LiteralRule.this.matchTrace(this, s, offset, cm.m);
 					return cm.m;
+				}
 				Match m = null;
 				int end = offset + literal.length();
 				if (end <= s.length()) {
@@ -50,8 +53,10 @@ public class LiteralRule extends Rule {
 				}
 				cm = new CachedMatch(m);
 				cache.put(offset, cm);
+				LiteralRule.this.matchTrace(this, s, offset, m);
 				return m;
 			}
+			LiteralRule.this.matchTrace(this, s, offset, null);
 			return null;
 		}
 

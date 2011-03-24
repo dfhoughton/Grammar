@@ -22,7 +22,7 @@ public class RepetitionRule extends Rule {
 
 		public RepetitionMatcher(CharSequence cs, int offset, Match parent,
 				Map<Label, Map<Integer, CachedMatch>> cache, Label label) {
-			super(cs, offset, parent, cache, label);
+			super(cs, offset, parent, cache, RepetitionRule.this);
 		}
 
 		@Override

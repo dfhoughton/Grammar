@@ -14,25 +14,29 @@ public abstract class NonterminalMatcher implements Matcher {
 	protected boolean done = false;
 	protected final Map<Label, Map<Integer, CachedMatch>> cache;
 	protected final Map<Integer, CachedMatch> subCache;
-	protected final Label label;
+	protected final Rule rule;
 
 	protected NonterminalMatcher(CharSequence cs2, int offset, Match parent,
-			Map<Label, Map<Integer, CachedMatch>> cache, Label label) {
+			Map<Label, Map<Integer, CachedMatch>> cache, Rule rule) {
 		this.cs = cs2;
 		this.offset = offset;
 		this.parent = parent;
 		this.cache = cache;
-		this.label = label;
-		this.subCache = cache.get(label);
+		this.rule = rule;
+		this.subCache = cache.get(rule.label());
 	}
 
 	@Override
 	public Match match() {
-		if (done)
+		rule.matchTrace(this, cs, offset);
+		if (done) {
+			rule.matchTrace(this, cs, offset, null);
 			return null;
+		}
 		CachedMatch cm = subCache.get(offset);
 		boolean alreadyMatched = cm != null;
 		if (alreadyMatched && cm.m == null) {
+			rule.matchTrace(this, cs, offset, null);
 			return null;
 		}
 		if (next == null)
@@ -43,6 +47,7 @@ public abstract class NonterminalMatcher implements Matcher {
 		}
 		Match n = next;
 		next = null;
+		rule.matchTrace(this, cs, offset, n);
 		return n;
 	}
 
@@ -58,6 +63,6 @@ public abstract class NonterminalMatcher implements Matcher {
 
 	@Override
 	public String toString() {
-		return "M:" + label.id;
+		return "M:" + rule.label().id;
 	}
 }

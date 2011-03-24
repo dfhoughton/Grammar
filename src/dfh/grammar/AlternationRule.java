@@ -11,7 +11,7 @@ public class AlternationRule extends Rule {
 
 		public AlternationMatcher(CharSequence cs, int offset, Match parent,
 				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
-			super(cs, offset, parent, cache, AlternationRule.this.label);
+			super(cs, offset, parent, cache, AlternationRule.this);
 		}
 
 		@Override

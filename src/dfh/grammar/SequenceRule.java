@@ -14,7 +14,7 @@ public class SequenceRule extends Rule {
 
 		public SequenceMatcher(CharSequence cs, int offset, Match parent,
 				Map<Label, Map<Integer, CachedMatch>> cache) {
-			super(cs, offset, parent, cache, SequenceRule.this.label);
+			super(cs, offset, parent, cache, SequenceRule.this);
 		}
 
 		@Override

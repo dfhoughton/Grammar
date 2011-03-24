@@ -43,6 +43,7 @@ public class DeferredDefinitionRule extends Rule {
 		if (r != null)
 			throw new GrammarException("rule " + label + "already defined");
 		LeafRule rule = new LeafRule(label, p);
+		rule.g = g;
 		r = rule;
 	}
 }

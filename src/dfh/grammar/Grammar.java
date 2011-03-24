@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.util.Collections;
@@ -107,6 +108,7 @@ public class Grammar implements Serializable {
 	 * Keeps track of terminals not defined in initial rule set.
 	 */
 	private final HashSet<Label> undefinedTerminals;
+	PrintStream trace;
 
 	public Grammar(String[] lines) throws GrammarException, IOException {
 		this(new AReader(lines));
@@ -138,6 +140,8 @@ public class Grammar implements Serializable {
 		Compiler c = new Compiler(reader);
 		root = c.root();
 		rules = c.rules();
+		for (Rule r : rules.values())
+			r.g = this;
 		terminalLabelMap = c.terminalLabelMap();
 		undefinedTerminals = c.undefinedTerminals();
 	}
@@ -411,5 +415,22 @@ public class Grammar implements Serializable {
 			offsetCache.put(l, new TreeMap<Integer, CachedMatch>());
 		}
 		return offsetCache;
+	}
+
+	/**
+	 * Setting this non-null turns on match debugging output.
+	 * 
+	 * @param trace
+	 *            sink for debugging trace
+	 */
+	public void setTrace(PrintStream trace) {
+		this.trace = trace;
+	}
+
+	/**
+	 * @return whether we're debugging
+	 */
+	boolean trace() {
+		return trace != null;
 	}
 }
