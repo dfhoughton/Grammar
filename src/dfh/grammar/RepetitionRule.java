@@ -25,24 +25,6 @@ public class RepetitionRule extends Rule {
 				Matcher master) {
 			super(cs, offset, parent, cache, RepetitionRule.this, master);
 		}
-
-		@Override
-		public String identify() {
-			StringBuilder b = new StringBuilder(label.id);
-			if (matched != null) {
-				boolean nonInitial = false;
-				b.append('[');
-				for (Match m : matched) {
-					if (nonInitial)
-						b.append(", ");
-					else
-						nonInitial = true;
-					b.append(s.subSequence(m.start(), m.end()));
-				}
-				b.append(']');
-			}
-			return b.toString();
-		}
 	}
 
 	private abstract class GreedyAndPossessive extends RepetitionMatcher {

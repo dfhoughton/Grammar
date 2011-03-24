@@ -67,11 +67,6 @@ public class BackReferenceRule extends Rule {
 		}
 
 		@Override
-		public String identify() {
-			return label.toString();
-		}
-
-		@Override
 		Rule rule() {
 			return BackReferenceRule.this;
 		}

@@ -51,11 +51,6 @@ public abstract class Matcher {
 	abstract boolean mightHaveNext();
 
 	/**
-	 * @return stringification useful in debugging
-	 */
-	abstract String identify();
-
-	/**
 	 * @return the {@link Rule} that generated this {@link Matcher}
 	 */
 	abstract Rule rule();

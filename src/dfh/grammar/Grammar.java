@@ -41,28 +41,13 @@ public class Grammar implements Serializable {
 	 * 
 	 */
 	private abstract class GrammarMatcher extends Matcher {
-		private final boolean noOverlap;
 
 		protected GrammarMatcher(CharSequence s, final int offset,
 				final boolean noOverlap) {
 			super(s, offset, null, null);
-			this.noOverlap = noOverlap;
 		}
 
 		protected abstract String name();
-
-		@Override
-		public String identify() {
-			StringBuilder b = new StringBuilder();
-			b.append(name());
-			if (offset > 0)
-				b.append(offset);
-			if (noOverlap) {
-				b.append("no overlap");
-			}
-			b.append(')');
-			return b.toString();
-		}
 
 		@Override
 		Rule rule() {
@@ -230,21 +215,6 @@ public class Grammar implements Serializable {
 					return n;
 				}
 				return null;
-			}
-
-			@Override
-			public String identify() {
-				StringBuilder b = new StringBuilder();
-				b.append("matches(");
-				if (offset > 0)
-					b.append(offset);
-				if (noOverlap) {
-					if (offset > 0)
-						b.append(' ');
-					b.append("no overlap");
-				}
-				b.append(')');
-				return b.toString();
 			}
 
 			@Override

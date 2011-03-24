@@ -67,34 +67,6 @@ public class SequenceRule extends Rule {
 				next.setChildren(children);
 			}
 		}
-
-		@Override
-		public String identify() {
-			StringBuilder b = new StringBuilder(label.id);
-			boolean nonInitial = false;
-			b.append("{{");
-			for (Rule r : sequence) {
-				if (nonInitial)
-					b.append(' ');
-				else
-					nonInitial = true;
-				b.append(r);
-			}
-			b.append("}}");
-			if (matched != null) {
-				nonInitial = false;
-				b.append('[');
-				for (Match m : matched) {
-					if (nonInitial)
-						b.append(", ");
-					else
-						nonInitial = true;
-					b.append(s.subSequence(m.start(), m.end()));
-				}
-				b.append(']');
-			}
-			return b.toString();
-		}
 	}
 
 	public SequenceRule(Label l, List<Rule> list) {

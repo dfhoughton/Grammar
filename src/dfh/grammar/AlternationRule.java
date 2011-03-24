@@ -43,11 +43,6 @@ public class AlternationRule extends Rule {
 				next.setEnd(child.end());
 			}
 		}
-
-		@Override
-		public String identify() {
-			return label.id + ":" + mostRecent;
-		}
 	}
 
 	final Rule[] alternates;

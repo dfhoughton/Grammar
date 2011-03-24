@@ -61,13 +61,8 @@ public class LiteralRule extends Rule {
 		}
 
 		@Override
-		public String identify() {
-			return '"' + literal + '"';
-		}
-
-		@Override
 		public String toString() {
-			return identify();
+			return '"' + literal + '"';
 		}
 
 		@Override
