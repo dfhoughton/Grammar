@@ -83,7 +83,7 @@ public class LiteralRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence s, int offset, Match parent,
+	public Matcher matcher(CharSequence s, Integer offset, Match parent,
 			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
 		return new LiteralMatcher(s, offset, parent, cache);
 	}

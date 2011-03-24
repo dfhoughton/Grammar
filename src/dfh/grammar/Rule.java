@@ -39,7 +39,7 @@ public abstract class Rule implements Serializable {
 	 *            backreference testing
 	 * @return
 	 */
-	public abstract Matcher matcher(CharSequence s, int offset, Match parent,
+	public abstract Matcher matcher(CharSequence s, Integer offset, Match parent,
 			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master);
 
 	@Override

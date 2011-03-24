@@ -107,7 +107,7 @@ public class SequenceRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence cs, int offset, Match parent,
+	public Matcher matcher(CharSequence cs, Integer offset, Match parent,
 			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
 		return new SequenceMatcher(cs, offset, parent, cache);
 	}
