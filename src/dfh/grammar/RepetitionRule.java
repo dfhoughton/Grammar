@@ -21,8 +21,9 @@ public class RepetitionRule extends Rule {
 		protected LinkedList<Matcher> matchers;
 
 		public RepetitionMatcher(CharSequence cs, int offset, Match parent,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label) {
-			super(cs, offset, parent, cache, RepetitionRule.this);
+				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
+				Matcher master) {
+			super(cs, offset, parent, cache, RepetitionRule.this, master);
 		}
 
 		@Override
@@ -36,7 +37,7 @@ public class RepetitionRule extends Rule {
 						b.append(", ");
 					else
 						nonInitial = true;
-					b.append(cs.subSequence(m.start(), m.end()));
+					b.append(s.subSequence(m.start(), m.end()));
 				}
 				b.append(']');
 			}
@@ -51,7 +52,7 @@ public class RepetitionRule extends Rule {
 		protected GreedyAndPossessive(CharSequence cs, int offset,
 				Match parent, Map<Label, Map<Integer, CachedMatch>> cache,
 				Label label, boolean backtracks, Matcher master) {
-			super(cs, offset, parent, cache, label);
+			super(cs, offset, parent, cache, label, master);
 			this.backtracks = backtracks;
 		}
 
@@ -80,7 +81,7 @@ public class RepetitionRule extends Rule {
 			if (matchers.size() > matched.size())
 				m = matchers.peekLast();
 			else {
-				m = r.matcher(cs, start, parent, cache, this);
+				m = r.matcher(s, start, parent, cache, this);
 				matchers.add(m);
 			}
 			Match n = m.match();
@@ -153,7 +154,7 @@ public class RepetitionRule extends Rule {
 		protected StingyMatcher(CharSequence cs, int offset, Match parent,
 				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
 				Matcher master) {
-			super(cs, offset, parent, cache, label);
+			super(cs, offset, parent, cache, label, master);
 			matchers = new LinkedList<Matcher>();
 			matched = new LinkedList<Match>();
 			matchers.add(r.matcher(cs, offset, parent, cache, master));
@@ -173,7 +174,7 @@ public class RepetitionRule extends Rule {
 							matched.removeLast();
 						matched.add(n);
 						if (matched.size() < repetition.top)
-							matchers.add(r.matcher(cs, n.end(), next, cache,
+							matchers.add(r.matcher(s, n.end(), next, cache,
 									this));
 					}
 				} else {

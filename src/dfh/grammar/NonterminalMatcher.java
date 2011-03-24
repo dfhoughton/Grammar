@@ -2,25 +2,20 @@ package dfh.grammar;
 
 import java.util.Map;
 
-public abstract class NonterminalMatcher implements Matcher {
-
-	protected final Integer offset;
-	protected final Match parent;
+public abstract class NonterminalMatcher extends Matcher {
 
 	protected abstract void fetchNext();
 
-	protected final CharSequence cs;
 	protected Match next;
 	protected boolean done = false;
 	protected final Map<Label, Map<Integer, CachedMatch>> cache;
 	protected final Map<Integer, CachedMatch> subCache;
 	protected final Rule rule;
 
-	protected NonterminalMatcher(CharSequence cs2, int offset, Match parent,
-			Map<Label, Map<Integer, CachedMatch>> cache, Rule rule) {
-		this.cs = cs2;
-		this.offset = offset;
-		this.parent = parent;
+	protected NonterminalMatcher(CharSequence cs2, Integer offset,
+			Match parent, Map<Label, Map<Integer, CachedMatch>> cache,
+			Rule rule, Matcher master) {
+		super(cs2, offset, parent, master);
 		this.cache = cache;
 		this.rule = rule;
 		this.subCache = cache.get(rule.label());
@@ -28,15 +23,15 @@ public abstract class NonterminalMatcher implements Matcher {
 
 	@Override
 	public Match match() {
-		rule.matchTrace(this, cs, offset);
+		rule.matchTrace(this);
 		if (done) {
-			rule.matchTrace(this, cs, offset, null);
+			rule.matchTrace(this, null);
 			return null;
 		}
 		CachedMatch cm = subCache.get(offset);
 		boolean alreadyMatched = cm != null;
 		if (alreadyMatched && cm.m == null) {
-			rule.matchTrace(this, cs, offset, null);
+			rule.matchTrace(this, null);
 			return null;
 		}
 		if (next == null)
@@ -47,7 +42,7 @@ public abstract class NonterminalMatcher implements Matcher {
 		}
 		Match n = next;
 		next = null;
-		rule.matchTrace(this, cs, offset, n);
+		rule.matchTrace(this, n);
 		return n;
 	}
 

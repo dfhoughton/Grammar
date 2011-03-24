@@ -16,28 +16,22 @@ public class BackReferenceRule extends Rule {
 	private static final long serialVersionUID = 1L;
 	private final int index;
 
-	private class BackReferenceMatcher implements Matcher {
+	private class BackReferenceMatcher extends Matcher {
 
-		private final CharSequence s;
-		private final int offset;
-		private final Match parent;
-		private final SequenceMatcher master;
 		private boolean fresh = true;
 
-		public BackReferenceMatcher(CharSequence s, int offset, Match parent,
-				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
-			this.s = s;
-			this.offset = offset;
-			this.parent = parent;
-			this.master = (SequenceMatcher) master;
+		public BackReferenceMatcher(CharSequence s, Integer offset,
+				Match parent, Map<Label, Map<Integer, CachedMatch>> cache,
+				Matcher master) {
+			super(s, offset, parent, master);
 		}
 
 		@Override
 		public Match match() {
-			BackReferenceRule.this.matchTrace(this, s, offset);
+			BackReferenceRule.this.matchTrace(this);
 			if (fresh) {
 				fresh = false;
-				Match m = master.matched.get(index), n = null;
+				Match m = ((SequenceMatcher) master).matched.get(index), n = null;
 				int delta = m.end() - m.start();
 				if (delta == 0) {
 					// zero-width matches always match
@@ -60,10 +54,10 @@ public class BackReferenceRule extends Rule {
 						}
 					}
 				}
-				BackReferenceRule.this.matchTrace(this, s, offset, n);
+				BackReferenceRule.this.matchTrace(this, n);
 				return n;
 			}
-			BackReferenceRule.this.matchTrace(this, s, offset, null);
+			BackReferenceRule.this.matchTrace(this, null);
 			return null;
 		}
 
@@ -76,7 +70,6 @@ public class BackReferenceRule extends Rule {
 		public String identify() {
 			return label.toString();
 		}
-
 	}
 
 	public BackReferenceRule(Label label, int index) {

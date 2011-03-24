@@ -11,29 +11,24 @@ import java.util.Map;
  * 
  */
 public class LiteralRule extends Rule {
-	private class LiteralMatcher implements Matcher {
-		private final CharSequence s;
-		private final Integer offset;
-		private final Match parent;
+	private class LiteralMatcher extends Matcher {
 		private final Map<Integer, CachedMatch> cache;
 		private boolean fresh = true;
 
-		public LiteralMatcher(CharSequence s, int offset, Match parent,
-				Map<Label, Map<Integer, CachedMatch>> cache) {
-			this.s = s;
-			this.offset = offset;
-			this.parent = parent;
+		public LiteralMatcher(CharSequence s, Integer offset, Match parent,
+				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			super(s, offset, parent, master);
 			this.cache = cache.get(label);
 		}
 
 		@Override
 		public Match match() {
-			LiteralRule.this.matchTrace(this, s, offset);
+			LiteralRule.this.matchTrace(this);
 			if (fresh) {
 				fresh = false;
 				CachedMatch cm = cache.get(offset);
 				if (cm != null) {
-					LiteralRule.this.matchTrace(this, s, offset, cm.m);
+					LiteralRule.this.matchTrace(this, cm.m);
 					return cm.m;
 				}
 				Match m = null;
@@ -53,10 +48,10 @@ public class LiteralRule extends Rule {
 				}
 				cm = new CachedMatch(m);
 				cache.put(offset, cm);
-				LiteralRule.this.matchTrace(this, s, offset, m);
+				LiteralRule.this.matchTrace(this, m);
 				return m;
 			}
-			LiteralRule.this.matchTrace(this, s, offset, null);
+			LiteralRule.this.matchTrace(this, null);
 			return null;
 		}
 
@@ -90,7 +85,7 @@ public class LiteralRule extends Rule {
 	@Override
 	public Matcher matcher(CharSequence s, Integer offset, Match parent,
 			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
-		return new LiteralMatcher(s, offset, parent, cache);
+		return new LiteralMatcher(s, offset, parent, cache, master);
 	}
 
 	@Override

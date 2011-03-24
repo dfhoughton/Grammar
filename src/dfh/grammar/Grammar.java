@@ -34,12 +34,12 @@ public class Grammar implements Serializable {
 	 * @author David Houghton
 	 * 
 	 */
-	private abstract class GrammarMatcher implements Matcher {
+	private abstract class GrammarMatcher extends Matcher {
 		private final boolean noOverlap;
-		private final int offset;
 
-		protected GrammarMatcher(final int offset, final boolean noOverlap) {
-			this.offset = offset;
+		protected GrammarMatcher(CharSequence s, final int offset,
+				final boolean noOverlap) {
+			super(s, offset, null, null);
 			this.noOverlap = noOverlap;
 		}
 
@@ -108,7 +108,11 @@ public class Grammar implements Serializable {
 	 * Keeps track of terminals not defined in initial rule set.
 	 */
 	private final HashSet<Label> undefinedTerminals;
-	PrintStream trace;
+	transient PrintStream trace;
+	/**
+	 * For creating a stack trace when debugging.
+	 */
+	transient LinkedList<Match> stack;
 
 	public Grammar(String[] lines) throws GrammarException, IOException {
 		this(new AReader(lines));
@@ -192,7 +196,7 @@ public class Grammar implements Serializable {
 		checkComplete();
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		final Matcher m = rules.get(root).matcher(s, offset, null, cache, null);
-		return new GrammarMatcher(offset, noOverlap) {
+		return new GrammarMatcher(s, offset, noOverlap) {
 			boolean matchedOnce = false;
 			Match next = fetchNext();
 
@@ -277,14 +281,14 @@ public class Grammar implements Serializable {
 		return lookingAt(s, 0, !allowOverlap);
 	}
 
-	public Matcher lookingAt(final CharSequence s, final int offset,
+	public Matcher lookingAt(final CharSequence cs, final int offset,
 			final boolean noOverlap) throws GrammarException {
 		checkComplete();
-		final Matcher m = rules.get(root).matcher(s, offset, null,
+		final Matcher m = rules.get(root).matcher(cs, offset, null,
 				offsetCache(), null);
 		abstract class LookingAtMatcher extends GrammarMatcher {
 			LookingAtMatcher(final int offset, final boolean NoOvlerlap) {
-				super(offset, NoOvlerlap);
+				super(cs, offset, NoOvlerlap);
 			}
 
 			@Override
@@ -346,7 +350,7 @@ public class Grammar implements Serializable {
 			final boolean noOverlap) throws GrammarException {
 		checkComplete();
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
-		return new GrammarMatcher(offset, noOverlap) {
+		return new GrammarMatcher(s, offset, noOverlap) {
 			int index = offset;
 			boolean firstMatch = true;
 			Matcher m = rules.get(root).matcher(s, index, null, cache, null);
@@ -425,12 +429,9 @@ public class Grammar implements Serializable {
 	 */
 	public void setTrace(PrintStream trace) {
 		this.trace = trace;
-	}
-
-	/**
-	 * @return whether we're debugging
-	 */
-	boolean trace() {
-		return trace != null;
+		if (trace == null)
+			stack = null;
+		else
+			stack = new LinkedList<Match>();
 	}
 }

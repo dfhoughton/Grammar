@@ -58,14 +58,13 @@ public abstract class Rule implements Serializable {
 	 * Debugging output to print before matching.
 	 * 
 	 * @param m
-	 * @param s
-	 * @param offset
 	 */
-	void matchTrace(Matcher m, CharSequence s, int offset) {
+	void matchTrace(Matcher m) {
 		if (g.trace != null) {
 			StringBuilder b = new StringBuilder();
 			b.append(label());
-			locate(b, s, offset);
+			locate(b, m.s, m.offset);
+			b.append("\n     ").append(m.parent);
 			g.trace.println(b);
 		}
 	}
@@ -95,23 +94,39 @@ public abstract class Rule implements Serializable {
 	 * 
 	 * @param m
 	 * @param s
-	 * @param offset
-	 * @param n
 	 */
-	void matchTrace(Matcher m, CharSequence s, int offset, Match n) {
+	void matchTrace(Matcher m, Match n) {
 		if (g.trace != null) {
 			StringBuilder b = new StringBuilder();
 			b.append("   ");
 			b.append(label());
-			locate(b, s, offset);
+			locate(b, m.s, m.offset);
 			b.append(" returning ");
 			b.append(n);
 			if (n != null) {
 				b.append(" = '");
-				b.append(s.subSequence(n.start(), n.end()));
+				b.append(m.s.subSequence(n.start(), n.end()));
 				b.append('\'');
 			}
+			b.append("\n        ").append(m.parent);
 			g.trace.println(b);
+			if (n == null)
+				g.stack.add(n);
 		}
+	}
+
+	/**
+	 * For use in {@link Matcher} during debugging.
+	 * 
+	 * @return whether we are debugging
+	 */
+	void push(Match m) {
+		if (g.trace != null)
+			g.stack.add(m);
+	}
+
+	void pop() {
+		if (g.trace != null)
+			g.stack.removeLast();
 	}
 }

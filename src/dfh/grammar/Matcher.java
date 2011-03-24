@@ -10,7 +10,19 @@ package dfh.grammar;
  * @author David Houghton
  * 
  */
-public interface Matcher {
+public abstract class Matcher {
+	CharSequence s;
+	Integer offset;
+	Match parent;
+	Matcher master;
+
+	protected Matcher(CharSequence s, Integer offset, Match parent,
+			Matcher master) {
+		this.s = s;
+		this.offset = offset;
+		this.parent = parent;
+		this.master = master;
+	}
 
 	/**
 	 * <code>next()</code> obtains the next match and iterates. If all matches
@@ -19,7 +31,7 @@ public interface Matcher {
 	 * @param offsetCache
 	 * @return next parse tree or null if no parse tree is possible
 	 */
-	public Match match();
+	public abstract Match match();
 
 	/**
 	 * Tests whether iteration is possible without iterating. For most purposes
@@ -36,10 +48,10 @@ public interface Matcher {
 	 * @return whether the sequence this matcher is iterating over has reached
 	 *         its end
 	 */
-	boolean mightHaveNext();
+	abstract boolean mightHaveNext();
 
 	/**
 	 * @return stringification useful in debugging
 	 */
-	String identify();
+	abstract String identify();
 }
