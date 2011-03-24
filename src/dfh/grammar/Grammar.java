@@ -409,6 +409,15 @@ public class Grammar implements Serializable {
 	}
 
 	/**
+	 * The canonical order, at the moment, is to sort them primarily by their
+	 * degree of independence from other rules and secondarily by their label.
+	 * The root rule comes first, separated by a blank line, then they descend
+	 * in order of abstraction and alphabet. Terminal rules are always last.
+	 * <p>
+	 * I may change the canonical order in the future. It has the advantage of
+	 * putting rules immediately above those rules they depend on most directly
+	 * but the disadvantage of making it hard to find an arbitrary rule.
+	 * 
 	 * @return canonical description of {@link Grammar}
 	 */
 	public String describe() {
