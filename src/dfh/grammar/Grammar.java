@@ -186,7 +186,7 @@ public class Grammar implements Serializable {
 	public Matcher matches(final CharSequence s, final int offset,
 			final boolean noOverlap) throws GrammarException {
 		checkComplete();
-		final Map<Label, Map<Integer, Match>> cache = offsetCache();
+		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		final Matcher m = rules.get(root).matcher(s, offset, null, cache, null);
 		return new GrammarMatcher(offset, noOverlap) {
 			boolean matchedOnce = false;
@@ -341,7 +341,7 @@ public class Grammar implements Serializable {
 	public Matcher find(final CharSequence s, final int offset,
 			final boolean noOverlap) throws GrammarException {
 		checkComplete();
-		final Map<Label, Map<Integer, Match>> cache = offsetCache();
+		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		return new GrammarMatcher(offset, noOverlap) {
 			int index = offset;
 			boolean firstMatch = true;
@@ -402,11 +402,13 @@ public class Grammar implements Serializable {
 	 * @return map from labels to sets of offsets where the associated rules are
 	 *         known not to match
 	 */
-	private Map<Label, Map<Integer, Match>> offsetCache() {
-		Map<Label, Map<Integer, Match>> offsetCache = new HashMap<Label, Map<Integer, Match>>(
+	private Map<Label, Map<Integer, CachedMatch>> offsetCache() {
+		Map<Label, Map<Integer, CachedMatch>> offsetCache = new HashMap<Label, Map<Integer, CachedMatch>>(
 				rules.size());
 		for (Label l : rules.keySet()) {
-			offsetCache.put(l, new TreeMap<Integer, Match>());
+			// using tree map for memory management reasons and because
+			// comparisons of integers is cheap
+			offsetCache.put(l, new TreeMap<Integer, CachedMatch>());
 		}
 		return offsetCache;
 	}

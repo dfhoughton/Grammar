@@ -4,7 +4,7 @@ import java.util.Map;
 
 public abstract class NonterminalMatcher implements Matcher {
 
-	protected final int offset;
+	protected final Integer offset;
 	protected final Match parent;
 
 	protected abstract void fetchNext();
@@ -12,12 +12,12 @@ public abstract class NonterminalMatcher implements Matcher {
 	protected final CharSequence cs;
 	protected Match next;
 	protected boolean done = false;
-	protected final Map<Label, Map<Integer, Match>> cache;
-	protected final Map<Integer, Match> subCache;
+	protected final Map<Label, Map<Integer, CachedMatch>> cache;
+	protected final Map<Integer, CachedMatch> subCache;
 	protected final Label label;
 
 	protected NonterminalMatcher(CharSequence cs2, int offset, Match parent,
-			Map<Label, Map<Integer, Match>> cache, Label label) {
+			Map<Label, Map<Integer, CachedMatch>> cache, Label label) {
 		this.cs = cs2;
 		this.offset = offset;
 		this.parent = parent;
@@ -30,14 +30,17 @@ public abstract class NonterminalMatcher implements Matcher {
 	public Match match() {
 		if (done)
 			return null;
-		boolean alreadyMatched = subCache.containsKey(offset);
-		if (alreadyMatched && subCache.get(offset) == null) {
+		CachedMatch cm = subCache.get(offset);
+		boolean alreadyMatched = cm != null;
+		if (alreadyMatched && cm.m == null) {
 			return null;
 		}
 		if (next == null)
 			fetchNext();
-		if (!alreadyMatched)
-			subCache.put(offset, next == null ? null : Match.dummy);
+		if (!alreadyMatched) {
+			cm = new CachedMatch(next == null ? null : Match.dummy);
+			subCache.put(offset, cm);
+		}
 		Match n = next;
 		next = null;
 		return n;

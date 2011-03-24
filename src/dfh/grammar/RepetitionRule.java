@@ -21,7 +21,7 @@ public class RepetitionRule extends Rule {
 		protected LinkedList<Matcher> matchers;
 
 		public RepetitionMatcher(CharSequence cs, int offset, Match parent,
-				Map<Label, Map<Integer, Match>> cache, Label label) {
+				Map<Label, Map<Integer, CachedMatch>> cache, Label label) {
 			super(cs, offset, parent, cache, label);
 		}
 
@@ -49,7 +49,7 @@ public class RepetitionRule extends Rule {
 		private final boolean backtracks;
 
 		protected GreedyAndPossessive(CharSequence cs, int offset,
-				Match parent, Map<Label, Map<Integer, Match>> cache,
+				Match parent, Map<Label, Map<Integer, CachedMatch>> cache,
 				Label label, boolean backtracks, Matcher master) {
 			super(cs, offset, parent, cache, label);
 			this.backtracks = backtracks;
@@ -102,7 +102,7 @@ public class RepetitionRule extends Rule {
 	 */
 	private class GreedyMatcher extends GreedyAndPossessive {
 		protected GreedyMatcher(CharSequence cs, int offset, Match parent,
-				Map<Label, Map<Integer, Match>> cache, Label label,
+				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
 				Matcher master) {
 			super(cs, offset, parent, cache, label, true, master);
 		}
@@ -151,7 +151,7 @@ public class RepetitionRule extends Rule {
 	private class StingyMatcher extends RepetitionMatcher {
 
 		protected StingyMatcher(CharSequence cs, int offset, Match parent,
-				Map<Label, Map<Integer, Match>> cache, Label label,
+				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
 				Matcher master) {
 			super(cs, offset, parent, cache, label);
 			matchers = new LinkedList<Matcher>();
@@ -201,7 +201,7 @@ public class RepetitionRule extends Rule {
 	private class PossessiveMatcher extends GreedyAndPossessive {
 
 		protected PossessiveMatcher(CharSequence cs, int offset, Match parent,
-				Map<Label, Map<Integer, Match>> cache, Label label,
+				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
 				Matcher master) {
 			super(cs, offset, parent, cache, label, false, master);
 		}
@@ -238,7 +238,7 @@ public class RepetitionRule extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence cs, int offset, Match parent,
-			Map<Label, Map<Integer, Match>> cache, Matcher master) {
+			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
 		switch (repetition.t) {
 		case possessive:
 			return new PossessiveMatcher(cs, offset, parent, cache, label,

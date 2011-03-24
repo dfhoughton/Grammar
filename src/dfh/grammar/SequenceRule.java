@@ -13,7 +13,7 @@ public class SequenceRule extends Rule {
 		LinkedList<Match> matched = new LinkedList<Match>();
 
 		public SequenceMatcher(CharSequence cs, int offset, Match parent,
-				Map<Label, Map<Integer, Match>> cache) {
+				Map<Label, Map<Integer, CachedMatch>> cache) {
 			super(cs, offset, parent, cache, SequenceRule.this.label);
 		}
 
@@ -108,7 +108,7 @@ public class SequenceRule extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence cs, int offset, Match parent,
-			Map<Label, Map<Integer, Match>> cache, Matcher master) {
+			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
 		return new SequenceMatcher(cs, offset, parent, cache);
 	}
 

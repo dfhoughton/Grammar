@@ -14,13 +14,13 @@ import java.util.regex.Pattern;
 public class LeafRule extends Rule {
 	private class LeafMatcher implements Matcher {
 		private final Match parent;
-		private final int offset;
+		private final Integer offset;
 		private final CharSequence chars;
-		private Map<Integer, Match> cache;
+		private Map<Integer, CachedMatch> cache;
 		private boolean fresh = true;
 
 		public LeafMatcher(CharSequence s, int offset, Match parent,
-				Map<Label, Map<Integer, Match>> cache) {
+				Map<Label, Map<Integer, CachedMatch>> cache) {
 			this.chars = s;
 			this.parent = parent;
 			this.offset = offset;
@@ -30,8 +30,9 @@ public class LeafRule extends Rule {
 		@Override
 		public Match match() {
 			fresh = false;
-			if (cache.containsKey(offset)) {
-				return cache.get(offset);
+			CachedMatch cm = cache.get(offset);
+			if (cm != null) {
+				return cm.m;
 			}
 			java.util.regex.Matcher m = p.matcher(chars);
 			m.region(offset, chars.length());
@@ -40,7 +41,8 @@ public class LeafRule extends Rule {
 			Match n = null;
 			if (m.lookingAt())
 				n = new Match(LeafRule.this, offset, m.end(), parent);
-			cache.put(offset, n);
+			cm = new CachedMatch(n);
+			cache.put(offset, cm);
 			return n;
 		}
 
@@ -70,7 +72,7 @@ public class LeafRule extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence s, final int offset, Match parent,
-			Map<Label, Map<Integer, Match>> cache, Matcher master) {
+			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
 		return new LeafMatcher(s, offset, parent, cache);
 	}
 

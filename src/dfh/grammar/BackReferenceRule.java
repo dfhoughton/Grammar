@@ -25,7 +25,7 @@ public class BackReferenceRule extends Rule {
 		private boolean fresh = true;
 
 		public BackReferenceMatcher(CharSequence s, int offset, Match parent,
-				Map<Label, Map<Integer, Match>> cache, Matcher master) {
+				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
 			this.s = s;
 			this.offset = offset;
 			this.parent = parent;
@@ -83,7 +83,7 @@ public class BackReferenceRule extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence s, int offset, Match parent,
-			Map<Label, Map<Integer, Match>> cache, Matcher master) {
+			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
 		return new BackReferenceMatcher(s, offset, parent, cache, master);
 	}
 

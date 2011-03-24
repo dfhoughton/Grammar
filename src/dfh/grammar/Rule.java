@@ -40,7 +40,7 @@ public abstract class Rule implements Serializable {
 	 * @return
 	 */
 	public abstract Matcher matcher(CharSequence s, int offset, Match parent,
-			Map<Label, Map<Integer, Match>> cache, Matcher master);
+			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master);
 
 	@Override
 	public String toString() {

@@ -10,7 +10,7 @@ public class AlternationRule extends Rule {
 		Matcher mostRecent = null;
 
 		public AlternationMatcher(CharSequence cs, int offset, Match parent,
-				Map<Label, Map<Integer, Match>> cache, Matcher master) {
+				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
 			super(cs, offset, parent, cache, AlternationRule.this.label);
 		}
 
@@ -57,7 +57,7 @@ public class AlternationRule extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence cs, int offset, Match parent,
-			Map<Label, Map<Integer, Match>> cache, Matcher master) {
+			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
 		return new AlternationMatcher(cs, offset, parent, cache, master);
 	}
 

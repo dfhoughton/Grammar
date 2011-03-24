@@ -28,7 +28,7 @@ public class DeferredDefinitionRule extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence cs, int offset, Match parent,
-			Map<Label, Map<Integer, Match>> cache, Matcher master) {
+			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
 		if (r == null)
 			r = rules.get(label);
 		return r.matcher(cs, offset, parent, cache, master);
