@@ -64,7 +64,7 @@ public abstract class Rule implements Serializable {
 	void matchTrace(Matcher m, CharSequence s, int offset) {
 		if (g.trace != null) {
 			StringBuilder b = new StringBuilder();
-			b.append(m.identify());
+			b.append(label());
 			locate(b, s, offset);
 			g.trace.println(b);
 		}
@@ -81,7 +81,7 @@ public abstract class Rule implements Serializable {
 			b.append(s.subSequence(start, offset));
 			b.append('"');
 		}
-		b.append('v');
+		b.append('_');
 		if (end > offset) {
 			b.append('"');
 			b.append(s.subSequence(offset, end));
@@ -102,13 +102,14 @@ public abstract class Rule implements Serializable {
 		if (g.trace != null) {
 			StringBuilder b = new StringBuilder();
 			b.append("   ");
-			b.append(m.identify());
+			b.append(label());
 			locate(b, s, offset);
 			b.append(" returning ");
 			b.append(n);
 			if (n != null) {
-				b.append(" = ");
+				b.append(" = '");
 				b.append(s.subSequence(n.start(), n.end()));
+				b.append('\'');
 			}
 			g.trace.println(b);
 		}
