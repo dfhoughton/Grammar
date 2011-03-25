@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import dfh.grammar.Label.Type;
@@ -391,9 +390,8 @@ public class Grammar implements Serializable {
 		Map<Label, Map<Integer, CachedMatch>> offsetCache = new HashMap<Label, Map<Integer, CachedMatch>>(
 				rules.size());
 		for (Label l : rules.keySet()) {
-			// using tree map for memory management reasons and because
-			// comparisons of integers is cheap
-			offsetCache.put(l, new TreeMap<Integer, CachedMatch>());
+			// might use TreeMap to save a little memory
+			offsetCache.put(l, new HashMap<Integer, CachedMatch>());
 		}
 		return offsetCache;
 	}

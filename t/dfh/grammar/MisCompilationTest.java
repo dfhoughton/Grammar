@@ -55,9 +55,8 @@ public class MisCompilationTest {
 			Grammar g = new Grammar(rules);
 			org.junit.Assert.fail("did not discover missing rule");
 		} catch (Exception e) {
-			org.junit.Assert
-					.assertTrue("found missing definition", e.getMessage()
-							.indexOf("could not satisfy all dependencies") > -1);
+			org.junit.Assert.assertTrue("undefined rule", e.getMessage()
+					.indexOf("undefined rule") > -1);
 		}
 	}
 
@@ -168,11 +167,8 @@ public class MisCompilationTest {
 			g.defineTerminal("x", Pattern.compile("\\s++"));
 			org.junit.Assert.fail("did not discover missing rule");
 		} catch (Exception e) {
-			org.junit.Assert
-					.assertTrue(
-							"could not satisfy all dependencies",
-							e.getMessage().indexOf(
-									"could not satisfy all dependencies") > -1);
+			org.junit.Assert.assertTrue("cycle found in rules", e.getMessage()
+					.indexOf("cycle found in rules") > -1);
 		}
 	}
 

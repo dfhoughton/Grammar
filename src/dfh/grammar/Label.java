@@ -55,7 +55,6 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 
 	public final Type t;
 	public final String id;
-
 	public Label(Type t, String id) {
 		this.t = t;
 		this.id = id;

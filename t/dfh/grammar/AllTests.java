@@ -22,6 +22,7 @@ import org.junit.runners.Suite;
 		MisCompilationTest.class,//
 		RepetitionTest.class,//
 		SimpleMatchTest.class,//
+		RecursiveTest.class,//
 })
 public class AllTests {
 }
