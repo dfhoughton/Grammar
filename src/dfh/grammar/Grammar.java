@@ -460,4 +460,21 @@ public class Grammar implements Serializable {
 		}
 		return b.toString();
 	}
+
+	/**
+	 * Assigns arbitrary rule to given label.
+	 * 
+	 * @param label
+	 * @param rule
+	 */
+	public void defineTerminal(String label, Rule rule) {
+		Label l = terminalLabelMap.get(label);
+		if (l == null)
+			throw new GrammarException("unknown terminal rule: " + label);
+		Rule r = rules.get(l);
+		if (!(r instanceof DeferredDefinitionRule))
+			throw new GrammarException("rule " + label + " already defined");
+		((DeferredDefinitionRule) r).setRule(rule);
+		undefinedTerminals.remove(r.label());
+	}
 }

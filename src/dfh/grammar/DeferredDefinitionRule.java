@@ -39,12 +39,28 @@ public class DeferredDefinitionRule extends Rule {
 		return "({DEFERRED}" + label + ")";
 	}
 
+	/**
+	 * Defines this rule as a {@link LeafRule}.
+	 * 
+	 * @param p
+	 */
 	public void setRegex(Pattern p) {
 		if (r != null)
 			throw new GrammarException("rule " + label + "already defined");
 		LeafRule rule = new LeafRule(label, p);
 		rule.g = g;
 		r = rule;
+	}
+
+	/**
+	 * Defines this rule as the given {@link Rule}.
+	 * 
+	 * @param r
+	 */
+	public void setRule(Rule r) {
+		if (this.r != null)
+			throw new GrammarException("rule " + label + "already defined");
+		this.r = r;
 	}
 
 	@Override
