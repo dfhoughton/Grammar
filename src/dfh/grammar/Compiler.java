@@ -132,7 +132,7 @@ public class Compiler {
 				}
 			}
 			if (map.size() == size) {
-				resolveRecursions(map);
+				resolveRecursions(map, gen);
 				if (map.size() == size)
 					throw new GrammarException(
 							"could not satisfy all dependencies");
@@ -189,7 +189,8 @@ public class Compiler {
 	 * 
 	 * @param map
 	 */
-	private void resolveRecursions(Map<Label, List<RuleFragment>> map) {
+	private void resolveRecursions(Map<Label, List<RuleFragment>> map,
+			int generation) {
 		for (Iterator<Entry<Label, Set<Label>>> i = dependencyMap.entrySet()
 				.iterator(); i.hasNext();) {
 			Entry<Label, Set<Label>> e = i.next();
@@ -203,7 +204,7 @@ public class Compiler {
 		removeStrictlyDominating(copy);
 		List<List<Entry<Label, List<RuleFragment>>>> cycles = separateCycles(copy);
 		for (List<Entry<Label, List<RuleFragment>>> cycle : cycles) {
-			processCycle(cycle);
+			processCycle(cycle, generation);
 			for (Entry<Label, List<RuleFragment>> e : cycle)
 				map.remove(e.getKey());
 		}
@@ -213,8 +214,10 @@ public class Compiler {
 	 * Creates a set of mutually dependent rules.
 	 * 
 	 * @param cycle
+	 * @param generation
 	 */
-	private void processCycle(List<Entry<Label, List<RuleFragment>>> cycle) {
+	private void processCycle(List<Entry<Label, List<RuleFragment>>> cycle,
+			int generation) {
 		testCycle(cycle);
 		Map<Label, CyclicRule> cycleMap = new HashMap<Label, CyclicRule>(
 				cycle.size());
@@ -224,6 +227,7 @@ public class Compiler {
 		}
 		for (Entry<Label, List<RuleFragment>> e : cycle) {
 			Rule r = parseRule(e.getKey(), e.getValue(), cycleMap);
+			r.generation = generation;
 			cycleMap.get(e.getKey()).setRule(r);
 			rules.put(e.getKey(), r);
 		}

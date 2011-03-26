@@ -34,6 +34,7 @@ public class RecursiveTest {
 				"(s) =\\s++",//
 		};
 		g = new Grammar(rules);
+		System.err.println(g.describe());
 	}
 
 	@Test

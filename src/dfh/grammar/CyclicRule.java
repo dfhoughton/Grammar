@@ -38,6 +38,6 @@ public class CyclicRule extends Rule {
 
 	@Override
 	public String description() {
-		return r.description();
+		return label.toString();
 	}
 }
