@@ -4,6 +4,13 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
+ * A {@link Matcher} generator. <code>Rules</code> generate
+ * <code>Matchers</code> with properly initialized state but have no dynamic
+ * state of their own. It is convenient to define <code>Matchers</code> as inner
+ * classes of their <code>Rules</code>, since one generally doesn't interact
+ * with them apart from their rules and they need access to the
+ * <code>Rule</code> that generated them in order to include a reference to it
+ * in the {@link Match} nodes they generate.
  * <p>
  * <b>Creation date:</b> Feb 19, 2011
  * 
@@ -20,6 +27,12 @@ public abstract class Rule implements Serializable {
 		this.label = label;
 	}
 
+	/**
+	 * Unique tag associated with the <code>Rule</code>. The label corresponds
+	 * to the part of a rule definition to the left of the "=".
+	 * 
+	 * @return unique tag associated with the <code>Rule</code>
+	 */
 	public Label label() {
 		return label;
 	}
@@ -51,6 +64,16 @@ public abstract class Rule implements Serializable {
 	}
 
 	/**
+	 * Returns a {@link String} representing with as much precision as possible
+	 * the pattern applied by this rule. This means if this rule depends on
+	 * other rules its unique id should incorporate their unique ids (but be
+	 * careful of cycles; see {@link CyclicRule}).
+	 * <p>
+	 * The purpose of the unique id is to allow the {@link Compiler} to discover
+	 * rules with identical patterns. To improve the efficiency of the cache and
+	 * reduce memory use, every rule should have a unique pattern. The compiler
+	 * uses the unique id to discover and remove redundancy.
+	 * 
 	 * @return label-free id used to recognize redundancy during compilation
 	 */
 	protected abstract String uniqueId();
@@ -130,6 +153,8 @@ public abstract class Rule implements Serializable {
 	}
 
 	/**
+	 * The rule description is invoked by {@link Grammar#describe()}.
+	 * 
 	 * @return a String describing the rule
 	 */
 	public abstract String description();
