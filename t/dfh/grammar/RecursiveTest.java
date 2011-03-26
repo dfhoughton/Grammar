@@ -62,4 +62,13 @@ public class RecursiveTest {
 		System.out.println(n);
 		assertNotNull("parsed minimal document", n);
 	}
+
+	@Test
+	public void failureTest() throws GrammarException, IOException {
+		String s = "<test><foo jolly=\"roger\"/></ROO>";
+		Matcher m = g.matches(s);
+		Match n = m.match();
+		System.out.println(n);
+		assertNull("parsed minimal document", n);
+	}
 }
