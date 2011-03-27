@@ -28,7 +28,6 @@ public abstract class Matcher {
 	 * <code>next()</code> obtains the next match and iterates. If all matches
 	 * have been found, it returns <code>null</code>.
 	 * 
-	 * @param offsetCache
 	 * @return next parse tree or null if no parse tree is possible
 	 */
 	public abstract Match match();
