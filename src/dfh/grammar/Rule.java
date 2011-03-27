@@ -52,7 +52,8 @@ public abstract class Rule implements Serializable {
 	 * @param master
 	 *            reference to enclosing {@link Matcher} for use in
 	 *            backreference testing
-	 * @return
+	 * @return {@link Matcher} initialized to manage matching state at this
+	 *         offset
 	 */
 	public abstract Matcher matcher(CharSequence s, Integer offset,
 			Match parent, Map<Label, Map<Integer, CachedMatch>> cache,
