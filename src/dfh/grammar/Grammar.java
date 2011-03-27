@@ -26,6 +26,54 @@ import dfh.grammar.Label.Type;
 /**
  * Base class that parses strings according to a given set of rules.
  * <p>
+ * A {@link Grammar} is constructed from a set of rules such as
+ * 
+ * <pre>
+ * &lt;ROOT&gt; = &lt;a> | &lt;b&gt;
+ * 
+ *    &lt;a&gt; = (foo) (s) (bar)
+ *    &lt;b&gt; = (quux) (s) (baz)
+ *  (bar) =bar
+ *  (baz) =baz
+ *  (foo) =foo
+ * (quux) =quux
+ *    (s) =\s++
+ * </pre>
+ * 
+ * And in turn constructs {@link Matcher} objects that can be applied to a
+ * {@link CharSequence} to produce a sequence of {@link Match} objects
+ * representing how this pattern matches the characters. A {@link Grammar} has
+ * several advantages over a {@link Pattern} and one chief disadvantage.
+ * <p>
+ * <h3>Advantages</h3>
+ * <ul>
+ * <li>Ease of composition, reading, maintenance, anddebugging. See
+ * {@link #setTrace(PrintStream)} and {@link #describe()}.
+ * <li>One can compose grammars from component {@link Rule rules}, regular
+ * expressions, and other grammars. See {@link #defineTerminal(String, Pattern)}, {@link #defineTerminal(String, Rule)}.
+ * <li>One can iterate over all possible ways of matching a {@link CharSequence}
+ * , not just a non-overlapping subset.
+ * <li>Given a {@link Match} one can find the precise way the pattern matches,
+ * each rule and subrule that participated in the match and which offsets is
+ * applied to.
+ * </ul>
+ * <h3>Disadvantages</h3>
+ * I am certain that someone who didn't write these classes would find
+ * infelicities to enumerate in the API. The chief disadvantage that I am aware
+ * of is that matchign with a {@link Grammar} is about an order of magnitude
+ * slower than matching with a simple {@link Pattern}. For one thing, fewer
+ * people have spent less time optimizing the code. But even were Oracle to take
+ * over this project the scope for efficiency is less simply because the task
+ * attempted is greater.
+ * <h2>Rule Definition</h2>
+ * <h2>Acknowledgements</h2> This class and its supporting classes was inspired
+ * by the recursive regular expressions available in Perl 5.10+, and especially
+ * their sugared up form in <a
+ * href="http://search.cpan.org/search?query=Regexp%3A%3AGrammars&mode=module"
+ * target="_blank">Regexp::Grammars</a> and <a
+ * href="http://en.wikipedia.org/wiki/Perl_6_rules" target="_blank">Perl 6
+ * rules</a>.
+ * <p>
  * <b>Creation date:</b> Feb 19, 2011
  * 
  * @author David Houghton
