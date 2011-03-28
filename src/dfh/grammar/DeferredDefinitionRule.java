@@ -1,6 +1,7 @@
 package dfh.grammar;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -66,5 +67,13 @@ public class DeferredDefinitionRule extends Rule {
 	@Override
 	public String description() {
 		return r.description();
+	}
+
+	@Override
+	public Set<Integer> study(CharSequence s,
+			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
+			Set<Rule> studiedRules) {
+		studiedRules.add(this);
+		return r.study(s, cache, offset, studiedRules);
 	}
 }

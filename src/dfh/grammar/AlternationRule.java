@@ -1,6 +1,8 @@
 package dfh.grammar;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class AlternationRule extends Rule {
 	private static final long serialVersionUID = 1L;
@@ -37,7 +39,7 @@ public class AlternationRule extends Rule {
 				done = true;
 				next = null;
 			} else {
-				next = new Match(AlternationRule.this, offset, parent);
+				next = new Match(AlternationRule.this, offset);
 				Match[] children = new Match[] { child };
 				next.setChildren(children);
 				next.setEnd(child.end());
@@ -94,5 +96,18 @@ public class AlternationRule extends Rule {
 				b.append(r.label());
 		}
 		return b.toString();
+	}
+
+	@Override
+	public Set<Integer> study(CharSequence s,
+			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
+			Set<Rule> studiedRules) {
+		studiedRules.add(this);
+		Set<Integer> startOffsets = new HashSet<Integer>();
+		studiedRules.add(this);
+		for (Rule r : alternates)
+			if (!studiedRules.contains(r))
+				startOffsets.addAll(r.study(s, cache, offset, studiedRules));
+		return startOffsets;
 	}
 }

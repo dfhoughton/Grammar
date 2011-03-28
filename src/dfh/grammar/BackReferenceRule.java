@@ -1,6 +1,8 @@
 package dfh.grammar;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import dfh.grammar.SequenceRule.SequenceMatcher;
 
@@ -35,7 +37,7 @@ public class BackReferenceRule extends Rule {
 				int delta = m.end() - m.start();
 				if (delta == 0) {
 					// zero-width matches always match
-					n = new Match(BackReferenceRule.this, offset, parent);
+					n = new Match(BackReferenceRule.this, offset);
 					n.setEnd(offset);
 				} else {
 					int end = offset + delta;
@@ -48,8 +50,7 @@ public class BackReferenceRule extends Rule {
 							}
 						}
 						if (matched) {
-							n = new Match(BackReferenceRule.this, offset,
-									parent);
+							n = new Match(BackReferenceRule.this, offset);
 							n.setEnd(end);
 						}
 					}
@@ -91,6 +92,15 @@ public class BackReferenceRule extends Rule {
 	@Override
 	public String description() {
 		return label.toString();
+	}
+
+	@Override
+	public Set<Integer> study(CharSequence s,
+			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
+			Set<Rule> studiedRules) {
+		studiedRules.add(this);
+		// one cannot study backreferences
+		return new HashSet<Integer>(0);
 	}
 
 }

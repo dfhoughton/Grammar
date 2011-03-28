@@ -3,6 +3,7 @@ import java.util.regex.Pattern;
 
 import dfh.grammar.Grammar;
 import dfh.grammar.GrammarException;
+import dfh.grammar.Matcher;
 
 public class Benchmarks {
 
@@ -31,6 +32,7 @@ public class Benchmarks {
 		test3();
 		test4();
 		test5();
+		longStringTest();
 	}
 
 	private static void test1() throws IOException {
@@ -41,27 +43,52 @@ public class Benchmarks {
 		Pattern p = Pattern.compile("[ab]");
 		String s = "qewrqewrqewraqwreqewr";
 		Grammar g = new Grammar(rules);
-		iterate(p, g, s);
+		iterate(p, g, s, false);
 	}
 
-	private static void iterate(Pattern p, Grammar g, String s) {
+	private static void iterate(Pattern p, Grammar g, String s,
+			boolean allMatches) {
 		System.out.println("pattern: " + p);
 		for (int i = 0; i < warmup; i++) {
-			p.matcher(s).find();
+			if (allMatches) {
+				java.util.regex.Matcher m = p.matcher(s);
+				while (m.find())
+					;
+			} else {
+				p.matcher(s).find();
+			}
 		}
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < iterations; i++) {
-			p.matcher(s).find();
+			if (allMatches) {
+				java.util.regex.Matcher m = p.matcher(s);
+				while (m.find())
+					;
+			} else {
+				p.matcher(s).find();
+			}
 		}
 		long end = System.currentTimeMillis();
 		System.out.println(end - start + " milliseconds\n");
 		System.out.println(g.describe().replaceAll("\\s++$", ""));
 		for (int i = 0; i < warmup; i++) {
-			g.find(s).match();
+			if (allMatches) {
+				Matcher m = g.find(s);
+				while (m.match() != null)
+					;
+			} else {
+				g.find(s).match();
+			}
 		}
 		start = System.currentTimeMillis();
 		for (int i = 0; i < iterations; i++) {
-			g.find(s).match();
+			if (allMatches) {
+				Matcher m = g.find(s);
+				while (m.match() != null)
+					;
+			} else {
+				g.find(s).match();
+			}
 		}
 		end = System.currentTimeMillis();
 		System.out.println(end - start + " milliseconds\n");
@@ -82,7 +109,7 @@ public class Benchmarks {
 		Pattern p = Pattern.compile("foo\\s++bar|quux\\s++baz");
 		String s = "foo bar";
 		Grammar g = new Grammar(rules);
-		iterate(p, g, s);
+		iterate(p, g, s, false);
 	}
 
 	private static void test3() throws IOException {
@@ -97,7 +124,7 @@ public class Benchmarks {
 		Pattern p = Pattern.compile("(?:a{0,2}|a{0,2}b){2}b");
 		String s = "aabb";
 		Grammar g = new Grammar(rules);
-		iterate(p, g, s);
+		iterate(p, g, s, false);
 	}
 
 	private static void test4() throws IOException {
@@ -110,7 +137,7 @@ public class Benchmarks {
 		Pattern p = Pattern.compile("[ab]");
 		String s = "qewrqewrqewraqwreqewr";
 		Grammar g = new Grammar(rules);
-		iterate(p, g, s);
+		iterate(p, g, s, false);
 	}
 
 	private static void test5() throws IOException {
@@ -125,7 +152,32 @@ public class Benchmarks {
 		Pattern p = Pattern.compile("(?:a{0,2}|a{0,2}b){2}b");
 		String s = "aabb";
 		Grammar g = new Grammar(rules);
-		iterate(p, g, s);
+		iterate(p, g, s, false);
 	}
 
+	private static void longStringTest() throws IOException {
+		String[] rules = {
+		//
+		"<ROOT> = 'a' | 'b' | 'c'",//
+		};
+		Pattern p = Pattern.compile("[abc]");
+		StringBuilder b = new StringBuilder();
+		for (int i = 0; i < 1000; i++) {
+			b.append("xxxxxxxxxx");
+			switch (i % 3) {
+			case 0:
+				b.append('a');
+				break;
+			case 1:
+				b.append('b');
+				break;
+			case 2:
+				b.append('c');
+			}
+		}
+		String s = b.toString();
+		Grammar g = new Grammar(rules);
+		iterate(p, g, s, true);
+
+	}
 }

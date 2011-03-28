@@ -2,6 +2,7 @@ package dfh.grammar;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A {@link Matcher} generator. <code>Rules</code> generate
@@ -19,8 +20,8 @@ import java.util.Map;
 public abstract class Rule implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	final Label label;
-	Grammar g;
+	protected final Label label;
+	protected Grammar g;
 	int generation = -1;
 
 	public Rule(Label label) {
@@ -84,7 +85,7 @@ public abstract class Rule implements Serializable {
 	 * 
 	 * @param m
 	 */
-	void matchTrace(Matcher m) {
+	protected final void matchTrace(Matcher m) {
 		if (g.trace != null) {
 			StringBuilder b = new StringBuilder();
 			b.append(label());
@@ -94,7 +95,7 @@ public abstract class Rule implements Serializable {
 		}
 	}
 
-	void stackTrace(StringBuilder b, Matcher m) {
+	private void stackTrace(StringBuilder b, Matcher m) {
 		b.append("\n     ");
 		while (true) {
 			b.append(m.rule().label());
@@ -135,7 +136,7 @@ public abstract class Rule implements Serializable {
 	 * @param m
 	 * @param s
 	 */
-	void matchTrace(Matcher m, Match n) {
+	protected final void matchTrace(Matcher m, Match n) {
 		if (g.trace != null) {
 			StringBuilder b = new StringBuilder();
 			b.append("  ");
@@ -159,4 +160,21 @@ public abstract class Rule implements Serializable {
 	 * @return a String describing the rule
 	 */
 	public abstract String description();
+
+	/**
+	 * Prepare for matching against the given {@link CharSequence}. This is an
+	 * optimization to allow terminal rules to cache matches and allow the root
+	 * {@link Matcher} to skip impossible matching offsets.
+	 * 
+	 * @param s
+	 *            {@link CharSequence} to be matched against
+	 * @param cache
+	 *            match cache that will be used
+	 * @param offset
+	 *            offset at which matching will begin
+	 * @return set of start offsets of matches
+	 */
+	public abstract Set<Integer> study(CharSequence s,
+			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
+			Set<Rule> studiedRules);
 }

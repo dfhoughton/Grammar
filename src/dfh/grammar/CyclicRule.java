@@ -1,6 +1,7 @@
 package dfh.grammar;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A rule that depends on some other or others in a cycle of dependence. These
@@ -39,5 +40,13 @@ public class CyclicRule extends Rule {
 	@Override
 	public String description() {
 		return label.toString();
+	}
+
+	@Override
+	public Set<Integer> study(CharSequence s,
+			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
+			Set<Rule> studiedRules) {
+		studiedRules.add(this);
+		return r.study(s, cache, offset, studiedRules);
 	}
 }

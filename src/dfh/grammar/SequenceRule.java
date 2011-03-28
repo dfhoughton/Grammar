@@ -1,8 +1,10 @@
 package dfh.grammar;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SequenceRule extends Rule {
 	private static final long serialVersionUID = 1L;
@@ -33,7 +35,7 @@ public class SequenceRule extends Rule {
 					return;
 				}
 			}
-			next = new Match(SequenceRule.this, offset, parent);
+			next = new Match(SequenceRule.this, offset);
 			while (matched.size() < sequence.length) {
 				Matcher m;
 				if (matchers.isEmpty()) {
@@ -115,6 +117,26 @@ public class SequenceRule extends Rule {
 				b.append(r.label());
 		}
 		return b.toString();
+	}
+
+	@Override
+	public Set<Integer> study(CharSequence s,
+			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
+			Set<Rule> studiedRules) {
+		studiedRules.add(this);
+		Set<Integer> startOffsets = null;
+		for (Rule r : sequence) {
+			if (studiedRules.contains(r)) {
+				if (startOffsets == null)
+					startOffsets = new HashSet<Integer>(cache.get(r.label())
+							.keySet());
+			} else {
+				Set<Integer> set = r.study(s, cache, offset, studiedRules);
+				if (startOffsets == null)
+					startOffsets = set;
+			}
+		}
+		return startOffsets;
 	}
 
 }

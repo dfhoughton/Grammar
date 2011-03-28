@@ -1,6 +1,8 @@
 package dfh.grammar;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -32,13 +34,13 @@ public class LeafRule extends Rule {
 					LeafRule.this.matchTrace(this, cm.m);
 					return cm.m;
 				}
+				Match n = null;
 				java.util.regex.Matcher m = p.matcher(s);
 				m.region(offset, s.length());
 				m.useTransparentBounds(true);
 				m.useAnchoringBounds(false);
-				Match n = null;
 				if (m.lookingAt())
-					n = new Match(LeafRule.this, offset, m.end(), parent);
+					n = new Match(LeafRule.this, offset, m.end());
 				cm = new CachedMatch(n);
 				cache.put(offset, cm);
 				LeafRule.this.matchTrace(this, n);
@@ -86,5 +88,30 @@ public class LeafRule extends Rule {
 	@Override
 	public String description() {
 		return p.toString();
+	}
+
+	@Override
+	public Set<Integer> study(CharSequence s,
+			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
+			Set<Rule> studiedRules) {
+		studiedRules.add(this);
+		Map<Integer, CachedMatch> subCache = cache.get(label);
+		Set<Integer> startOffsets = new HashSet<Integer>();
+		if (!subCache.keySet().isEmpty()) {
+			startOffsets.addAll(subCache.keySet());
+		} else {
+			java.util.regex.Matcher m = p.matcher(s);
+			m.useAnchoringBounds(false);
+			m.useTransparentBounds(true);
+			m.region(offset, s.length());
+			while (m.find()) {
+				Integer i = m.start();
+				startOffsets.add(i);
+				Match n = new Match(this, m.start(), m.end());
+				subCache.put(i, new CachedMatch(n));
+				m.region(m.start() + 1, s.length());
+			}
+		}
+		return startOffsets;
 	}
 }

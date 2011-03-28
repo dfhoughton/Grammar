@@ -1,7 +1,9 @@
 package dfh.grammar;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Rule to handle all the various repetition options.
@@ -122,7 +124,7 @@ public class RepetitionRule extends Rule {
 				done = true;
 			} else {
 				Match[] children = matched.toArray(new Match[matched.size()]);
-				next = new Match(RepetitionRule.this, offset, parent);
+				next = new Match(RepetitionRule.this, offset);
 				next.setChildren(children);
 				next.setEnd(matched.isEmpty() ? offset : matched.peekLast()
 						.end());
@@ -144,7 +146,7 @@ public class RepetitionRule extends Rule {
 
 		@Override
 		protected void fetchNext() {
-			next = new Match(RepetitionRule.this, offset, parent);
+			next = new Match(RepetitionRule.this, offset);
 			while (next != null && matched.size() < repetition.bottom) {
 				Matcher m = matchers.peekLast();
 				if (m.mightHaveNext()) {
@@ -198,7 +200,7 @@ public class RepetitionRule extends Rule {
 					matched = null;
 					next = null;
 				} else {
-					next = new Match(RepetitionRule.this, offset, parent);
+					next = new Match(RepetitionRule.this, offset);
 					Match[] children = matched
 							.toArray(new Match[matched.size()]);
 					next.setChildren(children);
@@ -252,5 +254,15 @@ public class RepetitionRule extends Rule {
 			b.append(r.label());
 		b.append(repetition);
 		return b.toString();
+	}
+
+	@Override
+	public Set<Integer> study(CharSequence s,
+			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
+			Set<Rule> studiedRules) {
+		studiedRules.add(this);
+		if (studiedRules.contains(r))
+			return new HashSet<Integer>(0);
+		return r.study(s, cache, offset, studiedRules);
 	}
 }

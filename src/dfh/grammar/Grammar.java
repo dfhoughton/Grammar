@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import dfh.grammar.Label.Type;
@@ -80,6 +81,48 @@ import dfh.grammar.Label.Type;
  */
 public class Grammar implements Serializable {
 	/**
+	 * A structure to hold matching options and define defaults.
+	 * <p>
+	 * <b>Creation date:</b> Mar 28, 2011
+	 * 
+	 * @author David Houghton
+	 * 
+	 */
+	public static class Options {
+		/**
+		 * Clones options from a prototype.
+		 * 
+		 * @param opt
+		 *            prototype
+		 */
+		public Options(Options opt) {
+			this.allowOverlap = opt.allowOverlap;
+			this.study = opt.study;
+			this.startOffset = opt.startOffset;
+		}
+
+		public Options() {
+		}
+
+		/**
+		 * Whether matches may overlap.
+		 */
+		public static final boolean ALLOW_OVERLAP = false;
+		/**
+		 * Whether to study the character sequence before matching to accelerate
+		 * the matching of terminal rules.
+		 */
+		public static final boolean STUDY = true;
+		/**
+		 * Character offset at which to begin matching.
+		 */
+		public static final int START_OFFSET = 0;
+		public boolean allowOverlap = ALLOW_OVERLAP;
+		public boolean study = STUDY;
+		public int startOffset = START_OFFSET;
+	}
+
+	/**
 	 * Special debugging API.
 	 * <p>
 	 * <b>Creation date:</b> Mar 21, 2011
@@ -89,9 +132,8 @@ public class Grammar implements Serializable {
 	 */
 	private abstract class GrammarMatcher extends Matcher {
 
-		protected GrammarMatcher(CharSequence s, final int offset,
-				final boolean noOverlap) {
-			super(s, offset, null, null);
+		protected GrammarMatcher(CharSequence s, final Options options) {
+			super(s, options.startOffset, null, null);
 		}
 
 		protected abstract String name();
@@ -99,6 +141,95 @@ public class Grammar implements Serializable {
 		@Override
 		Rule rule() {
 			return null;
+		}
+	}
+
+	private class FindMatcher extends GrammarMatcher {
+		private int index;
+		private boolean firstMatch;
+		private Matcher m;
+		private Options options;
+		private LinkedList<Integer> startOffsets;
+		private Map<Label, Map<Integer, CachedMatch>> cache;
+		private Match next;
+
+		FindMatcher(CharSequence s, Options options,
+				LinkedList<Integer> startOffsets,
+				Map<Label, Map<Integer, CachedMatch>> cache) {
+			super(s, options);
+			this.options = options;
+			this.startOffsets = startOffsets;
+			this.cache = cache;
+			index = options.study && !startOffsets.isEmpty() ? startOffsets
+					.removeFirst() : options.startOffset;
+			firstMatch = true;
+			m = rules.get(root).matcher(s, index, null, cache, null);
+			next = fetchNext();
+		}
+
+		@Override
+		public synchronized Match match() {
+			if (mightHaveNext()) {
+				Match n = next;
+				next = fetchNext();
+				if (n != null)
+					n.establishParentage();
+				return n;
+			}
+			return null;
+		}
+
+		private Match fetchNext() {
+			if (options.study && index == -1)
+				return null;
+			boolean firstNull = true;
+			while (true) {
+				Match n;
+				if (firstMatch) {
+					n = m.match();
+					firstMatch = false;
+				} else if (firstNull && !options.allowOverlap)
+					n = null;
+				else
+					n = m.match();
+				if (n != null) {
+					if (!options.allowOverlap) {
+						if (options.study) {
+							index = -1;
+							while (!startOffsets.isEmpty()) {
+								index = startOffsets.removeFirst();
+								if (index >= n.end())
+									break;
+							}
+						} else
+							index = n.end();
+					}
+					return n;
+				}
+				if (!(firstNull && !options.allowOverlap)) {
+					if (options.study) {
+						if (startOffsets.isEmpty())
+							break;
+						index = startOffsets.removeFirst();
+					} else
+						index++;
+				}
+				firstNull = false;
+				if (index == s.length())
+					break;
+				m = rules.get(root).matcher(s, index, null, cache, this);
+			}
+			return null;
+		}
+
+		@Override
+		public boolean mightHaveNext() {
+			return next != null;
+		}
+
+		@Override
+		protected String name() {
+			return "find";
 		}
 	}
 
@@ -209,66 +340,7 @@ public class Grammar implements Serializable {
 	}
 
 	public Matcher matches(CharSequence s) throws GrammarException {
-		return matches(s, 0, true);
-	}
-
-	public Matcher matches(CharSequence s, int offset) throws GrammarException {
-		return matches(s, offset, true);
-	}
-
-	public Matcher matches(CharSequence s, boolean allowOverlap)
-			throws GrammarException {
-		return matches(s, 0, !allowOverlap);
-	}
-
-	/**
-	 * Attempts to match the portion of the input string from the offset on to
-	 * the grammar.
-	 * 
-	 * @param s
-	 * @param offset
-	 * @return
-	 * @throws GrammarException
-	 */
-	public Matcher matches(final CharSequence s, final int offset,
-			final boolean noOverlap) throws GrammarException {
-		checkComplete();
-		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
-		final Matcher m = rules.get(root).matcher(s, offset, null, cache, null);
-		return new GrammarMatcher(s, offset, noOverlap) {
-			boolean matchedOnce = false;
-			Match next = fetchNext();
-
-			@Override
-			public boolean mightHaveNext() {
-				return noOverlap && matchedOnce || next != null;
-			}
-
-			private Match fetchNext() {
-				Match n;
-				while ((n = m.match()) != null) {
-					if (n.end() == s.length())
-						return n;
-				}
-				return null;
-			}
-
-			@Override
-			public synchronized Match match() {
-				if (mightHaveNext()) {
-					Match n = next;
-					next = fetchNext();
-					matchedOnce = true;
-					return n;
-				}
-				return null;
-			}
-
-			@Override
-			protected String name() {
-				return "matches";
-			}
-		};
+		return matches(s, new Options());
 	}
 
 	/**
@@ -292,27 +364,26 @@ public class Grammar implements Serializable {
 	}
 
 	public Matcher lookingAt(CharSequence s) throws GrammarException {
-		return lookingAt(s, 0, true);
+		return lookingAt(s, new Options());
 	}
 
-	public Matcher lookingAt(CharSequence s, int offset)
+	public Matcher lookingAt(final CharSequence cs, Options opt)
 			throws GrammarException {
-		return lookingAt(s, offset, true);
-	}
-
-	public Matcher lookingAt(CharSequence s, boolean allowOverlap)
-			throws GrammarException {
-		return lookingAt(s, 0, !allowOverlap);
-	}
-
-	public Matcher lookingAt(final CharSequence cs, final int offset,
-			final boolean noOverlap) throws GrammarException {
 		checkComplete();
-		final Matcher m = rules.get(root).matcher(cs, offset, null,
-				offsetCache(), null);
+		// make thread safe
+		final Options options = new Options(opt);
+		final Set<Integer> startOffsets = new HashSet<Integer>();
+		Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
+		if (options.study) {
+			Set<Rule> studiedRules = new HashSet<Rule>();
+			startOffsets.addAll(rules.get(root).study(cs, cache,
+					options.startOffset, studiedRules));
+		}
+		final Matcher m = rules.get(root).matcher(cs, options.startOffset,
+				null, cache, null);
 		abstract class LookingAtMatcher extends GrammarMatcher {
-			LookingAtMatcher(final int offset, final boolean NoOvlerlap) {
-				super(cs, offset, NoOvlerlap);
+			LookingAtMatcher() {
+				super(cs, options);
 			}
 
 			@Override
@@ -321,45 +392,51 @@ public class Grammar implements Serializable {
 			}
 		}
 		// synchronization wrappers
-		return noOverlap ? new LookingAtMatcher(offset, noOverlap) {
+		return !options.allowOverlap ? new LookingAtMatcher() {
 			boolean matchedOnce = false;
 
 			@Override
 			public synchronized boolean mightHaveNext() {
+				if (options.study && startOffsets.isEmpty())
+					return false;
 				return matchedOnce ? false : m.mightHaveNext();
 			}
 
 			@Override
 			public synchronized Match match() {
-				Match n = m.match();
-				matchedOnce = true;
+				Match n = null;
+				if (!(matchedOnce || options.study && startOffsets.isEmpty())) {
+					matchedOnce = true;
+					n = m.match();
+					if (n != null)
+						n.establishParentage();
+				}
 				return n;
 			}
-		} : new LookingAtMatcher(offset, noOverlap) {
+		} : new LookingAtMatcher() {
 
 			@Override
 			public synchronized boolean mightHaveNext() {
+				if (options.study && startOffsets.isEmpty())
+					return false;
 				return m.mightHaveNext();
 			}
 
 			@Override
 			public synchronized Match match() {
-				return m.match();
+				Match n = null;
+				if (!(options.study && startOffsets.isEmpty())) {
+					n = m.match();
+					if (n != null)
+						n.establishParentage();
+				}
+				return n;
 			}
 		};
 	}
 
 	public Matcher find(CharSequence s) throws GrammarException {
-		return find(s, 0, true);
-	}
-
-	public Matcher find(CharSequence s, int offset) throws GrammarException {
-		return find(s, offset, true);
-	}
-
-	public Matcher find(CharSequence s, boolean allowOverlap)
-			throws GrammarException {
-		return find(s, 0, !allowOverlap);
+		return find(s, new Options());
 	}
 
 	/**
@@ -370,62 +447,22 @@ public class Grammar implements Serializable {
 	 * @return
 	 * @throws GrammarException
 	 */
-	public Matcher find(final CharSequence s, final int offset,
-			final boolean noOverlap) throws GrammarException {
+	public Matcher find(final CharSequence s, Options opt)
+			throws GrammarException {
 		checkComplete();
+		// make thread safe
+		final Options options = new Options(opt);
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
-		return new GrammarMatcher(s, offset, noOverlap) {
-			int index = offset;
-			boolean firstMatch = true;
-			Matcher m = rules.get(root).matcher(s, index, null, cache, null);
-			Match next = fetchNext();
-
-			@Override
-			public synchronized Match match() {
-				if (mightHaveNext()) {
-					Match n = next;
-					next = fetchNext();
-					return n;
-				}
-				return null;
-			}
-
-			private Match fetchNext() {
-				boolean firstNull = true;
-				while (true) {
-					Match n;
-					if (firstMatch) {
-						n = m.match();
-						firstMatch = false;
-					} else if (firstNull && noOverlap)
-						n = null;
-					else
-						n = m.match();
-					if (n != null) {
-						if (noOverlap)
-							index = n.end();
-						return n;
-					}
-					if (!(firstNull && noOverlap))
-						index++;
-					firstNull = false;
-					if (index == s.length())
-						break;
-					m = rules.get(root).matcher(s, index, null, cache, null);
-				}
-				return null;
-			}
-
-			@Override
-			public boolean mightHaveNext() {
-				return next != null;
-			}
-
-			@Override
-			protected String name() {
-				return "find";
-			}
-		};
+		final LinkedList<Integer> startOffsets = new LinkedList<Integer>();
+		if (options.study) {
+			ArrayList<Integer> list = new ArrayList<Integer>();
+			Set<Rule> studiedRules = new HashSet<Rule>();
+			list.addAll(rules.get(root).study(s, cache, options.startOffset,
+					studiedRules));
+			Collections.sort(list);
+			startOffsets.addAll(list);
+		}
+		return new FindMatcher(s, options, startOffsets, cache);
 	}
 
 	/**
@@ -524,5 +561,70 @@ public class Grammar implements Serializable {
 			throw new GrammarException("rule " + label + " already defined");
 		((DeferredDefinitionRule) r).setRule(rule);
 		undefinedTerminals.remove(r.label());
+	}
+
+	/**
+	 * Attempts to match the portion of the input string from the offset on to
+	 * the grammar.
+	 * 
+	 * @param s
+	 * @param offset
+	 * @return
+	 * @throws GrammarException
+	 */
+	public Matcher matches(final CharSequence s, Options opt)
+			throws GrammarException {
+		checkComplete();
+		// clone options for thread safety
+		final Options options = new Options(opt);
+		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
+		final Set<Integer> startOffsets = new HashSet<Integer>();
+		if (options.study) {
+			Set<Rule> studiedRules = new HashSet<Rule>();
+			startOffsets.addAll(rules.get(root).study(s, cache,
+					options.startOffset, studiedRules));
+		}
+		final Matcher m = rules.get(root).matcher(s, options.startOffset, null,
+				cache, null);
+		return new GrammarMatcher(s, options) {
+			boolean matchedOnce = false;
+			Match next = fetchNext();
+
+			@Override
+			public boolean mightHaveNext() {
+				if (options.study && startOffsets.isEmpty())
+					return false;
+				return !options.allowOverlap && matchedOnce || next != null;
+			}
+
+			private Match fetchNext() {
+				if (options.study && startOffsets.isEmpty())
+					return null;
+				Match n;
+				while ((n = m.match()) != null) {
+					if (n.end() == s.length())
+						return n;
+				}
+				return null;
+			}
+
+			@Override
+			public synchronized Match match() {
+				if (mightHaveNext()) {
+					Match n = next;
+					next = fetchNext();
+					matchedOnce = true;
+					if (n != null)
+						n.establishParentage();
+					return n;
+				}
+				return null;
+			}
+
+			@Override
+			protected String name() {
+				return "matches";
+			}
+		};
 	}
 }

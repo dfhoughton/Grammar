@@ -4,10 +4,12 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
 
+import dfh.grammar.Grammar.Options;
 import dfh.grammar.Label.Type;
 
 /**
@@ -66,7 +68,7 @@ public class DeferredRuleTest {
 									break;
 							}
 							if (found)
-								n = new Match(ARule.this, offset, i, parent);
+								n = new Match(ARule.this, offset, i);
 							cm = new CachedMatch(n);
 							cache.put(offset, cm);
 						}
@@ -109,6 +111,14 @@ public class DeferredRuleTest {
 			public String description() {
 				return "foo bar";
 			}
+
+			@Override
+			public Set<Integer> study(CharSequence s,
+					Map<Label, Map<Integer, CachedMatch>> cache, int offset,
+					Set<Rule> studiedRules) {
+				// we won't study for this
+				return null;
+			}
 		}
 		String[] rules = {
 		//
@@ -118,7 +128,9 @@ public class DeferredRuleTest {
 		g.defineTerminal("q", Pattern.compile("[\"']"));
 		g.defineTerminal("text", new ARule(new Label(Type.terminal, "text")));
 		String s = "'ned'";
-		Matcher m = g.find(s);
+		Options options = new Options();
+		options.study = false;
+		Matcher m = g.find(s, options);
 		Match n = m.match();
 		System.out.println(n);
 		assertNotNull("found ned", n);
