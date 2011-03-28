@@ -242,7 +242,7 @@ public class RepetitionRule extends Rule {
 	public String description() {
 		StringBuilder b = new StringBuilder();
 		if (r.generation == -1) {
-			if (r instanceof SequenceRule) {
+			if (r instanceof SequenceRule || r instanceof AlternationRule) {
 				b.append("[ ");
 				b.append(r.description());
 				b.append(" ]");
