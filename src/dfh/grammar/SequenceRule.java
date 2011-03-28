@@ -14,9 +14,9 @@ public class SequenceRule extends Rule {
 		LinkedList<Matcher> matchers = new LinkedList<Matcher>();
 		LinkedList<Match> matched = new LinkedList<Match>();
 
-		public SequenceMatcher(CharSequence cs, Integer offset, Match parent,
+		public SequenceMatcher(CharSequence cs, Integer offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
-			super(cs, offset, parent, cache, SequenceRule.this, master);
+			super(cs, offset, cache, SequenceRule.this, master);
 		}
 
 		@Override
@@ -39,7 +39,7 @@ public class SequenceRule extends Rule {
 			while (matched.size() < sequence.length) {
 				Matcher m;
 				if (matchers.isEmpty()) {
-					m = sequence[0].matcher(s, offset, next, cache, this);
+					m = sequence[0].matcher(s, offset, cache, this);
 					matchers.add(m);
 				} else
 					m = matchers.peekLast();
@@ -57,8 +57,8 @@ public class SequenceRule extends Rule {
 				} else {
 					matched.add(n);
 					if (matched.size() < sequence.length) {
-						m = sequence[matched.size()].matcher(s, n.end(), next,
-								cache, this);
+						m = sequence[matched.size()].matcher(s, n.end(), cache,
+								this);
 						matchers.add(m);
 					}
 				}
@@ -81,9 +81,9 @@ public class SequenceRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence cs, Integer offset, Match parent,
+	public Matcher matcher(CharSequence cs, Integer offset,
 			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
-		return new SequenceMatcher(cs, offset, parent, cache, master);
+		return new SequenceMatcher(cs, offset, cache, master);
 	}
 
 	@Override

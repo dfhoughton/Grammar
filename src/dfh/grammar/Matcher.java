@@ -1,6 +1,5 @@
 package dfh.grammar;
 
-
 /**
  * An object associated with a {@link Rule} that can iterate over and return all
  * the possible parse trees meeting the matching conditions (pattern and start
@@ -14,14 +13,11 @@ package dfh.grammar;
 public abstract class Matcher {
 	CharSequence s;
 	Integer offset;
-	Match parent;
 	Matcher master;
 
-	protected Matcher(CharSequence s, Integer offset, Match parent,
-			Matcher master) {
+	protected Matcher(CharSequence s, Integer offset, Matcher master) {
 		this.s = s;
 		this.offset = offset;
-		this.parent = parent;
 		this.master = master;
 	}
 

@@ -21,9 +21,9 @@ public class CyclicRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence cs, Integer offset, Match parent,
+	public Matcher matcher(CharSequence cs, Integer offset,
 			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
-		return r.matcher(cs, offset, parent, cache, master);
+		return r.matcher(cs, offset, cache, master);
 	}
 
 	@Override

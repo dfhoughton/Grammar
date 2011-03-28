@@ -18,9 +18,9 @@ public class LeafRule extends Rule {
 		private Map<Integer, CachedMatch> cache;
 		private boolean fresh = true;
 
-		public LeafMatcher(CharSequence s, int offset, Match parent,
+		public LeafMatcher(CharSequence s, int offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
-			super(s, offset, parent, master);
+			super(s, offset, master);
 			this.cache = cache.get(label);
 		}
 
@@ -75,9 +75,9 @@ public class LeafRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence s, final Integer offset, Match parent,
+	public Matcher matcher(CharSequence s, final Integer offset,
 			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
-		return new LeafMatcher(s, offset, parent, cache, master);
+		return new LeafMatcher(s, offset, cache, master);
 	}
 
 	@Override

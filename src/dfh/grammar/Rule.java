@@ -57,8 +57,7 @@ public abstract class Rule implements Serializable {
 	 *         offset
 	 */
 	public abstract Matcher matcher(CharSequence s, Integer offset,
-			Match parent, Map<Label, Map<Integer, CachedMatch>> cache,
-			Matcher master);
+			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master);
 
 	@Override
 	public String toString() {

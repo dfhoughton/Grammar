@@ -13,9 +13,9 @@ public abstract class NonterminalMatcher extends Matcher {
 	protected final Rule rule;
 
 	protected NonterminalMatcher(CharSequence cs2, Integer offset,
-			Match parent, Map<Label, Map<Integer, CachedMatch>> cache,
+			Map<Label, Map<Integer, CachedMatch>> cache,
 			Rule rule, Matcher master) {
-		super(cs2, offset, parent, master);
+		super(cs2, offset, master);
 		this.cache = cache;
 		this.rule = rule;
 		this.subCache = cache.get(rule.label());

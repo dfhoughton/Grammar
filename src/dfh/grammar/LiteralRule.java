@@ -17,9 +17,9 @@ public class LiteralRule extends Rule {
 		private final Map<Integer, CachedMatch> cache;
 		private boolean fresh = true;
 
-		public LiteralMatcher(CharSequence s, Integer offset, Match parent,
+		public LiteralMatcher(CharSequence s, Integer offset, 
 				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
-			super(s, offset, parent, master);
+			super(s, offset, master);
 			this.cache = cache.get(label);
 		}
 
@@ -85,9 +85,9 @@ public class LiteralRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence s, Integer offset, Match parent,
+	public Matcher matcher(CharSequence s, Integer offset, 
 			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
-		return new LiteralMatcher(s, offset, parent, cache, master);
+		return new LiteralMatcher(s, offset, cache, master);
 	}
 
 	@Override

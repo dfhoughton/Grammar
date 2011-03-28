@@ -45,10 +45,10 @@ public class DeferredRuleTest {
 				private final Map<Integer, CachedMatch> cache;
 				private boolean fresh = true;
 
-				public AMatcher(CharSequence s, Integer offset, Match parent,
+				public AMatcher(CharSequence s, Integer offset,
 						Map<Label, Map<Integer, CachedMatch>> cache,
 						Matcher master) {
-					super(s, offset, parent, master);
+					super(s, offset, master);
 					this.cache = cache.get(label);
 				}
 
@@ -102,9 +102,8 @@ public class DeferredRuleTest {
 
 			@Override
 			public Matcher matcher(CharSequence s, Integer offset,
-					Match parent, Map<Label, Map<Integer, CachedMatch>> cache,
-					Matcher master) {
-				return new AMatcher(s, offset, parent, cache, master);
+					Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+				return new AMatcher(s, offset, cache, master);
 			}
 
 			@Override

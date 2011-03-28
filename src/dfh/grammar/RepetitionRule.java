@@ -22,10 +22,10 @@ public class RepetitionRule extends Rule {
 		protected LinkedList<Match> matched;
 		protected LinkedList<Matcher> matchers;
 
-		public RepetitionMatcher(CharSequence cs, int offset, Match parent,
+		public RepetitionMatcher(CharSequence cs, int offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
 				Matcher master) {
-			super(cs, offset, parent, cache, RepetitionRule.this, master);
+			super(cs, offset, cache, RepetitionRule.this, master);
 		}
 	}
 
@@ -34,9 +34,9 @@ public class RepetitionRule extends Rule {
 		private final boolean backtracks;
 
 		protected GreedyAndPossessive(CharSequence cs, int offset,
-				Match parent, Map<Label, Map<Integer, CachedMatch>> cache,
-				Label label, boolean backtracks, Matcher master) {
-			super(cs, offset, parent, cache, label, master);
+				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
+				boolean backtracks, Matcher master) {
+			super(cs, offset, cache, label, master);
 			this.backtracks = backtracks;
 		}
 
@@ -65,7 +65,7 @@ public class RepetitionRule extends Rule {
 			if (matchers.size() > matched.size())
 				m = matchers.peekLast();
 			else {
-				m = r.matcher(s, start, parent, cache, this);
+				m = r.matcher(s, start, cache, this);
 				matchers.add(m);
 			}
 			Match n = m.match();
@@ -86,10 +86,10 @@ public class RepetitionRule extends Rule {
 	 * 
 	 */
 	private class GreedyMatcher extends GreedyAndPossessive {
-		protected GreedyMatcher(CharSequence cs, int offset, Match parent,
+		protected GreedyMatcher(CharSequence cs, int offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
 				Matcher master) {
-			super(cs, offset, parent, cache, label, true, master);
+			super(cs, offset, cache, label, true, master);
 		}
 
 		@Override
@@ -135,13 +135,13 @@ public class RepetitionRule extends Rule {
 
 	private class StingyMatcher extends RepetitionMatcher {
 
-		protected StingyMatcher(CharSequence cs, int offset, Match parent,
+		protected StingyMatcher(CharSequence cs, int offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
 				Matcher master) {
-			super(cs, offset, parent, cache, label, master);
+			super(cs, offset, cache, label, master);
 			matchers = new LinkedList<Matcher>();
 			matched = new LinkedList<Match>();
-			matchers.add(r.matcher(cs, offset, parent, cache, master));
+			matchers.add(r.matcher(cs, offset, cache, master));
 		}
 
 		@Override
@@ -158,8 +158,7 @@ public class RepetitionRule extends Rule {
 							matched.removeLast();
 						matched.add(n);
 						if (matched.size() < repetition.top)
-							matchers.add(r.matcher(s, n.end(), next, cache,
-									this));
+							matchers.add(r.matcher(s, n.end(), cache, this));
 					}
 				} else {
 					decrement();
@@ -185,10 +184,10 @@ public class RepetitionRule extends Rule {
 
 	private class PossessiveMatcher extends GreedyAndPossessive {
 
-		protected PossessiveMatcher(CharSequence cs, int offset, Match parent,
+		protected PossessiveMatcher(CharSequence cs, int offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
 				Matcher master) {
-			super(cs, offset, parent, cache, label, false, master);
+			super(cs, offset, cache, label, false, master);
 		}
 
 		@Override
@@ -222,16 +221,15 @@ public class RepetitionRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence cs, Integer offset, Match parent,
+	public Matcher matcher(CharSequence cs, Integer offset,
 			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
 		switch (repetition.t) {
 		case possessive:
-			return new PossessiveMatcher(cs, offset, parent, cache, label,
-					master);
+			return new PossessiveMatcher(cs, offset, cache, label, master);
 		case stingy:
-			return new StingyMatcher(cs, offset, parent, cache, label, master);
+			return new StingyMatcher(cs, offset, cache, label, master);
 		default:
-			return new GreedyMatcher(cs, offset, parent, cache, label, master);
+			return new GreedyMatcher(cs, offset, cache, label, master);
 		}
 	}
 

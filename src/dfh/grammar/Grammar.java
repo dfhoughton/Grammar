@@ -133,7 +133,7 @@ public class Grammar implements Serializable {
 	private abstract class GrammarMatcher extends Matcher {
 
 		protected GrammarMatcher(CharSequence s, final Options options) {
-			super(s, options.startOffset, null, null);
+			super(s, options.startOffset, null);
 		}
 
 		protected abstract String name();
@@ -163,7 +163,7 @@ public class Grammar implements Serializable {
 			index = options.study && !startOffsets.isEmpty() ? startOffsets
 					.removeFirst() : options.startOffset;
 			firstMatch = true;
-			m = rules.get(root).matcher(s, index, null, cache, null);
+			m = rules.get(root).matcher(s, index, cache, null);
 			next = fetchNext();
 		}
 
@@ -217,7 +217,7 @@ public class Grammar implements Serializable {
 				firstNull = false;
 				if (index == s.length())
 					break;
-				m = rules.get(root).matcher(s, index, null, cache, this);
+				m = rules.get(root).matcher(s, index, cache, this);
 			}
 			return null;
 		}
@@ -380,7 +380,7 @@ public class Grammar implements Serializable {
 					options.startOffset, studiedRules));
 		}
 		final Matcher m = rules.get(root).matcher(cs, options.startOffset,
-				null, cache, null);
+				cache, null);
 		abstract class LookingAtMatcher extends GrammarMatcher {
 			LookingAtMatcher() {
 				super(cs, options);
@@ -584,7 +584,7 @@ public class Grammar implements Serializable {
 			startOffsets.addAll(rules.get(root).study(s, cache,
 					options.startOffset, studiedRules));
 		}
-		final Matcher m = rules.get(root).matcher(s, options.startOffset, null,
+		final Matcher m = rules.get(root).matcher(s, options.startOffset,
 				cache, null);
 		return new GrammarMatcher(s, options) {
 			boolean matchedOnce = false;
