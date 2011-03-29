@@ -1,5 +1,10 @@
 package dfh.grammar;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import dfh.grammar.Label.Type;
+
 /**
  * Node in an AST tree.
  * <p>
@@ -104,5 +109,118 @@ public class Match {
 		}
 		b.append(']');
 		return b.toString();
+	}
+
+	/*
+	 * some tests
+	 */
+
+	/**
+	 * @return whether this {@link Match} has no children
+	 */
+	public boolean isTerminal() {
+		return children == null || children.length == 0;
+	}
+
+	/**
+	 * @return whether this {@link Match} has no parent
+	 */
+	public boolean isRoot() {
+		return parent == null;
+	}
+
+	/**
+	 * Returns whether the {@link Rule} that generated this {@link Match} has
+	 * the given name. Note, rules of different types may have the same name.
+	 * For example, one may have both rules <code>&lt;a&gt;</code> and
+	 * <code>(a)</code>.
+	 * 
+	 * @param name
+	 *            a {@link Label#id}
+	 * @return whether the {@link Rule} that generated this {@link Match} has
+	 *         the given id
+	 */
+	public boolean hasLabel(String name) {
+		return r.label().id.equals(name);
+	}
+
+	/**
+	 * Returns whether the {@link Rule} that generated this {@link Match} has
+	 * the given name and type.
+	 * 
+	 * @param name
+	 *            a {@link Label#id}
+	 * @param t
+	 *            a {@link Type}
+	 * @return whether the {@link Rule} that generated this {@link Match} has
+	 *         the given name and type
+	 */
+	public boolean hasLabel(String name, Type t) {
+		return hasLabel(name) && r.label().t == t;
+	}
+
+	/**
+	 * @param l
+	 * @return whether the {@link Rule} that generated this {@link Match} has
+	 *         the given label
+	 */
+	public boolean hasLabel(Label l) {
+		return r.label().equals(l);
+	}
+
+	/**
+	 * Returns list of matches dominated by this that pass the given test. The
+	 * search is depth first. Children are returned before parents.
+	 * 
+	 * @param t
+	 *            test
+	 * @return list of matches dominated by this that pass the given test
+	 */
+	public LinkedList<Match> passes(MatchTest t) {
+		LinkedList<Match> list = new LinkedList<Match>();
+		passes(t, list);
+		return list;
+	}
+
+	private void passes(MatchTest t, List<Match> accumulator) {
+		if (children != null) {
+			for (Match m : children)
+				m.passes(t, accumulator);
+		}
+		if (t.test(this))
+			accumulator.add(this);
+	}
+
+	/**
+	 * Returns whether {@link Match} corresponds to a region with no width.
+	 * <code>(?=fred)</code> and <code>'fred'*</code> can both produce
+	 * zero-width matches.
+	 * 
+	 * @return whether {@link Match} corresponds to a region with no width
+	 */
+	public boolean zeroWidth() {
+		return start == end;
+	}
+
+	/**
+	 * Returns whether this {@link Match} corresponds to a named {@link Rule},
+	 * as opposed to an implicit rule. For example, in
+	 * 
+	 * <pre>
+	 * &lt;ROOT&gt; = &lt;fred&gt;++
+	 * &lt;fred&gt; = 'fred' | 'Fred'
+	 * </pre>
+	 * 
+	 * <code>&lt;ROOT&gt;</code> and <code>&lt;fred&gt;</code> are explicit
+	 * while <code>'fred'</code>, <code>&lt;fred&gt;++</code> and so forth are
+	 * implicit.
+	 * <p>
+	 * Any rule defined on its own line with its own label to the left of the
+	 * equals sign is an explicit rule.
+	 * 
+	 * @return whether this {@link Match} corresponds to a named {@link Rule}
+	 */
+	public boolean explicit() {
+		return r.generation > -1;
 	}
 }
