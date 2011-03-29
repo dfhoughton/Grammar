@@ -27,6 +27,25 @@ public class RepetitionRule extends Rule {
 				Matcher master) {
 			super(cs, offset, cache, RepetitionRule.this, master);
 		}
+
+		protected boolean grab() {
+			int start = matched.isEmpty() ? offset : matched.peekLast().end();
+			Matcher m;
+			if (matchers.size() > matched.size())
+				m = matchers.peekLast();
+			else {
+				m = r.matcher(s, start, cache, this);
+				matchers.add(m);
+			}
+			Match n = m.match();
+			if (n == null) {
+				matchers.removeLast();
+				return true;
+			} else {
+				matched.add(n);
+				return false;
+			}
+		}
 	}
 
 	private abstract class GreedyAndPossessive extends RepetitionMatcher {
@@ -56,25 +75,6 @@ public class RepetitionRule extends Rule {
 			} else if (!backtracks) {
 				matchers.clear();
 				matchers = null;
-			}
-		}
-
-		protected boolean grab() {
-			int start = matched.isEmpty() ? offset : matched.peekLast().end();
-			Matcher m;
-			if (matchers.size() > matched.size())
-				m = matchers.peekLast();
-			else {
-				m = r.matcher(s, start, cache, this);
-				matchers.add(m);
-			}
-			Match n = m.match();
-			if (n == null) {
-				matchers.removeLast();
-				return true;
-			} else {
-				matched.add(n);
-				return false;
 			}
 		}
 	}
@@ -134,6 +134,7 @@ public class RepetitionRule extends Rule {
 	}
 
 	private class StingyMatcher extends RepetitionMatcher {
+		private int goal;
 
 		protected StingyMatcher(CharSequence cs, int offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
@@ -141,43 +142,49 @@ public class RepetitionRule extends Rule {
 			super(cs, offset, cache, label, master);
 			matchers = new LinkedList<Matcher>();
 			matched = new LinkedList<Match>();
-			matchers.add(r.matcher(cs, offset, cache, master));
+			goal = repetition.bottom;
+			seekGoal();
+		}
+
+		private void seekGoal() {
+			boolean found = true;
+			next = null;
+			while (matched.size() < goal) {
+				if (grab()) {
+					if (matchers.isEmpty()) {
+						found = false;
+						break;
+					}
+				}
+			}
+			if (found) {
+				next = new Match(RepetitionRule.this, offset);
+				Match[] children = matched.toArray(new Match[matched.size()]);
+				next.setChildren(children);
+				if (matched.isEmpty())
+					next.setEnd(offset);
+				else
+					next.setEnd(matched.peekLast().end());
+			}
 		}
 
 		@Override
 		protected void fetchNext() {
-			next = new Match(RepetitionRule.this, offset);
-			while (next != null && matched.size() < repetition.bottom) {
-				Matcher m = matchers.peekLast();
-				if (m.mightHaveNext()) {
-					Match n = m.match();
-					if (n == null) {
-						decrement();
-					} else {
-						if (matched.size() == repetition.top)
-							matched.removeLast();
-						matched.add(n);
-						if (matched.size() < repetition.top)
-							matchers.add(r.matcher(s, n.end(), cache, this));
-					}
-				} else {
-					decrement();
-				}
+			if (goal == 0)
+				goal = 1;
+			else
+				matched.removeLast();
+			while (goal <= repetition.top) {
+				seekGoal();
+				if (matchers.isEmpty())
+					goal++;
+				else
+					break;
 			}
-			next.setEnd(matched.isEmpty() ? offset : matched.peekLast().end());
-			Match[] children = matched.toArray(new Match[matched.size()]);
-			next.setChildren(children);
-		}
-
-		private void decrement() {
-			matchers.removeLast();
-			if (matchers.isEmpty()) {
+			if (goal > repetition.top) {
 				done = true;
-				next = null;
 				matchers = null;
 				matched = null;
-			} else {
-				matched.removeLast();
 			}
 		}
 	}

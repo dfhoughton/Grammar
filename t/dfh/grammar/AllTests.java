@@ -23,6 +23,7 @@ import org.junit.runners.Suite;
 		RepetitionTest.class,//
 		SimpleMatchTest.class,//
 		RecursiveTest.class,//
+		AssertionTest.class,//
 })
 public class AllTests {
 }

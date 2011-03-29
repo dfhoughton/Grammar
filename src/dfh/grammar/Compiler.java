@@ -382,6 +382,8 @@ public class Compiler {
 			return new SequenceRule(label, ((SequenceRule) r).sequence);
 		if (r instanceof LiteralRule)
 			return new LiteralRule(label, ((LiteralRule) r).literal);
+		if (r instanceof LeafRule)
+			return new LeafRule(label, ((LeafRule) r).p);
 		throw new GrammarException("unanticipated rule type: "
 				+ r.getClass().getName());
 	}

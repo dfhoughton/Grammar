@@ -67,7 +67,7 @@ public class LeafRule extends Rule {
 	}
 
 	private static final long serialVersionUID = 1L;
-	private final Pattern p;
+	final Pattern p;
 
 	public LeafRule(Label label, Pattern p) {
 		super(label);
@@ -109,7 +109,10 @@ public class LeafRule extends Rule {
 				startOffsets.add(i);
 				Match n = new Match(this, m.start(), m.end());
 				subCache.put(i, new CachedMatch(n));
-				m.region(m.start() + 1, s.length());
+				int newStart = m.start() + 1;
+				if (newStart == s.length())
+					break;
+				m.region(newStart, s.length());
 			}
 		}
 		return startOffsets;
