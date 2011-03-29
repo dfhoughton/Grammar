@@ -26,8 +26,8 @@ As of Tuesday, March 22, 2011 the code passes all tests.
 TODO
 ----
  * Document how to use grammars.
- * Add capability to use deferred terminal rules.
  * Add capability to use Grammars as terminal rules in other grammars.
+ * Add code to facilitate extracting information from matches.
 
 Other Stuff
 -----------
