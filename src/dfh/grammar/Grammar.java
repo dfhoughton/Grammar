@@ -126,9 +126,35 @@ public class Grammar implements Serializable {
 		 * Character offset at which to begin matching.
 		 */
 		public static final int START_OFFSET = 0;
-		public boolean allowOverlap = ALLOW_OVERLAP;
-		public boolean study = STUDY;
-		public int startOffset = START_OFFSET;
+		boolean allowOverlap = ALLOW_OVERLAP;
+		boolean study = STUDY;
+		int startOffset = START_OFFSET;
+
+		public boolean allowOverlap() {
+			return allowOverlap;
+		}
+
+		public void allowOverlap(boolean allowOverlap) {
+			this.allowOverlap = allowOverlap;
+		}
+
+		public boolean study() {
+			return study;
+		}
+
+		public void study(boolean study) {
+			this.study = study;
+		}
+
+		public int startOffset() {
+			return startOffset;
+		}
+
+		public void startOffset(int startOffset) {
+			if (startOffset < 0)
+				throw new GrammarException("text offsets must be positive");
+			this.startOffset = startOffset;
+		}
 	}
 
 	/**
@@ -252,29 +278,77 @@ public class Grammar implements Serializable {
 	private final HashSet<Label> undefinedTerminals;
 	transient PrintStream trace;
 
+	/**
+	 * Delegates to {@link #Grammar(LineReader)}.
+	 * 
+	 * @param lines
+	 *            rule source
+	 * @throws GrammarException
+	 * @throws IOException
+	 */
 	public Grammar(String[] lines) throws GrammarException, IOException {
 		this(new ArrayLineReader(lines));
 	}
 
+	/**
+	 * Delegates to {@link #Grammar(Reader)} and ultimately
+	 * {@link #Grammar(LineReader)}.
+	 * 
+	 * @param f
+	 *            rule source
+	 * @throws GrammarException
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public Grammar(File f) throws GrammarException, FileNotFoundException,
 			IOException {
 		this(new FileReader(f));
 	}
 
+	/**
+	 * Delegates to {@link #Grammar(Reader)} and ultimately
+	 * {@link #Grammar(LineReader)}.
+	 * 
+	 * @param is
+	 *            rule source
+	 * @throws GrammarException
+	 * @throws IOException
+	 */
 	public Grammar(InputStream is) throws GrammarException, IOException {
 		this(new InputStreamReader(is));
 	}
 
+	/**
+	 * Delegates to {@link #Grammar(BufferedReader)} and ultimately
+	 * {@link #Grammar(LineReader)}.
+	 * 
+	 * @param r
+	 *            rule source
+	 * @throws GrammarException
+	 * @throws IOException
+	 */
 	public Grammar(Reader r) throws GrammarException, IOException {
 		this(new BufferedReader(r));
 	}
 
+	/**
+	 * Delegates to {@link #Grammar(BufferedReader)} and ultimately to
+	 * {@link #Grammar(LineReader)}.
+	 * 
+	 * @param r
+	 *            rule source
+	 * @throws GrammarException
+	 * @throws IOException
+	 */
 	public Grammar(BufferedReader r) throws GrammarException, IOException {
 		this(new BufferedLineReader(r));
 	}
 
 	/**
-	 * @param in
+	 * Creates a {@link Compiler} to parse input and prepares a {@link Grammar}
+	 * to generate {@link Matcher} objects.
+	 * 
+	 * @param reader
 	 * @throws GrammarException
 	 * @throws IOException
 	 */
@@ -338,8 +412,7 @@ public class Grammar implements Serializable {
 	public Matcher lookingAt(final CharSequence cs, Options opt)
 			throws GrammarException {
 		checkComplete();
-		// make thread safe
-		final Options options = new Options(opt);
+		final Options options = verifyOptions(cs, opt);
 		final Set<Integer> startOffsets = new HashSet<Integer>();
 		Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		if (options.study) {
@@ -408,18 +481,19 @@ public class Grammar implements Serializable {
 	}
 
 	/**
-	 * Finds first match of grammar to string at or after offset.
+	 * Generates iterator over matches anywhere in sequence.
 	 * 
 	 * @param s
-	 * @param offset
-	 * @return
+	 *            sequence against which to match
+	 * @param opt
+	 *            matching parameters
+	 * @return {@link Matcher} object for iterating over matches
 	 * @throws GrammarException
 	 */
 	public Matcher find(final CharSequence s, Options opt)
 			throws GrammarException {
 		checkComplete();
-		// make thread safe
-		final Options options = new Options(opt);
+		final Options options = verifyOptions(s, opt);
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		final LinkedList<Integer> startOffsets = new LinkedList<Integer>();
 		if (options.study) {
@@ -532,19 +606,21 @@ public class Grammar implements Serializable {
 	}
 
 	/**
-	 * Attempts to match the portion of the input string from the offset on to
-	 * the grammar.
+	 * Generates iterator over matches beginning on the first character of the
+	 * sequence (or at the offset specified in the {@link Options} object) and
+	 * ending on the last character.
 	 * 
 	 * @param s
-	 * @param offset
-	 * @return
+	 *            sequence against which to match
+	 * @param opt
+	 *            matching parameters
+	 * @return {@link Matcher} object with which one can iterate over matches
 	 * @throws GrammarException
 	 */
 	public Matcher matches(final CharSequence s, Options opt)
 			throws GrammarException {
 		checkComplete();
-		// clone options for thread safety
-		final Options options = new Options(opt);
+		final Options options = verifyOptions(s, opt);
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		final Set<Integer> startOffsets = new HashSet<Integer>();
 		if (options.study) {
@@ -594,5 +670,19 @@ public class Grammar implements Serializable {
 				return "matches";
 			}
 		};
+	}
+
+	/**
+	 * Validates options and clones object to make it thread safe.
+	 * 
+	 * @param s
+	 * @param opt
+	 * @return clone of given options
+	 */
+	private Options verifyOptions(CharSequence s, Options opt) {
+		if (opt.startOffset() >= s.length())
+			throw new GrammarException(
+					"start offset specified beyond end of string");
+		return new Options(opt);
 	}
 }

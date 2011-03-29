@@ -46,8 +46,6 @@ public abstract class Rule implements Serializable {
 	 *            sequence to match against
 	 * @param offset
 	 *            offset at which to begin the match
-	 * @param parent
-	 *            parent node for use in constructing the match tree
 	 * @param cache
 	 *            collection of offset matching caches
 	 * @param master
@@ -83,6 +81,7 @@ public abstract class Rule implements Serializable {
 	 * Debugging output to print before matching.
 	 * 
 	 * @param m
+	 *            matcher performing match
 	 */
 	protected final void matchTrace(Matcher m) {
 		if (g.trace != null) {
@@ -130,10 +129,11 @@ public abstract class Rule implements Serializable {
 	}
 
 	/**
-	 * Debugging output to print after matching.
+	 * Debugging output to print after matching. This includes any match
+	 * returned and a matching stack trace.
 	 * 
 	 * @param m
-	 * @param s
+	 * @param n
 	 */
 	protected final void matchTrace(Matcher m, Match n) {
 		if (g.trace != null) {
