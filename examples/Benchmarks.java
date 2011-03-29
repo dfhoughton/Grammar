@@ -144,10 +144,8 @@ public class Benchmarks {
 		String[] rules = {
 				//
 				"<ROOT> = [ <a> | <b> ]{2} <b>",//
-				"<a> = (a){,2}",//
-				"<b> = (a) (b)",//
-				"(a) = 'a'",//
-				"(b) = 'b'",//
+				"<a> = 'a'{,2}",//
+				"<b> = 'ab'",//
 		};
 		Pattern p = Pattern.compile("(?:a{0,2}|a{0,2}b){2}b");
 		String s = "aabb";

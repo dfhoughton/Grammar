@@ -15,7 +15,7 @@ import dfh.grammar.Label.Type;
 public class Match {
 	private final Rule r;
 	private final int start;
-	private int end;
+	private int end = -1;
 	private Match parent;
 	private Match[] children;
 	/**
@@ -33,12 +33,12 @@ public class Match {
 		parent = this;
 	}
 
-	Match(Rule r, int start) {
+	public Match(Rule r, int start) {
 		this.r = r;
 		this.start = start;
 	}
 
-	Match(Rule r, int start, int end) {
+	public Match(Rule r, int start, int end) {
 		this(r, start);
 		setEnd(end);
 	}
@@ -55,7 +55,9 @@ public class Match {
 		return end;
 	}
 
-	void setEnd(int end) {
+	public void setEnd(int end) {
+		if (this.end > -1)
+			throw new GrammarException("match end cannot be reset");
 		this.end = end;
 	}
 
@@ -81,7 +83,9 @@ public class Match {
 		}
 	}
 
-	void setChildren(Match[] children) {
+	public void setChildren(Match[] children) {
+		if (this.children != null)
+			throw new GrammarException("match children cannot be reset");
 		this.children = children;
 	}
 
