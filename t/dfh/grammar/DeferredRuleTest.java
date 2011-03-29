@@ -34,7 +34,6 @@ public class DeferredRuleTest {
 		String s = "'ned'";
 		Matcher m = g.find(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("found ned", n);
 	}
 
@@ -131,7 +130,6 @@ public class DeferredRuleTest {
 		options.study = false;
 		Matcher m = g.find(s, options);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("found ned", n);
 	}
 }

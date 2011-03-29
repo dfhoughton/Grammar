@@ -19,7 +19,6 @@ public class LiteralTest {
 		String s = "la la joe la la";
 		Matcher m = g.find(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("found joe", n);
 	}
 
@@ -33,7 +32,6 @@ public class LiteralTest {
 		String s = "la la la la";
 		Matcher m = g.find(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNull("didn't find non-joe", n);
 	}
 
@@ -47,7 +45,6 @@ public class LiteralTest {
 		String s = "la la joejoe la la";
 		Matcher m = g.find(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("found double joe", n);
 	}
 
@@ -61,7 +58,6 @@ public class LiteralTest {
 		String s = "la la joejoe la la";
 		Matcher m = g.find(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("single quotes worked", n);
 	}
 }

@@ -7,6 +7,14 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+/**
+ * Make sure backreferences work as advertised.'
+ * <p>
+ * <b>Creation date:</b> Mar 29, 2011
+ * 
+ * @author David Houghton
+ * 
+ */
 public class BackReferenceTest {
 
 	@Test
@@ -21,7 +29,6 @@ public class BackReferenceTest {
 		String s = "'ned'";
 		Matcher m = g.find(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("found ned", n);
 	}
 
@@ -37,7 +44,6 @@ public class BackReferenceTest {
 		String s = "'ned\"";
 		Matcher m = g.find(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNull("didn't find ned", n);
 	}
 }

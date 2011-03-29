@@ -41,7 +41,6 @@ public class RecursiveTest {
 		String s = "<test/>";
 		Matcher m = g.matches(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("parsed minimal document", n);
 	}
 
@@ -50,7 +49,6 @@ public class RecursiveTest {
 		String s = "<test><foo/></test>";
 		Matcher m = g.matches(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("parsed minimal document", n);
 	}
 
@@ -59,7 +57,6 @@ public class RecursiveTest {
 		String s = "<test><foo jolly=\"roger\"/></test>";
 		Matcher m = g.matches(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("parsed minimal document", n);
 	}
 
@@ -68,7 +65,6 @@ public class RecursiveTest {
 		String s = "<test><foo jolly=\"roger\"/></ROO>";
 		Matcher m = g.matches(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNull("parsed minimal document", n);
 	}
 }

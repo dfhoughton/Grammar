@@ -39,7 +39,6 @@ public class CommentTest {
 		String s = "foo bar";
 		Matcher m = g.matches(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("found 'foo bar'", n);
 	}
 
@@ -48,7 +47,6 @@ public class CommentTest {
 		String s = "quux baz";
 		Matcher m = g.matches(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("found 'quux baz'", n);
 	}
 
@@ -57,9 +55,7 @@ public class CommentTest {
 		String s = "quux baz  foo bar";
 		int count = 0;
 		Matcher m = g.find(s);
-		Match n;
-		while (count < 3 && (n = m.match()) != null) {
-			System.out.println(n);
+		while (count < 3 && m.match() != null) {
 			count++;
 		}
 		assertTrue("found both matches in " + s, count == 2);
@@ -70,7 +66,6 @@ public class CommentTest {
 		String s = "quwerewr";
 		Matcher m = g.matches(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNull("recognized non-match for " + s, n);
 	}
 }
