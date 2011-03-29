@@ -88,9 +88,10 @@ public class Grammar implements Serializable {
 	 * @author David Houghton
 	 * 
 	 */
-	public static class Options {
+	public static class Options implements Cloneable {
 		/**
-		 * Clones options from a prototype.
+		 * Clones options from a prototype. Use this instead of {@link #clone()}
+		 * and you don't have to cast.
 		 * 
 		 * @param opt
 		 *            prototype
@@ -101,7 +102,15 @@ public class Grammar implements Serializable {
 			this.startOffset = opt.startOffset;
 		}
 
+		/**
+		 * Gives you all the defaults.
+		 */
 		public Options() {
+		}
+
+		@Override
+		public Object clone() {
+			return new Options(this);
 		}
 
 		/**
@@ -233,47 +242,6 @@ public class Grammar implements Serializable {
 		}
 	}
 
-	private static class BReader implements LineReader {
-		private final BufferedReader reader;
-		int lineNumber = 0;
-
-		BReader(BufferedReader reader) {
-			this.reader = reader;
-		}
-
-		@Override
-		public String readLine() throws IOException {
-			lineNumber++;
-			return reader.readLine();
-		}
-
-		@Override
-		public int lineNumber() {
-			return lineNumber;
-		}
-	}
-
-	private static class AReader implements LineReader {
-		private final String[] lines;
-		int index = 0;
-
-		AReader(String[] lines) {
-			this.lines = lines;
-		}
-
-		@Override
-		public String readLine() throws IOException {
-			if (index == lines.length)
-				return null;
-			return lines[index++];
-		}
-
-		@Override
-		public int lineNumber() {
-			return index;
-		}
-	}
-
 	private static final long serialVersionUID = 1L;
 	private final Label root;
 	private final Map<Label, Rule> rules;
@@ -285,7 +253,7 @@ public class Grammar implements Serializable {
 	transient PrintStream trace;
 
 	public Grammar(String[] lines) throws GrammarException, IOException {
-		this(new AReader(lines));
+		this(new ArrayLineReader(lines));
 	}
 
 	public Grammar(File f) throws GrammarException, FileNotFoundException,
@@ -302,7 +270,7 @@ public class Grammar implements Serializable {
 	}
 
 	public Grammar(BufferedReader r) throws GrammarException, IOException {
-		this(new BReader(r));
+		this(new BufferedLineReader(r));
 	}
 
 	/**
