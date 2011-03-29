@@ -45,12 +45,26 @@ public class AssertionTest {
 		String s = "  mary joe susie joe ";
 		Matcher m = g.find(s);
 		int count = 0;
-		Match n;
-		while ((n = m.match()) != null) {
-			System.out.println(n);
-			System.out.println(s.substring(n.start(), n.end()));
+		while (m.match() != null)
 			count++;
-		}
+		assertTrue("found joe", count == 1);
+	}
+
+	@Test
+	public void forwardTest() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = (joe) (s)?+ (is_sue)",//
+				"(joe) =\\b(?i:joe)\\b",//
+				"(is_sue) =(?=(?i:sue))",//
+				"(s) =\\s++",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = " joe mary joe sue ";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
 		assertTrue("found joe", count == 1);
 	}
 }

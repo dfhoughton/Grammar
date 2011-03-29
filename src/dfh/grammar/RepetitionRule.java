@@ -144,6 +144,11 @@ public class RepetitionRule extends Rule {
 			matched = new LinkedList<Match>();
 			goal = repetition.bottom;
 			seekGoal();
+			if (next == null) {
+				done = true;
+				matched = null;
+				matchers = null;
+			}
 		}
 
 		private void seekGoal() {

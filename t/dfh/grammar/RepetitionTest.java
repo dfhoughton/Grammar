@@ -21,7 +21,6 @@ public class RepetitionTest {
 		String s = "aa";
 		Matcher m = g.lookingAt(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertTrue("found first instance", n.end() == 1);
 	}
 
@@ -36,7 +35,6 @@ public class RepetitionTest {
 		String s = "aa";
 		Matcher m = g.lookingAt(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertTrue("found first instance", n.end() == 1);
 	}
 
@@ -51,7 +49,6 @@ public class RepetitionTest {
 		String s = "aa";
 		Matcher m = g.lookingAt(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertTrue("found first instance", n.end() == 0);
 	}
 
@@ -66,7 +63,6 @@ public class RepetitionTest {
 		String s = "aa";
 		Matcher m = g.lookingAt(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertTrue("found all asterisks", n.end() == 2);
 	}
 
@@ -81,7 +77,6 @@ public class RepetitionTest {
 		String s = "aa";
 		Matcher m = g.lookingAt(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertTrue("found all plusses", n.end() == 2);
 	}
 
@@ -99,7 +94,6 @@ public class RepetitionTest {
 		String s = "aab";
 		Matcher m = g.lookingAt(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNull("possessiveness caused match to fail", n);
 	}
 
@@ -117,7 +111,6 @@ public class RepetitionTest {
 		String s = "aab";
 		Matcher m = g.lookingAt(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("greedy asterisk allowed backtracking", n);
 	}
 
@@ -132,7 +125,6 @@ public class RepetitionTest {
 		String s = "aaaaa";
 		Matcher m = g.lookingAt(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertTrue("matched an exact number", n.end() == 3);
 	}
 
@@ -150,7 +142,6 @@ public class RepetitionTest {
 		String s = "aab";
 		Matcher m = g.lookingAt(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("{,2} worked", n);
 	}
 
@@ -168,8 +159,32 @@ public class RepetitionTest {
 		String s = "aabb";
 		Matcher m = g.lookingAt(s);
 		Match n = m.match();
-		System.out.println(n);
 		assertNotNull("[]{2} worked", n);
 	}
 
+	@Test
+	public void stingyThenGreedy() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = 'ab'+? 'ab'+",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "ababab";
+		Matcher m = g.lookingAt(s);
+		Match n = m.match();
+		assertTrue("stingy is short", n.children()[0].end() == 2);
+	}
+
+	@Test
+	public void greedyThenStingy() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = 'ab'+ 'ab'+?",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "ababab";
+		Matcher m = g.lookingAt(s);
+		Match n = m.match();
+		assertTrue("stingy is short", n.children()[0].end() == 4);
+	}
 }
