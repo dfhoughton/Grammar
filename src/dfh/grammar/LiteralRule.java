@@ -43,10 +43,8 @@ public class LiteralRule extends Rule {
 							break;
 						}
 					}
-					if (matched) {
-						m = new Match(LiteralRule.this, offset);
-						m.setEnd(end);
-					}
+					if (matched)
+						m = new Match(LiteralRule.this, offset, end);
 				}
 				cm = new CachedMatch(m);
 				cache.put(offset, cm);

@@ -41,7 +41,8 @@ public class SequenceRule extends Rule {
 					return;
 				}
 			}
-			next = new Match(SequenceRule.this, offset);
+			next = null;
+			boolean found = true;
 			while (matched.size() < sequence.length) {
 				Matcher m;
 				if (matchers.isEmpty()) {
@@ -57,7 +58,7 @@ public class SequenceRule extends Rule {
 					}
 					if (matchers.isEmpty()) {
 						done = true;
-						next = null;
+						found = false;
 						break;
 					}
 				} else {
@@ -69,8 +70,9 @@ public class SequenceRule extends Rule {
 					}
 				}
 			}
-			if (next != null) {
-				next.setEnd(matched.peekLast().end());
+			if (found) {
+				next = new Match(SequenceRule.this, offset, matched.peekLast()
+						.end());
 				Match[] children = matched.toArray(new Match[sequence.length]);
 				next.setChildren(children);
 			}

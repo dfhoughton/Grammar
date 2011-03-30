@@ -37,10 +37,9 @@ public class AlternationRule extends Rule {
 				done = true;
 				next = null;
 			} else {
-				next = new Match(AlternationRule.this, offset);
+				next = new Match(AlternationRule.this, offset, child.end());
 				Match[] children = new Match[] { child };
 				next.setChildren(children);
-				next.setEnd(child.end());
 			}
 		}
 	}

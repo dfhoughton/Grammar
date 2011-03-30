@@ -36,8 +36,7 @@ public class BackReferenceRule extends Rule {
 				int delta = m.end() - m.start();
 				if (delta == 0) {
 					// zero-width matches always match
-					n = new Match(BackReferenceRule.this, offset);
-					n.setEnd(offset);
+					n = new Match(BackReferenceRule.this, offset, offset);
 				} else {
 					int end = offset + delta;
 					if (end <= s.length()) {
@@ -48,10 +47,8 @@ public class BackReferenceRule extends Rule {
 								break;
 							}
 						}
-						if (matched) {
-							n = new Match(BackReferenceRule.this, offset);
-							n.setEnd(end);
-						}
+						if (matched)
+							n = new Match(BackReferenceRule.this, offset, end);
 					}
 				}
 				BackReferenceRule.this.matchTrace(this, n);
