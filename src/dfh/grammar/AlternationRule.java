@@ -84,12 +84,7 @@ public class AlternationRule extends Rule {
 			else
 				nonInitial = true;
 			if (r.generation == -1) {
-				if (r instanceof SequenceRule) {
-					b.append("[ ");
-					b.append(r.description());
-					b.append(" ]");
-				} else
-					b.append(r.description());
+				b.append(r.description());
 			} else
 				b.append(r.label());
 		}

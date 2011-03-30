@@ -117,9 +117,14 @@ public class SequenceRule extends Rule {
 				b.append(' ');
 			else
 				nonInitial = true;
-			if (r.generation == -1)
+			if (r.generation == -1) {
+				boolean alternation = r instanceof AlternationRule;
+				if (alternation)
+					b.append('[');
 				b.append(r.description());
-			else
+				if (alternation)
+					b.append(']');
+			} else
 				b.append(r.label());
 		}
 		return b.toString();

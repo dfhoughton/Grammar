@@ -97,6 +97,16 @@ public class LiteralRule extends Rule {
 
 	@Override
 	public String description() {
+		boolean b1 = literal.indexOf('\\') > -1;
+		boolean b2 = literal.indexOf('"') > -1;
+		if (b1 || b2) {
+			String s = literal;
+			if (b2)
+				s = '\'' + s.replaceAll("([\\\\'])", "\\\\$1") + '\'';
+			else
+				s = '"' + s.replaceAll("([\\\\])", "\\\\$1") + '"';
+			return s;
+		}
 		return uniqueId();
 	}
 
