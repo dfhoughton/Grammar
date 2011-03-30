@@ -76,4 +76,9 @@ public class DeferredDefinitionRule extends Rule {
 		studiedRules.add(this);
 		return r.study(s, cache, offset, studiedRules);
 	}
+
+	@Override
+	public boolean zeroWidth() {
+		return r.zeroWidth();
+	}
 }

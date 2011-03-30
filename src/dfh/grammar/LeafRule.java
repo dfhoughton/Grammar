@@ -117,4 +117,9 @@ public class LeafRule extends Rule {
 		}
 		return startOffsets;
 	}
+
+	@Override
+	public boolean zeroWidth() {
+		return false;
+	}
 }

@@ -102,4 +102,9 @@ public class BackReferenceRule extends Rule {
 		return new HashSet<Integer>(0);
 	}
 
+	@Override
+	public boolean zeroWidth() {
+		return true;
+	}
+
 }

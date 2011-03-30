@@ -108,4 +108,13 @@ public class AlternationRule extends Rule {
 				startOffsets.addAll(r.study(s, cache, offset, studiedRules));
 		return startOffsets;
 	}
+
+	@Override
+	public boolean zeroWidth() {
+		for (Rule r : alternates) {
+			if (r.zeroWidth())
+				return true;
+		}
+		return false;
+	}
 }

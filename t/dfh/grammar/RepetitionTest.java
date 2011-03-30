@@ -187,4 +187,35 @@ public class RepetitionTest {
 		Match n = m.match();
 		assertTrue("stingy is short", n.children()[0].end() == 4);
 	}
+
+	@Test
+	public void plusAsterisk() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = <a>*+ <b>",//
+				"<a> = 'a'",//
+				"<b> = 'b'",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "b";
+		Matcher m = g.matches(s);
+		Match n = m.match();
+		assertNotNull("plus asterisk matches zero-width", n);
+	}
+	
+	@Test
+	public void nullAsterisk() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = <a>* <b>",//
+				"<a> = 'a'",//
+				"<b> = 'b'",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "b";
+		Matcher m = g.matches(s);
+		Match n = m.match();
+		assertNotNull("asterisk matches zero-width", n);
+	}
+
 }

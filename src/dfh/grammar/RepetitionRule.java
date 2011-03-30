@@ -204,22 +204,22 @@ public class RepetitionRule extends Rule {
 
 		@Override
 		protected void fetchNext() {
+			next = null;
 			if (matched == null) {
 				initialize();
-				if (matched.isEmpty()) {
-					done = true;
-					matched = null;
-					next = null;
-				} else {
+				if (matched.size() >= repetition.bottom) {
 					next = new Match(RepetitionRule.this, offset);
 					Match[] children = matched
 							.toArray(new Match[matched.size()]);
 					next.setChildren(children);
-					next.setEnd(matched.peekLast().end());
+					next.setEnd(matched.isEmpty() ? offset : matched.peekLast()
+							.end());
+				} else {
+					done = true;
+					matched = null;
 				}
 			} else {
 				done = true;
-				next = null;
 				matched = null;
 			}
 		}
@@ -274,5 +274,10 @@ public class RepetitionRule extends Rule {
 		if (studiedRules.contains(r))
 			return new HashSet<Integer>(0);
 		return r.study(s, cache, offset, studiedRules);
+	}
+
+	@Override
+	public boolean zeroWidth() {
+		return r.zeroWidth() || repetition.bottom == 0;
 	}
 }

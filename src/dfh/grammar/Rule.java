@@ -176,4 +176,23 @@ public abstract class Rule implements Serializable {
 	public abstract Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
 			Set<Rule> studiedRules);
+
+	/**
+	 * Returns whether this rule can match the null string. This method is used
+	 * in {@link #study(CharSequence, Map, int, Set) studying} in
+	 * {@link CharSequence}. When in doubt, default to <code>true</code>. This
+	 * may make the matching less efficient but is less likely to cause the
+	 * {@link Grammar} to miss a match.
+	 * <p>
+	 * Note that {@link LiteralRule} and {@link LeafRule} both return false.
+	 * This is because if either of these can legitimately match a zero-width
+	 * string in the character sequence,
+	 * <em>this will show up as a match when studying the sequence</em>.
+	 * Compositional rules like {@link SequenceRule}, {@link AlternationRule},
+	 * and {@link RepetitionRule}, however, need this because their study method
+	 * may return a spurious empty set.
+	 * 
+	 * @return whether this rule can match the null string
+	 */
+	public abstract boolean zeroWidth();
 }

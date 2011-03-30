@@ -117,6 +117,11 @@ public class DeferredRuleTest {
 				// we won't study for this
 				return null;
 			}
+
+			@Override
+			public boolean zeroWidth() {
+				return false;
+			}
 		}
 		String[] rules = {
 		//

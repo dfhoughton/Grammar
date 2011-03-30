@@ -115,6 +115,27 @@ public class Match {
 		return b.toString();
 	}
 
+	/**
+	 * Returns index of {@link Match} among its parent's children. It discovers
+	 * this index by linear search among its parent's children. As such searches
+	 * go this is relatively efficient since it uses object identity rather than
+	 * equality and the sequence iterated over is a usually short array.
+	 * 
+	 * @return index of {@link Match} among its parent's children
+	 */
+	public int index() {
+		if (parent == null)
+			return -1;
+		int index = 0;
+		for (Match m : parent.children) {
+			if (m == this)
+				return index;
+			index++;
+		}
+		throw new GrammarException(
+				"impossible state: match not among its parent's children");
+	}
+
 	/*
 	 * some tests
 	 */
@@ -170,6 +191,18 @@ public class Match {
 	 */
 	public boolean hasLabel(Label l) {
 		return r.label().equals(l);
+	}
+
+	public boolean has(String label) {
+		if (rule().label.id.equals(label))
+			return true;
+		if (children != null) {
+			for (Match m : children) {
+				if (m.has(label))
+					return true;
+			}
+		}
+		return false;
 	}
 
 	/**

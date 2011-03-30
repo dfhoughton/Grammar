@@ -6,6 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Matches a sequence of sub-rules.
+ * 
+ * @author David Houghton
+ * 
+ */
 public class SequenceRule extends Rule {
 	private static final long serialVersionUID = 1L;
 	final Rule[] sequence;
@@ -132,11 +138,20 @@ public class SequenceRule extends Rule {
 							.keySet());
 			} else {
 				Set<Integer> set = r.study(s, cache, offset, studiedRules);
-				if (startOffsets == null)
+				if (startOffsets == null && !(set.isEmpty() && r.zeroWidth()))
 					startOffsets = set;
 			}
 		}
 		return startOffsets;
+	}
+
+	@Override
+	public boolean zeroWidth() {
+		for (Rule r : sequence) {
+			if (!r.zeroWidth())
+				return false;
+		}
+		return true;
 	}
 
 }
