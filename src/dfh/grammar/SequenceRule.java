@@ -132,15 +132,22 @@ public class SequenceRule extends Rule {
 		studiedRules.add(this);
 		Set<Integer> startOffsets = null;
 		for (Rule r : sequence) {
+			Set<Integer> set;
 			if (studiedRules.contains(r)) {
+				set = cache.get(r.label()).keySet();
 				if (startOffsets == null)
-					startOffsets = new HashSet<Integer>(cache.get(r.label())
-							.keySet());
+					startOffsets = new HashSet<Integer>(set);
+				else
+					startOffsets.addAll(set);
 			} else {
-				Set<Integer> set = r.study(s, cache, offset, studiedRules);
-				if (startOffsets == null && !(set.isEmpty() && r.zeroWidth()))
-					startOffsets = set;
+				set = r.study(s, cache, offset, studiedRules);
 			}
+			if (startOffsets == null)
+				startOffsets = new HashSet<Integer>(set);
+			else
+				startOffsets.addAll(set);
+			if (!r.zeroWidth())
+				break;
 		}
 		return startOffsets;
 	}
