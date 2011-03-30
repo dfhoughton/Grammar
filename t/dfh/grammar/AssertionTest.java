@@ -20,8 +20,8 @@ public class AssertionTest {
 	public void basicTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = (joe)",//
-				"(joe) =\\bjoe\\b",//
+				"<ROOT> = <joe>",//
+				"<joe> = /\\bjoe\\b/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "  joe _joe_ ";
@@ -36,13 +36,12 @@ public class AssertionTest {
 	public void backwardsTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = (not_susie) (s)?+ (joe)",//
-				"(joe) =\\b(?i:joe)\\b",//
-				"(not_susie) =(?<!(?i:susie))",//
-				"(s) =\\s++",//
+				"<ROOT> = <not_space> <joe>",//
+				"<joe> = /joe/i",//
+				"<not_space> = /(?<!\\s)/i",//
 		};
 		Grammar g = new Grammar(rules);
-		String s = "  mary joe susie joe ";
+		String s = "  maryjoe susie joe ";
 		Matcher m = g.find(s);
 		int count = 0;
 		while (m.match() != null)
@@ -54,10 +53,10 @@ public class AssertionTest {
 	public void forwardTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = (joe) (s)?+ (is_sue)",//
-				"(joe) =\\b(?i:joe)\\b",//
-				"(is_sue) =(?=(?i:sue))",//
-				"(s) =\\s++",//
+				"<ROOT> = <joe> <s>?+ <is_sue>",//
+				"<joe> = /\\bjoe\\b/i",//
+				"<is_sue> = /(?=sue)/i",//
+				"<s> = /\\s++/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = " joe mary joe sue ";

@@ -14,8 +14,8 @@ public class RepetitionTest {
 	public void qmarkTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = (a)?",//
-				"(a) =a",//
+				"<ROOT> = <a>?",//
+				"<a> = /a/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "aa";
@@ -28,8 +28,8 @@ public class RepetitionTest {
 	public void qmarkTestPossessive() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = (a)?+",//
-				"(a) =a",//
+				"<ROOT> = <a>?+",//
+				"<a> = /a/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "aa";
@@ -42,8 +42,8 @@ public class RepetitionTest {
 	public void qmarkTestStingy() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = (a)??",//
-				"(a) =a",//
+				"<ROOT> = <a>??",//
+				"<a> = /a/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "aa";
@@ -56,8 +56,8 @@ public class RepetitionTest {
 	public void asteriskTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = (a)*",//
-				"(a) =a",//
+				"<ROOT> = <a>*",//
+				"<a> = /a/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "aa";
@@ -70,8 +70,8 @@ public class RepetitionTest {
 	public void plusTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = (a)+",//
-				"(a) =a",//
+				"<ROOT> = <a>+",//
+				"<a> = /a/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "aa";
@@ -84,11 +84,11 @@ public class RepetitionTest {
 	public void possessivenessTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = <a> <b>",//
-				"<a> = (a)++",//
-				"<b> = (a) (b)",//
-				"(a) =a",//
-				"(b) =b",//
+				"<ROOT> = <c> <d>",//
+				"<c> = <a>++",//
+				"<d> = <a> <b>",//
+				"<a> = /a/",//
+				"<b> = /b/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "aab";
@@ -101,11 +101,11 @@ public class RepetitionTest {
 	public void greedTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = <a> <b>",//
-				"<a> = (a)+",//
-				"<b> = (a) (b)",//
-				"(a) =a",//
-				"(b) =b",//
+				"<ROOT> = <c> <d>",//
+				"<c> = <a>+",//
+				"<d> = <a> <b>",//
+				"<a> = /a/",//
+				"<b> = /b/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "aab";
@@ -118,8 +118,8 @@ public class RepetitionTest {
 	public void countTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = (a){3}",//
-				"(a) =a",//
+				"<ROOT> = <a>{3}",//
+				"<a> = /a/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "aaaaa";
@@ -132,11 +132,11 @@ public class RepetitionTest {
 	public void noLowerLimitCountTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = <a> <b>",//
-				"<a> = (a){,2}",//
-				"<b> = (a) (b)",//
-				"(a) =a",//
-				"(b) =b",//
+				"<ROOT> = <c> <d>",//
+				"<c> = <a>{,2}",//
+				"<d> = <a> <b>",//
+				"<a> = /a/",//
+				"<b> = /b/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "aab";
@@ -149,11 +149,11 @@ public class RepetitionTest {
 	public void subgroupTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = [ <a> | <b> ]{2} <b>",//
-				"<a> = (a){,2}",//
-				"<b> = (a) (b)",//
-				"(a) =a",//
-				"(b) =b",//
+				"<ROOT> = [ <c> | <d> ]{2} <d>",//
+				"<c> = <a>{,2}",//
+				"<d> = <a> <b>",//
+				"<a> = /a/",//
+				"<b> = /b/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "aabb";
@@ -202,7 +202,7 @@ public class RepetitionTest {
 		Match n = m.match();
 		assertNotNull("plus asterisk matches zero-width", n);
 	}
-	
+
 	@Test
 	public void nullAsterisk() throws GrammarException, IOException {
 		String[] rules = {

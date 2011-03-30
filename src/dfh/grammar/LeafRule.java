@@ -87,7 +87,7 @@ public class LeafRule extends Rule {
 
 	@Override
 	public String description() {
-		return p.toString();
+		return '/' + p.toString() + '/';
 	}
 
 	@Override

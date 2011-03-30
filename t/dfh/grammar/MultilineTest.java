@@ -20,10 +20,10 @@ public class MultilineTest {
 	public void basicTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = <a> (s) <b>",//
+				"<ROOT> = <a> <s> <b>",//
 				"<a> = 'a'",//
 				"<b> = 'b'",//
-				"(s) =\\s++",//
+				"<s> = /\\s++/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "a\nb";

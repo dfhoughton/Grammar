@@ -21,9 +21,9 @@ public class BackReferenceTest {
 	public void goodTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = (q) (text) 1",//
-				"(q) =[\"']",//
-				"(text) =\\w++",//
+				"<ROOT> = <q> <text> 1",//
+				"<q> = /[\"']/",//
+				"<text> = /\\w++/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "'ned'";
@@ -36,9 +36,9 @@ public class BackReferenceTest {
 	public void badTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = (q) (text) 1",//
-				"(q) =[\"']",//
-				"(text) =\\w++",//
+				"<ROOT> = <q> <text> 1",//
+				"<q> = /[\"']/",//
+				"<text> = /\\w++/",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = "'ned\"";

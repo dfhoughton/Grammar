@@ -26,7 +26,7 @@ public class DeferredRuleTest {
 	public void goodTest() throws GrammarException, IOException {
 		String[] rules = {
 		//
-		"<ROOT> = (q) (text) 1",//
+		"<ROOT> = <q> <text> 1",//
 		};
 		Grammar g = new Grammar(rules);
 		g.defineTerminal("q", Pattern.compile("[\"']"));
@@ -125,7 +125,7 @@ public class DeferredRuleTest {
 		}
 		String[] rules = {
 		//
-		"<ROOT> = (q) (text) 1",//
+		"<ROOT> = <q> <text> 1",//
 		};
 		Grammar g = new Grammar(rules);
 		g.defineTerminal("q", Pattern.compile("[\"']"));

@@ -8,13 +8,13 @@ public class CompilationTest {
 		String[] rules = {
 				//
 				"<ROOT> = <a> | <b>", //
-				"<a> = (foo) (s) (bar)",//
-				"<b> = (quux) (s) (baz)",//
-				"(s) =\\s++",//
-				"(foo) =foo",//
-				"(bar) =bar",//
-				"(quux) =quux",//
-				"(baz) =baz",//
+				"<a> = <foo> <s> <bar>",//
+				"<b> = <quux> <s> <baz>",//
+				"<s> = /\\s++/",//
+				"<foo> = 'foo'",//
+				"<bar> = 'bar'",//
+				"<quux> = 'quux'",//
+				"<baz> = 'baz'",//
 		};
 		try {
 			@SuppressWarnings("unused")

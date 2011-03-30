@@ -22,14 +22,14 @@ public class CommentTest {
 				//
 				"<ROOT> = <a> | <b>  # first comment", //
 				"",// blank line
-				"<a> = (foo) (s) (bar)",//
+				"<a> = <foo> <s> <bar>",//
 				"  # comment line",//
-				"<b> = (quux) (s) (baz) # another comment",//
-				"(s) =\\s++",//
-				"(foo) =foo",//
-				"(bar) =bar",//
-				"(quux) =quux",//
-				"(baz) =baz",//
+				"<b> = <quux> <s> <baz> # another comment",//
+				"<s> = /\\s++/",//
+				"<foo> = /foo/",//
+				"<bar> = /bar/",//
+				"<quux> = /quux/",//
+				"<baz> = /baz/",//
 		};
 		g = new Grammar(rules);
 	}

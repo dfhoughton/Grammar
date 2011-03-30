@@ -13,13 +13,13 @@ public class SimpleMatchTest {
 		String[] rules = {
 				//
 				"<ROOT> = <a> | <b>", //
-				"<a> = (foo) (s) (bar)",//
-				"<b> = (quux) (s) (baz)",//
-				"(s) =\\s++",//
-				"(foo) =foo",//
-				"(bar) =bar",//
-				"(quux) =quux",//
-				"(baz) =baz",//
+				"<a> = <foo> <s> <bar>",//
+				"<b> = <quux> <s> <baz>",//
+				"<s> = /\\s++/",//
+				"<foo> = /foo/",//
+				"<bar> = /bar/",//
+				"<quux> = /quux/",//
+				"<baz> = /baz/",//
 		};
 		g = new Grammar(rules);
 	}

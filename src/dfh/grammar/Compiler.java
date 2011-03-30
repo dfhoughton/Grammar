@@ -64,11 +64,20 @@ public class Compiler {
 		for (Iterator<Entry<Label, List<RuleFragment>>> i = map.entrySet()
 				.iterator(); i.hasNext();) {
 			Entry<Label, List<RuleFragment>> e = i.next();
-			if (e.getKey().t == Type.terminal) {
+			List<RuleFragment> body = e.getValue();
+			RuleFragment rf = body.get(0);
+			if (body.size() == 1
+					&& (rf instanceof Regex || rf instanceof LiteralFragment)) {
 				Label l = e.getKey();
 				i.remove();
+				Type t = rf instanceof Regex ? Type.terminal : Type.literal;
+				l = new Label(t, l.id);
 				terminals.add(l);
-				Rule ru = new LeafRule(l, ((Regex) e.getValue().get(0)).re);
+				Rule ru;
+				if (rf instanceof Regex)
+					ru = new LeafRule(l, ((Regex) rf).re);
+				else
+					ru = new LiteralRule(l, ((LiteralFragment) rf).literal);
 				ru.generation = gen;
 				String id = ru.uniqueId();
 				Rule old = redundancyMap.get(id);
@@ -81,10 +90,16 @@ public class Compiler {
 		}
 		// now we extract all the deferred definition rules
 		gen = 0;
+		Set<String> knownIds = new HashSet<String>(map.size() + rules.size());
+		for (Label l : map.keySet())
+			knownIds.add(l.id);
+		for (Label l : rules.keySet())
+			knownIds.add(l.id);
 		for (List<RuleFragment> list : map.values()) {
 			Set<Label> labels = allLabels(list);
 			for (Label l : labels) {
-				if (l.t == Type.terminal && !terminals.contains(l)) {
+				if (l.t == Type.indeterminate && !knownIds.contains(l.id)) {
+					l = new Label(Type.terminal, l.id);
 					DeferredDefinitionRule ddr = new DeferredDefinitionRule(l,
 							rules);
 					ddr.generation = gen;
@@ -97,10 +112,6 @@ public class Compiler {
 		// create dependency map
 		for (Entry<Label, List<RuleFragment>> e : map.entrySet()) {
 			Set<Label> dependents = new HashSet<Label>(allLabels(e.getValue()));
-			for (Label l : dependents) {
-				if (!(map.containsKey(l) || rules.containsKey(l)))
-					throw new GrammarException("undefined rule: " + l);
-			}
 			dependents.retainAll(map.keySet());
 			if (!dependents.isEmpty()) {
 				dependencyMap.put(e.getKey(), dependents);

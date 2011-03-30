@@ -8,7 +8,8 @@ import java.util.regex.Pattern;
 import dfh.grammar.Label.Type;
 
 /**
- * Creates {@link Rule} objects from stringified specifications.
+ * Creates {@link Rule} objects from stringified specifications. This is a bunch
+ * of stateless functional code that assists a {@link Compiler} object.
  * <p>
  * <b>Creation date:</b> Feb 19, 2011
  * 
@@ -18,13 +19,12 @@ public class RuleParser {
 	/**
 	 * Basic pattern of a labeled rule.
 	 */
-	public static final Pattern labelPattern = Pattern
-			.compile("([<(])(\\w++)([>)])");
+	public static final Pattern labelPattern = Pattern.compile("<(\\w++)>");
 	/**
 	 * Pattern that defines a rule as "<"<name>">" "=" <remainder>
 	 */
 	public static final Pattern basePattern = Pattern.compile("\\s*+"
-			+ labelPattern + "\\s*+=(.*?)\\s*+");
+			+ labelPattern + "\\s*+=\\s*+(.*?)\\s*+");
 	/**
 	 * Pattern of repetition symbols such as <code>*</code>.
 	 */
@@ -53,31 +53,19 @@ public class RuleParser {
 			return null;
 		Matcher m = basePattern.matcher(line);
 		if (m.matches()) {
-			boolean isAngle = m.group(1).equals("<");
-			if (isAngle) {
-				if (!m.group(3).equals(">"))
-					throw new GrammarException(
-							"mismatched brackets in label for rule " + line);
-			} else {
-				if (!m.group(3).equals(")"))
-					throw new GrammarException(
-							"mismatched brackets in label for rule " + line);
-			}
-			String id = m.group(2);
-			String remainder = m.group(4);
+			String id = m.group(1);
+			String remainder = m.group(2);
+			if (remainder.length() == 0)
+				throw new GrammarException("no rule body provided in " + line);
 			List<RuleFragment> parse = new LinkedList<RuleFragment>();
 			Type t;
-			if (isAngle) {
-				if (id.equals(Label.ROOT)) {
-					t = Type.root;
-				} else
-					t = Type.nonTerminal;
-			} else {
-				t = Type.terminal;
-			}
+			if (id.equals(Label.ROOT)) {
+				t = Type.root;
+			} else
+				t = Type.indeterminate;
 			// we've parsed out the rule label
 			parse.add(new Label(t, id));
-			if (t == Type.terminal)
+			if (remainder.charAt(0) == '/')
 				parse.add(new Regex(remainder));
 			else {
 				int[] offset = { 0 };
@@ -312,20 +300,12 @@ public class RuleParser {
 			throws GrammarException {
 		Matcher m = labelPattern.matcher(body.substring(offset[0]));
 		if (m.lookingAt()) {
-			String s = m.group();
-			offset[0] += s.length();
-			char c1 = s.charAt(0), c2 = s.charAt(s.length() - 1);
-			if (c1 == '(' && c2 == ')') {
-				String id = s.substring(1, s.length() - 1);
-				return new Label(Label.Type.terminal, id);
-			} else if (c1 == '<' && c2 == '>') {
-				String id = s.substring(1, s.length() - 1);
-				if (id.equals(Label.ROOT))
-					return new Label(Label.Type.root, id);
-				else
-					return new Label(Label.Type.nonTerminal, id);
-			} else
-				throw new GrammarException("ill-formed rule identifier: " + s);
+			offset[0] += m.end();
+			String id = m.group(1);
+			if (id.equals(Label.ROOT))
+				return new Label(Label.Type.root, id);
+			else
+				return new Label(Label.Type.indeterminate, id);
 		} else
 			throw new GrammarException("ill-formed rule: " + body);
 	}

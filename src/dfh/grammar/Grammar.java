@@ -22,8 +22,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import dfh.grammar.Label.Type;
-
 /**
  * Base class that parses strings according to a given set of rules.
  * <p>
@@ -580,8 +578,7 @@ public class Grammar implements Serializable {
 		b.append("\n\n");
 		for (Rule r : ruleList) {
 			b.append(String.format(format, r.label()));
-			if (r.label().t != Type.terminal)
-				b.append(' ');
+			b.append(' ');
 			b.append(r.description());
 			b.append("\n");
 		}

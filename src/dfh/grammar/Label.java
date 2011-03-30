@@ -39,6 +39,10 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		 */
 		root(0),
 		/**
+		 * Rule awaiting further identification during parsing.
+		 */
+		indeterminate(-1),
+		/**
 		 * Any non-terminal rule except the root rule.
 		 */
 		nonTerminal(1);
@@ -55,6 +59,7 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 
 	public final Type t;
 	public final String id;
+
 	public Label(Type t, String id) {
 		this.t = t;
 		this.id = id;
@@ -76,16 +81,14 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 			return true;
 		if (o instanceof Label) {
 			Label l = (Label) o;
-			if (l.t == t) {
-				return l.id.equals(id);
-			}
+			return l.id.equals(id);
 		}
 		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return t.hashCode() ^ id.hashCode();
+		return id.hashCode();
 	}
 
 	@Override
@@ -93,11 +96,8 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		switch (t) {
 		case backreference:
 			return id;
-		case terminal:
-			return '(' + id + ')' + rep;
 		case literal:
 			return id;
-		case root:
 		default:
 			return '<' + id + '>' + rep;
 		}

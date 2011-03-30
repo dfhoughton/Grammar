@@ -19,14 +19,14 @@ public class MisCompilationTest {
 		String[] rules = {
 				//
 				"<ROOT> = <a> | <b>", //
-				"<a> = (foo) (s) (bar)",//
-				"<b> = (quux) (s) (baz)",//
-				"<b> = (quux) (s) (baz)",//
-				"(s) =\\s++",//
-				"(foo) =foo",//
-				"(bar) =bar",//
-				"(quux) =quux",//
-				"(baz) =baz",//
+				"<a> = <foo> <s> <bar>",//
+				"<b> = <quux> <s> <baz>",//
+				"<b> = <quux> <s> <baz>",//
+				"<s> = /\\s++/",//
+				"<foo> = /foo/",//
+				"<bar> = /bar/",//
+				"<quux> = /quux/",//
+				"<baz> = /baz/",//
 		};
 		try {
 			@SuppressWarnings("unused")
@@ -39,38 +39,16 @@ public class MisCompilationTest {
 	}
 
 	@Test
-	public void incompleteError() {
-		String[] rules = {
-				//
-				"<ROOT> = <a> | <b>", //
-				"<a> = (foo) (s) (bar)",//
-				"(s) =\\s++",//
-				"(foo) =foo",//
-				"(bar) =bar",//
-				"(quux) =quux",//
-				"(baz) =baz",//
-		};
-		try {
-			@SuppressWarnings("unused")
-			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover missing rule");
-		} catch (Exception e) {
-			org.junit.Assert.assertTrue("undefined rule", e.getMessage()
-					.indexOf("undefined rule") > -1);
-		}
-	}
-
-	@Test
 	public void noRootError() {
 		String[] rules = {
 				//
-				"<a> = (foo) (s) (bar)",//
-				"<b> = (quux) (s) (baz)",//
-				"(s) =\\s++",//
-				"(foo) =foo",//
-				"(bar) =bar",//
-				"(quux) =quux",//
-				"(baz) =baz",//
+				"<a> = <foo> <s> <bar>",//
+				"<b> = <quux> <s> <baz>",//
+				"<s> = /\\s++/",//
+				"<foo> = /foo/",//
+				"<bar> = /bar/",//
+				"<quux> = /quux/",//
+				"<baz> = /baz/",//
 		};
 		try {
 			@SuppressWarnings("unused")
@@ -87,12 +65,12 @@ public class MisCompilationTest {
 		String[] rules = {
 				//
 				"<ROOT> = <a> | <b>", //
-				"<a> = (foo) (s) (bar)",//
-				"<b> = (quux) (s) (baz)",//
-				"(foo) =foo",//
-				"(bar) =bar",//
-				"(quux) =quux",//
-				"(baz) =baz",//
+				"<a> = <foo> <s> <bar>",//
+				"<b> = <quux> <s> <baz>",//
+				"<foo> = /foo/",//
+				"<bar> = /bar/",//
+				"<quux> = /quux/",//
+				"<baz> = /baz/",//
 		};
 		try {
 			Grammar g = new Grammar(rules);
@@ -110,12 +88,12 @@ public class MisCompilationTest {
 		String[] rules = {
 				//
 				"<ROOT> = <a> | <b>", //
-				"<a> = (foo) (s) (bar)",//
-				"<b> = (quux) (s) (baz)",//
-				"(foo) =foo",//
-				"(bar) =bar",//
-				"(quux) =quux",//
-				"(baz) =baz",//
+				"<a> = <foo> <s> <bar>",//
+				"<b> = <quux> <s> <baz>",//
+				"<foo> = /foo/",//
+				"<bar> = /bar/",//
+				"<quux> = /quux/",//
+				"<baz> = /baz/",//
 		};
 		try {
 			Grammar g = new Grammar(rules);
@@ -132,12 +110,12 @@ public class MisCompilationTest {
 		String[] rules = {
 				//
 				"<ROOT> = <a> | <b>", //
-				"<a> = (foo) (s) (bar)",//
-				"<b> = (quux) (s) (baz)",//
-				"(foo) =foo",//
-				"(bar) =bar",//
-				"(quux) =quux",//
-				"(baz) =baz",//
+				"<a> = <foo> <s> <bar>",//
+				"<b> = <quux> <s> <baz>",//
+				"<foo> = /foo/",//
+				"<bar> = /bar/",//
+				"<quux> = /quux/",//
+				"<baz> = /baz/",//
 		};
 		try {
 			Grammar g = new Grammar(rules);
@@ -169,78 +147,6 @@ public class MisCompilationTest {
 		} catch (Exception e) {
 			org.junit.Assert.assertTrue("cycle found in rules", e.getMessage()
 					.indexOf("cycle found in rules") > -1);
-		}
-	}
-
-	@Test
-	public void mismatchedBracketTest1() {
-		String[] rules = {
-				//
-				"<ROOT> = <a) | <b>", //
-				"<a> = <b>",//
-				"<b> = <a>",//
-		};
-		try {
-			@SuppressWarnings("unused")
-			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover bad bracket");
-		} catch (Exception e) {
-			org.junit.Assert.assertTrue("ill-formed rule identifier", e
-					.getMessage().indexOf("ill-formed rule identifier") > -1);
-		}
-	}
-
-	@Test
-	public void mismatchedBracketTest2() {
-		String[] rules = {
-				//
-				"<ROOT> = (a> | <b>", //
-				"<a> = <b>",//
-				"<b> = <a>",//
-		};
-		try {
-			@SuppressWarnings("unused")
-			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover bad bracket");
-		} catch (Exception e) {
-			org.junit.Assert.assertTrue("ill-formed rule identifier", e
-					.getMessage().indexOf("ill-formed rule identifier") > -1);
-		}
-	}
-
-	@Test
-	public void mismatchedBracketTest3() {
-		String[] rules = {
-				//
-				"<ROOT> = <a> | <b>", //
-				"(a> = 'b'",//
-				"<b> = 'a'",//
-		};
-		try {
-			@SuppressWarnings("unused")
-			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover bad bracket");
-		} catch (Exception e) {
-			org.junit.Assert.assertTrue("mismatched brackets in label", e
-					.getMessage().indexOf("mismatched brackets in label") > -1);
-		}
-	}
-
-	@Test
-	public void mismatchedBracketTest4() {
-		String[] rules = {
-				//
-				"<ROOT> = <a> | <b>", //
-				"<a) = 'b'",//
-				"<b> = 'a'",//
-		};
-		try {
-			@SuppressWarnings("unused")
-			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover bad bracket");
-		} catch (Exception e) {
-			org.junit.Assert.assertTrue("mismatched brackets in label", e
-					.getMessage().indexOf("mismatched brackets in label") > -1);
 		}
 	}
 
@@ -294,7 +200,7 @@ public class MisCompilationTest {
 			org.junit.Assert.fail("did not discover empty group");
 		} catch (Exception e) {
 			org.junit.Assert.assertTrue("empty rule body", e.getMessage()
-					.indexOf("empty rule body") > -1);
+					.indexOf("no rule body provided in") > -1);
 		}
 	}
 

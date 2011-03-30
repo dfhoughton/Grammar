@@ -24,14 +24,14 @@ public class RecursiveTest {
 				//
 				"<ROOT> = <element>", //
 				"<element> = <single> | <double>",//
-				"<single> = '<' (tag) [ (s) <attribute> ]* '/>'",//
-				"<double> = '<' (tag) [ (s) <attribute> ]* '>' <element>* '</' 2 '>'",//
-				"<attribute> = (tag) '=\"' <content>++ '\"'",//
-				"<content> = (nq) | (esc)",//
-				"(nq) =[^\"]",//
-				"(esc) =\\\\.",//
-				"(tag) =\\w++",//
-				"(s) =\\s++",//
+				"<single> = '<' <tag> [ <s> <attribute> ]* '/>'",//
+				"<double> = '<' <tag> [ <s> <attribute> ]* '>' <element>* '</' 2 '>'",//
+				"<attribute> = <tag> '=\"' <content>++ '\"'",//
+				"<content> = <nq> | <esc>",//
+				"<nq> = /[^\"]/",//
+				"<esc> = /\\\\./",//
+				"<tag> = /\\w++/",//
+				"<s> = /\\s++/",//
 		};
 		g = new Grammar(rules);
 	}
