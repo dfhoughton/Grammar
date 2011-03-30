@@ -28,15 +28,15 @@ import java.util.regex.Pattern;
  * A {@link Grammar} is constructed from a set of rules such as
  * 
  * <pre>
- * &lt;ROOT&gt; = &lt;a> | &lt;b&gt;
+ * &lt;ROOT&gt; = &lt;a&gt; | &lt;b&gt;
  * 
- *    &lt;a&gt; = (foo) (s) (bar)
- *    &lt;b&gt; = (quux) (s) (baz)
- *  (bar) =bar
- *  (baz) =baz
- *  (foo) =foo
- * (quux) =quux
- *    (s) =\s++
+ *    &lt;a&gt; = &lt;foo&gt; &lt;s&gt; &lt;bar&gt;
+ *    &lt;b&gt; = &lt;quux&gt; &lt;s&gt; &lt;baz&gt;
+ *  &lt;bar&gt; = /bar/
+ *  &lt;baz&gt; = /baz/
+ *  &lt;foo&gt; = /foo/
+ * &lt;quux&gt; = /quux/
+ *    &lt;s&gt; = /\s++/
  * </pre>
  * 
  * And in turn constructs {@link Matcher} objects that can be applied to a
