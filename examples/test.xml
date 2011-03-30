@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<test random="attribute">
+<!--
+The purpose of this document is to show that grammars can
+parse useful stuff like XML.
+  -->
+	text
+	<bar />
+	<quux attribute="random" another:attribute="blarney">
+		more text and an element:
+		<br />
+		and a fake element:
+		&lt;br /&gt;
+<!-- another, nested comment -->
+	</quux>
+</test>
