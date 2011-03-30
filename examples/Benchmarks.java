@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.util.regex.Pattern;
 
@@ -99,13 +98,13 @@ public class Benchmarks {
 		String[] rules = {
 				//
 				"<ROOT> = <a> | <b>", //
-				"<a> = (foo) (s) (bar)",//
-				"<b> = (quux) (s) (baz)",//
-				"(s) =\\s++",//
-				"(foo) =foo",//
-				"(bar) =bar",//
-				"(quux) =quux",//
-				"(baz) =baz",//
+				"<a> = <foo> <s> <bar>",//
+				"<b> = <quux> <s> <baz>",//
+				"<s> = /\\s++/",//
+				"<foo> = /foo/",//
+				"<bar> = /bar/",//
+				"<quux> = /quux/",//
+				"<baz> = /baz/",//
 		};
 		Pattern p = Pattern.compile("foo\\s++bar|quux\\s++baz");
 		String s = "foo bar";
@@ -116,11 +115,11 @@ public class Benchmarks {
 	private static void test3() throws IOException {
 		String[] rules = {
 				//
-				"<ROOT> = [ <a> | <b> ]{2} <b>",//
-				"<a> = (a){,2}",//
-				"<b> = (a) (b)",//
-				"(a) =a",//
-				"(b) =b",//
+				"<ROOT> = [ <c> | <d> ]{2} <d>",//
+				"<c> = <a>{,2}",//
+				"<d> = <a> <b>",//
+				"<a> = /a/",//
+				"<b> = /b/",//
 		};
 		Pattern p = Pattern.compile("(?:a{0,2}|a{0,2}b){2}b");
 		String s = "aabb";
@@ -131,9 +130,9 @@ public class Benchmarks {
 	private static void test4() throws IOException {
 		String[] rules = {
 				//
-				"<ROOT> = (a) | (b)",//
-				"(a) =a",//
-				"(b) =b",//
+				"<ROOT> = <c> | <d>",//
+				"<c> = /a/",//
+				"<d> = /b/",//
 		};
 		Pattern p = Pattern.compile("[ab]");
 		String s = "qewrqewrqewraqwreqewr";

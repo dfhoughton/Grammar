@@ -24,21 +24,21 @@ import dfh.grammar.MatchTest;
 public class XMLParser {
 	private static final String[] rules = {
 			//
-			"       <ROOT> = (declaration)?+ (s)?+ <element> (s)?+",//
-			"     <double> = '<' (tag) [ (ns) <attribute> ]*+ '>' [ <content> | (comment) | <element> ]*+ '</' 2 '>'",//
+			"       <ROOT> = <declaration>?+ <s>?+ <element> <s>?+",//
+			"     <double> = '<' <tag> [ <ns> <attribute> ]*+ '>' [ <content> | <comment> | <element> ]*+ '</' 2 '>'",//
 			"    <element> = <single> | <double>",//
-			"     <single> = '<' (tag) [ (ns) <attribute> ]*+ (ns)? '/>'",//
-			"  <attribute> = (tag) '=' [ \"'\" (squote) \"'\" | '\"' (dquote) '\"' ]",//
-			"    <content> = [ (c) | (entity) ]++",//
-			"          (c) =[^&<]",//
-			"    (comment) =(?s:<!--.*?-->)",//
-			"(declaration) =<\\?xml[\\s&&[^\\n]]++version=([\"'])\\d++(?:\\.\\d++)?\\1[\\s&&[^\\n]]++encoding=([\"'])[\\w-]++\\2[\\s&&[^\\n]]*+\\?>\\n",//
-			"     (dquote) =[^\\n\"]*+",//
-			"     (entity) =&(?:#(?:\\d++|x[\\da-f]++)|\\w++);",//
-			"         (ns) =[\\s&&[^\\n]]++",//
-			"          (s) =\\s++",//
-			"     (squote) =[^\\n']*+",//
-			"        (tag) =\\w++(:\\w++)*+",//
+			"     <single> = '<' <tag> [ <ns> <attribute> ]*+ <ns>? '/>'",//
+			"  <attribute> = <tag> '=' [ \"'\" <squote> \"'\" | '\"' <dquote> '\"' ]",//
+			"    <content> = [ <c> | <entity> ]++",//
+			"          <c> = /[^&<]/",//
+			"    <comment> = /(?s:<!--.*?-->)/",//
+			"<declaration> = /<\\?xml[\\s&&[^\\n]]++version=([\"'])\\d++(?:\\.\\d++)?\\1[\\s&&[^\\n]]++encoding=([\"'])[\\w-]++\\2[\\s&&[^\\n]]*+\\?>\\n/",//
+			"     <dquote> = /[^\\n\"]*+/",//
+			"     <entity> = /&(?:#(?:\\d++|x[\\da-f]++)|\\w++);/",//
+			"         <ns> = /[\\s&&[^\\n]]++/",//
+			"          <s> = /\\s++/",//
+			"     <squote> = /[^\\n']*+/",//
+			"        <tag> = /\\w++(:\\w++)*+/",//
 	};
 
 	/**

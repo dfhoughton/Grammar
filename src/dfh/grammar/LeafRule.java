@@ -14,6 +14,12 @@ import java.util.regex.Pattern;
  * @author David Houghton
  */
 public class LeafRule extends Rule {
+	/**
+	 * For normalizing the unique ids of regexes that allow comments.
+	 */
+	private static final Pattern NORMALIZATION_PATTERN = Pattern.compile(
+			"#.*$", Pattern.MULTILINE);
+
 	private class LeafMatcher extends Matcher {
 		private Map<Integer, CachedMatch> cache;
 		private boolean fresh = true;
@@ -82,12 +88,47 @@ public class LeafRule extends Rule {
 
 	@Override
 	protected String uniqueId() {
-		return "(?:" + p.toString() + ")";
+		String s = description();
+		if ((p.flags() & Pattern.COMMENTS) == Pattern.COMMENTS) {
+			// must normalize away spaces and comments
+			int index = s.lastIndexOf('/');
+			String suffix = s.substring(index);
+			s = s.substring(1, index);
+			StringBuilder b = new StringBuilder();
+			java.util.regex.Matcher m = NORMALIZATION_PATTERN.matcher(s);
+			int start = 0;
+			while (m.find()) {
+				b.append(s.substring(start, m.start()));
+				start = m.end();
+			}
+			if (start < s.length())
+				b.append(s.substring(start));
+			s = b.toString();
+			s = s.replaceAll("\\s++", "");
+			return '/' + s + suffix;
+		}
+		return description();
 	}
 
 	@Override
 	public String description() {
-		return '/' + p.toString() + '/';
+		StringBuilder b = new StringBuilder();
+		b.append('/');
+		b.append(p.toString());
+		b.append('/');
+		if ((p.flags() & Pattern.CASE_INSENSITIVE) == Pattern.CASE_INSENSITIVE)
+			b.append('i');
+		if ((p.flags() & Pattern.DOTALL) == Pattern.DOTALL)
+			b.append('s');
+		if ((p.flags() & Pattern.MULTILINE) == Pattern.MULTILINE)
+			b.append('m');
+		if ((p.flags() & Pattern.UNIX_LINES) == Pattern.UNIX_LINES)
+			b.append('d');
+		if ((p.flags() & Pattern.UNICODE_CASE) == Pattern.UNICODE_CASE)
+			b.append('u');
+		if ((p.flags() & Pattern.COMMENTS) == Pattern.COMMENTS)
+			b.append('x');
+		return b.toString();
 	}
 
 	@Override
