@@ -24,6 +24,8 @@ import org.junit.runners.Suite;
 		SimpleMatchTest.class,//
 		RecursiveTest.class,//
 		AssertionTest.class,//
+		IterationTest.class,//
+		MultithreadTest.class,//
 })
 public class AllTests {
 }
