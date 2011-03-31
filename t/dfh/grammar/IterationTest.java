@@ -9,9 +9,9 @@ import org.junit.Test;
 import dfh.grammar.Grammar.Options;
 
 /**
- * Makes sure line endings are working correctly.
+ * Make sure we get exactly as many iterations as we expect.
  * <p>
- * <b>Creation date:</b> Mar 29, 2011
+ * <b>Creation date:</b> Mar 31, 2011
  * 
  * @author David Houghton
  * 

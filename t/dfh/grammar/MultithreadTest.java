@@ -8,6 +8,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+/**
+ * Make sure we can use the same grammar on multiple threads with no errors.
+ * <p>
+ * <b>Creation date:</b> Mar 31, 2011
+ * 
+ * @author David Houghton
+ * 
+ */
 public class MultithreadTest {
 
 	private static final int MULTIPLIER = 100;
