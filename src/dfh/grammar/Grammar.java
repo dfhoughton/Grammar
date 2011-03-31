@@ -19,8 +19,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import dfh.grammar.Label.Type;
 
 /**
  * Base class that parses strings according to a given set of rules.
@@ -49,7 +52,8 @@ import java.util.regex.Pattern;
  * <li>Ease of composition, reading, maintenance, anddebugging. See
  * {@link #setTrace(PrintStream)} and {@link #describe()}.
  * <li>One can compose grammars from component {@link Rule rules}, regular
- * expressions, and other grammars. See {@link #defineTerminal(String, Pattern)}, {@link #defineTerminal(String, Rule)}.
+ * expressions, and other grammars. See {@link #defineRule(String, Pattern)},
+ * {@link #defineRule(String, Rule)}.
  * <li>One can iterate over all possible ways of matching a {@link CharSequence}
  * , not just a non-overlapping subset.
  * <li>Given a {@link Match} one can find the precise way the pattern matches,
@@ -77,7 +81,7 @@ import java.util.regex.Pattern;
  * 
  * @author David Houghton
  */
-public class Grammar implements Serializable {
+public class Grammar implements Serializable, Cloneable {
 	/**
 	 * A structure to hold matching options and define defaults.
 	 * <p>
@@ -301,13 +305,13 @@ public class Grammar implements Serializable {
 	}
 
 	private static final long serialVersionUID = 1L;
-	private final Label root;
-	private final Map<Label, Rule> rules;
-	private final Map<String, Label> terminalLabelMap;
+	protected Label root;
+	protected final Map<Label, Rule> rules;
+	protected final Map<String, Label> terminalLabelMap;
 	/**
 	 * Keeps track of terminals not defined in initial rule set.
 	 */
-	private final HashSet<Label> undefinedTerminals;
+	protected final HashSet<Label> undefinedRules;
 	transient PrintStream trace;
 
 	/**
@@ -320,6 +324,18 @@ public class Grammar implements Serializable {
 	 */
 	public Grammar(String[] lines) throws GrammarException, IOException {
 		this(new ArrayLineReader(lines));
+	}
+
+	/**
+	 * Required for cloning.
+	 * 
+	 * @param root
+	 */
+	private Grammar(Label root) {
+		this.root = root;
+		this.rules = new HashMap<Label, Rule>();
+		this.terminalLabelMap = new HashMap<String, Label>();
+		this.undefinedRules = new HashSet<Label>();
 	}
 
 	/**
@@ -391,7 +407,7 @@ public class Grammar implements Serializable {
 		for (Rule r : rules.values())
 			r.g = this;
 		terminalLabelMap = c.terminalLabelMap();
-		undefinedTerminals = c.undefinedTerminals();
+		undefinedRules = c.undefinedTerminals();
 	}
 
 	/**
@@ -402,15 +418,31 @@ public class Grammar implements Serializable {
 	 * @param p
 	 * @throws GrammarException
 	 */
-	public void defineTerminal(String label, Pattern p) throws GrammarException {
+	public synchronized void defineRule(String label, Pattern p)
+			throws GrammarException {
+		DeferredDefinitionRule r = checkRuleDefinition(label);
+		Label l = new Label(Type.terminal, label);
+		LeafRule lr = new LeafRule(l, p);
+		Map<String, Label> idMap = new HashMap<String, Label>(rules.size());
+		for (Entry<Label, Rule> e : rules.entrySet())
+			idMap.put(e.getValue().uniqueId(), e.getKey());
+		String id = lr.uniqueId();
+		l = idMap.get(id);
+		if (l == null)
+			r.setRule(lr);
+		else
+			r.setRule(rules.get(idMap.get(id)));
+		undefinedRules.remove(r.label());
+	}
+
+	private DeferredDefinitionRule checkRuleDefinition(String label) {
 		Label l = terminalLabelMap.get(label);
 		if (l == null)
 			throw new GrammarException("unknown terminal rule: " + label);
 		Rule r = rules.get(l);
 		if (!(r instanceof DeferredDefinitionRule))
 			throw new GrammarException("rule " + label + " already defined");
-		((DeferredDefinitionRule) r).setRegex(p);
-		undefinedTerminals.remove(r.label());
+		return (DeferredDefinitionRule) r;
 	}
 
 	public Matcher matches(CharSequence s) throws GrammarException {
@@ -423,8 +455,8 @@ public class Grammar implements Serializable {
 	 * @throws GrammarException
 	 */
 	private void checkComplete() throws GrammarException {
-		if (!undefinedTerminals.isEmpty()) {
-			LinkedList<Label> list = new LinkedList<Label>(undefinedTerminals);
+		if (!undefinedRules.isEmpty()) {
+			LinkedList<Label> list = new LinkedList<Label>(undefinedRules);
 			Collections.sort(list);
 			StringBuilder b = new StringBuilder(
 					"terminal rules remaining undefined: ");
@@ -627,15 +659,21 @@ public class Grammar implements Serializable {
 	 * @param label
 	 * @param rule
 	 */
-	public void defineTerminal(String label, Rule rule) {
-		Label l = terminalLabelMap.get(label);
+	public synchronized void defineRule(String label, Rule rule) {
+		if (rule instanceof DeferredDefinitionRule)
+			throw new GrammarException(
+					"you cannot define a rule to be a DeferredDefinitionRule");
+		DeferredDefinitionRule r = checkRuleDefinition(label);
+		Map<String, Label> idMap = new HashMap<String, Label>(rules.size());
+		for (Entry<Label, Rule> e : rules.entrySet())
+			idMap.put(e.getValue().uniqueId(), e.getKey());
+		String id = rule.uniqueId();
+		Label l = idMap.get(id);
 		if (l == null)
-			throw new GrammarException("unknown terminal rule: " + label);
-		Rule r = rules.get(l);
-		if (!(r instanceof DeferredDefinitionRule))
-			throw new GrammarException("rule " + label + " already defined");
-		((DeferredDefinitionRule) r).setRule(rule);
-		undefinedTerminals.remove(r.label());
+			r.setRule(rule);
+		else
+			r.setRule(rules.get(idMap.get(id)));
+		undefinedRules.remove(r.label());
 	}
 
 	/**
@@ -718,5 +756,122 @@ public class Grammar implements Serializable {
 			throw new GrammarException(
 					"start offset specified beyond end of string");
 		return new Options(opt);
+	}
+
+	/**
+	 * Assign a complete grammar to an undefined symbol.
+	 * 
+	 * @param label
+	 * @param g
+	 */
+	public synchronized void defineRule(String label, Grammar g) {
+		DeferredDefinitionRule r = checkRuleDefinition(label);
+		g.checkComplete();
+		g = (Grammar) g.clone();
+		// now we fix labels
+		List<Label> labels = new ArrayList<Label>(g.rules.size());
+		for (Label l : g.rules.keySet()) {
+			if (rules.containsKey(l) && g.rules.get(l).generation > -1)
+				labels.add(l);
+		}
+		// rename
+		for (Label l : labels) {
+			Rule ru = g.rules.remove(l);
+			boolean isRoot = l.equals(g.root);
+			String s = label + ':' + l.id;
+			l = new Label(l.t, s);
+			Rule nru = Compiler.fixLabel(l, ru);
+			fix(g, ru, nru);
+			g.rules.put(l, nru);
+			if (isRoot)
+				g.root = l;
+		}
+		// and we check for any lingering redundancies
+		Map<String, Label> oldMap = new HashMap<String, Label>(rules.size()), newMap = new HashMap<String, Label>(
+				g.rules.size());
+		for (Entry<Label, Rule> e : rules.entrySet())
+			oldMap.put(e.getValue().uniqueId(), e.getKey());
+		for (Entry<Label, Rule> e : g.rules.entrySet())
+			newMap.put(e.getValue().uniqueId(), e.getKey());
+		for (String uid : newMap.keySet()) {
+			if (oldMap.containsKey(uid)) {
+				Rule oru = g.rules.remove(newMap.get(uid));
+				Rule nru = rules.get(newMap.get(uid));
+				fix(g, oru, nru);
+			}
+		}
+		// finally, we augment the original rule set
+		for (Entry<Label, Rule> e : g.rules.entrySet()) {
+			rules.put(e.getKey(), e.getValue());
+		}
+		// and we re-assign the grammar field of the cloned rules
+		for (Rule ru : g.rules.values())
+			ru.g = this;
+		// and we define the rule
+		r.setRule(g.rules.get(g.root));
+		// and fix it so it can't be redefined in the future
+		undefinedRules.remove(r.label());
+	}
+
+	/**
+	 * Replace all instances of old {@link Rule} with new.
+	 * 
+	 * @param g
+	 * @param ru
+	 * @param nru
+	 */
+	private void fix(Grammar g, Rule ru, Rule nru) {
+		for (Rule r : g.rules.values()) {
+			if (r instanceof AlternationRule) {
+				AlternationRule ar = (AlternationRule) r;
+				for (int i = 0; i < ar.alternates.length; i++) {
+					if (ar.alternates[i] == ru)
+						ar.alternates[i] = nru;
+				}
+			} else if (r instanceof SequenceRule) {
+				SequenceRule sr = (SequenceRule) r;
+				for (int i = 0; i < sr.sequence.length; i++) {
+					if (sr.sequence[i] == ru)
+						sr.sequence[i] = nru;
+				}
+			} else if (r instanceof RepetitionRule) {
+				RepetitionRule rr = (RepetitionRule) r;
+				if (rr.r == ru)
+					rr.r = nru;
+			} else if (r instanceof DeferredDefinitionRule) {
+				DeferredDefinitionRule ddr = (DeferredDefinitionRule) r;
+				if (ddr.r == ru)
+					ddr.r = nru;
+			} else if (r instanceof CyclicRule) {
+				CyclicRule cr = (CyclicRule) r;
+				if (cr.r == ru)
+					cr.r = nru;
+			}
+		}
+	}
+
+	@Override
+	public Object clone() {
+		Grammar clone = new Grammar((Label) root.clone());
+		Map<Label, Label> labelMap = new HashMap<Label, Label>(rules.size());
+		Map<Rule, Rule> ruleMap = new HashMap<Rule, Rule>(rules.size());
+		for (Entry<Label, Rule> e : rules.entrySet()) {
+			Label labelClone = (Label) e.getKey().clone();
+			Rule ruleClone = e.getValue().shallowClone();
+			ruleClone.generation = e.getValue().generation;
+			ruleClone.g = clone;
+			if (ruleClone instanceof DeferredDefinitionRule)
+				((DeferredDefinitionRule) ruleClone).rules = clone.rules;
+			labelMap.put(e.getKey(), labelClone);
+			ruleMap.put(e.getValue(), ruleClone);
+			clone.rules.put(labelClone, ruleClone);
+		}
+		for (Entry<String, Label> e : terminalLabelMap.entrySet())
+			clone.terminalLabelMap.put(e.getKey(), labelMap.get(e.getValue()));
+		for (Label l : undefinedRules)
+			clone.undefinedRules.add(labelMap.get(l));
+		for (Entry<Rule, Rule> e : ruleMap.entrySet())
+			fix(clone, e.getKey(), e.getValue());
+		return clone;
 	}
 }

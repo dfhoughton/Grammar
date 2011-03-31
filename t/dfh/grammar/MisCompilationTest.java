@@ -74,8 +74,8 @@ public class MisCompilationTest {
 		};
 		try {
 			Grammar g = new Grammar(rules);
-			g.defineTerminal("s", Pattern.compile("\\s++"));
-			g.defineTerminal("s", Pattern.compile("\\s++"));
+			g.defineRule("s", Pattern.compile("\\s++"));
+			g.defineRule("s", Pattern.compile("\\s++"));
 			org.junit.Assert.fail("did not discover missing rule");
 		} catch (Exception e) {
 			org.junit.Assert.assertTrue("found redefinition", e.getMessage()
@@ -97,7 +97,7 @@ public class MisCompilationTest {
 		};
 		try {
 			Grammar g = new Grammar(rules);
-			g.defineTerminal("x", Pattern.compile("\\s++"));
+			g.defineRule("x", Pattern.compile("\\s++"));
 			org.junit.Assert.fail("did not discover missing rule");
 		} catch (Exception e) {
 			org.junit.Assert.assertTrue("unknown terminal rule", e.getMessage()
@@ -120,7 +120,7 @@ public class MisCompilationTest {
 		try {
 			Grammar g = new Grammar(rules);
 			g.find("foo bar");
-			g.defineTerminal("x", Pattern.compile("\\s++"));
+			g.defineRule("x", Pattern.compile("\\s++"));
 			org.junit.Assert.fail("did not discover missing rule");
 		} catch (Exception e) {
 			org.junit.Assert
@@ -142,7 +142,7 @@ public class MisCompilationTest {
 		try {
 			Grammar g = new Grammar(rules);
 			g.find("foo bar");
-			g.defineTerminal("x", Pattern.compile("\\s++"));
+			g.defineRule("x", Pattern.compile("\\s++"));
 			org.junit.Assert.fail("did not discover missing rule");
 		} catch (Exception e) {
 			org.junit.Assert.assertTrue("cycle found in rules", e.getMessage()

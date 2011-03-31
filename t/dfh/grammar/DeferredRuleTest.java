@@ -29,8 +29,8 @@ public class DeferredRuleTest {
 		"<ROOT> = <q> <text> 1",//
 		};
 		Grammar g = new Grammar(rules);
-		g.defineTerminal("q", Pattern.compile("[\"']"));
-		g.defineTerminal("text", Pattern.compile("\\w++"));
+		g.defineRule("q", Pattern.compile("[\"']"));
+		g.defineRule("text", Pattern.compile("\\w++"));
 		String s = "'ned'";
 		Matcher m = g.find(s);
 		Match n = m.match();
@@ -123,14 +123,19 @@ public class DeferredRuleTest {
 			public boolean zeroWidth() {
 				return false;
 			}
+
+			@Override
+			public Rule shallowClone() {
+				return this;
+			}
 		}
 		String[] rules = {
 		//
 		"<ROOT> = <q> <text> 1",//
 		};
 		Grammar g = new Grammar(rules);
-		g.defineTerminal("q", Pattern.compile("[\"']"));
-		g.defineTerminal("text", new ARule(new Label(Type.terminal, "text")));
+		g.defineRule("q", Pattern.compile("[\"']"));
+		g.defineRule("text", new ARule(new Label(Type.terminal, "text")));
 		String s = "'ned'";
 		Options options = new Options();
 		options.study = false;

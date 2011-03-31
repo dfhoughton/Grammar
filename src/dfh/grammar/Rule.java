@@ -200,4 +200,14 @@ public abstract class Rule implements Serializable {
 	 * @return whether this rule can match the null string
 	 */
 	public abstract boolean zeroWidth();
+
+	/**
+	 * Returns clone of this {@link Rule} but not of any {@link Rule Rules} on
+	 * which it is dependent. This method is required by {@link Grammar#clone()}
+	 * .
+	 * 
+	 * @return clone of this {@link Rule} but not of any {@link Rule Rules} on
+	 *         which it is dependent
+	 */
+	public abstract Rule shallowClone();
 }

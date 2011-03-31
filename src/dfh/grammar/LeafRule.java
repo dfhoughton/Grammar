@@ -170,4 +170,10 @@ public class LeafRule extends Rule {
 	public boolean zeroWidth() {
 		return false;
 	}
+
+	@Override
+	public Rule shallowClone() {
+		LeafRule lr = new LeafRule((Label) label.clone(), p);
+		return lr;
+	}
 }

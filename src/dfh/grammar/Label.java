@@ -11,7 +11,7 @@ import java.io.Serializable;
  * 
  */
 public class Label extends RepeatableRuleFragment implements Comparable<Label>,
-		Serializable {
+		Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	/**
 	 * label reserved for root rule label
@@ -101,4 +101,8 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		}
 	}
 
+	@Override
+	public Object clone() {
+		return new Label(t, id);
+	}
 }

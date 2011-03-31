@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public class CyclicRule extends Rule {
 	private static final long serialVersionUID = 1L;
-	private Rule r;
+	Rule r;
 
 	public CyclicRule(Label label) {
 		super(label);
@@ -53,5 +53,12 @@ public class CyclicRule extends Rule {
 	@Override
 	public boolean zeroWidth() {
 		return r.zeroWidth();
+	}
+
+	@Override
+	public Rule shallowClone() {
+		CyclicRule cr = new CyclicRule((Label) label.clone());
+		cr.r = r;
+		return cr;
 	}
 }

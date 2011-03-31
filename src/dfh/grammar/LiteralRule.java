@@ -82,7 +82,7 @@ public class LiteralRule extends Rule {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	String literal;
+	protected final String literal;
 
 	public LiteralRule(Label label, String literal) {
 		super(label);
@@ -142,5 +142,11 @@ public class LiteralRule extends Rule {
 	@Override
 	public boolean zeroWidth() {
 		return false;
+	}
+
+	@Override
+	public Rule shallowClone() {
+		LiteralRule lr = new LiteralRule((Label) label.clone(), literal);
+		return lr;
 	}
 }

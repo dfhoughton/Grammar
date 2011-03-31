@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public class RepetitionRule extends Rule {
 	private static final long serialVersionUID = 1L;
-	final Rule r;
+	Rule r;
 	final Repetition repetition;
 
 	private abstract class RepetitionMatcher extends NonterminalMatcher {
@@ -279,5 +279,12 @@ public class RepetitionRule extends Rule {
 	@Override
 	public boolean zeroWidth() {
 		return r.zeroWidth() || repetition.bottom == 0;
+	}
+
+	@Override
+	public Rule shallowClone() {
+		RepetitionRule rr = new RepetitionRule((Label) label.clone(), r,
+				repetition);
+		return rr;
 	}
 }

@@ -30,7 +30,7 @@ import dfh.grammar.Label.Type;
 public class Compiler {
 	private HashMap<Label, Rule> rules;
 	private Map<String, Label> terminalLabelMap;
-	private Collection<Label> undefinedTerminals = new HashSet<Label>();
+	private Collection<Label> undefinedRules = new HashSet<Label>();
 	private Map<String, Rule> redundancyMap = new TreeMap<String, Rule>();
 	private Map<Label, Set<Label>> dependencyMap = new HashMap<Label, Set<Label>>();
 	private List<String> redundantLabels = new LinkedList<String>();
@@ -106,7 +106,7 @@ public class Compiler {
 					DeferredDefinitionRule ddr = new DeferredDefinitionRule(l,
 							rules);
 					ddr.generation = gen;
-					undefinedTerminals.add(l);
+					undefinedRules.add(l);
 					rules.put(l, ddr);
 					terminals.add(l);
 				}
@@ -385,7 +385,7 @@ public class Compiler {
 		return r;
 	}
 
-	private Rule fixLabel(Label label, Rule r) {
+	static Rule fixLabel(Label label, Rule r) {
 		if (r instanceof AlternationRule)
 			return new AlternationRule(label, ((AlternationRule) r).alternates);
 		if (r instanceof RepetitionRule) {
@@ -398,6 +398,13 @@ public class Compiler {
 			return new LiteralRule(label, ((LiteralRule) r).literal);
 		if (r instanceof LeafRule)
 			return new LeafRule(label, ((LeafRule) r).p);
+		if (r instanceof DeferredDefinitionRule) {
+			DeferredDefinitionRule old = (DeferredDefinitionRule) r;
+			DeferredDefinitionRule ddr = new DeferredDefinitionRule(label,
+					old.rules);
+			ddr.r = old;
+			return ddr;
+		}
 		throw new GrammarException("unanticipated rule type: "
 				+ r.getClass().getName());
 	}
@@ -537,7 +544,7 @@ public class Compiler {
 	}
 
 	public HashSet<Label> undefinedTerminals() {
-		return new HashSet<Label>(undefinedTerminals);
+		return new HashSet<Label>(undefinedRules);
 	}
 
 	private Set<Label> allLabels(List<RuleFragment> value) {

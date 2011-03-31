@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -166,6 +167,13 @@ public class SequenceRule extends Rule {
 				return false;
 		}
 		return true;
+	}
+
+	@Override
+	public Rule shallowClone() {
+		SequenceRule sr = new SequenceRule((Label) label.clone(),
+				Arrays.copyOf(sequence, sequence.length));
+		return sr;
 	}
 
 }

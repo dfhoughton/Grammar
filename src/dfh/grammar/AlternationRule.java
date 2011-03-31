@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -111,5 +112,12 @@ public class AlternationRule extends Rule {
 				return true;
 		}
 		return false;
+	}
+
+	@Override
+	public Rule shallowClone() {
+		AlternationRule ar = new AlternationRule((Label) label.clone(),
+				Arrays.copyOf(alternates, alternates.length));
+		return ar;
 	}
 }

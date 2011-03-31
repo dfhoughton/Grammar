@@ -2,7 +2,6 @@ package dfh.grammar;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * A rule undefined at the time of grammar compilation. It will always
@@ -19,8 +18,8 @@ import java.util.regex.Pattern;
  */
 public class DeferredDefinitionRule extends Rule {
 	private static final long serialVersionUID = 1L;
-	private final Map<Label, Rule> rules;
-	private Rule r;
+	protected Map<Label, Rule> rules;
+	protected Rule r;
 
 	public DeferredDefinitionRule(Label label, Map<Label, Rule> rules) {
 		super(label);
@@ -38,19 +37,6 @@ public class DeferredDefinitionRule extends Rule {
 	@Override
 	protected String uniqueId() {
 		return "({DEFERRED}" + label + ")";
-	}
-
-	/**
-	 * Defines this rule as a {@link LeafRule}.
-	 * 
-	 * @param p
-	 */
-	public void setRegex(Pattern p) {
-		if (r != null)
-			throw new GrammarException("rule " + label + "already defined");
-		LeafRule rule = new LeafRule(label, p);
-		rule.g = g;
-		r = rule;
 	}
 
 	/**
@@ -80,5 +66,13 @@ public class DeferredDefinitionRule extends Rule {
 	@Override
 	public boolean zeroWidth() {
 		return r.zeroWidth();
+	}
+
+	@Override
+	public Rule shallowClone() {
+		DeferredDefinitionRule ddr = new DeferredDefinitionRule(
+				(Label) label.clone(), rules);
+		ddr.r = r;
+		return ddr;
 	}
 }

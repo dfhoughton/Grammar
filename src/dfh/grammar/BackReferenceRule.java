@@ -104,4 +104,11 @@ public class BackReferenceRule extends Rule {
 		return true;
 	}
 
+	@Override
+	public Rule shallowClone() {
+		BackReferenceRule brr = new BackReferenceRule((Label) label.clone(),
+				index);
+		return brr;
+	}
+
 }
