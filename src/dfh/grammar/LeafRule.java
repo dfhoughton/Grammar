@@ -45,17 +45,18 @@ public class LeafRule extends Rule {
 					LeafRule.this.matchTrace(this, cm.m);
 					return cm.m;
 				}
-				Match n = null;
 				java.util.regex.Matcher m = p.matcher(s);
 				m.region(offset, s.length());
 				m.useTransparentBounds(true);
 				m.useAnchoringBounds(false);
-				if (m.lookingAt())
-					n = new Match(LeafRule.this, offset, m.end());
-				cm = new CachedMatch(n);
+				if (m.lookingAt()) {
+					Match n = new Match(LeafRule.this, offset, m.end());
+					cm = new CachedMatch(n);
+				} else
+					cm = CachedMatch.MISMATCH;
 				cache.put(offset, cm);
-				LeafRule.this.matchTrace(this, n);
-				return n;
+				LeafRule.this.matchTrace(this, cm.m);
+				return cm.m;
 			}
 			LeafRule.this.matchTrace(this, null);
 			return null;

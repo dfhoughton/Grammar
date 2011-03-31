@@ -96,8 +96,6 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		switch (t) {
 		case backreference:
 			return id;
-		case literal:
-			return id;
 		default:
 			return '<' + id + '>' + rep;
 		}

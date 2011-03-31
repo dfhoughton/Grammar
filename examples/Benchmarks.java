@@ -147,7 +147,7 @@ public class Benchmarks {
 				"<a> = 'a'{,2}",//
 				"<b> = 'ab'",//
 		};
-		Pattern p = Pattern.compile("(?:a{0,2}|a{0,2}b){2}b");
+		Pattern p = Pattern.compile("(?:a{0,2}|ab){2}ab");
 		String s = "aabb";
 		Grammar g = new Grammar(rules);
 		iterate(p, g, s, false);

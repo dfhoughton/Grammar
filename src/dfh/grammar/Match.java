@@ -21,10 +21,10 @@ public class Match {
 	/**
 	 * Used as a placeholder in offset cache.
 	 */
-	public static final Match dummy = new Match();
+	public static final Match DUMMY = new Match();
 
 	/**
-	 * Makes a dummy node. This serves as the opposite of <code>null</code> in
+	 * Makes a DUMMY node. This serves as the opposite of <code>null</code> in
 	 * matching caches.
 	 */
 	private Match() {
@@ -95,7 +95,7 @@ public class Match {
 
 	@Override
 	public String toString() {
-		if (this == dummy)
+		if (this == DUMMY)
 			return "[DUMMY]";
 		StringBuilder b = new StringBuilder();
 		b.append('[').append(r.label).append(' ');

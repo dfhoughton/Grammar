@@ -37,7 +37,7 @@ public abstract class NonterminalMatcher extends Matcher {
 		if (next == null)
 			fetchNext();
 		if (!alreadyMatched) {
-			cm = new CachedMatch(next == null ? null : Match.dummy);
+			cm = next == null ? CachedMatch.MISMATCH : CachedMatch.MATCH;
 			subCache.put(offset, cm);
 		}
 		Match n = next;

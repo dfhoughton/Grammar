@@ -68,6 +68,9 @@ public class Compiler {
 			RuleFragment rf = body.get(0);
 			if (body.size() == 1
 					&& (rf instanceof Regex || rf instanceof LiteralFragment)) {
+				if (rf instanceof LiteralFragment
+						&& !((RepeatableRuleFragment) rf).rep.redundant())
+					continue;
 				Label l = e.getKey();
 				i.remove();
 				Type t = rf instanceof Regex ? Type.terminal : Type.literal;

@@ -57,7 +57,6 @@ public class DeferredRuleTest {
 						fresh = false;
 						CachedMatch cm = cache.get(offset);
 						if (cm == null) {
-							Match n = null;
 							boolean found = false;
 							int i = offset;
 							for (; i < s.length(); i++) {
@@ -66,9 +65,11 @@ public class DeferredRuleTest {
 								else
 									break;
 							}
-							if (found)
-								n = new Match(ARule.this, offset, i);
-							cm = new CachedMatch(n);
+							if (found) {
+								Match n = new Match(ARule.this, offset, i);
+								cm = new CachedMatch(n);
+							} else
+								cm = CachedMatch.MISMATCH;
 							cache.put(offset, cm);
 						}
 						return cm.m;

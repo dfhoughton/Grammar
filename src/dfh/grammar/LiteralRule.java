@@ -38,7 +38,6 @@ public class LiteralRule extends Rule {
 					LiteralRule.this.matchTrace(this, cm.m);
 					return cm.m;
 				}
-				Match m = null;
 				int end = offset + literal.length();
 				if (end <= s.length()) {
 					boolean matched = true;
@@ -48,13 +47,16 @@ public class LiteralRule extends Rule {
 							break;
 						}
 					}
-					if (matched)
-						m = new Match(LiteralRule.this, offset, end);
-				}
-				cm = new CachedMatch(m);
+					if (matched) {
+						Match m = new Match(LiteralRule.this, offset, end);
+						cm = new CachedMatch(m);
+					} else
+						cm = CachedMatch.MISMATCH;
+				} else
+					cm = CachedMatch.MISMATCH;
 				cache.put(offset, cm);
-				LiteralRule.this.matchTrace(this, m);
-				return m;
+				LiteralRule.this.matchTrace(this, cm.m);
+				return cm.m;
 			}
 			LiteralRule.this.matchTrace(this, null);
 			return null;
