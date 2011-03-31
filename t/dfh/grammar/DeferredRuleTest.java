@@ -77,12 +77,12 @@ public class DeferredRuleTest {
 				}
 
 				@Override
-				boolean mightHaveNext() {
+				protected boolean mightHaveNext() {
 					return fresh;
 				}
 
 				@Override
-				Rule rule() {
+				protected Rule rule() {
 					return ARule.this;
 				}
 
@@ -113,7 +113,7 @@ public class DeferredRuleTest {
 			@Override
 			public Set<Integer> study(CharSequence s,
 					Map<Label, Map<Integer, CachedMatch>> cache, int offset,
-					Set<Rule> studiedRules) {
+					Set<Rule> studiedRules, Map<Rule, RuleState> ruleStates) {
 				// we won't study for this
 				return null;
 			}

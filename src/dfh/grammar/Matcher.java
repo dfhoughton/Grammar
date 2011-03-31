@@ -1,5 +1,7 @@
 package dfh.grammar;
 
+import java.util.Map;
+
 /**
  * An object associated with a {@link Rule} that can iterate over and return all
  * the possible parse trees meeting the matching conditions (pattern and start
@@ -11,14 +13,32 @@ package dfh.grammar;
  * 
  */
 public abstract class Matcher {
-	CharSequence s;
-	Integer offset;
-	Matcher master;
+	protected final CharSequence s;
+	protected final Integer offset;
+	protected final Matcher master;
+	protected final Map<Rule, RuleState> ruleStates;
 
 	protected Matcher(CharSequence s, Integer offset, Matcher master) {
 		this.s = s;
 		this.offset = offset;
 		this.master = master;
+		this.ruleStates = master.ruleStates;
+	}
+
+	/**
+	 * Constructor only to be used by {@link Grammar}.
+	 * 
+	 * @param s
+	 * @param offset
+	 * @param master
+	 * @param ruleStates
+	 */
+	Matcher(CharSequence s, Integer offset, Matcher master,
+			Map<Rule, RuleState> ruleStates) {
+		this.s = s;
+		this.offset = offset;
+		this.master = master;
+		this.ruleStates = ruleStates;
 	}
 
 	/**
@@ -44,10 +64,10 @@ public abstract class Matcher {
 	 * @return whether the sequence this matcher is iterating over has reached
 	 *         its end
 	 */
-	abstract boolean mightHaveNext();
+	protected abstract boolean mightHaveNext();
 
 	/**
 	 * @return the {@link Rule} that generated this {@link Matcher}
 	 */
-	abstract Rule rule();
+	protected abstract Rule rule();
 }

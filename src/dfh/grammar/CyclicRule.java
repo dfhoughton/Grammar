@@ -45,9 +45,9 @@ public class CyclicRule extends Rule {
 	@Override
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
-			Set<Rule> studiedRules) {
+			Set<Rule> studiedRules, Map<Rule, RuleState> ruleStates) {
 		studiedRules.add(this);
-		return r.study(s, cache, offset, studiedRules);
+		return r.study(s, cache, offset, studiedRules, ruleStates);
 	}
 
 	@Override

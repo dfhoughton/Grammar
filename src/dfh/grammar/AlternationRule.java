@@ -93,13 +93,14 @@ public class AlternationRule extends Rule {
 	@Override
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
-			Set<Rule> studiedRules) {
+			Set<Rule> studiedRules, Map<Rule, RuleState> ruleStates) {
 		studiedRules.add(this);
 		Set<Integer> startOffsets = new HashSet<Integer>();
 		studiedRules.add(this);
 		for (Rule r : alternates)
 			if (!studiedRules.contains(r))
-				startOffsets.addAll(r.study(s, cache, offset, studiedRules));
+				startOffsets.addAll(r.study(s, cache, offset, studiedRules,
+						ruleStates));
 		return startOffsets;
 	}
 

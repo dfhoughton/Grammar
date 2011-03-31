@@ -29,7 +29,12 @@ public class LiteralRule extends Rule {
 			if (fresh) {
 				fresh = false;
 				CachedMatch cm = cache.get(offset);
-				if (cm != null) {
+				if (cm == null) {
+					if (ruleStates.containsKey(rule())) {
+						LiteralRule.this.matchTrace(this, null);
+						return null;
+					}
+				} else {
 					LiteralRule.this.matchTrace(this, cm.m);
 					return cm.m;
 				}
@@ -66,7 +71,7 @@ public class LiteralRule extends Rule {
 		}
 
 		@Override
-		Rule rule() {
+		protected Rule rule() {
 			return LiteralRule.this;
 		}
 	}
@@ -111,8 +116,9 @@ public class LiteralRule extends Rule {
 	@Override
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
-			Set<Rule> studiedRules) {
+			Set<Rule> studiedRules, Map<Rule, RuleState> ruleStates) {
 		studiedRules.add(this);
+		ruleStates.put(this, new TerminalState(true));
 		Map<Integer, CachedMatch> subCache = cache.get(label);
 		Set<Integer> startOffsets = new HashSet<Integer>();
 		if (subCache.isEmpty()) {

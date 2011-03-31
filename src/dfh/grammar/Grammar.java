@@ -165,16 +165,49 @@ public class Grammar implements Serializable {
 	 */
 	private abstract class GrammarMatcher extends Matcher {
 
-		protected GrammarMatcher(CharSequence s, final Options options) {
-			super(s, options.startOffset, null);
+		protected GrammarMatcher(CharSequence s, final Options options,
+				Map<Rule, RuleState> ruleStates) {
+			super(s, options.startOffset, null, ruleStates);
 		}
 
 		protected abstract String name();
 
 		@Override
-		Rule rule() {
+		protected Rule rule() {
 			return null;
 		}
+	}
+
+	/**
+	 * For starting the chain of inheritance (in terms of handing down from
+	 * parent to child, not OO) of the rule state map.
+	 * <p>
+	 * <b>Creation date:</b> Mar 30, 2011
+	 * 
+	 * @author David Houghton
+	 * 
+	 */
+	private class DummyMatcher extends Matcher {
+		DummyMatcher(CharSequence s, final Options options,
+				Map<Rule, RuleState> ruleStates) {
+			super(s, options.startOffset, null, ruleStates);
+		}
+
+		@Override
+		public Match match() {
+			return null;
+		}
+
+		@Override
+		protected boolean mightHaveNext() {
+			return false;
+		}
+
+		@Override
+		protected Rule rule() {
+			return null;
+		}
+
 	}
 
 	private class FindMatcher extends GrammarMatcher {
@@ -188,15 +221,16 @@ public class Grammar implements Serializable {
 
 		FindMatcher(CharSequence s, Options options,
 				LinkedList<Integer> startOffsets,
-				Map<Label, Map<Integer, CachedMatch>> cache) {
-			super(s, options);
+				Map<Label, Map<Integer, CachedMatch>> cache,
+				Map<Rule, RuleState> ruleStates) {
+			super(s, options, ruleStates);
 			this.options = options;
 			this.startOffsets = startOffsets;
 			this.cache = cache;
 			index = options.study && !startOffsets.isEmpty() ? startOffsets
 					.removeFirst() : options.startOffset;
 			firstMatch = true;
-			m = rules.get(root).matcher(s, index, cache, null);
+			m = rules.get(root).matcher(s, index, cache, this);
 			next = fetchNext();
 		}
 
@@ -413,16 +447,17 @@ public class Grammar implements Serializable {
 		final Options options = verifyOptions(cs, opt);
 		final Set<Integer> startOffsets = new HashSet<Integer>();
 		Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
+		final Map<Rule, RuleState> rs = new HashMap<Rule, RuleState>();
 		if (options.study) {
 			Set<Rule> studiedRules = new HashSet<Rule>();
 			startOffsets.addAll(rules.get(root).study(cs, cache,
-					options.startOffset, studiedRules));
+					options.startOffset, studiedRules, rs));
 		}
 		final Matcher m = rules.get(root).matcher(cs, options.startOffset,
-				cache, null);
+				cache, new DummyMatcher(cs, options, rs));
 		abstract class LookingAtMatcher extends GrammarMatcher {
 			LookingAtMatcher() {
-				super(cs, options);
+				super(cs, options, rs);
 			}
 
 			@Override
@@ -494,15 +529,16 @@ public class Grammar implements Serializable {
 		final Options options = verifyOptions(s, opt);
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		final LinkedList<Integer> startOffsets = new LinkedList<Integer>();
+		final Map<Rule, RuleState> ruleStates = new HashMap<Rule, RuleState>();
 		if (options.study) {
 			ArrayList<Integer> list = new ArrayList<Integer>();
 			Set<Rule> studiedRules = new HashSet<Rule>();
 			list.addAll(rules.get(root).study(s, cache, options.startOffset,
-					studiedRules));
+					studiedRules, ruleStates));
 			Collections.sort(list);
 			startOffsets.addAll(list);
 		}
-		return new FindMatcher(s, options, startOffsets, cache);
+		return new FindMatcher(s, options, startOffsets, cache, ruleStates);
 	}
 
 	/**
@@ -620,14 +656,15 @@ public class Grammar implements Serializable {
 		final Options options = verifyOptions(s, opt);
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		final Set<Integer> startOffsets = new HashSet<Integer>();
+		final Map<Rule, RuleState> ruleStates = new HashMap<Rule, RuleState>();
 		if (options.study) {
 			Set<Rule> studiedRules = new HashSet<Rule>();
 			startOffsets.addAll(rules.get(root).study(s, cache,
-					options.startOffset, studiedRules));
+					options.startOffset, studiedRules, ruleStates));
 		}
 		final Matcher m = rules.get(root).matcher(s, options.startOffset,
-				cache, null);
-		return new GrammarMatcher(s, options) {
+				cache, new DummyMatcher(s, options, ruleStates));
+		return new GrammarMatcher(s, options, ruleStates) {
 			boolean matchedOnce = false;
 			Match next = fetchNext();
 

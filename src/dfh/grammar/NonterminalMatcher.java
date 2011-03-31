@@ -13,8 +13,8 @@ public abstract class NonterminalMatcher extends Matcher {
 	protected final Rule rule;
 
 	protected NonterminalMatcher(CharSequence cs2, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache,
-			Rule rule, Matcher master) {
+			Map<Label, Map<Integer, CachedMatch>> cache, Rule rule,
+			Matcher master) {
 		super(cs2, offset, master);
 		this.cache = cache;
 		this.rule = rule;
@@ -62,7 +62,7 @@ public abstract class NonterminalMatcher extends Matcher {
 	}
 
 	@Override
-	Rule rule() {
+	protected Rule rule() {
 		return rule;
 	}
 }

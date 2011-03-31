@@ -64,7 +64,7 @@ public class BackReferenceRule extends Rule {
 		}
 
 		@Override
-		Rule rule() {
+		protected Rule rule() {
 			return BackReferenceRule.this;
 		}
 	}
@@ -93,7 +93,7 @@ public class BackReferenceRule extends Rule {
 	@Override
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
-			Set<Rule> studiedRules) {
+			Set<Rule> studiedRules, Map<Rule, RuleState> ruleStates) {
 		studiedRules.add(this);
 		// one cannot study backreferences
 		return new HashSet<Integer>(0);

@@ -40,7 +40,7 @@ public class Match {
 
 	public Match(Rule r, int start, int end) {
 		this(r, start);
-		setEnd(end);
+		this.end = end;
 	}
 
 	public Rule rule() {

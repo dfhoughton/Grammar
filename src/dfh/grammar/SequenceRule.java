@@ -135,7 +135,7 @@ public class SequenceRule extends Rule {
 	@Override
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
-			Set<Rule> studiedRules) {
+			Set<Rule> studiedRules, Map<Rule, RuleState> ruleStates) {
 		studiedRules.add(this);
 		Set<Integer> startOffsets = null;
 		for (Rule r : sequence) {
@@ -147,7 +147,7 @@ public class SequenceRule extends Rule {
 				else
 					startOffsets.addAll(set);
 			} else {
-				set = r.study(s, cache, offset, studiedRules);
+				set = r.study(s, cache, offset, studiedRules, ruleStates);
 			}
 			if (startOffsets == null)
 				startOffsets = new HashSet<Integer>(set);
