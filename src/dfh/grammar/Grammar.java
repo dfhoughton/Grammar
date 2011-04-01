@@ -787,10 +787,10 @@ public class Grammar implements Serializable, Cloneable {
 	 * Putting this together with namespace changes may produce
 	 * counter-intuitive results. For example, consider the following
 	 * composition of three grammars.
-	 * <h2>Root Grammar
+	 * <h2>Root Grammar</h2>
 	 * 
 	 * <pre>
-	 * 	 &lt;ROOT&gt; = &lt;bar&gt; | &lt;quux&gt;
+	 * &lt;ROOT&gt; = &lt;bar&gt; | &lt;quux&gt;
 	 * 
 	 *  &lt;foo&gt; = &lt;bar&gt; | &lt;quux&gt;
 	 * &lt;quux&gt; = &lt;b&gt; &lt;foo&gt; 1
@@ -799,7 +799,7 @@ public class Grammar implements Serializable, Cloneable {
 	 *    &lt;b&gt; = UNDEFINED
 	 * </pre>
 	 * 
-	 * <h2>Grammar for &lt;a&gt;
+	 * <h2>Grammar for <code>&lt;a&gt;</code></h2>
 	 * 
 	 * <pre>
 	 * &lt;ROOT&gt; = &lt;a&gt;{2} &lt;b&gt;
@@ -808,7 +808,7 @@ public class Grammar implements Serializable, Cloneable {
 	 *    &lt;b&gt; = "b"
 	 * </pre>
 	 * 
-	 * <h2>Grammar for &lt;b&gt;
+	 * <h2>Grammar for <code>&lt;b&gt;</code></h2>
 	 * 
 	 * <pre>
 	 * &lt;ROOT&gt; = &lt;a&gt; &lt;b&gt;{1,2}
@@ -817,7 +817,7 @@ public class Grammar implements Serializable, Cloneable {
 	 *    &lt;b&gt; = "b"
 	 * </pre>
 	 * 
-	 * <h2>Result
+	 * <h2>Result</h2>
 	 * 
 	 * <pre>
 	 * &lt;ROOT&gt; = &lt;bar&gt; | &lt;quux&gt;
@@ -1033,7 +1033,9 @@ public class Grammar implements Serializable, Cloneable {
 	 * this case you are defining the rule to be a {@link LiteralRule}.
 	 * 
 	 * @param label
-	 * @param p
+	 *            id of undefined rule
+	 * @param literal
+	 *            String to match
 	 * @throws GrammarException
 	 */
 	public synchronized void defineRule(String label, String literal)

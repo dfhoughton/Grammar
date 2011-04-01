@@ -36,6 +36,14 @@ public class Compiler {
 	private List<String> redundantLabels = new LinkedList<String>();
 	private final Label root;
 
+	/**
+	 * Generates a {@link Compiler} reading rules from the given
+	 * {@link LineReader}.
+	 * 
+	 * @param reader
+	 * @throws GrammarException
+	 * @throws IOException
+	 */
 	public Compiler(LineReader reader) throws GrammarException, IOException {
 		String line = null;
 		Map<Label, List<RuleFragment>> map = new HashMap<Label, List<RuleFragment>>();
@@ -385,6 +393,13 @@ public class Compiler {
 		return r;
 	}
 
+	/**
+	 * Assigns a name to an anonymous {@link Rule}.
+	 * 
+	 * @param label
+	 * @param r
+	 * @return named {@link Rule}
+	 */
 	static Rule fixLabel(Label label, Rule r) {
 		if (r instanceof AlternationRule)
 			return new AlternationRule(label, ((AlternationRule) r).alternates);
@@ -535,15 +550,15 @@ public class Compiler {
 		return redundancyCheck(r);
 	}
 
-	public Map<Label, Rule> rules() {
+	Map<Label, Rule> rules() {
 		return new HashMap<Label, Rule>(rules);
 	}
 
-	public Map<String, Label> terminalLabelMap() {
+	Map<String, Label> terminalLabelMap() {
 		return new HashMap<String, Label>(terminalLabelMap);
 	}
 
-	public HashSet<Label> undefinedTerminals() {
+	HashSet<Label> undefinedTerminals() {
 		return new HashSet<Label>(undefinedRules);
 	}
 
@@ -562,7 +577,7 @@ public class Compiler {
 		return allLabels;
 	}
 
-	public Label root() {
+	Label root() {
 		return root;
 	}
 }

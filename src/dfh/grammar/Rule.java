@@ -24,6 +24,11 @@ public abstract class Rule implements Serializable {
 	protected Grammar g;
 	int generation = -1;
 
+	/**
+	 * Assigns given label to {@link Rule}.
+	 * 
+	 * @param label
+	 */
 	public Rule(Label label) {
 		this.label = label;
 	}
@@ -133,7 +138,9 @@ public abstract class Rule implements Serializable {
 	 * returned and a matching stack trace.
 	 * 
 	 * @param m
+	 *            the {@link Matcher} matching
 	 * @param n
+	 *            the {@link Match} returned
 	 */
 	protected final void matchTrace(Matcher m, Match n) {
 		if (g.trace != null) {
@@ -154,7 +161,8 @@ public abstract class Rule implements Serializable {
 	}
 
 	/**
-	 * The rule description is invoked by {@link Grammar#describe()}.
+	 * The rule description is invoked by {@link Grammar#describe()}. It is the
+	 * text that appears after the '=' in a rule definition.
 	 * 
 	 * @return a String describing the rule
 	 */
@@ -184,7 +192,7 @@ public abstract class Rule implements Serializable {
 
 	/**
 	 * Returns whether this rule can match the null string. This method is used
-	 * in {@link #study(CharSequence, Map, int, Set) studying} in
+	 * in {@link #study(CharSequence, Map, int, Set, Map) studying} in
 	 * {@link CharSequence}. When in doubt, default to <code>true</code>. This
 	 * may make the matching less efficient but is less likely to cause the
 	 * {@link Grammar} to miss a match.

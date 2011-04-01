@@ -5,6 +5,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * The object implementing rules such as
+ * 
+ * <pre>
+ * &lt;a&gt; = &lt;b&gt; | &lt;c&gt;
+ * </pre>
+ * 
+ * @author David Houghton
+ * 
+ */
 public class AlternationRule extends Rule {
 	private static final long serialVersionUID = 1L;
 
@@ -45,8 +55,14 @@ public class AlternationRule extends Rule {
 		}
 	}
 
-	final Rule[] alternates;
+	protected final Rule[] alternates;
 
+	/**
+	 * Generates a rule from the given label and alternates.
+	 * 
+	 * @param label
+	 * @param alternates
+	 */
 	public AlternationRule(Label label, Rule[] alternates) {
 		super(label);
 		this.alternates = alternates;

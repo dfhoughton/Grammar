@@ -12,8 +12,13 @@ import java.io.IOException;
  */
 public class ArrayLineReader implements LineReader {
 	private final String[] lines;
-	int index = 0;
+	private int index = 0;
 
+	/**
+	 * Generates a {@link LineReader} that will iterate over the given strings.
+	 * 
+	 * @param lines
+	 */
 	public ArrayLineReader(String[] lines) {
 		this.lines = lines;
 	}

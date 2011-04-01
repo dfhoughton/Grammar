@@ -7,6 +7,13 @@ package dfh.grammar;
  * <li>failure
  * <li>match
  * </ol>
+ * If the offset is untested, there is no {@link CachedMatch} instance in the
+ * cache for that {@link Rule} and offset. Otherwise, there is such an object,
+ * and its value indicates whether a match is or is not possible at that offset.
+ * In the case of terminal rules -- {@link LeafRule} and {@link LiteralRule},
+ * for example -- the actual {@link Match} object is cached. Otherwise, the
+ * constant {@link #MATCH} and {@link #MISMATCH} objects are used.
+ * <p>
  * <b>Creation date:</b> Mar 24, 2011
  * 
  * @author David Houghton
@@ -25,7 +32,12 @@ public class CachedMatch {
 	 */
 	public static final CachedMatch MATCH = new CachedMatch(Match.DUMMY);
 
+	/**
+	 * @param m
+	 *            {@link Match} to cache
+	 */
 	public CachedMatch(Match m) {
+		assert m != null;
 		this.m = m;
 	}
 }

@@ -85,14 +85,10 @@ public class TerminalGrammarTest {
 				"<b> = 'b'",//
 		};
 		Grammar g1 = new Grammar(rules1);
-		System.out.println(g1.describe());
 		Grammar gA = new Grammar(rulesA);
-		System.out.println(gA.describe());
 		Grammar gB = new Grammar(rulesB);
-		System.out.println(gB.describe());
 		g1.defineRule("a", gA);
 		g1.defineRule("b", gB);
-		System.out.println(g1.describe());
 		String s = "aab";
 		Matcher m = g1.find(s);
 		assertNotNull("found joe", m.match());

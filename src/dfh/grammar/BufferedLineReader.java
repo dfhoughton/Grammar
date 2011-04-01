@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public class BufferedLineReader implements LineReader {
 	private final BufferedReader reader;
-	int lineNumber = 0;
+	private int lineNumber = 0;
 
 	public BufferedLineReader(BufferedReader reader) {
 		this.reader = reader;

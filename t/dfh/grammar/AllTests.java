@@ -26,6 +26,7 @@ import org.junit.runners.Suite;
 		AssertionTest.class,//
 		IterationTest.class,//
 		MultithreadTest.class,//
+		TerminalGrammarTest.class,//
 })
 public class AllTests {
 }

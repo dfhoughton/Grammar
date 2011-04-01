@@ -11,7 +11,7 @@ import java.io.IOException;
  * @author David Houghton
  * 
  */
-interface LineReader {
+public interface LineReader {
 	String readLine() throws IOException;
 
 	int lineNumber();
