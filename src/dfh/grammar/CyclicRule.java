@@ -5,7 +5,13 @@ import java.util.Set;
 
 /**
  * A rule that depends on some other or others in a cycle of dependence. These
- * rules must be defined in two steps.
+ * rules must be defined in two steps. For example:
+ * 
+ * <pre>
+ * &lt;a&gt; = '(' [ '*' | &lt;a&gt; ] ')'
+ * </pre>
+ * 
+ * which will match <i>(*)</i>, <i>((*))</i>, <i>(((*)))</i>, etc.
  * <p>
  * <b>Creation date:</b> Mar 25, 2011
  * 
@@ -16,6 +22,11 @@ public class CyclicRule extends Rule {
 	private static final long serialVersionUID = 1L;
 	Rule r;
 
+	/**
+	 * Generates a {@link CyclicRule} with the given label.
+	 * 
+	 * @param label
+	 */
 	public CyclicRule(Label label) {
 		super(label);
 	}
@@ -31,7 +42,12 @@ public class CyclicRule extends Rule {
 		return label.toString();
 	}
 
-	public void setRule(Rule r) {
+	/**
+	 * Used to complete the cycle during {@link Grammar} compilation.
+	 * 
+	 * @param r
+	 */
+	protected void setRule(Rule r) {
 		if (this.r != null)
 			throw new GrammarException("rule " + label + "already defined");
 		this.r = r;

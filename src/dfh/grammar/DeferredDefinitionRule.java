@@ -21,6 +21,10 @@ public class DeferredDefinitionRule extends Rule {
 	protected Map<Label, Rule> rules;
 	protected Rule r;
 
+	/**
+	 * @param label
+	 * @param rules
+	 */
 	public DeferredDefinitionRule(Label label, Map<Label, Rule> rules) {
 		super(label);
 		this.rules = rules;
