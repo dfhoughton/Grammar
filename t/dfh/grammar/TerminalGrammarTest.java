@@ -42,17 +42,17 @@ public class TerminalGrammarTest {
 		"<ROOT> = <a> | <b>",//
 		};
 		String[] rulesA = {
-		//
-		"<ROOT> = <a>{2} <b>",//
-		"<a> = 'a'",//
-		"<b> = 'b'",//
+				//
+				"<ROOT> = <a>{2} <b>",//
+				"<a> = 'a'",//
+				"<b> = 'b'",//
 		};
 		String[] rulesB = {
 				//
 				"<ROOT> = <a> <b>{3}",//
 				"<a> = 'a'",//
 				"<b> = 'b'",//
-				};
+		};
 		Grammar g1 = new Grammar(rules1);
 		Grammar gA = new Grammar(rulesA);
 		Grammar gB = new Grammar(rulesB);
@@ -66,27 +66,30 @@ public class TerminalGrammarTest {
 	@Test
 	public void cyclicTest() throws GrammarException, IOException {
 		String[] rules1 = {
-		//
-		"<ROOT> = <element>",//
-		"<element> = <single> | <double>",//
-		"<single> = <a>",//
-		"<double> = <b> <element> 1",//
+				//
+				"<ROOT> = <foo>",//
+				"<foo> = <bar> | <quux>",//
+				"<bar> = <a>",//
+				"<quux> = <b> <foo> 1",//
 		};
 		String[] rulesA = {
-		//
-		"<ROOT> = <a>{2} <b>",//
-		"<a> = 'a'",//
-		"<b> = 'b'",//
+				//
+				"<ROOT> = <a>{2} <b>",//
+				"<a> = 'a'",//
+				"<b> = 'b'",//
 		};
 		String[] rulesB = {
 				//
 				"<ROOT> = <a> <b>{1,2}",//
 				"<a> = 'a'",//
 				"<b> = 'b'",//
-				};
+		};
 		Grammar g1 = new Grammar(rules1);
+		System.out.println(g1.describe());
 		Grammar gA = new Grammar(rulesA);
+		System.out.println(gA.describe());
 		Grammar gB = new Grammar(rulesB);
+		System.out.println(gB.describe());
 		g1.defineRule("a", gA);
 		g1.defineRule("b", gB);
 		System.out.println(g1.describe());

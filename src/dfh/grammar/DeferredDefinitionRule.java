@@ -54,7 +54,7 @@ public class DeferredDefinitionRule extends Rule {
 	public String description() {
 		if (r instanceof DeferredDefinitionRule)
 			return r.label.toString();
-		return r.description();
+		return r == null ? "UNDEFINED" : r.description();
 	}
 
 	@Override

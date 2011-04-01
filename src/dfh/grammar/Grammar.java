@@ -775,6 +775,66 @@ public class Grammar implements Serializable, Cloneable {
 
 	/**
 	 * Assign a complete grammar to an undefined symbol.
+	 * <p>
+	 * Defining a {@link Rule} as a {@link Grammar} presents namespace
+	 * difficulties because the two grammars are compiled independently, so up
+	 * to the point of assignment there is no way to ensure there won't be
+	 * namespace collisions. To solve this problem, the label that is being
+	 * redefined becomes a namespace prefix should there be collisions.
+	 * <p>
+	 * Furthermore, during compilation redundant rules are consolidated. This
+	 * same process is replicated when a symbol is redefined as a grammar.
+	 * Putting this together with namespace changes may produce
+	 * counter-intuitive results. For example, consider the following
+	 * composition of three grammars.
+	 * <h2>Root Grammar
+	 * 
+	 * <pre>
+	 * 	 &lt;ROOT&gt; = &lt;bar&gt; | &lt;quux&gt;
+	 * 
+	 *  &lt;foo&gt; = &lt;bar&gt; | &lt;quux&gt;
+	 * &lt;quux&gt; = &lt;b&gt; &lt;foo&gt; 1
+	 *  &lt;bar&gt; = &lt;a&gt;
+	 *    &lt;a&gt; = UNDEFINED
+	 *    &lt;b&gt; = UNDEFINED
+	 * </pre>
+	 * 
+	 * <h2>Grammar for &lt;a&gt;
+	 * 
+	 * <pre>
+	 * &lt;ROOT&gt; = &lt;a&gt;{2} &lt;b&gt;
+	 * 
+	 *    &lt;a&gt; = "a"
+	 *    &lt;b&gt; = "b"
+	 * </pre>
+	 * 
+	 * <h2>Grammar for &lt;b&gt;
+	 * 
+	 * <pre>
+	 * &lt;ROOT&gt; = &lt;a&gt; &lt;b&gt;{1,2}
+	 * 
+	 *    &lt;a&gt; = "a"
+	 *    &lt;b&gt; = "b"
+	 * </pre>
+	 * 
+	 * <h2>Result
+	 * 
+	 * <pre>
+	 * &lt;ROOT&gt; = &lt;bar&gt; | &lt;quux&gt;
+	 * 
+	 * &lt;quux&gt; = &lt;b&gt; &lt;foo&gt; 1
+	 *  &lt;foo&gt; = &lt;bar&gt; | &lt;quux&gt;
+	 *  &lt;bar&gt; = &lt;a&gt;
+	 *  &lt;a:a&gt; = "a"
+	 *  &lt;a:b&gt; = "b"
+	 *    &lt;a&gt; = &lt;a:a&gt;{2} &lt;a:b&gt;
+	 *    &lt;b&gt; = &lt;a:a&gt; &lt;a:b&gt;{1,2}
+	 * </pre>
+	 * 
+	 * The matching pattern is what you would expect but you will see that the
+	 * <code>b</code> namespace goes entirely unused because all of the named
+	 * elements of the <code>&lt;b&gt;</code> grammar have been reconstituted
+	 * from components of <code>&lt;a&gt;</code>.
 	 * 
 	 * @param label
 	 * @param g
@@ -873,14 +933,14 @@ public class Grammar implements Serializable, Cloneable {
 		if (ru instanceof AlternationRule) {
 			AlternationRule ar = (AlternationRule) ru;
 			Set<Rule> set = new HashSet<Rule>(ar.alternates.length);
-			for (Rule r: ar.alternates)
+			for (Rule r : ar.alternates)
 				set.add(r);
 			return set;
 		}
 		if (ru instanceof SequenceRule) {
 			SequenceRule sr = (SequenceRule) ru;
 			Set<Rule> set = new HashSet<Rule>(sr.sequence.length);
-			for (Rule r: sr.sequence)
+			for (Rule r : sr.sequence)
 				set.add(r);
 			return set;
 		}
