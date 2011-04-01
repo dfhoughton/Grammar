@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -411,8 +412,10 @@ public class Grammar implements Serializable, Cloneable {
 	}
 
 	/**
-	 * For defining a terminal rule left undefined by the initial rule set.
-	 * Useful when terminals are unwieldy regular expressions such as TRIEs.
+	 * For defining a terminal rule left undefined by the initial rule set. In
+	 * this case you are defining the rule to be a {@link LeafRule}. This is
+	 * useful when the regular expression is too unwieldy to fit in the grammar
+	 * file or when you generate it in the program.
 	 * 
 	 * @param label
 	 * @param p
@@ -428,9 +431,10 @@ public class Grammar implements Serializable, Cloneable {
 			idMap.put(e.getValue().uniqueId(), e.getKey());
 		String id = lr.uniqueId();
 		l = idMap.get(id);
-		if (l == null)
+		if (l == null) {
+			lr.g = this;
 			r.setRule(lr);
-		else
+		} else
 			r.setRule(rules.get(idMap.get(id)));
 		undefinedRules.remove(r.label());
 	}
@@ -654,7 +658,9 @@ public class Grammar implements Serializable, Cloneable {
 	}
 
 	/**
-	 * Assigns arbitrary rule to given label.
+	 * Assigns arbitrary rule to given label. This arbitrary rule must be
+	 * clonable, as defining the deferred definition rule requires modifying the
+	 * state of the rule object that will replace it.
 	 * 
 	 * @param label
 	 * @param rule
@@ -663,15 +669,24 @@ public class Grammar implements Serializable, Cloneable {
 		if (rule instanceof DeferredDefinitionRule)
 			throw new GrammarException(
 					"you cannot define a rule to be a DeferredDefinitionRule");
+		if (!(rule instanceof Cloneable))
+			throw new GrammarException("rule must be clonable");
+		try {
+			Method m = rule.getClass().getMethod("clone");
+			rule = (Rule) m.invoke(rule);
+		} catch (Exception e1) {
+			throw new GrammarException("rule must be clonable: " + e1);
+		}
 		DeferredDefinitionRule r = checkRuleDefinition(label);
 		Map<String, Label> idMap = new HashMap<String, Label>(rules.size());
 		for (Entry<Label, Rule> e : rules.entrySet())
 			idMap.put(e.getValue().uniqueId(), e.getKey());
 		String id = rule.uniqueId();
 		Label l = idMap.get(id);
-		if (l == null)
+		if (l == null) {
+			rule.g = this;
 			r.setRule(rule);
-		else
+		} else
 			r.setRule(rules.get(idMap.get(id)));
 		undefinedRules.remove(r.label());
 	}
@@ -783,8 +798,11 @@ public class Grammar implements Serializable, Cloneable {
 			Rule nru = Compiler.fixLabel(l, ru);
 			fix(g, ru, nru);
 			g.rules.put(l, nru);
-			if (isRoot)
+			if (isRoot) {
 				g.root = l;
+				// hide root
+				nru.generation = -1;
+			}
 		}
 		// and we check for any lingering redundancies
 		Map<String, Label> oldMap = new HashMap<String, Label>(rules.size()), newMap = new HashMap<String, Label>(
@@ -796,11 +814,11 @@ public class Grammar implements Serializable, Cloneable {
 		for (String uid : newMap.keySet()) {
 			if (oldMap.containsKey(uid)) {
 				Rule oru = g.rules.remove(newMap.get(uid));
-				Rule nru = rules.get(newMap.get(uid));
+				Rule nru = rules.get(oldMap.get(uid));
 				fix(g, oru, nru);
 			}
 		}
-		// finally, we augment the original rule set
+		// we augment the original rule set
 		for (Entry<Label, Rule> e : g.rules.entrySet()) {
 			rules.put(e.getKey(), e.getValue());
 		}
@@ -811,6 +829,80 @@ public class Grammar implements Serializable, Cloneable {
 		r.setRule(g.rules.get(g.root));
 		// and fix it so it can't be redefined in the future
 		undefinedRules.remove(r.label());
+
+		// finally, we reassign generation numbers to better indicate dependency
+		Map<Rule, Set<Rule>> dependentMap = new HashMap<Rule, Set<Rule>>(
+				rules.size());
+		Set<Rule> requireAssignment = new HashSet<Rule>(rules.size());
+		for (Rule ru : rules.values()) {
+			Set<Rule> dependents = dependents(ru);
+			dependentMap.put(ru, dependents);
+			if (!ru.label.equals(root) && ru.generation > -1) {
+				requireAssignment.add(ru);
+			}
+		}
+		int generation = 0;
+		while (!requireAssignment.isEmpty()) {
+			generation++;
+			List<Rule> reassigned = new ArrayList<Rule>(
+					requireAssignment.size());
+			OUTER: for (Rule ru : requireAssignment) {
+				Set<Rule> dependents = dependentMap.get(ru);
+				for (Rule dr : dependents) {
+					if (requireAssignment.contains(dr))
+						continue OUTER;
+				}
+				reassigned.add(ru);
+			}
+			if (reassigned.isEmpty()) {
+				// looping, break out
+				for (Rule ru : requireAssignment)
+					ru.generation = generation;
+				break;
+			} else {
+				for (Rule ru : reassigned)
+					ru.generation = generation;
+				requireAssignment.removeAll(reassigned);
+			}
+		}
+	}
+
+	private Set<Rule> dependents(Rule ru) {
+		if (ru instanceof LeafRule || ru instanceof LiteralRule)
+			return new HashSet<Rule>(0);
+		if (ru instanceof AlternationRule) {
+			AlternationRule ar = (AlternationRule) ru;
+			Set<Rule> set = new HashSet<Rule>(ar.alternates.length);
+			for (Rule r: ar.alternates)
+				set.add(r);
+			return set;
+		}
+		if (ru instanceof SequenceRule) {
+			SequenceRule sr = (SequenceRule) ru;
+			Set<Rule> set = new HashSet<Rule>(sr.sequence.length);
+			for (Rule r: sr.sequence)
+				set.add(r);
+			return set;
+		}
+		if (ru instanceof RepetitionRule) {
+			RepetitionRule rr = (RepetitionRule) ru;
+			Set<Rule> set = new HashSet<Rule>(1);
+			set.add(rr.r);
+			return set;
+		}
+		if (ru instanceof DeferredDefinitionRule) {
+			DeferredDefinitionRule ddr = (DeferredDefinitionRule) ru;
+			Set<Rule> set = new HashSet<Rule>(1);
+			set.add(ddr.r);
+			return set;
+		}
+		if (ru instanceof CyclicRule) {
+			CyclicRule cr = (CyclicRule) ru;
+			Set<Rule> set = new HashSet<Rule>(1);
+			set.add(cr.r);
+			return set;
+		}
+		return new HashSet<Rule>(0);
 	}
 
 	/**
@@ -821,6 +913,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @param nru
 	 */
 	private void fix(Grammar g, Rule ru, Rule nru) {
+		nru.generation = ru.generation;
 		for (Rule r : g.rules.values()) {
 			if (r instanceof AlternationRule) {
 				AlternationRule ar = (AlternationRule) r;
@@ -873,5 +966,31 @@ public class Grammar implements Serializable, Cloneable {
 		for (Entry<Rule, Rule> e : ruleMap.entrySet())
 			fix(clone, e.getKey(), e.getValue());
 		return clone;
+	}
+
+	/**
+	 * For defining a terminal rule left undefined by the initial rule set. In
+	 * this case you are defining the rule to be a {@link LiteralRule}.
+	 * 
+	 * @param label
+	 * @param p
+	 * @throws GrammarException
+	 */
+	public synchronized void defineRule(String label, String literal)
+			throws GrammarException {
+		DeferredDefinitionRule r = checkRuleDefinition(label);
+		Label l = new Label(Type.literal, label);
+		LiteralRule lr = new LiteralRule(l, literal);
+		Map<String, Label> idMap = new HashMap<String, Label>(rules.size());
+		for (Entry<Label, Rule> e : rules.entrySet())
+			idMap.put(e.getValue().uniqueId(), e.getKey());
+		String id = lr.uniqueId();
+		l = idMap.get(id);
+		if (l == null) {
+			lr.g = this;
+			r.setRule(lr);
+		} else
+			r.setRule(rules.get(idMap.get(id)));
+		undefinedRules.remove(r.label());
 	}
 }

@@ -52,6 +52,8 @@ public class DeferredDefinitionRule extends Rule {
 
 	@Override
 	public String description() {
+		if (r instanceof DeferredDefinitionRule)
+			return r.label.toString();
 		return r.description();
 	}
 

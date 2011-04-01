@@ -30,8 +30,67 @@ public class TerminalGrammarTest {
 		Grammar g1 = new Grammar(rules1);
 		Grammar g2 = new Grammar(rules2);
 		g1.defineRule("a", g2);
-		System.out.println(g1.describe());
 		String s = "a";
+		Matcher m = g1.find(s);
+		assertNotNull("found joe", m.match());
+	}
+
+	@Test
+	public void renamingTest() throws GrammarException, IOException {
+		String[] rules1 = {
+		//
+		"<ROOT> = <a> | <b>",//
+		};
+		String[] rulesA = {
+		//
+		"<ROOT> = <a>{2} <b>",//
+		"<a> = 'a'",//
+		"<b> = 'b'",//
+		};
+		String[] rulesB = {
+				//
+				"<ROOT> = <a> <b>{3}",//
+				"<a> = 'a'",//
+				"<b> = 'b'",//
+				};
+		Grammar g1 = new Grammar(rules1);
+		Grammar gA = new Grammar(rulesA);
+		Grammar gB = new Grammar(rulesB);
+		g1.defineRule("a", gA);
+		g1.defineRule("b", gB);
+		String s = "aab";
+		Matcher m = g1.find(s);
+		assertNotNull("found joe", m.match());
+	}
+
+	@Test
+	public void cyclicTest() throws GrammarException, IOException {
+		String[] rules1 = {
+		//
+		"<ROOT> = <element>",//
+		"<element> = <single> | <double>",//
+		"<single> = <a>",//
+		"<double> = <b> <element> 1",//
+		};
+		String[] rulesA = {
+		//
+		"<ROOT> = <a>{2} <b>",//
+		"<a> = 'a'",//
+		"<b> = 'b'",//
+		};
+		String[] rulesB = {
+				//
+				"<ROOT> = <a> <b>{1,2}",//
+				"<a> = 'a'",//
+				"<b> = 'b'",//
+				};
+		Grammar g1 = new Grammar(rules1);
+		Grammar gA = new Grammar(rulesA);
+		Grammar gB = new Grammar(rulesB);
+		g1.defineRule("a", gA);
+		g1.defineRule("b", gB);
+		System.out.println(g1.describe());
+		String s = "aab";
 		Matcher m = g1.find(s);
 		assertNotNull("found joe", m.match());
 	}

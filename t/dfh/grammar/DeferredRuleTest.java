@@ -39,7 +39,7 @@ public class DeferredRuleTest {
 
 	@Test
 	public void arbitraryRuleTest() throws GrammarException, IOException {
-		class ARule extends Rule {
+		class ARule extends Rule implements Cloneable {
 			class AMatcher extends Matcher {
 				private final Map<Integer, CachedMatch> cache;
 				private boolean fresh = true;
@@ -126,6 +126,11 @@ public class DeferredRuleTest {
 
 			@Override
 			public Rule shallowClone() {
+				return this;
+			}
+
+			@Override
+			public Object clone() {
 				return this;
 			}
 		}
