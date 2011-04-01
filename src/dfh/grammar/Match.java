@@ -3,8 +3,6 @@ package dfh.grammar;
 import java.util.LinkedList;
 import java.util.List;
 
-import dfh.grammar.Label.Type;
-
 /**
  * Node in an match tree.
  * <p>
@@ -199,9 +197,7 @@ public class Match {
 
 	/**
 	 * Returns whether the {@link Rule} that generated this {@link Match} has
-	 * the given name. Note, rules of different types may have the same name.
-	 * For example, one may have both rules <code>&lt;a&gt;</code> and
-	 * <code>(a)</code>.
+	 * the given name.
 	 * 
 	 * @param name
 	 *            a {@link Label#id}
