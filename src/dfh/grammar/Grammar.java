@@ -133,26 +133,49 @@ public class Grammar implements Serializable, Cloneable {
 		boolean study = STUDY;
 		int startOffset = START_OFFSET;
 
+		/**
+		 * @return whether matches iterated over may overlap
+		 */
 		public boolean allowOverlap() {
 			return allowOverlap;
 		}
 
+		/**
+		 * @param allowOverlap
+		 *            whether matches iterated over may overlap
+		 */
 		public void allowOverlap(boolean allowOverlap) {
 			this.allowOverlap = allowOverlap;
 		}
 
+		/**
+		 * @return whether the {@link CharSequence} will be studied before
+		 *         matching
+		 */
 		public boolean study() {
 			return study;
 		}
 
+		/**
+		 * @param study
+		 *            whether the {@link CharSequence} will be studied before
+		 *            matching
+		 */
 		public void study(boolean study) {
 			this.study = study;
 		}
 
+		/**
+		 * @return point in {@link CharSequence} at which to begin matching
+		 */
 		public int startOffset() {
 			return startOffset;
 		}
 
+		/**
+		 * @param startOffset
+		 *            point in {@link CharSequence} at which to begin matching
+		 */
 		public void startOffset(int startOffset) {
 			if (startOffset < 0)
 				throw new GrammarException("text offsets must be positive");
@@ -215,6 +238,12 @@ public class Grammar implements Serializable, Cloneable {
 
 	}
 
+	/**
+	 * {@link Matcher} for {@link Grammar#find(CharSequence, Options)}.
+	 * 
+	 * @author David Houghton
+	 * 
+	 */
 	private class FindMatcher extends GrammarMatcher {
 		private int index;
 		private boolean firstMatch;
@@ -306,8 +335,18 @@ public class Grammar implements Serializable, Cloneable {
 	}
 
 	private static final long serialVersionUID = 1L;
+	/**
+	 * {@link Label} of root {@link Rule}.
+	 */
 	protected Label root;
+	/**
+	 * Collection of all {@link Rule rules}.
+	 */
 	protected final Map<Label, Rule> rules;
+	/**
+	 * Collection of labels for rules of {@link Type#terminal} or
+	 * {@link Type#literal}.
+	 */
 	protected final Map<String, Label> terminalLabelMap;
 	/**
 	 * Keeps track of terminals not defined in initial rule set.
@@ -449,6 +488,15 @@ public class Grammar implements Serializable, Cloneable {
 		return (DeferredDefinitionRule) r;
 	}
 
+	/**
+	 * Generates iterator over matches beginning on the first character of the
+	 * sequence (or at the offset specified in the {@link Options} object) and
+	 * ending on the last character.
+	 * 
+	 * @param s
+	 * @return {@link Matcher} iterating over matches
+	 * @throws GrammarException
+	 */
 	public Matcher matches(CharSequence s) throws GrammarException {
 		return matches(s, new Options());
 	}
@@ -473,10 +521,28 @@ public class Grammar implements Serializable, Cloneable {
 		}
 	}
 
+	/**
+	 * Generates iterator over matches whose start offset is the beginning of
+	 * the given {@link CharSequence}.
+	 * 
+	 * @param s
+	 * @return iterator over matches
+	 * @throws GrammarException
+	 */
 	public Matcher lookingAt(CharSequence s) throws GrammarException {
 		return lookingAt(s, new Options());
 	}
 
+	/**
+	 * Generates iterator over matches whose start offset is the beginning of
+	 * the given {@link CharSequence}.
+	 * 
+	 * @param cs
+	 * @param opt
+	 *            {@link Options} to apply in matching
+	 * @return iterator over matches
+	 * @throws GrammarException
+	 */
 	public Matcher lookingAt(final CharSequence cs, Options opt)
 			throws GrammarException {
 		checkComplete();
@@ -545,6 +611,14 @@ public class Grammar implements Serializable, Cloneable {
 		};
 	}
 
+	/**
+	 * Creates iterator over matches occurring anywhere in given
+	 * {@link CharSequence}.
+	 * 
+	 * @param s
+	 * @return object iterating over matches
+	 * @throws GrammarException
+	 */
 	public Matcher find(CharSequence s) throws GrammarException {
 		return find(s, new Options());
 	}
@@ -594,7 +668,9 @@ public class Grammar implements Serializable, Cloneable {
 	}
 
 	/**
-	 * Setting this non-null turns on match debugging output.
+	 * Setting this non-null turns on match debugging output. This is a
+	 * transient property of the {@link Grammar} that will not survive
+	 * serialization.
 	 * 
 	 * @param trace
 	 *            sink for debugging trace
@@ -1013,8 +1089,6 @@ public class Grammar implements Serializable, Cloneable {
 			Rule ruleClone = e.getValue().shallowClone();
 			ruleClone.generation = e.getValue().generation;
 			ruleClone.g = clone;
-			if (ruleClone instanceof DeferredDefinitionRule)
-				((DeferredDefinitionRule) ruleClone).rules = clone.rules;
 			labelMap.put(e.getKey(), labelClone);
 			ruleMap.put(e.getValue(), ruleClone);
 			clone.rules.put(labelClone, ruleClone);

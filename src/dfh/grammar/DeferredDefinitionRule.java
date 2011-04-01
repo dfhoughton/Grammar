@@ -18,23 +18,23 @@ import java.util.Set;
  */
 public class DeferredDefinitionRule extends Rule {
 	private static final long serialVersionUID = 1L;
-	protected Map<Label, Rule> rules;
+	/**
+	 * Holds rule whose definition is deferred.
+	 */
 	protected Rule r;
 
 	/**
+	 * Generates {@link Rule} from given label.
+	 * 
 	 * @param label
-	 * @param rules
 	 */
-	public DeferredDefinitionRule(Label label, Map<Label, Rule> rules) {
+	public DeferredDefinitionRule(Label label) {
 		super(label);
-		this.rules = rules;
 	}
 
 	@Override
 	public Matcher matcher(CharSequence cs, Integer offset,
 			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
-		if (r == null)
-			r = rules.get(label);
 		return r.matcher(cs, offset, cache, master);
 	}
 
@@ -77,7 +77,7 @@ public class DeferredDefinitionRule extends Rule {
 	@Override
 	public Rule shallowClone() {
 		DeferredDefinitionRule ddr = new DeferredDefinitionRule(
-				(Label) label.clone(), rules);
+				(Label) label.clone());
 		ddr.r = r;
 		return ddr;
 	}

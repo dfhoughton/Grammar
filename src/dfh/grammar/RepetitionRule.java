@@ -226,6 +226,13 @@ public class RepetitionRule extends Rule {
 
 	}
 
+	/**
+	 * Generates a repetition rule with the given state.
+	 * 
+	 * @param label
+	 * @param r
+	 * @param rep
+	 */
 	public RepetitionRule(Label label, Rule r, Repetition rep) {
 		super(label);
 		this.r = r;

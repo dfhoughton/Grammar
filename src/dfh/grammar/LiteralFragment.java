@@ -10,8 +10,16 @@ package dfh.grammar;
  */
 public class LiteralFragment extends RepeatableRuleFragment {
 
-	final String literal;
+	/**
+	 * sequence to match
+	 */
+	public final String literal;
 
+	/**
+	 * Generates {@link LiteralFragment} with given sequence.
+	 * 
+	 * @param literal
+	 */
 	public LiteralFragment(String literal) {
 		this.literal = literal;
 	}

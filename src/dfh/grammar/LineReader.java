@@ -12,7 +12,17 @@ import java.io.IOException;
  * 
  */
 public interface LineReader {
+	/**
+	 * @return one line from source
+	 * @throws IOException
+	 */
 	String readLine() throws IOException;
 
+	/**
+	 * Returns line number currently being read. Used in generating error
+	 * messages during compilation.
+	 * 
+	 * @return line number currently being read
+	 */
 	int lineNumber();
 }

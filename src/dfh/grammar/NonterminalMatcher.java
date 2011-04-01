@@ -2,16 +2,52 @@ package dfh.grammar;
 
 import java.util.Map;
 
+/**
+ * General pattern of a {@link Matcher} that matches against {@link Match}
+ * objects rather than the {@link CharSequence}.
+ * <p>
+ * <b>Creation date:</b> Apr 1, 2011
+ * 
+ * @author David Houghton
+ * 
+ */
 public abstract class NonterminalMatcher extends Matcher {
 
+	/**
+	 * Obtains next value of {@link #next}.
+	 */
 	protected abstract void fetchNext();
 
+	/**
+	 * Next {@link Match} that will be returned by {@link #match()}.
+	 */
 	protected Match next;
+	/**
+	 * Whether no further matching is possible.
+	 */
 	protected boolean done = false;
+	/**
+	 * General matching cache.
+	 */
 	protected final Map<Label, Map<Integer, CachedMatch>> cache;
+	/**
+	 * Matching cache appropriate to this {@link Matcher}'s {@link Rule}.
+	 */
 	protected final Map<Integer, CachedMatch> subCache;
+	/**
+	 * {@link Rule} that generated this {@link Matcher}.
+	 */
 	protected final Rule rule;
 
+	/**
+	 * Constructs non-terminal matcher with given state.
+	 * 
+	 * @param cs2
+	 * @param offset
+	 * @param cache
+	 * @param rule
+	 * @param master
+	 */
 	protected NonterminalMatcher(CharSequence cs2, Integer offset,
 			Map<Label, Map<Integer, CachedMatch>> cache, Rule rule,
 			Matcher master) {

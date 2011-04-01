@@ -20,8 +20,19 @@ import java.util.Set;
 public abstract class Rule implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * the rule's name
+	 */
 	protected final Label label;
+	/**
+	 * The {@link Grammar} this {@link Rule} is associated with. The rule is
+	 * cloned if {@link Grammar#defineRule(String, Rule)} is used so that
+	 * different uses of this rule will not alter each other's state.
+	 */
 	protected Grammar g;
+	/**
+	 * Used by {@link Grammar#describe()}.
+	 */
 	int generation = -1;
 
 	/**

@@ -111,8 +111,7 @@ public class Compiler {
 			for (Label l : labels) {
 				if (l.t == Type.indeterminate && !knownIds.contains(l.id)) {
 					l = new Label(Type.terminal, l.id);
-					DeferredDefinitionRule ddr = new DeferredDefinitionRule(l,
-							rules);
+					DeferredDefinitionRule ddr = new DeferredDefinitionRule(l);
 					ddr.generation = gen;
 					undefinedRules.add(l);
 					rules.put(l, ddr);
@@ -415,8 +414,7 @@ public class Compiler {
 			return new LeafRule(label, ((LeafRule) r).p);
 		if (r instanceof DeferredDefinitionRule) {
 			DeferredDefinitionRule old = (DeferredDefinitionRule) r;
-			DeferredDefinitionRule ddr = new DeferredDefinitionRule(label,
-					old.rules);
+			DeferredDefinitionRule ddr = new DeferredDefinitionRule(label);
 			ddr.r = old;
 			return ddr;
 		}

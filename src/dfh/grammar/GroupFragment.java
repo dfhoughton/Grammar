@@ -5,7 +5,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Represents a set of alternates.
+ * Represents a set of alternates such as
+ * 
+ * <pre>
+ * &lt;a&gt; = &lt;b&gt; | &lt;c&gt;
+ * </pre>
+ * 
+ * This is a companion to {@link AlternationRule}.
  * <p>
  * <b>Creation date:</b> Mar 10, 2011
  * 

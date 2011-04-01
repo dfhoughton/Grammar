@@ -8,7 +8,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Matches a sequence of sub-rules.
+ * Matches a sequence of sub-rules. E.g.,
+ * 
+ * <pre>
+ * &lt;a&gt; = &lt;b&gt; &lt;c&gt;
+ * </pre>
  * 
  * @author David Houghton
  * 
@@ -80,10 +84,22 @@ public class SequenceRule extends Rule {
 		}
 	}
 
+	/**
+	 * Generates a {@link SequenceRule} with the given sequence.
+	 * 
+	 * @param l
+	 * @param list
+	 */
 	public SequenceRule(Label l, List<Rule> list) {
 		this(l, list.toArray(new Rule[list.size()]));
 	}
 
+	/**
+	 * Generates a {@link SequenceRule} with the given sequence.
+	 * 
+	 * @param label
+	 * @param sequence
+	 */
 	public SequenceRule(Label label, Rule[] sequence) {
 		super(label);
 		this.sequence = sequence;

@@ -7,7 +7,8 @@ import java.util.regex.Pattern;
 
 /**
  * {@link Rule} defined over sequence of terminal objects rather than other
- * <code>Rules</code>.
+ * <code>Rules</code>. In particular, this is such a {@link Rule} when the
+ * pattern of terminal characters is defined by a {@link Pattern}.
  * <p>
  * <b>Creation date:</b> Feb 19, 2011
  * 
@@ -79,8 +80,14 @@ public class LeafRule extends Rule {
 	}
 
 	private static final long serialVersionUID = 1L;
-	final Pattern p;
+	protected final Pattern p;
 
+	/**
+	 * Generates {@link LeafRule} with given label and {@link Pattern}.
+	 * 
+	 * @param label
+	 * @param p
+	 */
 	public LeafRule(Label label, Pattern p) {
 		super(label);
 		this.p = p;

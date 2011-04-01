@@ -18,6 +18,14 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 	 */
 	public static final String ROOT = "ROOT";
 
+	/**
+	 * Type of {@link Rule} associated with {@link Label}.
+	 * <p>
+	 * <b>Creation date:</b> Apr 1, 2011
+	 * 
+	 * @author David Houghton
+	 * 
+	 */
 	public enum Type {
 		/**
 		 * A regular expression. The grammar cannot backtrack within whatever
@@ -52,14 +60,32 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 			this.ranking = ranking;
 		}
 
+		/**
+		 * Used in sorting.
+		 * 
+		 * @param other
+		 * @return order of types
+		 */
 		public int cmp(Type other) {
 			return ranking - other.ranking;
 		}
 	}
 
+	/**
+	 * {@link Type} of the associated {@link Rule}.
+	 */
 	public final Type t;
+	/**
+	 * Identifier of associated {@link Rule}.
+	 */
 	public final String id;
 
+	/**
+	 * Constructs {@link Label} with given id and {@link Type}.
+	 * 
+	 * @param t
+	 * @param id
+	 */
 	public Label(Type t, String id) {
 		this.t = t;
 		this.id = id;
