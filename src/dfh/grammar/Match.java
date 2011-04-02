@@ -233,16 +233,35 @@ public class Match {
 	 *            test
 	 * @return list of matches dominated by this that pass the given test
 	 */
-	public LinkedList<Match> passes(MatchTest t) {
+	public LinkedList<Match> passingMatches(MatchTest t) {
 		LinkedList<Match> list = new LinkedList<Match>();
-		passes(t, list);
+		passingMatches(t, list);
 		return list;
 	}
 
-	private void passes(MatchTest t, List<Match> accumulator) {
+	/**
+	 * Recursively applies given test to this {@link Match} and its children.
+	 * 
+	 * @param t
+	 * @return whether this or any {@link Match} dominated by this passes the
+	 *         test
+	 */
+	public boolean passes(MatchTest t) {
+		if (t.test(this))
+			return true;
+		if (children != null) {
+			for (Match m: children) {
+				if (m.passes(t))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	private void passingMatches(MatchTest t, List<Match> accumulator) {
 		if (children != null) {
 			for (Match m : children)
-				m.passes(t, accumulator);
+				m.passingMatches(t, accumulator);
 		}
 		if (t.test(this))
 			accumulator.add(this);

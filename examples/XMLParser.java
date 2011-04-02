@@ -75,7 +75,7 @@ public class XMLParser {
 				// its not quite XPath, but it shows what can be done
 
 				System.out.println("COMMENTS:");
-				for (Match n : m.passes(new MatchTest() {
+				for (Match n : m.passingMatches(new MatchTest() {
 					@Override
 					public boolean test(Match m) {
 						return m.hasLabel("comment");
@@ -85,7 +85,7 @@ public class XMLParser {
 				}
 				System.out.println();
 				System.out.println("ENTITIES:");
-				for (Match n : m.passes(new MatchTest() {
+				for (Match n : m.passingMatches(new MatchTest() {
 					@Override
 					public boolean test(Match m) {
 						return m.hasLabel("entity");
@@ -95,7 +95,7 @@ public class XMLParser {
 				}
 				System.out.println();
 				System.out.println("CONTENT:");
-				for (Match n : m.passes(new MatchTest() {
+				for (Match n : m.passingMatches(new MatchTest() {
 					@Override
 					public boolean test(Match m) {
 						return m.hasLabel("content");
