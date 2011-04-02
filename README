@@ -34,7 +34,6 @@ As of Tuesday, March 22, 2011 the code passes all tests.
 TODO
 ----
  * Document how to use grammars.
- * Add capability to use Grammars as terminal rules in other grammars.
 
 Other Stuff
 -----------
