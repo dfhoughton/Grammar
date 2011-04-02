@@ -11,6 +11,78 @@ import java.util.List;
  * @author David Houghton
  */
 public class Match {
+	/**
+	 * {@link MatchTest} that finds terminal matches. For use in
+	 * {@link #passingMatches(MatchTest)} and {@link #passes(MatchTest)}.
+	 */
+	public static final MatchTest TERMINAL = new MatchTest() {
+		@Override
+		public boolean test(Match m) {
+			return m.isTerminal();
+		}
+	};
+	/**
+	 * {@link MatchTest} that finds non-terminal matches. For use in
+	 * {@link #passingMatches(MatchTest)} and {@link #passes(MatchTest)}.
+	 */
+	public static final MatchTest NON_TERMINAL = new MatchTest() {
+		@Override
+		public boolean test(Match m) {
+			return !m.isTerminal();
+		}
+	};
+	/**
+	 * {@link MatchTest} that finds matches for named rules -- any rule with its
+	 * own line in the grammar definition. For use in
+	 * {@link #passingMatches(MatchTest)} and {@link #passes(MatchTest)}.
+	 */
+	public static final MatchTest NAMED = new MatchTest() {
+		@Override
+		public boolean test(Match m) {
+			return m.explicit();
+		}
+	};
+	/**
+	 * {@link MatchTest} that finds matches for anonymous rules -- rules without
+	 * their own explicit label. For use in {@link #passingMatches(MatchTest)}
+	 * and {@link #passes(MatchTest)}.
+	 */
+	public static final MatchTest ANONYMOUS = new MatchTest() {
+		@Override
+		public boolean test(Match m) {
+			return !m.explicit();
+		}
+	};
+	/**
+	 * {@link MatchTest} that finds all matches. For use in
+	 * {@link #passingMatches(MatchTest)} and {@link #passes(MatchTest)}.
+	 */
+	public static final MatchTest ALL = new MatchTest() {
+		@Override
+		public boolean test(Match m) {
+			return true;
+		}
+	};
+	/**
+	 * {@link MatchTest} that finds zero-width matches. For use in
+	 * {@link #passingMatches(MatchTest)} and {@link #passes(MatchTest)}.
+	 */
+	public static final MatchTest ZERO_WIDTH = new MatchTest() {
+		@Override
+		public boolean test(Match m) {
+			return m.zeroWidth();
+		}
+	};
+	/**
+	 * {@link MatchTest} that finds matches with non-zero width. For use in
+	 * {@link #passingMatches(MatchTest)} and {@link #passes(MatchTest)}.
+	 */
+	public static final MatchTest WIDE = new MatchTest() {
+		@Override
+		public boolean test(Match m) {
+			return !m.zeroWidth();
+		}
+	};
 	private final Rule r;
 	private final int start;
 	private int end = -1;
@@ -250,7 +322,7 @@ public class Match {
 		if (t.test(this))
 			return true;
 		if (children != null) {
-			for (Match m: children) {
+			for (Match m : children) {
 				if (m.passes(t))
 					return true;
 			}
