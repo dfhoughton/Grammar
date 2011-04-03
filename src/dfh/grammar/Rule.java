@@ -27,12 +27,6 @@ public abstract class Rule implements Serializable {
 	 */
 	protected final Label label;
 	/**
-	 * The {@link Grammar} this {@link Rule} is associated with. The rule is
-	 * cloned if {@link Grammar#defineRule(String, Rule)} is used so that
-	 * different uses of this rule will not alter each other's state.
-	 */
-	protected Grammar g;
-	/**
 	 * Used by {@link Grammar#describe()}.
 	 */
 	int generation = -1;
@@ -102,12 +96,12 @@ public abstract class Rule implements Serializable {
 	 *            matcher performing match
 	 */
 	protected final void matchTrace(Matcher m) {
-		if (g.trace != null) {
+		if (m.options.debug) {
 			StringBuilder b = new StringBuilder();
 			b.append(label());
 			locate(b, m.s, m.offset);
 			stackTrace(b, m);
-			g.trace.println(b);
+			m.options.trace.println(b);
 		}
 	}
 
@@ -156,7 +150,7 @@ public abstract class Rule implements Serializable {
 	 *            the {@link Match} returned
 	 */
 	protected final void matchTrace(Matcher m, Match n) {
-		if (g.trace != null) {
+		if (m.options.debug) {
 			StringBuilder b = new StringBuilder();
 			b.append("  ");
 			b.append(label());
@@ -169,7 +163,7 @@ public abstract class Rule implements Serializable {
 				b.append('\'');
 			}
 			stackTrace(b, m);
-			g.trace.println(b);
+			m.options.trace.println(b);
 		}
 	}
 

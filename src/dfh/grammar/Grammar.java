@@ -91,30 +91,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @author David Houghton
 	 * 
 	 */
-	public static class Options implements Cloneable {
-		/**
-		 * Clones options from a prototype. Use this instead of {@link #clone()}
-		 * and you don't have to cast.
-		 * 
-		 * @param opt
-		 *            prototype
-		 */
-		public Options(Options opt) {
-			this.allowOverlap = opt.allowOverlap;
-			this.study = opt.study;
-			this.startOffset = opt.startOffset;
-		}
-
-		/**
-		 * Gives you all the defaults.
-		 */
-		public Options() {
-		}
-
-		@Override
-		public Object clone() {
-			return new Options(this);
-		}
+	public static class Options {
 
 		/**
 		 * Whether matches may overlap.
@@ -129,9 +106,10 @@ public class Grammar implements Serializable, Cloneable {
 		 * Character offset at which to begin matching.
 		 */
 		public static final int START_OFFSET = 0;
-		boolean allowOverlap = ALLOW_OVERLAP;
-		boolean study = STUDY;
-		int startOffset = START_OFFSET;
+		private boolean allowOverlap = ALLOW_OVERLAP;
+		private boolean study = STUDY;
+		private int startOffset = START_OFFSET;
+		private PrintStream trace;
 
 		/**
 		 * @return whether matches iterated over may overlap
@@ -181,6 +159,23 @@ public class Grammar implements Serializable, Cloneable {
 				throw new GrammarException("text offsets must be positive");
 			this.startOffset = startOffset;
 		}
+
+		/**
+		 * Turn match debugging output on or off.
+		 * 
+		 * @param trace
+		 *            data sink for debugging
+		 */
+		public void trace(PrintStream trace) {
+			this.trace = trace;
+		}
+
+		/**
+		 * @return data sink for debugging
+		 */
+		public PrintStream trace() {
+			return trace;
+		}
 	}
 
 	/**
@@ -195,11 +190,15 @@ public class Grammar implements Serializable, Cloneable {
 		public final boolean allowOverlap;
 		public final boolean study;
 		public final int startOffset;
+		public final PrintStream trace;
+		public final boolean debug;
 
 		private ConstantOptions(Options o) {
 			this.allowOverlap = o.allowOverlap;
 			this.study = o.study;
 			this.startOffset = o.startOffset;
+			this.trace = o.trace;
+			this.debug = trace != null;
 		}
 	}
 
@@ -459,8 +458,6 @@ public class Grammar implements Serializable, Cloneable {
 		Compiler c = new Compiler(reader);
 		root = c.root();
 		rules = c.rules();
-		for (Rule r : rules.values())
-			r.g = this;
 		terminalLabelMap = c.terminalLabelMap();
 		undefinedRules = c.undefinedTerminals();
 	}
@@ -486,7 +483,6 @@ public class Grammar implements Serializable, Cloneable {
 		String id = lr.uniqueId();
 		l = idMap.get(id);
 		if (l == null) {
-			lr.g = this;
 			r.setRule(lr);
 		} else
 			r.setRule(rules.get(idMap.get(id)));
@@ -772,7 +768,6 @@ public class Grammar implements Serializable, Cloneable {
 		String id = rule.uniqueId();
 		Label l = idMap.get(id);
 		if (l == null) {
-			rule.g = this;
 			r.setRule(rule);
 		} else
 			r.setRule(rules.get(idMap.get(id)));
@@ -969,9 +964,6 @@ public class Grammar implements Serializable, Cloneable {
 		for (Entry<Label, Rule> e : g.rules.entrySet()) {
 			rules.put(e.getKey(), e.getValue());
 		}
-		// and we re-assign the grammar field of the cloned rules
-		for (Rule ru : g.rules.values())
-			ru.g = this;
 		// and we define the rule
 		r.setRule(g.rules.get(g.root));
 		// and fix it so it can't be redefined in the future
@@ -1099,7 +1091,6 @@ public class Grammar implements Serializable, Cloneable {
 			Label labelClone = (Label) e.getKey().clone();
 			Rule ruleClone = e.getValue().shallowClone();
 			ruleClone.generation = e.getValue().generation;
-			ruleClone.g = clone;
 			labelMap.put(e.getKey(), labelClone);
 			ruleMap.put(e.getValue(), ruleClone);
 			clone.rules.put(labelClone, ruleClone);
@@ -1134,7 +1125,6 @@ public class Grammar implements Serializable, Cloneable {
 		String id = lr.uniqueId();
 		l = idMap.get(id);
 		if (l == null) {
-			lr.g = this;
 			r.setRule(lr);
 		} else
 			r.setRule(rules.get(idMap.get(id)));

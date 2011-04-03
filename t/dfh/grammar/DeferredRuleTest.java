@@ -144,7 +144,7 @@ public class DeferredRuleTest {
 		g.defineRule("text", new ARule(new Label(Type.terminal, "text")));
 		String s = "'ned'";
 		Options options = new Options();
-		options.study = false;
+		options.study(false);
 		Matcher m = g.find(s, options);
 		Match n = m.match();
 		assertNotNull("found ned", n);
