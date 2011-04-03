@@ -108,7 +108,8 @@ public class Grammar implements Serializable, Cloneable {
 		public static final int START_OFFSET = 0;
 		private boolean allowOverlap = ALLOW_OVERLAP;
 		private boolean study = STUDY;
-		private int startOffset = START_OFFSET;
+		private int start = START_OFFSET;
+		private int end = -1;
 		private PrintStream trace;
 
 		/**
@@ -146,18 +147,18 @@ public class Grammar implements Serializable, Cloneable {
 		/**
 		 * @return point in {@link CharSequence} at which to begin matching
 		 */
-		public int startOffset() {
-			return startOffset;
+		public int start() {
+			return start;
 		}
 
 		/**
-		 * @param startOffset
+		 * @param start
 		 *            point in {@link CharSequence} at which to begin matching
 		 */
-		public void startOffset(int startOffset) {
+		public void start(int startOffset) {
 			if (startOffset < 0)
 				throw new GrammarException("text offsets must be positive");
-			this.startOffset = startOffset;
+			this.start = startOffset;
 		}
 
 		/**
@@ -176,6 +177,24 @@ public class Grammar implements Serializable, Cloneable {
 		public PrintStream trace() {
 			return trace;
 		}
+
+		/**
+		 * @param end
+		 *            end of region to match
+		 */
+		public void end(int end) {
+			if (end <= start)
+				throw new GrammarException("end offset must follow start");
+			this.end = end;
+		}
+
+		/**
+		 * @return end of region to match; returns -1 if the end is the end of
+		 *         the sequence to match
+		 */
+		public int end() {
+			return end;
+		}
 	}
 
 	/**
@@ -187,16 +206,16 @@ public class Grammar implements Serializable, Cloneable {
 	 * 
 	 */
 	public static class ConstantOptions {
-		public final boolean allowOverlap;
-		public final boolean study;
-		public final int startOffset;
+		public final boolean allowOverlap, study;
+		public final int start, end;
 		public final PrintStream trace;
 		public final boolean debug;
 
 		private ConstantOptions(Options o) {
 			this.allowOverlap = o.allowOverlap;
 			this.study = o.study;
-			this.startOffset = o.startOffset;
+			this.start = o.start;
+			this.end = o.end;
 			this.trace = o.trace;
 			this.debug = trace != null;
 		}
@@ -213,7 +232,7 @@ public class Grammar implements Serializable, Cloneable {
 	private abstract class GrammarMatcher extends Matcher {
 
 		protected GrammarMatcher(CharSequence s, ConstantOptions options) {
-			super(s, options.startOffset, null, options);
+			super(s, options.start, null, options);
 		}
 
 		protected abstract String name();
@@ -235,7 +254,7 @@ public class Grammar implements Serializable, Cloneable {
 	 */
 	private class DummyMatcher extends Matcher {
 		DummyMatcher(CharSequence s, ConstantOptions options) {
-			super(s, options.startOffset, null, options);
+			super(s, options.start, null, options);
 		}
 
 		@Override
@@ -276,7 +295,7 @@ public class Grammar implements Serializable, Cloneable {
 			this.startOffsets = startOffsets;
 			this.cache = cache;
 			index = options.study && !startOffsets.isEmpty() ? startOffsets
-					.removeFirst() : options.startOffset;
+					.removeFirst() : options.start;
 			firstMatch = true;
 			m = rules.get(root).matcher(s, index, cache, this);
 			next = fetchNext();
@@ -330,7 +349,7 @@ public class Grammar implements Serializable, Cloneable {
 						index++;
 				}
 				firstNull = false;
-				if (index == s.length())
+				if (index >= options.end)
 					break;
 				m = rules.get(root).matcher(s, index, cache, this);
 			}
@@ -565,7 +584,7 @@ public class Grammar implements Serializable, Cloneable {
 			startOffsets.addAll(rules.get(root).study(cs, cache, studiedRules,
 					co));
 		}
-		final Matcher m = rules.get(root).matcher(cs, co.startOffset, cache,
+		final Matcher m = rules.get(root).matcher(cs, co.start, cache,
 				new DummyMatcher(cs, co));
 		abstract class LookingAtMatcher extends GrammarMatcher {
 			LookingAtMatcher() {
@@ -797,8 +816,8 @@ public class Grammar implements Serializable, Cloneable {
 			startOffsets.addAll(rules.get(root).study(s, cache, studiedRules,
 					options));
 		}
-		final Matcher m = rules.get(root).matcher(s, options.startOffset,
-				cache, new DummyMatcher(s, options));
+		final Matcher m = rules.get(root).matcher(s, options.start, cache,
+				new DummyMatcher(s, options));
 		return new GrammarMatcher(s, options) {
 			boolean matchedOnce = false;
 			Match next = fetchNext();
@@ -815,7 +834,7 @@ public class Grammar implements Serializable, Cloneable {
 					return null;
 				Match n;
 				while ((n = m.match()) != null) {
-					if (n.end() == s.length())
+					if (n.end() == options.end)
 						return n;
 				}
 				return null;
@@ -849,9 +868,11 @@ public class Grammar implements Serializable, Cloneable {
 	 * @return clone of given options
 	 */
 	private ConstantOptions verifyOptions(CharSequence s, Options opt) {
-		if (opt.startOffset() >= s.length())
+		if (opt.start() >= s.length())
 			throw new GrammarException(
 					"start offset specified beyond end of string");
+		if (opt.end == -1)
+			opt.end(s.length());
 		return new ConstantOptions(opt);
 	}
 

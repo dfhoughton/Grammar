@@ -49,7 +49,7 @@ public class BackReferenceRule extends Rule {
 					n = new Match(BackReferenceRule.this, offset, offset);
 				} else {
 					int end = offset + delta;
-					if (end <= s.length()) {
+					if (end <= options.end) {
 						boolean matched = true;
 						for (int i = offset, j = m.start(); i < end; i++, j++) {
 							if (s.charAt(i) != s.charAt(j)) {

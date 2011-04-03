@@ -60,7 +60,7 @@ public class DeferredRuleTest {
 						if (cm == null) {
 							boolean found = false;
 							int i = offset;
-							for (; i < s.length(); i++) {
+							for (; i < options.end; i++) {
 								if (Character.isLetterOrDigit(s.charAt(i)))
 									found = true;
 								else

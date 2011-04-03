@@ -49,7 +49,7 @@ public class LeafRule extends Rule {
 					return cm.m;
 				}
 				java.util.regex.Matcher m = p.matcher(s);
-				m.region(offset, s.length());
+				m.region(offset, options.end);
 				m.useTransparentBounds(true);
 				m.useAnchoringBounds(false);
 				if (m.lookingAt()) {
@@ -159,16 +159,16 @@ public class LeafRule extends Rule {
 			java.util.regex.Matcher m = p.matcher(s);
 			m.useAnchoringBounds(false);
 			m.useTransparentBounds(true);
-			m.region(options.startOffset, s.length());
+			m.region(options.start, options.end);
 			while (m.find()) {
 				Integer i = m.start();
 				startOffsets.add(i);
 				Match n = new Match(this, m.start(), m.end());
 				subCache.put(i, new CachedMatch(n));
 				int newStart = m.start() + 1;
-				if (newStart == s.length())
+				if (newStart == options.end)
 					break;
-				m.region(newStart, s.length());
+				m.region(newStart, options.end);
 			}
 		}
 		return startOffsets;

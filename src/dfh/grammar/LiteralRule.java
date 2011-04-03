@@ -41,7 +41,7 @@ public class LiteralRule extends Rule {
 					return cm.m;
 				}
 				int end = offset + literal.length();
-				if (end <= s.length()) {
+				if (end <= options.end) {
 					boolean matched = true;
 					for (int i = offset, j = 0; i < end; i++, j++) {
 						if (literal.charAt(j) != s.charAt(i)) {
@@ -126,10 +126,9 @@ public class LiteralRule extends Rule {
 		Set<Integer> startOffsets = new HashSet<Integer>();
 		if (subCache.isEmpty()) {
 			int index, o = 0;
-			String string = s.subSequence(options.startOffset, s.length())
-					.toString();
+			String string = s.subSequence(options.start, options.end).toString();
 			while ((index = string.indexOf(literal, o)) > -1) {
-				Integer i = index + options.startOffset;
+				Integer i = index + options.start;
 				Match n = new Match(this, i, i + literal.length());
 				subCache.put(i, new CachedMatch(n));
 				startOffsets.add(i);
