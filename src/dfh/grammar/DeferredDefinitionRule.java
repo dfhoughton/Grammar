@@ -3,6 +3,8 @@ package dfh.grammar;
 import java.util.Map;
 import java.util.Set;
 
+import dfh.grammar.Grammar.ConstantOptions;
+
 /**
  * A rule undefined at the time of grammar compilation. It will always
  * correspond to a terminal rule. This class exists so that a {@link Grammar}
@@ -63,10 +65,10 @@ public class DeferredDefinitionRule extends Rule {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
-			Set<Rule> studiedRules, Map<Rule, RuleState> ruleStates) {
+			Map<Label, Map<Integer, CachedMatch>> cache,
+			Set<Rule> studiedRules, ConstantOptions options) {
 		studiedRules.add(this);
-		return r.study(s, cache, offset, studiedRules, ruleStates);
+		return r.study(s, cache, studiedRules, options);
 	}
 
 	@Override

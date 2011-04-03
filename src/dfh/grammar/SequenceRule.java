@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import dfh.grammar.Grammar.ConstantOptions;
+
 /**
  * Matches a sequence of sub-rules. E.g.,
  * 
@@ -151,11 +153,16 @@ public class SequenceRule extends Rule {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
-			Set<Rule> studiedRules, Map<Rule, RuleState> ruleStates) {
+			Map<Label, Map<Integer, CachedMatch>> cache,
+			Set<Rule> studiedRules, ConstantOptions options) {
 		studiedRules.add(this);
 		Set<Integer> startOffsets = null;
+		boolean foundStarts = false;
 		for (Rule r : sequence) {
+			if (foundStarts) {
+				r.study(s, cache, studiedRules, options);
+				continue;
+			}
 			Set<Integer> set;
 			if (studiedRules.contains(r)) {
 				set = cache.get(r.label()).keySet();
@@ -164,14 +171,14 @@ public class SequenceRule extends Rule {
 				else
 					startOffsets.addAll(set);
 			} else {
-				set = r.study(s, cache, offset, studiedRules, ruleStates);
+				set = r.study(s, cache, studiedRules, options);
 			}
 			if (startOffsets == null)
 				startOffsets = new HashSet<Integer>(set);
 			else
 				startOffsets.addAll(set);
 			if (!r.zeroWidth())
-				break;
+				foundStarts = true;
 		}
 		return startOffsets;
 	}

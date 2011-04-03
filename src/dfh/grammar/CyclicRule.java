@@ -3,6 +3,8 @@ package dfh.grammar;
 import java.util.Map;
 import java.util.Set;
 
+import dfh.grammar.Grammar.ConstantOptions;
+
 /**
  * A rule that depends on some other or others in a cycle of dependence. These
  * rules must be defined in two steps. For example:
@@ -60,10 +62,10 @@ public class CyclicRule extends Rule {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
-			Set<Rule> studiedRules, Map<Rule, RuleState> ruleStates) {
+			Map<Label, Map<Integer, CachedMatch>> cache,
+			Set<Rule> studiedRules, ConstantOptions options) {
 		studiedRules.add(this);
-		return r.study(s, cache, offset, studiedRules, ruleStates);
+		return r.study(s, cache, studiedRules, options);
 	}
 
 	@Override

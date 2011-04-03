@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.junit.Test;
 
 import dfh.grammar.Grammar.Options;
+import dfh.grammar.Grammar.ConstantOptions;
 import dfh.grammar.Label.Type;
 
 /**
@@ -113,8 +114,8 @@ public class DeferredRuleTest {
 
 			@Override
 			public Set<Integer> study(CharSequence s,
-					Map<Label, Map<Integer, CachedMatch>> cache, int offset,
-					Set<Rule> studiedRules, Map<Rule, RuleState> ruleStates) {
+					Map<Label, Map<Integer, CachedMatch>> cache,
+					Set<Rule> studiedRules, ConstantOptions options) {
 				// we won't study for this
 				return null;
 			}

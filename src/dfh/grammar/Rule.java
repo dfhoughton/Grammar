@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
+import dfh.grammar.Grammar.ConstantOptions;
+
 /**
  * A {@link Matcher} generator. <code>Rules</code> generate
  * <code>Matchers</code> with properly initialized state but have no dynamic
@@ -188,18 +190,15 @@ public abstract class Rule implements Serializable {
 	 *            {@link CharSequence} to be matched against
 	 * @param cache
 	 *            match cache that will be used
-	 * @param offset
-	 *            offset at which matching will begin
 	 * @param studiedRules
 	 *            cache to forestall the re-studying of a rule
-	 * @param ruleStates
-	 *            cache of {@link RuleState} objects that will later be made
-	 *            available to {@link Matcher Matchers}
+	 * @param options
+	 *            {@link ConstantOptions} in use in this match
 	 * @return set of start offsets of matches
 	 */
 	public abstract Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
-			Set<Rule> studiedRules, Map<Rule, RuleState> ruleStates);
+			Map<Label, Map<Integer, CachedMatch>> cache,
+			Set<Rule> studiedRules, ConstantOptions options);
 
 	/**
 	 * Returns whether this rule can match the null string. This method is used

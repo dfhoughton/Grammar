@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import dfh.grammar.Grammar.ConstantOptions;
+
 /**
  * Rule to handle all the various repetition options.
  * <p>
@@ -275,12 +277,12 @@ public class RepetitionRule extends Rule {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
-			Set<Rule> studiedRules, Map<Rule, RuleState> ruleStates) {
+			Map<Label, Map<Integer, CachedMatch>> cache,
+			Set<Rule> studiedRules, ConstantOptions options) {
 		studiedRules.add(this);
 		if (studiedRules.contains(r))
 			return new HashSet<Integer>(0);
-		return r.study(s, cache, offset, studiedRules, ruleStates);
+		return r.study(s, cache, studiedRules, options);
 	}
 
 	@Override

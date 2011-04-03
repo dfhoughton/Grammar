@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import dfh.grammar.Grammar.ConstantOptions;
+
 /**
  * {@link Rule} defined over sequence of terminal objects rather than other
  * <code>Rules</code>. In particular, this is such a {@link Rule} when the
@@ -38,7 +40,7 @@ public class LeafRule extends Rule {
 				fresh = false;
 				CachedMatch cm = cache.get(offset);
 				if (cm == null) {
-					if (ruleStates.containsKey(rule())) {
+					if (options.study) {
 						LeafRule.this.matchTrace(this, null);
 						return null;
 					}
@@ -146,10 +148,9 @@ public class LeafRule extends Rule {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache, int offset,
-			Set<Rule> studiedRules, Map<Rule, RuleState> ruleStates) {
+			Map<Label, Map<Integer, CachedMatch>> cache,
+			Set<Rule> studiedRules, ConstantOptions options) {
 		studiedRules.add(this);
-		ruleStates.put(this, new TerminalState(true));
 		Map<Integer, CachedMatch> subCache = cache.get(label);
 		Set<Integer> startOffsets = new HashSet<Integer>();
 		if (!subCache.keySet().isEmpty()) {
@@ -158,7 +159,7 @@ public class LeafRule extends Rule {
 			java.util.regex.Matcher m = p.matcher(s);
 			m.useAnchoringBounds(false);
 			m.useTransparentBounds(true);
-			m.region(offset, s.length());
+			m.region(options.startOffset, s.length());
 			while (m.find()) {
 				Integer i = m.start();
 				startOffsets.add(i);

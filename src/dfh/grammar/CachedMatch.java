@@ -40,4 +40,13 @@ public class CachedMatch {
 		assert m != null;
 		this.m = m;
 	}
+
+	@Override
+	public String toString() {
+		if (this == MATCH)
+			return "cm:match";
+		if (this == MISMATCH)
+			return "cm:mismatch";
+		return "cm:" + m;
+	}
 }

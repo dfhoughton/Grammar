@@ -1,6 +1,6 @@
 package dfh.grammar;
 
-import java.util.Map;
+import dfh.grammar.Grammar.ConstantOptions;
 
 /**
  * An object associated with a {@link Rule} that can iterate over and return all
@@ -27,10 +27,9 @@ public abstract class Matcher {
 	 */
 	protected final Matcher master;
 	/**
-	 * Reference to collection of {@link RuleState} objects potentially useful
-	 * to the matcher.
+	 * Reference to the matching parameters in use in this context.
 	 */
-	protected final Map<Rule, RuleState> ruleStates;
+	protected final ConstantOptions options;
 
 	/**
 	 * Generate a {@link Matcher} with the given state.
@@ -43,7 +42,7 @@ public abstract class Matcher {
 		this.s = s;
 		this.offset = offset;
 		this.master = master;
-		this.ruleStates = master.ruleStates;
+		this.options = master.options;
 	}
 
 	/**
@@ -55,11 +54,11 @@ public abstract class Matcher {
 	 * @param ruleStates
 	 */
 	Matcher(CharSequence s, Integer offset, Matcher master,
-			Map<Rule, RuleState> ruleStates) {
+			ConstantOptions options) {
 		this.s = s;
 		this.offset = offset;
 		this.master = master;
-		this.ruleStates = ruleStates;
+		this.options = options;
 	}
 
 	/**
