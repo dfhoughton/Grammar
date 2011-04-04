@@ -110,7 +110,6 @@ public class BackReferenceRule extends Rule {
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache,
 			Set<Rule> studiedRules, ConstantOptions options) {
-		studiedRules.add(this);
 		// one cannot study backreferences
 		return new HashSet<Integer>(0);
 	}

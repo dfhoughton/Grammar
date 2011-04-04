@@ -121,12 +121,16 @@ public class LiteralRule extends Rule {
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache,
 			Set<Rule> studiedRules, ConstantOptions options) {
-		studiedRules.add(this);
 		Map<Integer, CachedMatch> subCache = cache.get(label);
 		Set<Integer> startOffsets = new HashSet<Integer>();
 		if (subCache.isEmpty()) {
+			if (studiedRules.contains(this))
+				return startOffsets;
+			else
+				studiedRules.add(this);
 			int index, o = 0;
-			String string = s.subSequence(options.start, options.end).toString();
+			String string = s.subSequence(options.start, options.end)
+					.toString();
 			while ((index = string.indexOf(literal, o)) > -1) {
 				Integer i = index + options.start;
 				Match n = new Match(this, i, i + literal.length());

@@ -67,7 +67,6 @@ public class DeferredDefinitionRule extends Rule {
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache,
 			Set<Rule> studiedRules, ConstantOptions options) {
-		studiedRules.add(this);
 		return r.study(s, cache, studiedRules, options);
 	}
 

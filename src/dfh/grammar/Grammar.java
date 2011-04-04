@@ -219,6 +219,13 @@ public class Grammar implements Serializable, Cloneable {
 			this.trace = o.trace;
 			this.debug = trace != null;
 		}
+
+		@Override
+		public String toString() {
+			return "[overlap: " + allowOverlap + "; study: " + study
+					+ "; start: " + start + "; end: " + end + "; debug: "
+					+ debug + "]";
+		}
 	}
 
 	/**

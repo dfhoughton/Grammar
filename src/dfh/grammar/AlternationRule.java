@@ -113,12 +113,9 @@ public class AlternationRule extends Rule {
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache,
 			Set<Rule> studiedRules, ConstantOptions options) {
-		studiedRules.add(this);
 		Set<Integer> startOffsets = new HashSet<Integer>();
-		studiedRules.add(this);
 		for (Rule r : alternates)
-			if (!studiedRules.contains(r))
-				startOffsets.addAll(r.study(s, cache, studiedRules, options));
+			startOffsets.addAll(r.study(s, cache, studiedRules, options));
 		return startOffsets;
 	}
 

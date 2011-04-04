@@ -5,7 +5,7 @@
 # This is almost precisely the grammar used by App::JobLog.
 # see http://search.cpan.org/search?query=App%3A%3AJobLog&mode=module
 
-                   <ROOT> = <s>? <ever> | <span> <s>?
+                   <ROOT> = <ever> | <span>
 
                    <span> = <date> [ <span_divider> <date> ]?
                    <date> = <numeric> | <verbal>

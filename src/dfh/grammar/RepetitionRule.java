@@ -1,6 +1,5 @@
 package dfh.grammar;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -279,9 +278,6 @@ public class RepetitionRule extends Rule {
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache,
 			Set<Rule> studiedRules, ConstantOptions options) {
-		studiedRules.add(this);
-		if (studiedRules.contains(r))
-			return new HashSet<Integer>(0);
 		return r.study(s, cache, studiedRules, options);
 	}
 

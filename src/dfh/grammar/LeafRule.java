@@ -150,12 +150,13 @@ public class LeafRule extends Rule {
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache,
 			Set<Rule> studiedRules, ConstantOptions options) {
-		studiedRules.add(this);
 		Map<Integer, CachedMatch> subCache = cache.get(label);
 		Set<Integer> startOffsets = new HashSet<Integer>();
-		if (!subCache.keySet().isEmpty()) {
-			startOffsets.addAll(subCache.keySet());
-		} else {
+		if (subCache.keySet().isEmpty()) {
+			if (studiedRules.contains(this))
+				return startOffsets;
+			else
+				studiedRules.add(this);
 			java.util.regex.Matcher m = p.matcher(s);
 			m.useAnchoringBounds(false);
 			m.useTransparentBounds(true);
@@ -170,6 +171,8 @@ public class LeafRule extends Rule {
 					break;
 				m.region(newStart, options.end);
 			}
+		} else {
+			startOffsets.addAll(subCache.keySet());
 		}
 		return startOffsets;
 	}

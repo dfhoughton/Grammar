@@ -155,7 +155,6 @@ public class SequenceRule extends Rule {
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache,
 			Set<Rule> studiedRules, ConstantOptions options) {
-		studiedRules.add(this);
 		Set<Integer> startOffsets = null;
 		boolean foundStarts = false;
 		for (Rule r : sequence) {
@@ -163,16 +162,7 @@ public class SequenceRule extends Rule {
 				r.study(s, cache, studiedRules, options);
 				continue;
 			}
-			Set<Integer> set;
-			if (studiedRules.contains(r)) {
-				set = cache.get(r.label()).keySet();
-				if (startOffsets == null)
-					startOffsets = new HashSet<Integer>(set);
-				else
-					startOffsets.addAll(set);
-			} else {
-				set = r.study(s, cache, studiedRules, options);
-			}
+			Set<Integer> set = r.study(s, cache, studiedRules, options);
 			if (startOffsets == null)
 				startOffsets = new HashSet<Integer>(set);
 			else
