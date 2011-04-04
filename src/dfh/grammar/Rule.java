@@ -107,7 +107,7 @@ public abstract class Rule implements Serializable {
 
 	private void stackTrace(StringBuilder b, Matcher m) {
 		b.append("\n     ");
-		while (true) {
+		while (m.rule() != null) {
 			b.append(m.rule().label());
 			b.append(' ');
 			b.append(m.offset);

@@ -472,8 +472,7 @@ public class Compiler {
 				if (gf.rep.redundant())
 					return r;
 				else {
-					Label l = new Label(Type.nonTerminal, r.label().toString()
-							+ gf.rep);
+					Label l = new Label(Type.nonTerminal, subLabel(r) + gf.rep);
 					r = new RepetitionRule(l, r, gf.rep);
 					return redundancyCheck(r);
 				}
@@ -481,7 +480,7 @@ public class Compiler {
 			Rule r = makeSequence(gf.alternates.get(0), cycleMap);
 			if (gf.rep.redundant())
 				return r;
-			Label l = new Label(Type.nonTerminal, r.label().toString() + gf.rep);
+			Label l = new Label(Type.nonTerminal, subLabel(r) + gf.rep);
 			r = new RepetitionRule(l, r, gf.rep);
 			return redundancyCheck(r);
 		}
@@ -501,7 +500,7 @@ public class Compiler {
 				b.append('|');
 			else
 				nonInitial = true;
-			b.append(r.label());
+			b.append(subLabel(r));
 		}
 		b.append(']');
 		Label l = new Label(Type.nonTerminal, b.toString());
@@ -512,6 +511,10 @@ public class Compiler {
 		l = new Label(Type.nonTerminal, l.toString() + gf.rep);
 		r = new RepetitionRule(l, r, gf.rep);
 		return redundancyCheck(r);
+	}
+
+	private String subLabel(Rule r) {
+		return r.generation == -1 ? r.label().id : r.label().toString();
 	}
 
 	private Rule makeSequence(Label label, List<RuleFragment> fragments,
@@ -540,7 +543,7 @@ public class Compiler {
 				nonInitial = true;
 			Rule r = makeSingle(rf, cycleMap);
 			sequence[index++] = r;
-			b.append(r.label());
+			b.append(subLabel(r));
 		}
 		b.append(']');
 		Label l = new Label(Type.nonTerminal, b.toString());

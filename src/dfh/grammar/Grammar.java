@@ -719,10 +719,12 @@ public class Grammar implements Serializable, Cloneable {
 	 * @return canonical description of {@link Grammar}
 	 */
 	public String describe() {
-		List<Rule> ruleList = new ArrayList<Rule>(rules.values());
+		List<Entry<Label, Rule>> ruleList = new ArrayList<Map.Entry<Label, Rule>>(
+				rules.entrySet());
 		int maxLabel = -1;
-		for (Iterator<Rule> i = ruleList.iterator(); i.hasNext();) {
-			Rule r = i.next();
+		for (Iterator<Entry<Label, Rule>> i = ruleList.iterator(); i.hasNext();) {
+			Entry<Label, Rule> e = i.next();
+			Rule r = e.getValue();
 			if (r.generation == -1) {
 				i.remove();
 				continue;
@@ -735,13 +737,14 @@ public class Grammar implements Serializable, Cloneable {
 		}
 		String format = "%" + maxLabel + "s =";
 		// put rules in canonical order
-		Collections.sort(ruleList, new Comparator<Rule>() {
+		Collections.sort(ruleList, new Comparator<Entry<Label, Rule>>() {
 			@Override
-			public int compare(Rule o1, Rule o2) {
-				int comparison = o2.generation - o1.generation;
+			public int compare(Entry<Label, Rule> o1, Entry<Label, Rule> o2) {
+				int comparison = o2.getValue().generation
+						- o1.getValue().generation;
 				if (comparison == 0)
-					comparison = o1.label().toString()
-							.compareTo(o2.label().toString());
+					comparison = o1.getKey().toString()
+							.compareTo(o2.getKey().toString());
 				return comparison;
 			}
 		});
@@ -751,10 +754,10 @@ public class Grammar implements Serializable, Cloneable {
 		b.append(' ');
 		b.append(rules.get(root).description());
 		b.append("\n\n");
-		for (Rule r : ruleList) {
-			b.append(String.format(format, r.label()));
+		for (Entry<Label, Rule> e : ruleList) {
+			b.append(String.format(format, e.getKey()));
 			b.append(' ');
-			b.append(r.description());
+			b.append(e.getValue().description());
 			b.append("\n");
 		}
 		return b.toString();
