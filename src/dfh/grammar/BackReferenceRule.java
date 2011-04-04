@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import dfh.grammar.Grammar.ConstantOptions;
+import dfh.grammar.Grammar.GlobalState;
 import dfh.grammar.SequenceRule.SequenceMatcher;
 
 /**
@@ -112,7 +112,7 @@ public class BackReferenceRule extends Rule {
 	@Override
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, ConstantOptions options) {
+			Set<Rule> studiedRules, GlobalState options) {
 		// one cannot study backreferences
 		return new HashSet<Integer>(0);
 	}

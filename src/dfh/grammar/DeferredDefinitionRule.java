@@ -3,7 +3,7 @@ package dfh.grammar;
 import java.util.Map;
 import java.util.Set;
 
-import dfh.grammar.Grammar.ConstantOptions;
+import dfh.grammar.Grammar.GlobalState;
 
 /**
  * A rule undefined at the time of grammar compilation. It will always
@@ -66,7 +66,7 @@ public class DeferredDefinitionRule extends Rule {
 	@Override
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, ConstantOptions options) {
+			Set<Rule> studiedRules, GlobalState options) {
 		return r.study(s, cache, studiedRules, options);
 	}
 

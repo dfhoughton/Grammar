@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-import dfh.grammar.Grammar.ConstantOptions;
+import dfh.grammar.Grammar.GlobalState;
 
 /**
  * A {@link Matcher} generator. <code>Rules</code> generate
@@ -183,12 +183,12 @@ public abstract class Rule implements Serializable {
 	 * @param studiedRules
 	 *            cache to forestall the re-studying of a rule
 	 * @param options
-	 *            {@link ConstantOptions} in use in this match
+	 *            {@link GlobalState} in use in this match
 	 * @return set of start offsets of matches
 	 */
 	public abstract Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, ConstantOptions options);
+			Set<Rule> studiedRules, GlobalState options);
 	
 	/**
 	 * Returns whether this rule can match the null string. This method is used

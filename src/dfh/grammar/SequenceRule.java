@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import dfh.grammar.Grammar.ConstantOptions;
+import dfh.grammar.Grammar.GlobalState;
 
 /**
  * Matches a sequence of sub-rules. E.g.,
@@ -154,7 +154,7 @@ public class SequenceRule extends Rule {
 	@Override
 	public Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, ConstantOptions options) {
+			Set<Rule> studiedRules, GlobalState options) {
 		Set<Integer> startOffsets = null;
 		boolean foundStarts = false;
 		for (Rule r : sequence) {

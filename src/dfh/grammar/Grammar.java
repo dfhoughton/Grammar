@@ -205,13 +205,13 @@ public class Grammar implements Serializable, Cloneable {
 	 * @author David Houghton
 	 * 
 	 */
-	public static class ConstantOptions {
+	public static class GlobalState {
 		public final boolean allowOverlap, study, containsCycles;
 		public final int start, end;
 		public final PrintStream trace;
 		public final boolean debug;
 
-		private ConstantOptions(Options o, boolean containsCycles) {
+		private GlobalState(Options o, boolean containsCycles) {
 			this.allowOverlap = o.allowOverlap;
 			this.study = o.study;
 			this.start = o.start;
@@ -239,7 +239,7 @@ public class Grammar implements Serializable, Cloneable {
 	 */
 	private abstract class GrammarMatcher extends Matcher {
 
-		protected GrammarMatcher(CharSequence s, ConstantOptions options) {
+		protected GrammarMatcher(CharSequence s, GlobalState options) {
 			super(s, options.start, null, options);
 		}
 
@@ -261,7 +261,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * 
 	 */
 	private class DummyMatcher extends Matcher {
-		DummyMatcher(CharSequence s, ConstantOptions options) {
+		DummyMatcher(CharSequence s, GlobalState options) {
 			super(s, options.start, null, options);
 		}
 
@@ -297,8 +297,7 @@ public class Grammar implements Serializable, Cloneable {
 		private Match next;
 
 		FindMatcher(CharSequence s, LinkedList<Integer> startOffsets,
-				Map<Label, Map<Integer, CachedMatch>> cache,
-				ConstantOptions options) {
+				Map<Label, Map<Integer, CachedMatch>> cache, GlobalState options) {
 			super(s, options);
 			this.startOffsets = startOffsets;
 			this.cache = cache;
@@ -588,7 +587,7 @@ public class Grammar implements Serializable, Cloneable {
 	public Matcher lookingAt(final CharSequence cs, Options opt)
 			throws GrammarException {
 		checkComplete();
-		final ConstantOptions co = verifyOptions(cs, opt);
+		final GlobalState co = verifyOptions(cs, opt);
 		Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		final Set<Integer> startOffsets = startOffsets(cs, co, cache);
 		final Matcher m = rules.get(root).matcher(cs, co.start, cache,
@@ -672,7 +671,7 @@ public class Grammar implements Serializable, Cloneable {
 	public Matcher find(final CharSequence s, Options opt)
 			throws GrammarException {
 		checkComplete();
-		final ConstantOptions options = verifyOptions(s, opt);
+		final GlobalState options = verifyOptions(s, opt);
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		List<Integer> list = new ArrayList<Integer>(startOffsets(s, options,
 				cache));
@@ -814,7 +813,7 @@ public class Grammar implements Serializable, Cloneable {
 	public Matcher matches(final CharSequence s, Options opt)
 			throws GrammarException {
 		checkComplete();
-		final ConstantOptions options = verifyOptions(s, opt);
+		final GlobalState options = verifyOptions(s, opt);
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		final Set<Integer> startOffsets = startOffsets(s, options, cache);
 		final Matcher m = rules.get(root).matcher(s, options.start, cache,
@@ -862,7 +861,7 @@ public class Grammar implements Serializable, Cloneable {
 	}
 
 	private Set<Integer> startOffsets(final CharSequence s,
-			final ConstantOptions options,
+			final GlobalState options,
 			final Map<Label, Map<Integer, CachedMatch>> cache) {
 		final Set<Integer> startOffsets = new HashSet<Integer>();
 		if (options.study) {
@@ -891,13 +890,13 @@ public class Grammar implements Serializable, Cloneable {
 	 * @param opt
 	 * @return clone of given options
 	 */
-	private ConstantOptions verifyOptions(CharSequence s, Options opt) {
+	private GlobalState verifyOptions(CharSequence s, Options opt) {
 		if (opt.start() >= s.length())
 			throw new GrammarException(
 					"start offset specified beyond end of string");
 		if (opt.end == -1)
 			opt.end(s.length());
-		return new ConstantOptions(opt, recursive);
+		return new GlobalState(opt, recursive);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 package dfh.grammar;
 
-import dfh.grammar.Grammar.ConstantOptions;
+import dfh.grammar.Grammar.GlobalState;
 
 /**
  * An object associated with a {@link Rule} that can iterate over and return all
@@ -29,7 +29,7 @@ public abstract class Matcher {
 	/**
 	 * Reference to the matching parameters in use in this context.
 	 */
-	protected final ConstantOptions options;
+	protected final GlobalState options;
 
 	/**
 	 * Generate a {@link Matcher} with the given state.
@@ -54,7 +54,7 @@ public abstract class Matcher {
 	 * @param ruleStates
 	 */
 	Matcher(CharSequence s, Integer offset, Matcher master,
-			ConstantOptions options) {
+			GlobalState options) {
 		this.s = s;
 		this.offset = offset;
 		this.master = master;
