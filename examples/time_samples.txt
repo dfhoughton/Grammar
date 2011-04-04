@@ -1,0 +1,9 @@
+This file was written to provide, along with time.txt, input for the MatchToDot class.
+
+yesterday
+last Friday at 4:00 am
+February 16
+last week
+Tuesday
+2011/4/24
+5/6/1969
