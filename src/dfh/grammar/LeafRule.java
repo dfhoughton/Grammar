@@ -27,7 +27,7 @@ public class LeafRule extends Rule {
 		private Map<Integer, CachedMatch> cache;
 		private boolean fresh = true;
 
-		public LeafMatcher(CharSequence s, int offset,
+		public LeafMatcher(CharSequence s, Integer offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
 			super(s, offset, master);
 			this.cache = cache.get(label);

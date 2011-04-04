@@ -225,7 +225,7 @@ public class Grammar implements Serializable, Cloneable {
 		public String toString() {
 			return "[overlap: " + allowOverlap + "; study: " + study
 					+ "; start: " + start + "; end: " + end + "; debug: "
-					+ debug + "; cycles:" + containsCycles + "]";
+					+ debug + "; cycles: " + containsCycles + "]";
 		}
 	}
 
@@ -342,6 +342,8 @@ public class Grammar implements Serializable, Cloneable {
 								index = startOffsets.removeFirst();
 								if (index >= n.end())
 									break;
+								else
+									index = -1;
 							}
 						} else
 							index = n.end();

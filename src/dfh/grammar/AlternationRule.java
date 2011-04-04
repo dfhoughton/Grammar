@@ -24,7 +24,7 @@ public class AlternationRule extends Rule {
 		int index = 0;
 		Matcher mostRecent = null;
 
-		public AlternationMatcher(CharSequence cs, int offset,
+		public AlternationMatcher(CharSequence cs, Integer offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
 			super(cs, offset, cache, AlternationRule.this, master);
 		}

@@ -14,7 +14,7 @@
                    <full> = <at_time_on> <full_no_time> | <full_no_time> <at_time>
          <modifiable_day> = <at_time_on> <modifiable_day_no_time> | <modifiable_day_no_time> <at_time>
               <month_day> = <at_time_on> <month_day_no_time> | <month_day_no_time> <at_time>
-                <numeric> = <year> | <ym> | <at_time_on> <numeric_no_time> | <numeric_no_time> <at_time>
+                <numeric> = <at_time_on> <numeric_no_time> | <numeric_no_time> <at_time> | <ym> | <year>
         <relative_period> = [ <at> <s>? ]? <time> <s> <relative_period_no_time> | <relative_period_no_time> <at_time> | <now>
                 <at_time> = [ [ <s> | <s>? <at> <s>? ]? <time> ]?
              <at_time_on> = [ <at> <s> ]? <time> <s> <on> <s>

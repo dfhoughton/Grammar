@@ -23,7 +23,7 @@ public class RepetitionRule extends Rule {
 		protected LinkedList<Match> matched;
 		protected LinkedList<Matcher> matchers;
 
-		public RepetitionMatcher(CharSequence cs, int offset,
+		public RepetitionMatcher(CharSequence cs, Integer offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
 				Matcher master) {
 			super(cs, offset, cache, RepetitionRule.this, master);
@@ -53,7 +53,7 @@ public class RepetitionRule extends Rule {
 
 		private final boolean backtracks;
 
-		protected GreedyAndPossessive(CharSequence cs, int offset,
+		protected GreedyAndPossessive(CharSequence cs, Integer offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
 				boolean backtracks, Matcher master) {
 			super(cs, offset, cache, label, master);
@@ -87,7 +87,7 @@ public class RepetitionRule extends Rule {
 	 * 
 	 */
 	private class GreedyMatcher extends GreedyAndPossessive {
-		protected GreedyMatcher(CharSequence cs, int offset,
+		protected GreedyMatcher(CharSequence cs, Integer offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
 				Matcher master) {
 			super(cs, offset, cache, label, true, master);
@@ -137,7 +137,7 @@ public class RepetitionRule extends Rule {
 	private class StingyMatcher extends RepetitionMatcher {
 		private int goal;
 
-		protected StingyMatcher(CharSequence cs, int offset,
+		protected StingyMatcher(CharSequence cs, Integer offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
 				Matcher master) {
 			super(cs, offset, cache, label, master);
@@ -197,7 +197,7 @@ public class RepetitionRule extends Rule {
 
 	private class PossessiveMatcher extends GreedyAndPossessive {
 
-		protected PossessiveMatcher(CharSequence cs, int offset,
+		protected PossessiveMatcher(CharSequence cs, Integer offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
 				Matcher master) {
 			super(cs, offset, cache, label, false, master);
