@@ -35,17 +35,20 @@ public class LeafRule extends Rule {
 
 		@Override
 		public Match match() {
-			LeafRule.this.matchTrace(this);
+			if (options.debug)
+				LeafRule.this.matchTrace(this);
 			if (fresh) {
 				fresh = false;
 				CachedMatch cm = cache.get(offset);
 				if (cm == null) {
 					if (options.study) {
-						LeafRule.this.matchTrace(this, null);
+						if (options.debug)
+							LeafRule.this.matchTrace(this, null);
 						return null;
 					}
 				} else {
-					LeafRule.this.matchTrace(this, cm.m);
+					if (options.debug)
+						LeafRule.this.matchTrace(this, cm.m);
 					return cm.m;
 				}
 				java.util.regex.Matcher m = p.matcher(s);
@@ -58,10 +61,12 @@ public class LeafRule extends Rule {
 				} else
 					cm = CachedMatch.MISMATCH;
 				cache.put(offset, cm);
-				LeafRule.this.matchTrace(this, cm.m);
+				if (options.debug)
+					LeafRule.this.matchTrace(this, cm.m);
 				return cm.m;
 			}
-			LeafRule.this.matchTrace(this, null);
+			if (options.debug)
+				LeafRule.this.matchTrace(this, null);
 			return null;
 		}
 

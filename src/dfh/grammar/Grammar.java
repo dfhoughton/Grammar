@@ -206,17 +206,18 @@ public class Grammar implements Serializable, Cloneable {
 	 * 
 	 */
 	public static class ConstantOptions {
-		public final boolean allowOverlap, study;
+		public final boolean allowOverlap, study, containsCycles;
 		public final int start, end;
 		public final PrintStream trace;
 		public final boolean debug;
 
-		private ConstantOptions(Options o) {
+		private ConstantOptions(Options o, boolean containsCycles) {
 			this.allowOverlap = o.allowOverlap;
 			this.study = o.study;
 			this.start = o.start;
 			this.end = o.end;
 			this.trace = o.trace;
+			this.containsCycles = containsCycles;
 			this.debug = trace != null;
 		}
 
@@ -224,7 +225,7 @@ public class Grammar implements Serializable, Cloneable {
 		public String toString() {
 			return "[overlap: " + allowOverlap + "; study: " + study
 					+ "; start: " + start + "; end: " + end + "; debug: "
-					+ debug + "]";
+					+ debug + "; cycles:" + containsCycles + "]";
 		}
 	}
 
@@ -393,6 +394,7 @@ public class Grammar implements Serializable, Cloneable {
 	 */
 	protected final HashSet<Label> undefinedRules;
 	transient PrintStream trace;
+	private boolean recursive;
 
 	/**
 	 * Delegates to {@link #Grammar(LineReader)}.
@@ -486,6 +488,7 @@ public class Grammar implements Serializable, Cloneable {
 		rules = c.rules();
 		terminalLabelMap = c.terminalLabelMap();
 		undefinedRules = c.undefinedTerminals();
+		recursive = c.recursive();
 	}
 
 	/**
@@ -584,13 +587,8 @@ public class Grammar implements Serializable, Cloneable {
 			throws GrammarException {
 		checkComplete();
 		final ConstantOptions co = verifyOptions(cs, opt);
-		final Set<Integer> startOffsets = new HashSet<Integer>();
 		Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
-		if (co.study) {
-			Set<Rule> studiedRules = new HashSet<Rule>();
-			startOffsets.addAll(rules.get(root).study(cs, cache, studiedRules,
-					co));
-		}
+		final Set<Integer> startOffsets = startOffsets(cs, co, cache);
 		final Matcher m = rules.get(root).matcher(cs, co.start, cache,
 				new DummyMatcher(cs, co));
 		abstract class LookingAtMatcher extends GrammarMatcher {
@@ -674,14 +672,10 @@ public class Grammar implements Serializable, Cloneable {
 		checkComplete();
 		final ConstantOptions options = verifyOptions(s, opt);
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
-		final LinkedList<Integer> startOffsets = new LinkedList<Integer>();
-		if (options.study) {
-			ArrayList<Integer> list = new ArrayList<Integer>();
-			Set<Rule> studiedRules = new HashSet<Rule>();
-			list.addAll(rules.get(root).study(s, cache, studiedRules, options));
-			Collections.sort(list);
-			startOffsets.addAll(list);
-		}
+		List<Integer> list = new ArrayList<Integer>(startOffsets(s, options,
+				cache));
+		Collections.sort(list);
+		final LinkedList<Integer> startOffsets = new LinkedList<Integer>(list);
 		return new FindMatcher(s, startOffsets, cache, options);
 	}
 
@@ -820,12 +814,7 @@ public class Grammar implements Serializable, Cloneable {
 		checkComplete();
 		final ConstantOptions options = verifyOptions(s, opt);
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
-		final Set<Integer> startOffsets = new HashSet<Integer>();
-		if (options.study) {
-			Set<Rule> studiedRules = new HashSet<Rule>();
-			startOffsets.addAll(rules.get(root).study(s, cache, studiedRules,
-					options));
-		}
+		final Set<Integer> startOffsets = startOffsets(s, options, cache);
 		final Matcher m = rules.get(root).matcher(s, options.start, cache,
 				new DummyMatcher(s, options));
 		return new GrammarMatcher(s, options) {
@@ -870,6 +859,29 @@ public class Grammar implements Serializable, Cloneable {
 		};
 	}
 
+	private Set<Integer> startOffsets(final CharSequence s,
+			final ConstantOptions options,
+			final Map<Label, Map<Integer, CachedMatch>> cache) {
+		final Set<Integer> startOffsets = new HashSet<Integer>();
+		if (options.study) {
+			Set<Rule> studiedRules = new HashSet<Rule>();
+			if (options.containsCycles) {
+				for (Rule r : rules.values()) {
+					if (r instanceof AlternationRule
+							|| r instanceof SequenceRule
+							|| r instanceof RepetitionRule
+							|| r instanceof CyclicRule)
+						continue;
+					startOffsets.addAll(r
+							.study(s, cache, studiedRules, options));
+				}
+			} else
+				startOffsets.addAll(rules.get(root).study(s, cache,
+						studiedRules, options));
+		}
+		return startOffsets;
+	}
+
 	/**
 	 * Validates options and clones object to make it thread safe.
 	 * 
@@ -883,7 +895,7 @@ public class Grammar implements Serializable, Cloneable {
 					"start offset specified beyond end of string");
 		if (opt.end == -1)
 			opt.end(s.length());
-		return new ConstantOptions(opt);
+		return new ConstantOptions(opt, recursive);
 	}
 
 	/**

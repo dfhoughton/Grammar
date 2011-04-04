@@ -35,6 +35,7 @@ public class Compiler {
 	private Map<Label, Set<Label>> dependencyMap = new HashMap<Label, Set<Label>>();
 	private List<String> redundantLabels = new LinkedList<String>();
 	private final Label root;
+	private boolean recursive;
 
 	/**
 	 * Generates a {@link Compiler} reading rules from the given
@@ -153,6 +154,7 @@ public class Compiler {
 				}
 			}
 			if (map.size() == size) {
+				recursive = true;
 				resolveRecursions(map, gen);
 				if (map.size() == size)
 					throw new GrammarException(
@@ -561,6 +563,10 @@ public class Compiler {
 
 	HashSet<Label> undefinedTerminals() {
 		return new HashSet<Label>(undefinedRules);
+	}
+
+	boolean recursive() {
+		return recursive;
 	}
 
 	private Set<Label> allLabels(List<RuleFragment> value) {

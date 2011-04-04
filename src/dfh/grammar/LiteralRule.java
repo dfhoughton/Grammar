@@ -27,17 +27,20 @@ public class LiteralRule extends Rule {
 
 		@Override
 		public Match match() {
-			LiteralRule.this.matchTrace(this);
+			if (options.debug)
+				LiteralRule.this.matchTrace(this);
 			if (fresh) {
 				fresh = false;
 				CachedMatch cm = cache.get(offset);
 				if (cm == null) {
 					if (options.study) {
-						LiteralRule.this.matchTrace(this, null);
+						if (options.debug)
+							LiteralRule.this.matchTrace(this, null);
 						return null;
 					}
 				} else {
-					LiteralRule.this.matchTrace(this, cm.m);
+					if (options.debug)
+						LiteralRule.this.matchTrace(this, cm.m);
 					return cm.m;
 				}
 				int end = offset + literal.length();
@@ -57,10 +60,12 @@ public class LiteralRule extends Rule {
 				} else
 					cm = CachedMatch.MISMATCH;
 				cache.put(offset, cm);
-				LiteralRule.this.matchTrace(this, cm.m);
+				if (options.debug)
+					LiteralRule.this.matchTrace(this, cm.m);
 				return cm.m;
 			}
-			LiteralRule.this.matchTrace(this, null);
+			if (options.debug)
+				LiteralRule.this.matchTrace(this, null);
 			return null;
 		}
 

@@ -27,7 +27,7 @@ public class XMLParser {
 			"       <ROOT> = <declaration>?+ <s>?+ <element> <s>?+",//
 			"     <double> = '<' <tag> [ <ns> <attribute> ]*+ '>' [ <content> | <comment> | <element> ]*+ '</' 2 '>'",//
 			"    <element> = <single> | <double>",//
-			"     <single> = '<' <tag> [ <ns> <attribute> ]*+ <ns>? '/>'",//
+			"     <single> = '<' <tag> [ <ns> <attribute> ]*+ <ns>?+ '/>'",//
 			"  <attribute> = <tag> '=' [ \"'\" <squote> \"'\" | '\"' <dquote> '\"' ]",//
 			"    <content> = [ <c> | <entity> ]++",//
 			"          <c> = /[^&<]/",//
@@ -38,7 +38,7 @@ public class XMLParser {
 			"         <ns> = /[\\s&&[^\\n]]++/",//
 			"          <s> = /\\s++/",//
 			"     <squote> = /[^\\n']*+/",//
-			"        <tag> = /\\w++(:\\w++)*+/",//
+			"        <tag> = /\\b\\w++(:\\w++)*+/",//
 	};
 
 	/**

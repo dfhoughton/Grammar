@@ -59,18 +59,21 @@ public abstract class NonterminalMatcher extends Matcher {
 
 	@Override
 	public Match match() {
-		rule.matchTrace(this);
+		if (options.debug)
+			rule.matchTrace(this);
 		if (done) {
-			rule.matchTrace(this, null);
+			if (options.debug)
+				rule.matchTrace(this, null);
 			return null;
 		}
 		CachedMatch cm = subCache.get(offset);
 		boolean alreadyMatched = cm != null;
 		if (alreadyMatched && cm.m == null) {
-			rule.matchTrace(this, null);
+			if (options.debug)
+				rule.matchTrace(this, null);
 			return null;
 		}
-		if (next == null)
+		if (next == null && !(options.containsCycles && cycleCheck()))
 			fetchNext();
 		if (!alreadyMatched) {
 			cm = next == null ? CachedMatch.MISMATCH : CachedMatch.MATCH;
@@ -78,7 +81,8 @@ public abstract class NonterminalMatcher extends Matcher {
 		}
 		Match n = next;
 		next = null;
-		rule.matchTrace(this, n);
+		if (options.debug)
+			rule.matchTrace(this, n);
 		return n;
 	}
 
@@ -87,9 +91,22 @@ public abstract class NonterminalMatcher extends Matcher {
 		if (done) {
 			return false;
 		}
-		if (next == null)
+		if (next == null && !(options.containsCycles && cycleCheck()))
 			fetchNext();
 		return next != null;
+	}
+
+	/**
+	 * @return whether we seem to be in a non-progressing recursive loop
+	 */
+	private boolean cycleCheck() {
+		Matcher m = master;
+		while (m != null && m.offset == offset) {
+			if (m.rule() == rule)
+				return true;
+			m = m.master;
+		}
+		return false;
 	}
 
 	@Override

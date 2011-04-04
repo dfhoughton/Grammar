@@ -30,7 +30,7 @@ public class RecursiveTest {
 				"<content> = <nq> | <esc>",//
 				"<nq> = /[^\"]/",//
 				"<esc> = /\\\\./",//
-				"<tag> = /\\w++/",//
+				"<tag> = /\\b\\w++\\b/",//
 				"<s> = /\\s++/",//
 		};
 		g = new Grammar(rules);

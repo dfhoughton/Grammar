@@ -39,7 +39,8 @@ public class BackReferenceRule extends Rule {
 
 		@Override
 		public Match match() {
-			BackReferenceRule.this.matchTrace(this);
+			if (options.debug)
+				BackReferenceRule.this.matchTrace(this);
 			if (fresh) {
 				fresh = false;
 				Match m = ((SequenceMatcher) master).matched.get(index), n = null;
@@ -61,10 +62,12 @@ public class BackReferenceRule extends Rule {
 							n = new Match(BackReferenceRule.this, offset, end);
 					}
 				}
-				BackReferenceRule.this.matchTrace(this, n);
+				if (options.debug)
+					BackReferenceRule.this.matchTrace(this, n);
 				return n;
 			}
-			BackReferenceRule.this.matchTrace(this, null);
+			if (options.debug)
+				BackReferenceRule.this.matchTrace(this, null);
 			return null;
 		}
 

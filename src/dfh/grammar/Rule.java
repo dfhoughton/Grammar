@@ -96,13 +96,11 @@ public abstract class Rule implements Serializable {
 	 *            matcher performing match
 	 */
 	protected final void matchTrace(Matcher m) {
-		if (m.options.debug) {
-			StringBuilder b = new StringBuilder();
-			b.append(label());
-			locate(b, m.s, m.offset);
-			stackTrace(b, m);
-			m.options.trace.println(b);
-		}
+		StringBuilder b = new StringBuilder();
+		b.append(label());
+		locate(b, m.s, m.offset);
+		stackTrace(b, m);
+		m.options.trace.println(b);
 	}
 
 	private void stackTrace(StringBuilder b, Matcher m) {
@@ -150,21 +148,19 @@ public abstract class Rule implements Serializable {
 	 *            the {@link Match} returned
 	 */
 	protected final void matchTrace(Matcher m, Match n) {
-		if (m.options.debug) {
-			StringBuilder b = new StringBuilder();
-			b.append("  ");
-			b.append(label());
-			locate(b, m.s, m.offset);
-			b.append(" returning ");
-			b.append(n);
-			if (n != null) {
-				b.append(" = '");
-				b.append(m.s.subSequence(n.start(), n.end()));
-				b.append('\'');
-			}
-			stackTrace(b, m);
-			m.options.trace.println(b);
+		StringBuilder b = new StringBuilder();
+		b.append("  ");
+		b.append(label());
+		locate(b, m.s, m.offset);
+		b.append(" returning ");
+		b.append(n);
+		if (n != null) {
+			b.append(" = '");
+			b.append(m.s.subSequence(n.start(), n.end()));
+			b.append('\'');
 		}
+		stackTrace(b, m);
+		m.options.trace.println(b);
 	}
 
 	/**
@@ -193,7 +189,7 @@ public abstract class Rule implements Serializable {
 	public abstract Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache,
 			Set<Rule> studiedRules, ConstantOptions options);
-
+	
 	/**
 	 * Returns whether this rule can match the null string. This method is used
 	 * in {@link #study(CharSequence, Map, int, Set, Map) studying} in
