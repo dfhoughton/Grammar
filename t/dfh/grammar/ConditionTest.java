@@ -93,4 +93,30 @@ public class ConditionTest {
 		assertTrue("found only whole words", count == 2);
 	}
 
+	@Test
+	public void alternationTest() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = 'foo' | 'bar' {whole}",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("whole", new Condition() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean passes(Match m, CharSequence s) {
+				return (m.start() == 0 || !Character.isLetterOrDigit(s.charAt(m
+						.start() - 1)))
+						&& (m.end() == s.length() || !Character
+								.isLetterOrDigit(s.charAt(m.end())));
+			}
+		});
+		String s = "foo foot bar";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found only whole words", count == 2);
+	}
+
 }

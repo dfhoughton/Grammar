@@ -39,8 +39,12 @@ public class AlternationRule extends Rule {
 					|| index < alternates.length) {
 				while (mostRecent.mightHaveNext()) {
 					child = mostRecent.match();
-					if (child != null)
-						break OUTER;
+					if (child != null) {
+						if (c == null || c.passes(child, s))
+							break OUTER;
+						else
+							child = null;
+					}
 				}
 				if (++index == alternates.length)
 					break;
@@ -58,6 +62,7 @@ public class AlternationRule extends Rule {
 	}
 
 	protected final Rule[] alternates;
+	protected Condition c;
 
 	/**
 	 * Generates a rule from the given label and alternates.
@@ -108,6 +113,8 @@ public class AlternationRule extends Rule {
 			} else
 				b.append(r.label());
 		}
+		if (condition != null)
+			b.append(" {").append(condition).append('}');
 		return b.toString();
 	}
 
@@ -135,5 +142,11 @@ public class AlternationRule extends Rule {
 		AlternationRule ar = new AlternationRule((Label) label.clone(),
 				Arrays.copyOf(alternates, alternates.length));
 		return ar;
+	}
+
+	@Override
+	public Rule conditionalize(Condition c) {
+		this.c = c;
+		return this;
 	}
 }
