@@ -67,4 +67,30 @@ public class ConditionTest {
 		assertTrue("only found value lower than 100", count == 1);
 	}
 
+	@Test
+	public void literalTest() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = 'foo' {whole}",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("whole", new Condition() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean passes(Match m, CharSequence s) {
+				return (m.start() == 0 || !Character.isLetterOrDigit(s.charAt(m
+						.start() - 1)))
+						&& (m.end() == s.length() || !Character
+								.isLetterOrDigit(s.charAt(m.end())));
+			}
+		});
+		String s = "foo foot foo";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found only whole words", count == 2);
+	}
+
 }

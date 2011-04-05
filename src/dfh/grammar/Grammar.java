@@ -1204,7 +1204,8 @@ public class Grammar implements Serializable, Cloneable {
 		for (Label l : set) {
 			Rule r = rules.remove(l);
 			Rule nr = r.conditionalize(c);
-			fix(this, r, nr);
+			if (r != nr)
+				fix(this, r, nr);
 			rules.put(l, nr);
 		}
 	}

@@ -26,7 +26,7 @@ import dfh.grammar.SequenceRule.SequenceMatcher;
  */
 public class BackReferenceRule extends Rule {
 	private static final long serialVersionUID = 1L;
-	private final int index;
+	protected final int index;
 
 	private class BackReferenceMatcher extends Matcher {
 
@@ -101,11 +101,7 @@ public class BackReferenceRule extends Rule {
 
 	@Override
 	protected String uniqueId() {
-		StringBuilder b = new StringBuilder();
-		b.append(index + 1);
-		if (condition != null)
-			b.append('{').append(condition).append('}');
-		return b.toString();
+		return Integer.toString(index + 1);
 	}
 
 	@Override

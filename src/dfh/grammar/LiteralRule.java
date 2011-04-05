@@ -54,7 +54,10 @@ public class LiteralRule extends Rule {
 					}
 					if (matched) {
 						Match m = new Match(LiteralRule.this, offset, end);
-						cm = new CachedMatch(m);
+						if (!(c == null || c.passes(m, s)))
+							cm = new CachedMatch(m);
+						else
+							cm = CachedMatch.MISMATCH;
 					} else
 						cm = CachedMatch.MISMATCH;
 				} else
@@ -90,6 +93,7 @@ public class LiteralRule extends Rule {
 	 */
 	private static final long serialVersionUID = 1L;
 	protected final String literal;
+	private Condition c;
 
 	public LiteralRule(Label label, String literal) {
 		super(label);
@@ -121,6 +125,8 @@ public class LiteralRule extends Rule {
 				s = '\'' + s.replaceAll("([\\\\'])", "\\\\$1") + '\'';
 			else
 				s = '"' + s.replaceAll("([\\\\])", "\\\\$1") + '"';
+			if (condition != null)
+				s += " {" + condition + '}';
 			return s;
 		}
 		return uniqueId();
@@ -143,7 +149,8 @@ public class LiteralRule extends Rule {
 			while ((index = string.indexOf(literal, o)) > -1) {
 				Integer i = index + options.start;
 				Match n = new Match(this, i, i + literal.length());
-				subCache.put(i, new CachedMatch(n));
+				if (c == null || c.passes(n, s))
+					subCache.put(i, new CachedMatch(n));
 				startOffsets.add(i);
 				o = index + 1;
 			}
@@ -162,5 +169,11 @@ public class LiteralRule extends Rule {
 	public Rule shallowClone() {
 		LiteralRule lr = new LiteralRule((Label) label.clone(), literal);
 		return lr;
+	}
+
+	@Override
+	public Rule conditionalize(Condition c) {
+		this.c = c;
+		return this;
 	}
 }
