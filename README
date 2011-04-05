@@ -37,6 +37,7 @@ TODO
  * add closures
  * add assertions
  * add backtracking barriers
+ * parallelize consideration of alternates and make alternate list order irrelevant
 
 Other Stuff
 -----------
