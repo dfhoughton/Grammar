@@ -18,6 +18,7 @@ public class RepetitionRule extends Rule {
 	private static final long serialVersionUID = 1L;
 	Rule r;
 	final Repetition repetition;
+	protected Condition c;
 
 	private abstract class RepetitionMatcher extends NonterminalMatcher {
 		protected LinkedList<Match> matched;
@@ -95,40 +96,44 @@ public class RepetitionRule extends Rule {
 
 		@Override
 		protected void fetchNext() {
-			if (matched == null)
-				initialize();
-			else if (matched.isEmpty()) {
-				matchers.clear();
-				matchers = null;
-				next = null;
-				done = true;
-				return;
-			} else {
-				matched.removeLast();
-				// see if we can find some other way forward
-				if (matchers.peekLast().mightHaveNext()) {
-					while (!(matchers.isEmpty() || matched.size() == repetition.top)) {
-						if (grab())
-							break;
-					}
+			while (true) {
+				if (matched == null)
+					initialize();
+				else if (matched.isEmpty()) {
+					matchers = null;
+					next = null;
+					done = true;
+					return;
 				} else {
-					matchers.removeLast();
-					if (!matchers.isEmpty()
-							&& matchers.peekLast().mightHaveNext())
-						fetchNext();
+					matched.removeLast();
+					// see if we can find some other way forward
+					if (matchers.peekLast().mightHaveNext()) {
+						while (!(matchers.isEmpty() || matched.size() == repetition.top)) {
+							if (grab())
+								break;
+						}
+					} else {
+						matchers.removeLast();
+						if (!matchers.isEmpty()
+								&& matchers.peekLast().mightHaveNext())
+							continue;
+					}
 				}
-			}
-			if (matched.size() < repetition.bottom) {
-				matched.clear();
-				matchers = null;
-				next = null;
-				done = true;
-			} else {
-				Match[] children = matched.toArray(new Match[matched.size()]);
-				next = new Match(RepetitionRule.this, offset);
-				next.setChildren(children);
-				next.setEnd(matched.isEmpty() ? offset : matched.peekLast()
-						.end());
+				if (matched.size() < repetition.bottom) {
+					matched.clear();
+					matchers = null;
+					next = null;
+					done = true;
+				} else {
+					Match[] children = matched
+							.toArray(new Match[matched.size()]);
+					next = new Match(RepetitionRule.this, offset);
+					next.setChildren(children);
+					next.setEnd(matched.isEmpty() ? offset : matched.peekLast()
+							.end());
+					if (c == null || c.passes(next, s))
+						break;
+				}
 			}
 		}
 
@@ -153,24 +158,34 @@ public class RepetitionRule extends Rule {
 		}
 
 		private void seekGoal() {
-			boolean found = true;
-			next = null;
-			while (matched.size() < goal) {
-				if (grab()) {
-					if (matchers.isEmpty()) {
-						found = false;
-						break;
+			while (true) {
+				boolean found = true;
+				next = null;
+				while (matched.size() < goal) {
+					if (grab()) {
+						if (matchers.isEmpty()) {
+							found = false;
+							break;
+						}
 					}
 				}
-			}
-			if (found) {
-				next = new Match(RepetitionRule.this, offset);
-				Match[] children = matched.toArray(new Match[matched.size()]);
-				next.setChildren(children);
-				if (matched.isEmpty())
-					next.setEnd(offset);
-				else
-					next.setEnd(matched.peekLast().end());
+				if (found) {
+					next = new Match(RepetitionRule.this, offset);
+					Match[] children = matched
+							.toArray(new Match[matched.size()]);
+					next.setChildren(children);
+					if (matched.isEmpty())
+						next.setEnd(offset);
+					else
+						next.setEnd(matched.peekLast().end());
+					if (c == null || c.passes(next, s)) {
+						break;
+					} else if (goal == 0)
+						goal = 1;
+					else
+						matched.removeLast();
+				} else
+					break;
 			}
 		}
 
@@ -215,6 +230,11 @@ public class RepetitionRule extends Rule {
 					next.setChildren(children);
 					next.setEnd(matched.isEmpty() ? offset : matched.peekLast()
 							.end());
+					if (!(c == null || c.passes(next, s))) {
+						next = null;
+						done = true;
+						matched = null;
+					}
 				} else {
 					done = true;
 					matched = null;
@@ -224,7 +244,6 @@ public class RepetitionRule extends Rule {
 				matched = null;
 			}
 		}
-
 	}
 
 	/**
@@ -295,5 +314,11 @@ public class RepetitionRule extends Rule {
 		RepetitionRule rr = new RepetitionRule((Label) label.clone(), r,
 				repetition);
 		return rr;
+	}
+
+	@Override
+	public Rule conditionalize(Condition c) {
+		this.c = c;
+		return this;
 	}
 }
