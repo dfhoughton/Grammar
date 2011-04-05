@@ -14,6 +14,7 @@ import org.junit.Test;
  * @author David Houghton
  * 
  */
+@SuppressWarnings("serial")
 public class ConditionTest {
 
 	@Test
@@ -24,8 +25,6 @@ public class ConditionTest {
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("less_than_100", new Condition() {
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public boolean passes(Match m, CharSequence s) {
 				int i = Integer.parseInt(s.subSequence(m.start(), m.end())
@@ -50,8 +49,6 @@ public class ConditionTest {
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("less_than_100", new Condition() {
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public boolean passes(Match m, CharSequence s) {
 				int i = Integer.parseInt(s.subSequence(m.start(), m.end())
@@ -75,8 +72,6 @@ public class ConditionTest {
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("whole", new Condition() {
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public boolean passes(Match m, CharSequence s) {
 				return (m.start() == 0 || !Character.isLetterOrDigit(s.charAt(m
@@ -101,8 +96,6 @@ public class ConditionTest {
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("whole", new Condition() {
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public boolean passes(Match m, CharSequence s) {
 				return (m.start() == 0 || !Character.isLetterOrDigit(s.charAt(m
@@ -128,8 +121,6 @@ public class ConditionTest {
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("2", new Condition() {
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public boolean passes(Match m, CharSequence s) {
 				return m.end() - m.start() == 2;
@@ -152,8 +143,6 @@ public class ConditionTest {
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("2", new Condition() {
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public boolean passes(Match m, CharSequence s) {
 				return m.end() - m.start() == 2
@@ -178,8 +167,6 @@ public class ConditionTest {
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("2", new Condition() {
-			private static final long serialVersionUID = 1L;
-	
 			@Override
 			public boolean passes(Match m, CharSequence s) {
 				return m.end() - m.start() == 2;
@@ -191,6 +178,25 @@ public class ConditionTest {
 		while (m.match() != null)
 			count++;
 		assertTrue("found all the matches", count == 3);
+	}
+
+	@Test
+	public void sequenceTest() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = 'a'+ 'b' {2}",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("2", new Condition() {
+			@Override
+			public boolean passes(Match m, CharSequence s) {
+				return m.end() - m.start() == 2;
+			}
+		});
+		String s = "aaaab";
+		Matcher m = g.find(s);
+		Match n = m.match();
+		assertTrue("found right match", n.start() == 3);
 	}
 
 }

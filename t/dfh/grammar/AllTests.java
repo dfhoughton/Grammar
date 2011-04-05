@@ -27,6 +27,7 @@ import org.junit.runners.Suite;
 		IterationTest.class,//
 		MultithreadTest.class,//
 		TerminalGrammarTest.class,//
+		ConditionTest.class,//
 })
 public class AllTests {
 }

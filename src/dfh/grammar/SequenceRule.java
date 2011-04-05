@@ -22,6 +22,7 @@ import dfh.grammar.Grammar.GlobalState;
 public class SequenceRule extends Rule {
 	private static final long serialVersionUID = 1L;
 	final Rule[] sequence;
+	private Condition c;
 
 	class SequenceMatcher extends NonterminalMatcher {
 		LinkedList<Matcher> matchers = new LinkedList<Matcher>();
@@ -34,54 +35,60 @@ public class SequenceRule extends Rule {
 
 		@Override
 		protected void fetchNext() {
-			if (matched.size() > 0) {
-				while (!matched.isEmpty()) {
-					matched.removeLast();
-					if (matchers.peekLast().mightHaveNext())
-						break;
-					else
-						matchers.removeLast();
-				}
-				if (matchers.isEmpty()) {
-					next = null;
-					done = true;
-					return;
-				}
-			}
-			next = null;
-			boolean found = true;
-			while (matched.size() < sequence.length) {
-				Matcher m;
-				if (matchers.isEmpty()) {
-					m = sequence[0].matcher(s, offset, cache, this);
-					matchers.add(m);
-				} else
-					m = matchers.peekLast();
-				Match n = m.mightHaveNext() ? m.match() : null;
-				if (n == null) {
-					matchers.removeLast();
-					if (!matched.isEmpty()) {
+			while (true) {
+				if (matched.size() > 0) {
+					while (!matched.isEmpty()) {
 						matched.removeLast();
+						if (matchers.peekLast().mightHaveNext())
+							break;
+						else
+							matchers.removeLast();
 					}
 					if (matchers.isEmpty()) {
+						next = null;
 						done = true;
-						found = false;
-						break;
-					}
-				} else {
-					matched.add(n);
-					if (matched.size() < sequence.length) {
-						m = sequence[matched.size()].matcher(s, n.end(), cache,
-								this);
-						matchers.add(m);
+						return;
 					}
 				}
-			}
-			if (found) {
-				next = new Match(SequenceRule.this, offset, matched.peekLast()
-						.end());
-				Match[] children = matched.toArray(new Match[sequence.length]);
-				next.setChildren(children);
+				next = null;
+				boolean found = true;
+				while (matched.size() < sequence.length) {
+					Matcher m;
+					if (matchers.isEmpty()) {
+						m = sequence[0].matcher(s, offset, cache, this);
+						matchers.add(m);
+					} else
+						m = matchers.peekLast();
+					Match n = m.mightHaveNext() ? m.match() : null;
+					if (n == null) {
+						matchers.removeLast();
+						if (!matched.isEmpty()) {
+							matched.removeLast();
+						}
+						if (matchers.isEmpty()) {
+							done = true;
+							found = false;
+							break;
+						}
+					} else {
+						matched.add(n);
+						if (matched.size() < sequence.length) {
+							m = sequence[matched.size()].matcher(s, n.end(),
+									cache, this);
+							matchers.add(m);
+						}
+					}
+				}
+				if (found) {
+					next = new Match(SequenceRule.this, offset, matched
+							.peekLast().end());
+					Match[] children = matched
+							.toArray(new Match[sequence.length]);
+					next.setChildren(children);
+					if (c == null || c.passes(next, s))
+						break;
+				} else
+					break;
 			}
 		}
 	}
@@ -150,6 +157,8 @@ public class SequenceRule extends Rule {
 			} else
 				b.append(r.label());
 		}
+		if (condition != null)
+			b.append(" {").append(condition).append('}');
 		return b.toString();
 	}
 
@@ -191,4 +200,9 @@ public class SequenceRule extends Rule {
 		return sr;
 	}
 
+	@Override
+	public Rule conditionalize(Condition c) {
+		this.c = c;
+		return this;
+	}
 }
