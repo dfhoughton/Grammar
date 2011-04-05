@@ -108,7 +108,7 @@ public class LeafRule extends Rule {
 
 	@Override
 	protected String uniqueId() {
-		String s = description();
+		String s = descriptionWOCondition().toString();
 		if ((p.flags() & Pattern.COMMENTS) == Pattern.COMMENTS) {
 			// must normalize away spaces and comments
 			int index = s.lastIndexOf('/');
@@ -127,11 +127,20 @@ public class LeafRule extends Rule {
 			s = s.replaceAll("\\s++", "");
 			return '/' + s + suffix;
 		}
-		return description();
+		if (condition != null)
+			s += '{' + condition + '}';
+		return s;
 	}
 
 	@Override
 	public String description() {
+		StringBuilder b = descriptionWOCondition();
+		if (condition != null)
+			b.append(" {").append(condition).append('}');
+		return b.toString();
+	}
+
+	private StringBuilder descriptionWOCondition() {
 		StringBuilder b = new StringBuilder();
 		b.append('/');
 		b.append(p.toString());
@@ -148,7 +157,7 @@ public class LeafRule extends Rule {
 			b.append('u');
 		if ((p.flags() & Pattern.COMMENTS) == Pattern.COMMENTS)
 			b.append('x');
-		return b.toString();
+		return b;
 	}
 
 	@Override
@@ -191,5 +200,10 @@ public class LeafRule extends Rule {
 	public Rule shallowClone() {
 		LeafRule lr = new LeafRule((Label) label.clone(), p);
 		return lr;
+	}
+
+	@Override
+	public Rule conditionalize(Condition c) {
+		return new ConditionalLeafRule(this, c);
 	}
 }

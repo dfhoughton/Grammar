@@ -101,7 +101,11 @@ public class BackReferenceRule extends Rule {
 
 	@Override
 	protected String uniqueId() {
-		return Integer.toString(index + 1);
+		StringBuilder b = new StringBuilder();
+		b.append(index + 1);
+		if (condition != null)
+			b.append('{').append(condition).append('}');
+		return b.toString();
 	}
 
 	@Override

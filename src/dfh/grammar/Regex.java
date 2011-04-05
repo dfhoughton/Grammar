@@ -27,7 +27,7 @@ public class Regex implements RuleFragment {
 	 * @param re
 	 */
 	public Regex(String re) {
-		Matcher m = parsingPattern.matcher(re);
+		Matcher m = parsingPattern.matcher(re.trim());
 		if (m.matches()) {
 			int options = 0;
 			for (char c : m.group(2).toCharArray()) {

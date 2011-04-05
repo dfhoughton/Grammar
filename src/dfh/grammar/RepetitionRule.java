@@ -255,7 +255,11 @@ public class RepetitionRule extends Rule {
 
 	@Override
 	protected String uniqueId() {
-		return r.uniqueId() + repetition;
+		StringBuilder b = new StringBuilder();
+		b.append(r.uniqueId()).append(repetition);
+		if (condition != null)
+			b.append('{').append(condition).append('}');
+		return b.toString();
 	}
 
 	@Override

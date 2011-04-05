@@ -36,6 +36,8 @@ public class Compiler {
 	private List<String> redundantLabels = new LinkedList<String>();
 	private final Label root;
 	private boolean recursive;
+	private Map<String, Set<Label>> undefinedConditions = new HashMap<String, Set<Label>>();
+	private Map<Label, String> conditionMap = new HashMap<Label, String>();
 
 	/**
 	 * Generates a {@link Compiler} reading rules from the given
@@ -50,10 +52,20 @@ public class Compiler {
 		Map<Label, List<RuleFragment>> map = new HashMap<Label, List<RuleFragment>>();
 		Label r = null;
 		while ((line = reader.readLine()) != null) {
-			List<RuleFragment> list = RuleParser.parse(line);
+			LinkedList<RuleFragment> list = RuleParser.parse(line);
 			if (list == null)
 				continue; // blank line or comment
-			Label l = (Label) list.remove(0);
+			Label l = (Label) list.removeFirst();
+			if (list.peekLast() instanceof ConditionFragment) {
+				ConditionFragment cf = (ConditionFragment) list.removeLast();
+				Set<Label> set = undefinedConditions.get(cf.id);
+				if (set == null) {
+					set = new TreeSet<Label>();
+					undefinedConditions.put(cf.id, set);
+				}
+				conditionMap.put(l, cf.id);
+				set.add(l);
+			}
 			if (map.containsKey(l))
 				throw new GrammarException("rule " + l + " redefined at line "
 						+ reader.lineNumber());
@@ -81,6 +93,7 @@ public class Compiler {
 						&& !((RepeatableRuleFragment) rf).rep.redundant())
 					continue;
 				Label l = e.getKey();
+				String condition = conditionMap.get(l);
 				i.remove();
 				Type t = rf instanceof Regex ? Type.terminal : Type.literal;
 				l = new Label(t, l.id);
@@ -90,6 +103,7 @@ public class Compiler {
 					ru = new LeafRule(l, ((Regex) rf).re);
 				else
 					ru = new LiteralRule(l, ((LiteralFragment) rf).literal);
+				ru.condition = condition;
 				ru.generation = gen;
 				String id = ru.uniqueId();
 				Rule old = redundancyMap.get(id);
@@ -389,9 +403,18 @@ public class Compiler {
 			Map<Label, CyclicRule> cycleMap) {
 		if (rules.containsKey(label))
 			return rules.get(label);
-		Rule r = makeSingle(ruleFragment, cycleMap);
-		r = fixLabel(label, r);
+		Rule r = makeSingle(ruleFragment, cycleMap, conditionMap.get(label));
+		r = fixLabel(label, r, conditionMap.get(label));
+		fixConditions(label, r);
 		return r;
+	}
+
+	private void fixConditions(Label label, Rule r) {
+		if (r.condition != null) {
+			conditionMap.put(label, r.condition);
+			Set<Label> set = undefinedConditions().get(r.condition);
+			set.add(label);
+		}
 	}
 
 	/**
@@ -399,29 +422,37 @@ public class Compiler {
 	 * 
 	 * @param label
 	 * @param r
+	 * @param condition
 	 * @return named {@link Rule}
 	 */
-	static Rule fixLabel(Label label, Rule r) {
-		if (r instanceof AlternationRule)
-			return new AlternationRule(label, ((AlternationRule) r).alternates);
-		if (r instanceof RepetitionRule) {
+	static Rule fixLabel(Label label, Rule r, String condition) {
+		Rule ru = null;
+		if (r instanceof AlternationRule) {
+			ru = new AlternationRule(label, ((AlternationRule) r).alternates);
+		} else if (r instanceof RepetitionRule) {
 			RepetitionRule rr = (RepetitionRule) r;
-			return new RepetitionRule(label, rr.r, rr.repetition);
-		}
-		if (r instanceof SequenceRule)
-			return new SequenceRule(label, ((SequenceRule) r).sequence);
-		if (r instanceof LiteralRule)
-			return new LiteralRule(label, ((LiteralRule) r).literal);
-		if (r instanceof LeafRule)
-			return new LeafRule(label, ((LeafRule) r).p);
-		if (r instanceof DeferredDefinitionRule) {
+			ru = new RepetitionRule(label, rr.r, rr.repetition);
+		} else if (r instanceof SequenceRule) {
+			ru = new SequenceRule(label, ((SequenceRule) r).sequence);
+		} else if (r instanceof LiteralRule) {
+			ru = new LiteralRule(label, ((LiteralRule) r).literal);
+		} else if (r instanceof LeafRule) {
+			ru = new LeafRule(label, ((LeafRule) r).p);
+		} else if (r instanceof DeferredDefinitionRule) {
 			DeferredDefinitionRule old = (DeferredDefinitionRule) r;
 			DeferredDefinitionRule ddr = new DeferredDefinitionRule(label);
 			ddr.r = old;
-			return ddr;
+			ru = ddr;
 		}
-		throw new GrammarException("unanticipated rule type: "
-				+ r.getClass().getName());
+		if (ru == null)
+			throw new GrammarException("unanticipated rule type: "
+					+ r.getClass().getName());
+		if (condition != null)
+			ru.condition = condition;
+		else if (r.condition != null) {
+			ru.condition = r.condition;
+		}
+		return ru;
 	}
 
 	private Rule redundancyCheck(Rule r) {
@@ -440,7 +471,8 @@ public class Compiler {
 	 * @param cycleMap
 	 * @return
 	 */
-	private Rule makeSingle(RuleFragment rf, Map<Label, CyclicRule> cycleMap) {
+	private Rule makeSingle(RuleFragment rf, Map<Label, CyclicRule> cycleMap,
+			String condition) {
 		if (rf instanceof Label) {
 			Label l = (Label) rf;
 			Rule r = rules.get(l);
@@ -450,40 +482,51 @@ public class Compiler {
 				return r;
 			Label label = new Label(Type.nonTerminal, l.toString());
 			r = new RepetitionRule(label, r, l.rep);
+			r.condition = condition;
 			return redundancyCheck(r);
 		} else if (rf instanceof LiteralFragment) {
 			LiteralFragment lf = (LiteralFragment) rf;
 			Label l = new Label(Type.literal, '"' + lf.literal + '"');
 			Rule r = new LiteralRule(l, lf.literal);
-			r = redundancyCheck(r);
-			if (lf.rep.redundant())
+			if (lf.rep.redundant()) {
+				r.condition = condition;
+				r = redundancyCheck(r);
 				return r;
+			}
+			r = redundancyCheck(r);
 			l = new Label(Type.nonTerminal, lf.toString());
 			r = new RepetitionRule(l, r, lf.rep);
+			r.condition = condition;
 			return redundancyCheck(r);
 		} else if (rf instanceof BackReferenceFragment) {
 			BackReferenceFragment brf = (BackReferenceFragment) rf;
 			Label l = new Label(Type.backreference, rf.toString());
 			Rule r = new BackReferenceRule(l, brf.reference);
+			r.condition = condition;
 			return redundancyCheck(r);
 		}
 		GroupFragment gf = (GroupFragment) rf;
 		if (gf.alternates.size() == 1) {
 			if (gf.alternates.get(0).size() == 1) {
-				Rule r = makeSingle(gf.alternates.get(0).get(0), cycleMap);
-				if (gf.rep.redundant())
-					return r;
-				else {
+				Rule r = makeSingle(gf.alternates.get(0).get(0), cycleMap, null);
+				if (gf.rep.redundant()) {
+					r.condition = condition;
+					return redundancyCheck(r);
+				} else {
 					Label l = new Label(Type.nonTerminal, subLabel(r) + gf.rep);
 					r = new RepetitionRule(l, r, gf.rep);
+					r.condition = condition;
 					return redundancyCheck(r);
 				}
 			}
-			Rule r = makeSequence(gf.alternates.get(0), cycleMap);
-			if (gf.rep.redundant())
-				return r;
+			Rule r = makeSequence(gf.alternates.get(0), cycleMap, null);
+			if (gf.rep.redundant()) {
+				r.condition = condition;
+				return redundancyCheck(r);
+			}
 			Label l = new Label(Type.nonTerminal, subLabel(r) + gf.rep);
 			r = new RepetitionRule(l, r, gf.rep);
+			r.condition = condition;
 			return redundancyCheck(r);
 		}
 		Rule[] alternates = new Rule[gf.alternates.size()];
@@ -494,9 +537,9 @@ public class Compiler {
 		for (List<RuleFragment> alternate : gf.alternates) {
 			Rule r;
 			if (alternate.size() == 1)
-				r = makeSingle(alternate.get(0), cycleMap);
+				r = makeSingle(alternate.get(0), cycleMap, null);
 			else
-				r = makeSequence(alternate, cycleMap);
+				r = makeSequence(alternate, cycleMap, null);
 			alternates[index++] = r;
 			if (nonInitial)
 				b.append('|');
@@ -507,11 +550,15 @@ public class Compiler {
 		b.append(']');
 		Label l = new Label(Type.nonTerminal, b.toString());
 		Rule r = new AlternationRule(l, alternates);
-		r = redundancyCheck(r);
-		if (gf.rep.redundant())
+		if (gf.rep.redundant()) {
+			r.condition = condition;
+			r = redundancyCheck(r);
 			return r;
+		}
+		r = redundancyCheck(r);
 		l = new Label(Type.nonTerminal, l.toString() + gf.rep);
 		r = new RepetitionRule(l, r, gf.rep);
+		r.condition = condition;
 		return redundancyCheck(r);
 	}
 
@@ -523,13 +570,14 @@ public class Compiler {
 			Map<Label, CyclicRule> cycleMap) {
 		if (rules.containsKey(label))
 			return rules.get(label);
-		Rule r = makeSequence(fragments, cycleMap);
-		r = fixLabel(label, r);
+		Rule r = makeSequence(fragments, cycleMap, conditionMap.get(label));
+		r = fixLabel(label, r, conditionMap.get(label));
+		fixConditions(label, r);
 		return r;
 	}
 
 	private Rule makeSequence(List<RuleFragment> value,
-			Map<Label, CyclicRule> cycleMap) {
+			Map<Label, CyclicRule> cycleMap, String condition) {
 		if (value.size() == 1)
 			throw new GrammarException(
 					"logic error in compiler; no singleton lists should arrive at this point");
@@ -543,13 +591,14 @@ public class Compiler {
 				b.append(' ');
 			else
 				nonInitial = true;
-			Rule r = makeSingle(rf, cycleMap);
+			Rule r = makeSingle(rf, cycleMap, null);
 			sequence[index++] = r;
 			b.append(subLabel(r));
 		}
 		b.append(']');
 		Label l = new Label(Type.nonTerminal, b.toString());
 		Rule r = new SequenceRule(l, sequence);
+		r.condition = condition;
 		return redundancyCheck(r);
 	}
 
@@ -586,5 +635,9 @@ public class Compiler {
 
 	Label root() {
 		return root;
+	}
+
+	public Map<String, Set<Label>> undefinedConditions() {
+		return new HashMap<String, Set<Label>>(undefinedConditions);
 	}
 }

@@ -32,6 +32,12 @@ public abstract class Rule implements Serializable {
 	int generation = -1;
 
 	/**
+	 * Used during compilation to hold condition identifier for use in
+	 * constructing unique ids. See {@link #uniqueId()}.
+	 */
+	String condition;
+
+	/**
 	 * Assigns given label to {@link Rule}.
 	 * 
 	 * @param label
@@ -189,7 +195,7 @@ public abstract class Rule implements Serializable {
 	public abstract Set<Integer> study(CharSequence s,
 			Map<Label, Map<Integer, CachedMatch>> cache,
 			Set<Rule> studiedRules, GlobalState options);
-	
+
 	/**
 	 * Returns whether this rule can match the null string. This method is used
 	 * in {@link #study(CharSequence, Map, int, Set, Map) studying} in
@@ -218,4 +224,19 @@ public abstract class Rule implements Serializable {
 	 *         which it is dependent
 	 */
 	public abstract Rule shallowClone();
+
+	/**
+	 * Returns a {@link Rule} that duplicates this except that it won't return
+	 * any {@link Match} that doesn't meet the given condition. This method must
+	 * be overridden by child classes as the base implementation only throws a
+	 * {@link GrammarException} when called.
+	 * 
+	 * @param c
+	 * @return a {@link Rule} that duplicates this except that it won't return
+	 *         any {@link Match} that doesn't meet the given condition
+	 */
+	public Rule conditionalize(Condition c) {
+		throw new GrammarException(this.getClass()
+				+ " cannot be conditionalized");
+	}
 }

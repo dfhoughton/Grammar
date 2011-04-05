@@ -396,6 +396,7 @@ public class Grammar implements Serializable, Cloneable {
 	protected final HashSet<Label> undefinedRules;
 	transient PrintStream trace;
 	private boolean recursive;
+	protected final Map<String, Set<Label>> undefinedConditions;
 
 	/**
 	 * Delegates to {@link #Grammar(LineReader)}.
@@ -419,6 +420,7 @@ public class Grammar implements Serializable, Cloneable {
 		this.rules = new HashMap<Label, Rule>();
 		this.terminalLabelMap = new HashMap<String, Label>();
 		this.undefinedRules = new HashSet<Label>();
+		this.undefinedConditions = new HashMap<String, Set<Label>>();
 	}
 
 	/**
@@ -490,6 +492,7 @@ public class Grammar implements Serializable, Cloneable {
 		terminalLabelMap = c.terminalLabelMap();
 		undefinedRules = c.undefinedTerminals();
 		recursive = c.recursive();
+		undefinedConditions = c.undefinedConditions();
 	}
 
 	/**
@@ -557,6 +560,19 @@ public class Grammar implements Serializable, Cloneable {
 			for (Label l : list) {
 				b.append(", ");
 				b.append(l.id);
+			}
+			throw new GrammarException(b.toString());
+		}
+		if (!undefinedConditions.isEmpty()) {
+			LinkedList<String> list = new LinkedList<String>();
+			list.addAll(undefinedConditions.keySet());
+			Collections.sort(list);
+			StringBuilder b = new StringBuilder(
+					"conditions remaining undefined: ");
+			b.append(list.pollFirst());
+			for (String s : list) {
+				b.append(", ");
+				b.append(s);
 			}
 			throw new GrammarException(b.toString());
 		}
@@ -981,7 +997,7 @@ public class Grammar implements Serializable, Cloneable {
 			boolean isRoot = l.equals(g.root);
 			String s = label + ':' + l.id;
 			l = new Label(l.t, s);
-			Rule nru = Compiler.fixLabel(l, ru);
+			Rule nru = Compiler.fixLabel(l, ru, ru.condition);
 			fix(g, ru, nru);
 			g.rules.put(l, nru);
 			if (isRoot) {
@@ -1145,6 +1161,12 @@ public class Grammar implements Serializable, Cloneable {
 			clone.undefinedRules.add(labelMap.get(l));
 		for (Entry<Rule, Rule> e : ruleMap.entrySet())
 			fix(clone, e.getKey(), e.getValue());
+		for (Entry<String, Set<Label>> e : undefinedConditions.entrySet()) {
+			Set<Label> set = new HashSet<Label>(e.getValue().size());
+			for (Label l : e.getValue())
+				set.add(labelMap.get(l));
+			clone.undefinedConditions.put(e.getKey(), set);
+		}
 		return clone;
 	}
 
@@ -1173,5 +1195,17 @@ public class Grammar implements Serializable, Cloneable {
 		} else
 			r.setRule(rules.get(idMap.get(id)));
 		undefinedRules.remove(r.label());
+	}
+
+	public synchronized void defineCondition(String label, Condition c) {
+		Set<Label> set = undefinedConditions.remove(label);
+		if (set == null)
+			throw new GrammarException("no undefined condition " + label);
+		for (Label l : set) {
+			Rule r = rules.remove(l);
+			Rule nr = r.conditionalize(c);
+			fix(this, r, nr);
+			rules.put(l, nr);
+		}
 	}
 }

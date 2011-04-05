@@ -21,6 +21,10 @@ public class RuleParser {
 	 */
 	public static final Pattern labelPattern = Pattern.compile("<(\\w++)>");
 	/**
+	 * Character class for characters in condition identifiers.
+	 */
+	public static final Pattern conditionLabelPattern = Pattern.compile("\\w");
+	/**
 	 * Pattern that defines a rule as "<"<name>">" "=" <remainder>
 	 */
 	public static final Pattern basePattern = Pattern.compile("\\s*+"
@@ -46,7 +50,8 @@ public class RuleParser {
 	 * @return line parsed into properly nested tokens
 	 * @throws GrammarException
 	 */
-	public static List<RuleFragment> parse(String line) throws GrammarException {
+	public static LinkedList<RuleFragment> parse(String line)
+			throws GrammarException {
 		if (line == null)
 			throw new GrammarException("cannot parse nulls");
 		if (ignorePattern.matcher(line).matches())
@@ -57,7 +62,7 @@ public class RuleParser {
 			String remainder = m.group(2);
 			if (remainder.length() == 0)
 				throw new GrammarException("no rule body provided in " + line);
-			List<RuleFragment> parse = new LinkedList<RuleFragment>();
+			LinkedList<RuleFragment> parse = new LinkedList<RuleFragment>();
 			Type t;
 			if (id.equals(Label.ROOT)) {
 				t = Type.root;
@@ -65,9 +70,27 @@ public class RuleParser {
 				t = Type.indeterminate;
 			// we've parsed out the rule label
 			parse.add(new Label(t, id));
-			if (remainder.charAt(0) == '/')
-				parse.add(new Regex(remainder));
-			else {
+			if (remainder.charAt(0) == '/') {
+				int i1 = remainder.lastIndexOf('/'), i2 = remainder
+						.lastIndexOf('{');
+				if (i1 == 0)
+					throw new GrammarException(
+							"no terminal slash in regular expression "
+									+ remainder);
+				int i3 = remainder.indexOf('#', i1);
+				if (i3 > i1) {
+					remainder = remainder.substring(0, i3);
+					if (i2 > i3)
+						i2 = -1;
+				}
+				if (i2 > i1) {
+					parse.add(new Regex(remainder.substring(0, i2)));
+					int[] offset = { i2 };
+					ConditionFragment c = getCondition(remainder, offset);
+					parse.add(c);
+				} else
+					parse.add(new Regex(remainder));
+			} else {
 				int[] offset = { 0 };
 				parse.addAll(parseBody(remainder, offset, (char) 0));
 			}
@@ -157,6 +180,13 @@ public class RuleParser {
 				}
 				BackReferenceFragment brf = new BackReferenceFragment(reference);
 				add(parse, gf, brf);
+			} else if (c == '{') {
+				if (parse.isEmpty())
+					throw new GrammarException("condition without rule in "
+							+ body);
+				ConditionFragment cond = getCondition(body, offset);
+				parse.add(cond);
+				break;
 			} else {
 				RuleFragment r = nextRule(body, offset, bracket);
 				if (r instanceof RepeatableRuleFragment) {
@@ -320,5 +350,34 @@ public class RuleParser {
 		while (offset[0] < body.length()
 				&& Character.isWhitespace(body.charAt(offset[0])))
 			offset[0]++;
+	}
+
+	private static ConditionFragment getCondition(String body, int[] offset)
+			throws GrammarException {
+		offset[0]++;
+		int start = offset[0];
+		Matcher m = conditionLabelPattern.matcher(body);
+		while (offset[0] < body.length()) {
+			if (body.charAt(offset[0]) == '}')
+				break;
+			m.region(offset[0], offset[0] + 1);
+			if (m.matches())
+				offset[0]++;
+			else
+				throw new GrammarException("ill-formed condition at end of "
+						+ body);
+		}
+		if (start == offset[0])
+			throw new GrammarException("zero-width condition identifier in "
+					+ body);
+		int end = offset[0]++;
+		@SuppressWarnings("unused")
+		String s = body.substring(start, end);
+		trimWhitespace(body, offset);
+		if (offset[0] < body.length() && body.charAt(offset[0]) != '#')
+			throw new GrammarException(
+					"no content other than a comment permitted after a condition: "
+							+ body);
+		return new ConditionFragment(body.substring(start, end));
 	}
 }

@@ -89,6 +89,8 @@ public class AlternationRule extends Rule {
 			b.append(r.uniqueId());
 		}
 		b.append(']');
+		if (condition != null)
+			b.append('{').append(condition).append('}');
 		return b.toString();
 	}
 

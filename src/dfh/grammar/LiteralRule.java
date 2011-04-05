@@ -104,7 +104,11 @@ public class LiteralRule extends Rule {
 
 	@Override
 	protected String uniqueId() {
-		return '"' + literal + '"';
+		StringBuilder b = new StringBuilder();
+		b.append('"').append(literal).append('"');
+		if (condition != null)
+			b.append('{').append(condition).append('}');
+		return b.toString();
 	}
 
 	@Override
