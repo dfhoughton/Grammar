@@ -119,4 +119,78 @@ public class ConditionTest {
 		assertTrue("found only whole words", count == 2);
 	}
 
+	@Test
+	public void asteriskQTest() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = <a>*? {2}",//
+				"<a> = 'a'",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("2", new Condition() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean passes(Match m, CharSequence s) {
+				return m.end() - m.start() == 2;
+			}
+		});
+		String s = "aaaaaa a";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found all the matches", count == 3);
+	}
+
+	@Test
+	public void asteriskPTest() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = <a>*+ {2}",//
+				"<a> = 'a'",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("2", new Condition() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean passes(Match m, CharSequence s) {
+				return m.end() - m.start() == 2
+						&& (m.start() == 0 || !Character.isLetterOrDigit(s
+								.charAt(m.start() - 1)));
+			}
+		});
+		String s = "aaaaaa aa";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found the one good match", count == 1);
+	}
+
+	@Test
+	public void plusQTest() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = <a>+? {2}",//
+				"<a> = 'a'",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("2", new Condition() {
+			private static final long serialVersionUID = 1L;
+	
+			@Override
+			public boolean passes(Match m, CharSequence s) {
+				return m.end() - m.start() == 2;
+			}
+		});
+		String s = "aaaaaa a";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found all the matches", count == 3);
+	}
+
 }

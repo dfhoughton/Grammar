@@ -154,58 +154,67 @@ public class RepetitionRule extends Rule {
 				done = true;
 				matched = null;
 				matchers = null;
-			}
+			} else if (!(c == null || c.passes(next, cs)))
+				fetchNext();
 		}
 
 		private void seekGoal() {
-			while (true) {
-				boolean found = true;
-				next = null;
-				while (matched.size() < goal) {
-					if (grab()) {
-						if (matchers.isEmpty()) {
-							found = false;
-							break;
+			boolean found = true;
+			next = null;
+			OUTER: while (matched.size() < goal) {
+				if (grab()) {
+					if (matchers.isEmpty()) {
+						found = false;
+						break;
+					} else {
+						while (!matchers.peekLast().mightHaveNext()) {
+							if (matchers.size() == 1) {
+								found = false;
+								done = true;
+								matchers = null;
+								matched = null;
+								break OUTER;
+							} else {
+								matchers.removeLast();
+								matched.removeLast();
+							}
 						}
 					}
 				}
-				if (found) {
-					next = new Match(RepetitionRule.this, offset);
-					Match[] children = matched
-							.toArray(new Match[matched.size()]);
-					next.setChildren(children);
-					if (matched.isEmpty())
-						next.setEnd(offset);
-					else
-						next.setEnd(matched.peekLast().end());
-					if (c == null || c.passes(next, s)) {
-						break;
-					} else if (goal == 0)
-						goal = 1;
-					else
-						matched.removeLast();
-				} else
-					break;
+			}
+			if (found) {
+				next = new Match(RepetitionRule.this, offset);
+				Match[] children = matched.toArray(new Match[matched.size()]);
+				next.setChildren(children);
+				if (matched.isEmpty())
+					next.setEnd(offset);
+				else
+					next.setEnd(matched.peekLast().end());
 			}
 		}
 
 		@Override
 		protected void fetchNext() {
-			if (goal == 0)
-				goal = 1;
-			else
-				matched.removeLast();
-			while (goal <= repetition.top) {
-				seekGoal();
-				if (matchers.isEmpty())
-					goal++;
+			while (true) {
+				if (goal == 0)
+					goal = 1;
 				else
+					matched.removeLast();
+				while (goal <= repetition.top) {
+					seekGoal();
+					if (done)
+						return;
+					if (matchers.isEmpty())
+						goal++;
+					else
+						break;
+				}
+				if (goal > repetition.top) {
+					done = true;
+					matchers = null;
+					matched = null;
+				} else if (c == null || c.passes(next, s))
 					break;
-			}
-			if (goal > repetition.top) {
-				done = true;
-				matchers = null;
-				matched = null;
 			}
 		}
 	}
