@@ -155,10 +155,10 @@ public class Grammar implements Serializable, Cloneable {
 		 * @param start
 		 *            point in {@link CharSequence} at which to begin matching
 		 */
-		public void start(int startOffset) {
-			if (startOffset < 0)
+		public void start(int start) {
+			if (start < 0)
 				throw new GrammarException("text offsets must be positive");
-			this.start = startOffset;
+			this.start = start;
 		}
 
 		/**

@@ -33,12 +33,14 @@ public class BarrierFragment implements RuleFragment {
 	/**
 	 * Generates a fragment from the given reference number.
 	 * 
-	 * @param reference
+	 * @param single
+	 *            whether it is a single or double colon barrier
 	 */
 	public BarrierFragment(boolean single) {
 		this.id = single ? ":" : "::";
 	}
 
+	@Override
 	public String toString() {
 		return id;
 	}

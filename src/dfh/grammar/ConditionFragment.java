@@ -23,12 +23,14 @@ public class ConditionFragment implements RuleFragment {
 	/**
 	 * Generates a fragment from the given reference number.
 	 * 
-	 * @param reference
+	 * @param id
+	 *            phrase identifying condition
 	 */
 	public ConditionFragment(String id) {
 		this.id = id;
 	}
 
+	@Override
 	public String toString() {
 		return '{' + id + '}';
 	}

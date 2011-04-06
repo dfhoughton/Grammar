@@ -7,6 +7,14 @@ import java.util.Set;
 import dfh.grammar.Grammar.GlobalState;
 import dfh.grammar.Label.Type;
 
+/**
+ * Implements a backtracking barrier. See {@link BarrierFragment}.
+ * <p>
+ * <b>Creation date:</b> Apr 6, 2011
+ * 
+ * @author David Houghton
+ * 
+ */
 public class BacktrackingBarrier extends Rule {
 	private static final long serialVersionUID = 1L;
 	/**
@@ -19,6 +27,9 @@ public class BacktrackingBarrier extends Rule {
 	 */
 	public static final Label DOUBLE_COLON_LABEL = new Label(Type.nonTerminal,
 			"::");
+	/**
+	 * Whether this is a single or double colon barrier.
+	 */
 	protected final boolean isSingle;
 
 	public BacktrackingBarrier(boolean isSingle) {

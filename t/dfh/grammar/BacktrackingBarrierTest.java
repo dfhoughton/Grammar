@@ -1,12 +1,12 @@
 package dfh.grammar;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
 import org.junit.Test;
-
-import dfh.grammar.Grammar.Options;
 
 /**
  * Makes sure backtracking barriers work to spec.
