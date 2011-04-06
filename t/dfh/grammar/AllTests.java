@@ -28,6 +28,7 @@ import org.junit.runners.Suite;
 		MultithreadTest.class,//
 		TerminalGrammarTest.class,//
 		ConditionTest.class,//
+		BacktrackingBarrierTest.class,//
 })
 public class AllTests {
 }

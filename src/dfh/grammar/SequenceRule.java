@@ -59,7 +59,14 @@ public class SequenceRule extends Rule {
 						matchers.add(m);
 					} else
 						m = matchers.peekLast();
-					Match n = m.mightHaveNext() ? m.match() : null;
+					Match n = null;
+					try {
+						n = m.mightHaveNext() ? m.match() : null;
+					} catch (SingleColonBarrier s) {
+						done = true;
+						found = false;
+						break;
+					}
 					if (n == null) {
 						matchers.removeLast();
 						if (!matched.isEmpty()) {

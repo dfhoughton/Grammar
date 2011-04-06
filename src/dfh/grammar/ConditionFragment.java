@@ -1,7 +1,7 @@
 package dfh.grammar;
 
 /**
- * Holds a back reference in a rule.
+ * Holds a condition in a rule.
  * <p>
  * Used in rules such as
  * 

@@ -473,7 +473,11 @@ public class Compiler {
 	 */
 	private Rule makeSingle(RuleFragment rf, Map<Label, CyclicRule> cycleMap,
 			String condition) {
-		if (rf instanceof Label) {
+		if (rf instanceof BarrierFragment) {
+			BarrierFragment bf = (BarrierFragment) rf;
+			Rule r = new BacktrackingBarrier(bf.id.length() == 1);
+			return redundancyCheck(r);
+		} else if (rf instanceof Label) {
 			Label l = (Label) rf;
 			Rule r = rules.get(l);
 			if (r == null)

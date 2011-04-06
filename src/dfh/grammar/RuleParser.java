@@ -92,11 +92,38 @@ public class RuleParser {
 					parse.add(new Regex(remainder));
 			} else {
 				int[] offset = { 0 };
-				parse.addAll(parseBody(remainder, offset, (char) 0));
+				LinkedList<RuleFragment> body = parseBody(remainder, offset,
+						(char) 0);
+				checkBarriers(body.peekLast() instanceof ConditionFragment ? body
+						.subList(0, body.size() - 1) : body);
+				parse.addAll(body);
 			}
 			return parse;
 		} else
 			throw new GrammarException("ill-formed rule: " + line);
+	}
+
+	/**
+	 * Makes sure we don't have any '::' barriers unaccompanied by other rule
+	 * fragments.
+	 * 
+	 * @param body
+	 */
+	private static void checkBarriers(List<RuleFragment> body) {
+		boolean oneElementList = body.size() == 1;
+		for (RuleFragment r : body)
+			checkBarriers(r, oneElementList);
+	}
+
+	private static void checkBarriers(RuleFragment r, boolean oneElementList) {
+		if (oneElementList && r instanceof BarrierFragment)
+			throw new GrammarException(
+					"all backtracking barriers must occur as members of a sequence");
+		if (r instanceof GroupFragment) {
+			GroupFragment gf = (GroupFragment) r;
+			for (List<RuleFragment> alternate : gf.alternates)
+				checkBarriers(alternate);
+		}
 	}
 
 	/**
@@ -112,9 +139,9 @@ public class RuleParser {
 	 * @return
 	 * @throws GrammarException
 	 */
-	private static List<RuleFragment> parseBody(String body, int[] offset,
-			char bracket) throws GrammarException {
-		List<RuleFragment> parse = new LinkedList<RuleFragment>();
+	private static LinkedList<RuleFragment> parseBody(String body,
+			int[] offset, char bracket) throws GrammarException {
+		LinkedList<RuleFragment> parse = new LinkedList<RuleFragment>();
 		GroupFragment gf = null;
 		while (offset[0] < body.length()) {
 			trimWhitespace(body, offset);
@@ -187,6 +214,20 @@ public class RuleParser {
 				ConditionFragment cond = getCondition(body, offset);
 				parse.add(cond);
 				break;
+			} else if (c == ':') {
+				BarrierFragment bf = getBarrier(body, offset);
+				if (bf.id.equals(":")) {
+					if (gf != null) {
+						if (gf.currentSequence.isEmpty())
+							throw new GrammarException(
+									"':' is redundant as the first element of a sequence: "
+											+ body);
+					} else if (parse.isEmpty())
+						throw new GrammarException(
+								"':' is redundant as the first element of a sequence: "
+										+ body);
+				}
+				add(parse, gf, bf);
 			} else {
 				RuleFragment r = nextRule(body, offset, bracket);
 				if (r instanceof RepeatableRuleFragment) {
@@ -379,5 +420,18 @@ public class RuleParser {
 					"no content other than a comment permitted after a condition: "
 							+ body);
 		return new ConditionFragment(body.substring(start, end));
+	}
+
+	private static BarrierFragment getBarrier(String body, int[] offset)
+			throws GrammarException {
+		int count = 0;
+		while (offset[0] < body.length() && body.charAt(offset[0]) == ':') {
+			offset[0]++;
+			count++;
+		}
+		if (count > 2)
+			throw new GrammarException("two many colons in '" + body
+					+ "' barriers must appear singly");
+		return new BarrierFragment(count == 1);
 	}
 }

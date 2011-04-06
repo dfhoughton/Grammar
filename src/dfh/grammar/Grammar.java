@@ -325,14 +325,21 @@ public class Grammar implements Serializable, Cloneable {
 				return null;
 			boolean firstNull = true;
 			while (true) {
-				Match n;
+				Match n = null;
 				if (firstMatch) {
-					n = m.match();
-					firstMatch = false;
+					try {
+						n = m.match();
+						firstMatch = false;
+					} catch (DoubleColonBarrier e) {
+					}
 				} else if (firstNull && !options.allowOverlap)
 					n = null;
-				else
-					n = m.match();
+				else {
+					try {
+						n = m.match();
+					} catch (DoubleColonBarrier e) {
+					}
+				}
 				if (n != null) {
 					if (!options.allowOverlap) {
 						if (options.study) {
@@ -626,7 +633,11 @@ public class Grammar implements Serializable, Cloneable {
 			public synchronized boolean mightHaveNext() {
 				if (options.study && startOffsets.isEmpty())
 					return false;
-				return matchedOnce ? false : m.mightHaveNext();
+				try {
+					return matchedOnce ? false : m.mightHaveNext();
+				} catch (DoubleColonBarrier e) {
+					return false;
+				}
 			}
 
 			@Override
@@ -634,7 +645,11 @@ public class Grammar implements Serializable, Cloneable {
 				Match n = null;
 				if (!(matchedOnce || options.study && startOffsets.isEmpty())) {
 					matchedOnce = true;
-					n = m.match();
+					try {
+						n = m.match();
+					} catch (DoubleColonBarrier e) {
+						return null;
+					}
 					if (n != null)
 						n.establishParentage();
 				}
@@ -646,14 +661,22 @@ public class Grammar implements Serializable, Cloneable {
 			public synchronized boolean mightHaveNext() {
 				if (options.study && startOffsets.isEmpty())
 					return false;
-				return m.mightHaveNext();
+				try {
+					return m.mightHaveNext();
+				} catch (DoubleColonBarrier e) {
+					return false;
+				}
 			}
 
 			@Override
 			public synchronized Match match() {
 				Match n = null;
 				if (!(options.study && startOffsets.isEmpty())) {
-					n = m.match();
+					try {
+						n = m.match();
+					} catch (DoubleColonBarrier e) {
+						return null;
+					}
 					if (n != null)
 						n.establishParentage();
 				}
@@ -849,9 +872,12 @@ public class Grammar implements Serializable, Cloneable {
 				if (options.study && startOffsets.isEmpty())
 					return null;
 				Match n;
-				while ((n = m.match()) != null) {
-					if (n.end() == options.end)
-						return n;
+				try {
+					while ((n = m.match()) != null) {
+						if (n.end() == options.end)
+							return n;
+					}
+				} catch (DoubleColonBarrier e) {
 				}
 				return null;
 			}
