@@ -29,8 +29,8 @@ public class CompilationTest {
 	public void compileConditions() {
 		String[] rules = {
 				//
-				"<ROOT> = <a> {less_than_20}", //
-				"<a> = /\\b\\d{2}\\b/ {less_than_30}",//
+				"<ROOT> = <a> (less_than_20)", //
+				"<a> = /\\b\\d{2}\\b/ (less_than_30)",//
 		};
 		try {
 			@SuppressWarnings("unused")
@@ -45,8 +45,8 @@ public class CompilationTest {
 	public void compileConditionsAndComments() {
 		String[] rules = {
 				//
-				"<ROOT> = <a> {less_than_20} # la di da", //
-				"<a> = /\\b\\d{2}\\b/ {less_than_30} # whoa",//
+				"<ROOT> = <a> (less_than_20) # la di da", //
+				"<a> = /\\b\\d{2}\\b/ (less_than_30) # whoa",//
 		};
 		try {
 			@SuppressWarnings("unused")

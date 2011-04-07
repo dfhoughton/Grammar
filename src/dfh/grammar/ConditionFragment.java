@@ -6,7 +6,7 @@ package dfh.grammar;
  * Used in rules such as
  * 
  * <pre>
- * &lt;a&gt; = /\d++/ {less_than_20}
+ * &lt;a&gt; = /\d++/ (less_than_20)
  * </pre>
  * 
  * where <code>{less_than_20}</code> must later be defined by invoking
@@ -32,6 +32,6 @@ public class ConditionFragment implements RuleFragment {
 
 	@Override
 	public String toString() {
-		return '{' + id + '}';
+		return '(' + id + ')';
 	}
 }

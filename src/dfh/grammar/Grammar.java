@@ -404,6 +404,8 @@ public class Grammar implements Serializable, Cloneable {
 	transient PrintStream trace;
 	private boolean recursive;
 	protected final Map<String, Set<Label>> undefinedConditions;
+	private final Map<String, Set<Rule>> knownConditions;
+	private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
 
 	/**
 	 * Delegates to {@link #Grammar(LineReader)}.
@@ -428,6 +430,7 @@ public class Grammar implements Serializable, Cloneable {
 		this.terminalLabelMap = new HashMap<String, Label>();
 		this.undefinedRules = new HashSet<Label>();
 		this.undefinedConditions = new HashMap<String, Set<Label>>();
+		this.knownConditions = new HashMap<String, Set<Rule>>();
 	}
 
 	/**
@@ -500,6 +503,8 @@ public class Grammar implements Serializable, Cloneable {
 		undefinedRules = c.undefinedTerminals();
 		recursive = c.recursive();
 		undefinedConditions = c.undefinedConditions();
+		knownConditions = new HashMap<String, Set<Rule>>(
+				undefinedConditions.size());
 	}
 
 	/**
@@ -510,13 +515,71 @@ public class Grammar implements Serializable, Cloneable {
 	 * 
 	 * @param label
 	 * @param p
+	 * @param id
+	 *            unique identifier for condition, if any
+	 * @param c
+	 *            optional {@link Condition}
 	 * @throws GrammarException
 	 */
-	public synchronized void defineRule(String label, Pattern p)
-			throws GrammarException {
+	public synchronized void defineRule(String label, Pattern p, String id,
+			Condition c) throws GrammarException {
 		DeferredDefinitionRule r = checkRuleDefinition(label);
 		Label l = new Label(Type.terminal, label);
 		LeafRule lr = new LeafRule(l, p);
+		if (c != null) {
+			lr = (LeafRule) conditionCheck(id, c, lr);
+		}
+		redefinitionCheck(r, lr);
+	}
+
+	/**
+	 * Makes sure we keep things which should be unique unique.
+	 * 
+	 * @param id
+	 * @param c
+	 * @param lr
+	 * @return
+	 */
+	private Rule conditionCheck(String id, Condition c, Rule lr) {
+		if (c == null) {
+			if (id != null)
+				throw new GrammarException(
+						"null condition given for non-null condition identifier "
+								+ id);
+			return lr;
+		} else {
+			Condition other = conditionMap.get(id);
+			if (other == null)
+				conditionMap.put(id, c);
+			else if (!other.equals(c))
+				throw new GrammarException("condition identifier " + id
+						+ " already in use");
+			Set<Rule> set = knownConditions.get(id);
+			if (!(set == null || set.isEmpty()))
+				throw new GrammarException("condition identifier " + id
+						+ " already in use");
+			if (set == null) {
+				set = new HashSet<Rule>();
+				knownConditions.put(id, set);
+			} else if (set.contains(lr)) {
+				return lr;
+			}
+			// remove lr from any set already containing it
+			for (Set<Rule> s : knownConditions.values())
+				s.remove(lr);
+			lr = lr.conditionalize(c, id);
+			set.add(lr);
+			return lr;
+		}
+	}
+
+	/**
+	 * @param r
+	 * @param lr
+	 * @return whether rule is novel
+	 */
+	private boolean redefinitionCheck(DeferredDefinitionRule r, Rule lr) {
+		Label l;
 		Map<String, Label> idMap = new HashMap<String, Label>(rules.size());
 		for (Entry<Label, Rule> e : rules.entrySet())
 			idMap.put(e.getValue().uniqueId(), e.getKey());
@@ -527,6 +590,7 @@ public class Grammar implements Serializable, Cloneable {
 		} else
 			r.setRule(rules.get(idMap.get(id)));
 		undefinedRules.remove(r.label());
+		return l == null;
 	}
 
 	private DeferredDefinitionRule checkRuleDefinition(String label) {
@@ -1006,8 +1070,13 @@ public class Grammar implements Serializable, Cloneable {
 	 * 
 	 * @param label
 	 * @param g
+	 * @param id
+	 *            unique identifier for condition, if any
+	 * @param c
+	 *            optional {@link Condition}
 	 */
-	public synchronized void defineRule(String label, Grammar g) {
+	public synchronized void defineRule(String label, Grammar g, String id,
+			Condition c) {
 		DeferredDefinitionRule r = checkRuleDefinition(label);
 		g.checkComplete();
 		g = (Grammar) g.clone();
@@ -1051,43 +1120,46 @@ public class Grammar implements Serializable, Cloneable {
 			rules.put(e.getKey(), e.getValue());
 		}
 		// and we define the rule
-		r.setRule(g.rules.get(g.root));
-		// and fix it so it can't be redefined in the future
-		undefinedRules.remove(r.label());
+		Rule rr = g.rules.get(g.root);
+		if (c != null)
+			rr = conditionCheck(label, c, rr);
+		if (redefinitionCheck(r, rr)) {
 
-		// finally, we reassign generation numbers to better indicate dependency
-		Map<Rule, Set<Rule>> dependentMap = new HashMap<Rule, Set<Rule>>(
-				rules.size());
-		Set<Rule> requireAssignment = new HashSet<Rule>(rules.size());
-		for (Rule ru : rules.values()) {
-			Set<Rule> dependents = dependents(ru);
-			dependentMap.put(ru, dependents);
-			if (!ru.label.equals(root) && ru.generation > -1) {
-				requireAssignment.add(ru);
-			}
-		}
-		int generation = 0;
-		while (!requireAssignment.isEmpty()) {
-			generation++;
-			List<Rule> reassigned = new ArrayList<Rule>(
-					requireAssignment.size());
-			OUTER: for (Rule ru : requireAssignment) {
-				Set<Rule> dependents = dependentMap.get(ru);
-				for (Rule dr : dependents) {
-					if (requireAssignment.contains(dr))
-						continue OUTER;
+			// finally, we reassign generation numbers to better indicate
+			// dependency
+			Map<Rule, Set<Rule>> dependentMap = new HashMap<Rule, Set<Rule>>(
+					rules.size());
+			Set<Rule> requireAssignment = new HashSet<Rule>(rules.size());
+			for (Rule ru : rules.values()) {
+				Set<Rule> dependents = dependents(ru);
+				dependentMap.put(ru, dependents);
+				if (!ru.label.equals(root) && ru.generation > -1) {
+					requireAssignment.add(ru);
 				}
-				reassigned.add(ru);
 			}
-			if (reassigned.isEmpty()) {
-				// looping, break out
-				for (Rule ru : requireAssignment)
-					ru.generation = generation;
-				break;
-			} else {
-				for (Rule ru : reassigned)
-					ru.generation = generation;
-				requireAssignment.removeAll(reassigned);
+			int generation = 0;
+			while (!requireAssignment.isEmpty()) {
+				generation++;
+				List<Rule> reassigned = new ArrayList<Rule>(
+						requireAssignment.size());
+				OUTER: for (Rule ru : requireAssignment) {
+					Set<Rule> dependents = dependentMap.get(ru);
+					for (Rule dr : dependents) {
+						if (requireAssignment.contains(dr))
+							continue OUTER;
+					}
+					reassigned.add(ru);
+				}
+				if (reassigned.isEmpty()) {
+					// looping, break out
+					for (Rule ru : requireAssignment)
+						ru.generation = generation;
+					break;
+				} else {
+					for (Rule ru : reassigned)
+						ru.generation = generation;
+					requireAssignment.removeAll(reassigned);
+				}
 			}
 		}
 	}
@@ -1193,6 +1265,12 @@ public class Grammar implements Serializable, Cloneable {
 				set.add(labelMap.get(l));
 			clone.undefinedConditions.put(e.getKey(), set);
 		}
+		for (Entry<String, Set<Rule>> e : knownConditions.entrySet()) {
+			Set<Rule> newSet = new HashSet<Rule>(e.getValue().size());
+			for (Rule r : e.getValue())
+				newSet.add(ruleMap.get(r));
+			knownConditions.put(e.getKey(), newSet);
+		}
 		return clone;
 	}
 
@@ -1204,35 +1282,109 @@ public class Grammar implements Serializable, Cloneable {
 	 *            id of undefined rule
 	 * @param literal
 	 *            String to match
+	 * @param id
+	 *            unique identifier for condition, if any
+	 * @param c
+	 *            optional {@link Condition}
 	 * @throws GrammarException
 	 */
-	public synchronized void defineRule(String label, String literal)
-			throws GrammarException {
+	public synchronized void defineRule(String label, String literal,
+			String id, Condition c) throws GrammarException {
 		DeferredDefinitionRule r = checkRuleDefinition(label);
 		Label l = new Label(Type.literal, label);
 		LiteralRule lr = new LiteralRule(l, literal);
-		Map<String, Label> idMap = new HashMap<String, Label>(rules.size());
-		for (Entry<Label, Rule> e : rules.entrySet())
-			idMap.put(e.getValue().uniqueId(), e.getKey());
-		String id = lr.uniqueId();
-		l = idMap.get(id);
-		if (l == null) {
-			r.setRule(lr);
-		} else
-			r.setRule(rules.get(idMap.get(id)));
-		undefinedRules.remove(r.label());
+		if (c != null)
+			lr = (LiteralRule) conditionCheck(label, c, lr);
+		redefinitionCheck(r, lr);
 	}
 
+	/**
+	 * Assign a condition to an arbitrary {@link Rule}.
+	 * 
+	 * @param labelId
+	 * @param conditionId
+	 * @param c
+	 */
+	public synchronized void assignCondition(String labelId,
+			String conditionId, Condition c) {
+		if (undefinedConditions.containsKey(conditionId))
+			throw new GrammarException(conditionId
+					+ " belongs to an as yet undefined condition");
+		Label l = null;
+		for (Label label : rules.keySet()) {
+			if (label.id.equals(labelId)) {
+				l = label;
+				break;
+			}
+		}
+		if (l == null)
+			throw new GrammarException("unknown rule: " + labelId);
+		Rule r = rules.remove(l);
+		Rule nr = conditionCheck(conditionId, c, r);
+		fix(this, r, nr);
+		rules.put(l, nr);
+	}
+
+	/**
+	 * @param label
+	 *            condition identifier
+	 * @param c
+	 */
 	public synchronized void defineCondition(String label, Condition c) {
 		Set<Label> set = undefinedConditions.remove(label);
 		if (set == null)
 			throw new GrammarException("no undefined condition " + label);
+		Set<Rule> rset = new HashSet<Rule>(set.size());
+		knownConditions.put(label, rset);
 		for (Label l : set) {
 			Rule r = rules.remove(l);
-			Rule nr = r.conditionalize(c);
+			Rule nr = r.conditionalize(c, label);
 			if (r != nr)
 				fix(this, r, nr);
 			rules.put(l, nr);
+			rset.add(nr);
 		}
+	}
+
+	/**
+	 * Assign a complete grammar to an undefined symbol. Delegates to
+	 * {@link #defineRule(String, Grammar, String, Condition)}, using
+	 * <code>null</code> for last two parameters.
+	 * 
+	 * @param label
+	 * @param g
+	 */
+	public synchronized void defineRule(String label, Grammar g) {
+		defineRule(label, g, null, null);
+	}
+
+	/**
+	 * For defining a terminal rule left undefined by the initial rule set.
+	 * Delegates to {@link #defineRule(String, Pattern, String, Condition)},
+	 * using <code>null</code> for last two parameters.
+	 * 
+	 * @param label
+	 * @param p
+	 * @throws GrammarException
+	 */
+	public synchronized void defineRule(String label, Pattern p)
+			throws GrammarException {
+		defineRule(label, p, null, null);
+	}
+
+	/**
+	 * For defining a terminal rule left undefined by the initial rule set.
+	 * Delegates to {@link #defineRule(String, String, String, Condition)},
+	 * using <code>null</code> for last two parameters.
+	 * 
+	 * @param label
+	 *            id of undefined rule
+	 * @param literal
+	 *            String to match
+	 * @throws GrammarException
+	 */
+	public synchronized void defineRule(String label, String literal)
+			throws GrammarException {
+		defineRule(label, literal, null, null);
 	}
 }

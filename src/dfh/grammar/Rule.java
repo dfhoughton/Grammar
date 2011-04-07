@@ -109,6 +109,22 @@ public abstract class Rule implements Serializable {
 		m.options.trace.println(b);
 	}
 
+	/**
+	 * Print message to debugging stream along with stack trace.
+	 * 
+	 * @param m
+	 * @param message
+	 */
+	protected final void event(Matcher m, String message) {
+		if (m.options.debug) {
+			StringBuilder b = new StringBuilder();
+			b.append(message).append(' ');
+			locate(b, m.s, m.offset);
+			stackTrace(b, m);
+			m.options.trace.println(b);
+		}
+	}
+
 	private void stackTrace(StringBuilder b, Matcher m) {
 		b.append("\n     ");
 		while (m.rule() != null) {
@@ -235,7 +251,7 @@ public abstract class Rule implements Serializable {
 	 * @return a {@link Rule} that duplicates this except that it won't return
 	 *         any {@link Match} that doesn't meet the given condition
 	 */
-	public Rule conditionalize(Condition c) {
+	public Rule conditionalize(Condition c, String id) {
 		throw new GrammarException(this.getClass()
 				+ " cannot be conditionalized");
 	}

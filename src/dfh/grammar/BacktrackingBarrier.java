@@ -56,6 +56,7 @@ public class BacktrackingBarrier extends Rule {
 		}
 
 		private void throwBarrierException() {
+			rule().event(this, "hit backtracking barrier");
 			if (isSingle)
 				throw new SingleColonBarrier(this);
 			throw new DoubleColonBarrier(this);

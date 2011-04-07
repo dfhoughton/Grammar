@@ -54,7 +54,7 @@ public class LiteralRule extends Rule {
 					}
 					if (matched) {
 						Match m = new Match(LiteralRule.this, offset, end);
-						if (!(c == null || c.passes(m, s)))
+						if (!(c == null || c.passes(m, this, s)))
 							cm = new CachedMatch(m);
 						else
 							cm = CachedMatch.MISMATCH;
@@ -111,7 +111,7 @@ public class LiteralRule extends Rule {
 		StringBuilder b = new StringBuilder();
 		b.append('"').append(literal).append('"');
 		if (condition != null)
-			b.append('{').append(condition).append('}');
+			b.append('(').append(condition).append(')');
 		return b.toString();
 	}
 
@@ -126,7 +126,7 @@ public class LiteralRule extends Rule {
 			else
 				s = '"' + s.replaceAll("([\\\\])", "\\\\$1") + '"';
 			if (condition != null)
-				s += " {" + condition + '}';
+				s += " (" + condition + ')';
 			return s;
 		}
 		return uniqueId();
@@ -149,7 +149,7 @@ public class LiteralRule extends Rule {
 			while ((index = string.indexOf(literal, o)) > -1) {
 				Integer i = index + options.start;
 				Match n = new Match(this, i, i + literal.length());
-				if (c == null || c.passes(n, s))
+				if (c == null || c.passes(n, null, s))
 					subCache.put(i, new CachedMatch(n));
 				startOffsets.add(i);
 				o = index + 1;
@@ -172,8 +172,9 @@ public class LiteralRule extends Rule {
 	}
 
 	@Override
-	public Rule conditionalize(Condition c) {
+	public Rule conditionalize(Condition c, String id) {
 		this.c = c;
+		this.condition = id;
 		return this;
 	}
 }

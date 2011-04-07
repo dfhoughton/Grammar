@@ -128,7 +128,7 @@ public class LeafRule extends Rule {
 			return '/' + s + suffix;
 		}
 		if (condition != null)
-			s += '{' + condition + '}';
+			s += '(' + condition + ')';
 		return s;
 	}
 
@@ -136,7 +136,7 @@ public class LeafRule extends Rule {
 	public String description() {
 		StringBuilder b = descriptionWOCondition();
 		if (condition != null)
-			b.append(" {").append(condition).append('}');
+			b.append(" (").append(condition).append(')');
 		return b.toString();
 	}
 
@@ -203,7 +203,7 @@ public class LeafRule extends Rule {
 	}
 
 	@Override
-	public Rule conditionalize(Condition c) {
-		return new ConditionalLeafRule(this, c);
+	public Rule conditionalize(Condition c, String id) {
+		return new ConditionalLeafRule(this, c, id);
 	}
 }

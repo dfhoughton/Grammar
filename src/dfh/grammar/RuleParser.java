@@ -72,7 +72,7 @@ public class RuleParser {
 			parse.add(new Label(t, id));
 			if (remainder.charAt(0) == '/') {
 				int i1 = remainder.lastIndexOf('/'), i2 = remainder
-						.lastIndexOf('{');
+						.lastIndexOf('(');
 				if (i1 == 0)
 					throw new GrammarException(
 							"no terminal slash in regular expression "
@@ -207,7 +207,7 @@ public class RuleParser {
 				}
 				BackReferenceFragment brf = new BackReferenceFragment(reference);
 				add(parse, gf, brf);
-			} else if (c == '{') {
+			} else if (c == '(') {
 				if (parse.isEmpty())
 					throw new GrammarException("condition without rule in "
 							+ body);
@@ -399,7 +399,7 @@ public class RuleParser {
 		int start = offset[0];
 		Matcher m = conditionLabelPattern.matcher(body);
 		while (offset[0] < body.length()) {
-			if (body.charAt(offset[0]) == '}')
+			if (body.charAt(offset[0]) == ')')
 				break;
 			m.region(offset[0], offset[0] + 1);
 			if (m.matches())

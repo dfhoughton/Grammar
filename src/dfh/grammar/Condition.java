@@ -19,11 +19,13 @@ public interface Condition extends Serializable {
 	 * concurrency issues and/or context dependent bugs that are hard to
 	 * reproduce and fix.
 	 * 
-	 * @param m
+	 * @param n
 	 *            {@link Match} being tested
+	 * @param m
+	 *            the {@link Matcher} that produced the {@link Match}
 	 * @param s
 	 *            {@link CharSequence} being matched against
 	 * @return whether the {@link Match} meets the condition
 	 */
-	boolean passes(Match m, CharSequence s);
+	boolean passes(Match n, Matcher m, CharSequence s);
 }

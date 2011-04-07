@@ -131,7 +131,7 @@ public class RepetitionRule extends Rule {
 					next.setChildren(children);
 					next.setEnd(matched.isEmpty() ? offset : matched.peekLast()
 							.end());
-					if (c == null || c.passes(next, s))
+					if (c == null || c.passes(next, this, s))
 						break;
 				}
 			}
@@ -154,7 +154,7 @@ public class RepetitionRule extends Rule {
 				done = true;
 				matched = null;
 				matchers = null;
-			} else if (!(c == null || c.passes(next, cs)))
+			} else if (!(c == null || c.passes(next, this, cs)))
 				fetchNext();
 		}
 
@@ -213,7 +213,7 @@ public class RepetitionRule extends Rule {
 					done = true;
 					matchers = null;
 					matched = null;
-				} else if (c == null || c.passes(next, s))
+				} else if (c == null || c.passes(next, this, s))
 					break;
 			}
 		}
@@ -239,7 +239,7 @@ public class RepetitionRule extends Rule {
 					next.setChildren(children);
 					next.setEnd(matched.isEmpty() ? offset : matched.peekLast()
 							.end());
-					if (!(c == null || c.passes(next, s))) {
+					if (!(c == null || c.passes(next, this, s))) {
 						next = null;
 						done = true;
 						matched = null;
@@ -286,7 +286,7 @@ public class RepetitionRule extends Rule {
 		StringBuilder b = new StringBuilder();
 		b.append(r.uniqueId()).append(repetition);
 		if (condition != null)
-			b.append('{').append(condition).append('}');
+			b.append('(').append(condition).append(')');
 		return b.toString();
 	}
 
@@ -326,8 +326,9 @@ public class RepetitionRule extends Rule {
 	}
 
 	@Override
-	public Rule conditionalize(Condition c) {
+	public Rule conditionalize(Condition c, String id) {
 		this.c = c;
+		this.condition = id;
 		return this;
 	}
 }

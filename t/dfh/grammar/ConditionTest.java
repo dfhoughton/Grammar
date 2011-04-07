@@ -21,12 +21,12 @@ public class ConditionTest {
 	public void leafTest() throws GrammarException, IOException {
 		String[] rules = {
 		//
-		"<ROOT> = /\\b\\d++\\b/ {less_than_100}",//
+		"<ROOT> = /\\b\\d++\\b/ (less_than_100)",//
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("less_than_100", new Condition() {
 			@Override
-			public boolean passes(Match m, CharSequence s) {
+			public boolean passes(Match m, Matcher n, CharSequence s) {
 				int i = Integer.parseInt(s.subSequence(m.start(), m.end())
 						.toString());
 				return i < 100;
@@ -45,12 +45,12 @@ public class ConditionTest {
 		String[] rules = {
 				//
 				"<ROOT> = <a>",//
-				"<a> = /\\b\\d++\\b/ {less_than_100}",//
+				"<a> = /\\b\\d++\\b/ (less_than_100)",//
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("less_than_100", new Condition() {
 			@Override
-			public boolean passes(Match m, CharSequence s) {
+			public boolean passes(Match m, Matcher n, CharSequence s) {
 				int i = Integer.parseInt(s.subSequence(m.start(), m.end())
 						.toString());
 				return i < 100;
@@ -68,12 +68,12 @@ public class ConditionTest {
 	public void literalTest() throws GrammarException, IOException {
 		String[] rules = {
 		//
-		"<ROOT> = 'foo' {whole}",//
+		"<ROOT> = 'foo' (whole)",//
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("whole", new Condition() {
 			@Override
-			public boolean passes(Match m, CharSequence s) {
+			public boolean passes(Match m, Matcher n, CharSequence s) {
 				return (m.start() == 0 || !Character.isLetterOrDigit(s.charAt(m
 						.start() - 1)))
 						&& (m.end() == s.length() || !Character
@@ -92,12 +92,12 @@ public class ConditionTest {
 	public void alternationTest() throws GrammarException, IOException {
 		String[] rules = {
 		//
-		"<ROOT> = 'foo' | 'bar' {whole}",//
+		"<ROOT> = 'foo' | 'bar' (whole)",//
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("whole", new Condition() {
 			@Override
-			public boolean passes(Match m, CharSequence s) {
+			public boolean passes(Match m, Matcher n, CharSequence s) {
 				return (m.start() == 0 || !Character.isLetterOrDigit(s.charAt(m
 						.start() - 1)))
 						&& (m.end() == s.length() || !Character
@@ -116,13 +116,13 @@ public class ConditionTest {
 	public void asteriskQTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = <a>*? {2}",//
+				"<ROOT> = <a>*? (2)",//
 				"<a> = 'a'",//
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("2", new Condition() {
 			@Override
-			public boolean passes(Match m, CharSequence s) {
+			public boolean passes(Match m, Matcher n, CharSequence s) {
 				return m.end() - m.start() == 2;
 			}
 		});
@@ -138,13 +138,13 @@ public class ConditionTest {
 	public void asteriskPTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = <a>*+ {2}",//
+				"<ROOT> = <a>*+ (2)",//
 				"<a> = 'a'",//
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("2", new Condition() {
 			@Override
-			public boolean passes(Match m, CharSequence s) {
+			public boolean passes(Match m, Matcher n, CharSequence s) {
 				return m.end() - m.start() == 2
 						&& (m.start() == 0 || !Character.isLetterOrDigit(s
 								.charAt(m.start() - 1)));
@@ -162,13 +162,13 @@ public class ConditionTest {
 	public void plusQTest() throws GrammarException, IOException {
 		String[] rules = {
 				//
-				"<ROOT> = <a>+? {2}",//
+				"<ROOT> = <a>+? (2)",//
 				"<a> = 'a'",//
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("2", new Condition() {
 			@Override
-			public boolean passes(Match m, CharSequence s) {
+			public boolean passes(Match m, Matcher n, CharSequence s) {
 				return m.end() - m.start() == 2;
 			}
 		});
@@ -184,12 +184,12 @@ public class ConditionTest {
 	public void sequenceTest() throws GrammarException, IOException {
 		String[] rules = {
 		//
-		"<ROOT> = 'a'+ 'b' {2}",//
+		"<ROOT> = 'a'+ 'b' (2)",//
 		};
 		Grammar g = new Grammar(rules);
 		g.defineCondition("2", new Condition() {
 			@Override
-			public boolean passes(Match m, CharSequence s) {
+			public boolean passes(Match m, Matcher n, CharSequence s) {
 				return m.end() - m.start() == 2;
 			}
 		});
@@ -197,6 +197,34 @@ public class ConditionTest {
 		Matcher m = g.find(s);
 		Match n = m.match();
 		assertTrue("found right match", n.start() == 3);
+	}
+
+	@Test
+	public void assignmentTest() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = /\\b\\d++/",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "1 10 100";
+		Matcher m = g.find(s);
+		int count1 = 0;
+		while (m.match() != null)
+			count1++;
+		g.assignCondition("ROOT", "less_than_100", new Condition() {
+
+			@Override
+			public boolean passes(Match n, Matcher m, CharSequence s) {
+				int i = Integer.parseInt(s.subSequence(n.start(), n.end())
+						.toString());
+				return i < 100;
+			}
+		});
+		m = g.find(s);
+		int count2 = 0;
+		while (m.match() != null)
+			count2++;
+		assertTrue("changed match count", count1 == 3 && count2 == 2);
 	}
 
 }

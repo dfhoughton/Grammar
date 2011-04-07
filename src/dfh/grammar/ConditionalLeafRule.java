@@ -45,7 +45,7 @@ public class ConditionalLeafRule extends LeafRule {
 				if (m.lookingAt()) {
 					Match n = new Match(ConditionalLeafRule.this, offset,
 							m.end());
-					if (c.passes(n, s))
+					if (c.passes(n, this, s))
 						cm = new CachedMatch(n);
 					else
 						cm = CachedMatch.MISMATCH;
@@ -77,9 +77,9 @@ public class ConditionalLeafRule extends LeafRule {
 		}
 	}
 
-	public ConditionalLeafRule(LeafRule lr, Condition c) {
+	public ConditionalLeafRule(LeafRule lr, Condition c, String id) {
 		super(lr.label, lr.p);
-		this.condition = lr.condition;
+		this.condition = id;
 		this.generation = lr.generation;
 		this.c = c;
 	}
@@ -109,7 +109,7 @@ public class ConditionalLeafRule extends LeafRule {
 				Integer i = m.start();
 				startOffsets.add(i);
 				Match n = new Match(this, m.start(), m.end());
-				if (c.passes(n, s))
+				if (c.passes(n, null, s))
 					subCache.put(i, new CachedMatch(n));
 				int newStart = m.start() + 1;
 				if (newStart == options.end)
@@ -123,7 +123,7 @@ public class ConditionalLeafRule extends LeafRule {
 	}
 
 	@Override
-	public Rule conditionalize(Condition c) {
+	public Rule conditionalize(Condition c, String id) {
 		throw new GrammarException(this.getClass()
 				+ " cannot be re-conditionalized");
 	}

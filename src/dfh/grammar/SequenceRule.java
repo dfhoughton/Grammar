@@ -92,7 +92,7 @@ public class SequenceRule extends Rule {
 					Match[] children = matched
 							.toArray(new Match[sequence.length]);
 					next.setChildren(children);
-					if (c == null || c.passes(next, s))
+					if (c == null || c.passes(next, this, s))
 						break;
 				} else
 					break;
@@ -141,7 +141,7 @@ public class SequenceRule extends Rule {
 		}
 		b.append(']');
 		if (condition != null)
-			b.append('{').append(condition).append('}');
+			b.append('(').append(condition).append(')');
 		return b.toString();
 	}
 
@@ -165,7 +165,7 @@ public class SequenceRule extends Rule {
 				b.append(r.label());
 		}
 		if (condition != null)
-			b.append(" {").append(condition).append('}');
+			b.append(" (").append(condition).append(')');
 		return b.toString();
 	}
 
@@ -208,8 +208,9 @@ public class SequenceRule extends Rule {
 	}
 
 	@Override
-	public Rule conditionalize(Condition c) {
+	public Rule conditionalize(Condition c, String id) {
 		this.c = c;
+		this.condition = id;
 		return this;
 	}
 }

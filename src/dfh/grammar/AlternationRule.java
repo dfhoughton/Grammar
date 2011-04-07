@@ -40,7 +40,7 @@ public class AlternationRule extends Rule {
 				while (mostRecent.mightHaveNext()) {
 					child = mostRecent.match();
 					if (child != null) {
-						if (c == null || c.passes(child, s))
+						if (c == null || c.passes(child, this, s))
 							break OUTER;
 						else
 							child = null;
@@ -95,7 +95,7 @@ public class AlternationRule extends Rule {
 		}
 		b.append(']');
 		if (condition != null)
-			b.append('{').append(condition).append('}');
+			b.append('(').append(condition).append(')');
 		return b.toString();
 	}
 
@@ -114,7 +114,7 @@ public class AlternationRule extends Rule {
 				b.append(r.label());
 		}
 		if (condition != null)
-			b.append(" {").append(condition).append('}');
+			b.append(" (").append(condition).append(')');
 		return b.toString();
 	}
 
@@ -145,8 +145,9 @@ public class AlternationRule extends Rule {
 	}
 
 	@Override
-	public Rule conditionalize(Condition c) {
+	public Rule conditionalize(Condition c, String id) {
 		this.c = c;
+		this.condition = id;
 		return this;
 	}
 }
