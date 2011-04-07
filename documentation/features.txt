@@ -18,14 +18,32 @@ Grammar can handle the following:
                                   # in this case '1' must match verbatim whatever '[ <a> | <b> ]' matched
                                   # NOTE: back references can't take repetition suffixes
 9) terminal regular expressions
-     <rule> = <a> (s) <b>
-        (s) =\s++
-     # note the regular expression begins immediately after the '=' and you can't include comments
-     # except via the usual methods in regular expressions
-     # regular expression labels are enclosed in round brackets rather than angled
+     <rule> = <a> <s> <b>
+        <s> = /\s++/
 10) reasonably thorough optimization and error checking
 11) memoization of matching success where possible -- actual matches are recorded for literals and regexes, success 
     or failure for all other rules except back references, whose success or failure cannot easily be cached
 12) every Grammar must have a root rule, the basis of all matching, called ROOT; e.g.,
      <ROOT> = <a> <b>
 13) all rule labels must be some sequence of \w characters
+14) postponed definition of terminals as
+     * literals
+     * regexes
+     * arbitrary rules
+     * other grammars
+15) pretty printing of grammars
+16) debugging mode
+17) native zero-width forward assertions (variable length backwards assertions in works)
+     <rule> = ~<a> <b> # <a> must be able to match where <b> matches
+     <rule> = !<a> <b> # <a> must not be able to match where <b> matches
+18) backtracking barriers
+     <rule> = <a> : <b>  # never backtrack into <a> in this rule once you've matched!
+     <rule> = <a> :: <b> # if <b> fails to match, the grammar cannot match at this offset
+19) impose arbitrary conditions on rule to be tested after rule matches
+     <rule> = <a> <b> <c> (length_less_than_20)
+    in this case one must instantiate a Condition that contains the desired test code, this object will be passed 
+    the character sequence, the Match, and the Matcher that produced it.
+    !NOTE! conditions on terminal rules must not make use of the Matcher object if you wish to "study" the character
+    sequence before matching (the default behavior). Also, the condition code should have immutable state and be 
+    purely functional, or at least cause no changes that will affect matching. For example, you might use a condition
+    to log information, but it would be unwise to modify a HashTable, particularly without synchronization.
