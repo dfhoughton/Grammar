@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -228,6 +229,9 @@ public class RuleParser {
 										+ body);
 				}
 				add(parse, gf, bf);
+			} else if (c == '~' || c == '!') {
+				AssertionFragment as = getAssertion(body, offset);
+				add(parse, gf, as);
 			} else {
 				RuleFragment r = nextRule(body, offset, bracket);
 				if (r instanceof RepeatableRuleFragment) {
@@ -244,7 +248,45 @@ public class RuleParser {
 			throw new GrammarException("empty rule body: " + body);
 		if (gf != null)
 			gf.done();
+		completeAssertions(parse, body);
 		return parse;
+	}
+
+	/**
+	 * Joins assertions to their constituent rules.
+	 * 
+	 * @param parse
+	 */
+	private static void completeAssertions(LinkedList<RuleFragment> parse,
+			String body) {
+		if (parse.peekLast() instanceof AssertionFragment)
+			throw new GrammarException("no rule after assertion marker in "
+					+ body);
+		RuleFragment previous = null;
+		for (Iterator<RuleFragment> i = parse.iterator(); i.hasNext();) {
+			RuleFragment rf = i.next();
+			if (rf instanceof GroupFragment) {
+				GroupFragment gf = (GroupFragment) rf;
+				for (LinkedList<RuleFragment> list : gf.alternates)
+					completeAssertions(list, body);
+			}
+			if (previous != null && previous instanceof AssertionFragment) {
+				if (rf instanceof AssertionFragment)
+					throw new GrammarException(
+							"two consecutive assertion markers in " + body);
+				AssertionFragment af = (AssertionFragment) previous;
+				af.rf = rf;
+				i.remove();
+			}
+			previous = rf;
+		}
+	}
+
+	private static AssertionFragment getAssertion(String body, int[] offset) {
+		// TODO implement modifier for backwards assertions
+		boolean positive = body.charAt(offset[0]) == '~';
+		offset[0]++;
+		return new AssertionFragment(positive);
 	}
 
 	private static int getBackReference(String body, int[] offset) {

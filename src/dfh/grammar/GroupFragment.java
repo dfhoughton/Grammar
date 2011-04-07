@@ -18,8 +18,8 @@ import java.util.List;
  * @author David Houghton
  */
 public class GroupFragment extends RepeatableRuleFragment {
-	List<List<RuleFragment>> alternates = new LinkedList<List<RuleFragment>>();
-	List<RuleFragment> currentSequence = new LinkedList<RuleFragment>();
+	List<LinkedList<RuleFragment>> alternates = new LinkedList<LinkedList<RuleFragment>>();
+	LinkedList<RuleFragment> currentSequence = new LinkedList<RuleFragment>();
 	private boolean did = false;
 
 	public GroupFragment(List<RuleFragment> list) {
@@ -66,7 +66,7 @@ public class GroupFragment extends RepeatableRuleFragment {
 	 *         <code>NONE</code>
 	 */
 	public GroupFragment noRep() {
-		Iterator<List<RuleFragment>> i = alternates.iterator();
+		Iterator<LinkedList<RuleFragment>> i = alternates.iterator();
 		GroupFragment clone = new GroupFragment(i.next());
 		clone.rep = Repetition.NONE;
 		while (i.hasNext())

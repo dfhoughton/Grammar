@@ -14,6 +14,7 @@ import org.junit.Test;
  * @author David Houghton
  * 
  */
+@SuppressWarnings("unused")
 public class AssertionTest {
 
 	@Test
@@ -65,5 +66,35 @@ public class AssertionTest {
 		while (m.match() != null)
 			count++;
 		assertTrue("found joe", count == 1);
+	}
+
+	@Test
+	public void nativePostiveAssertionCompilationSimple()
+			throws GrammarException, IOException {
+		try {
+			String[] rules = {
+					//
+					"<ROOT> = ~ '1' <b>",//
+					"<b> = /\\b\\d++/",//
+			};
+			Grammar g = new Grammar(rules);
+		} catch (Exception e) {
+			fail("could not compile a simple positive assertion");
+		}
+	}
+
+	@Test
+	public void nativeNegativeAssertionCompilationSimple()
+			throws GrammarException, IOException {
+		try {
+			String[] rules = {
+					//
+					"<ROOT> = ! '1' <b>",//
+					"<b> = /\\b\\d++/",//
+			};
+			Grammar g = new Grammar(rules);
+		} catch (Exception e) {
+			fail("could not compile a simple negative assertion");
+		}
 	}
 }

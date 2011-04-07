@@ -473,7 +473,15 @@ public class Compiler {
 	 */
 	private Rule makeSingle(RuleFragment rf, Map<Label, CyclicRule> cycleMap,
 			String condition) {
-		if (rf instanceof BarrierFragment) {
+		if (rf instanceof AssertionFragment) {
+			AssertionFragment af = (AssertionFragment) rf;
+			Rule sr = makeSingle(af.rf, cycleMap, null);
+			String id = (af.positive ? '~' : '!') + subLabel(sr);
+			Label l = new Label(Type.nonTerminal, id);
+			Assertion a = new Assertion(l, sr, af.positive);
+			a.condition = condition;
+			return redundancyCheck(a);
+		} else if (rf instanceof BarrierFragment) {
 			BarrierFragment bf = (BarrierFragment) rf;
 			Rule r = new BacktrackingBarrier(bf.id.length() == 1);
 			return redundancyCheck(r);
