@@ -107,9 +107,16 @@ public class Assertion extends Rule {
 	public String description() {
 		StringBuilder b = new StringBuilder();
 		b.append(positive ? '~' : '!');
-		if (r.generation == -1)
+		if (r.generation == -1) {
+			boolean needsBrackets = r instanceof SequenceRule
+					|| r instanceof RepetitionRule
+					|| r instanceof AlternationRule;
+			if (needsBrackets)
+				b.append("[ ");
 			b.append(r.description());
-		else
+			if (needsBrackets)
+				b.append(" ]");
+		} else
 			b.append(r.label);
 		return b.toString();
 	}

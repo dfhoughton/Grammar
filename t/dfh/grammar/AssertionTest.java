@@ -97,4 +97,98 @@ public class AssertionTest {
 			fail("could not compile a simple negative assertion");
 		}
 	}
+
+	@Test
+	public void nativePostiveAssertionCompilationComplex()
+			throws GrammarException, IOException {
+		try {
+			String[] rules = {
+					//
+					"<ROOT> = ~['1'|'2'] <b>",//
+					"<b> = /\\b\\d++/",//
+			};
+			Grammar g = new Grammar(rules);
+		} catch (Exception e) {
+			fail("could not compile a complex positive assertion");
+		}
+	}
+
+	@Test
+	public void nativeNegativeAssertionCompilationComplex()
+			throws GrammarException, IOException {
+		try {
+			String[] rules = {
+					//
+					"<ROOT> = !['1'|'2'] <b>",//
+					"<b> = /\\b\\d++/",//
+			};
+			Grammar g = new Grammar(rules);
+		} catch (Exception e) {
+			fail("could not compile a complex negative assertion");
+		}
+	}
+
+	@Test
+	public void nativePostiveAssertionSimple() throws GrammarException,
+			IOException {
+		String[] rules = {
+				//
+				"<ROOT> = ~ '1' <b>",//
+				"<b> = /\\b\\d++/",//
+		};
+		Grammar g = new Grammar(rules);
+		Matcher m = g.find("1 2");
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("used simple positive native assertion", count == 1);
+	}
+
+	@Test
+	public void nativeNegativeAssertionSimple() throws GrammarException,
+			IOException {
+		String[] rules = {
+				//
+				"<ROOT> = ! '1' <b>",//
+				"<b> = /\\b\\d++/",//
+		};
+		Grammar g = new Grammar(rules);
+		Matcher m = g.find("1 2");
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("used simple negative native assertion", count == 1);
+	}
+
+	@Test
+	public void nativePostiveAssertionComplex() throws GrammarException,
+			IOException {
+		String[] rules = {
+				//
+				"<ROOT> = ~['1'|'2'] <b>",//
+				"<b> = /\\b\\d++/",//
+		};
+		Grammar g = new Grammar(rules);
+		Matcher m = g.find("1 2 3");
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("used complex positive native assertion", count == 2);
+	}
+
+	@Test
+	public void nativeNegativeAssertionComplex() throws GrammarException,
+			IOException {
+		String[] rules = {
+				//
+				"<ROOT> = !['1'|'2'] <b>",//
+				"<b> = /\\b\\d++/",//
+		};
+		Grammar g = new Grammar(rules);
+		Matcher m = g.find("1 2 3");
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("used complex negative native assertion", count == 1);
+	}
 }

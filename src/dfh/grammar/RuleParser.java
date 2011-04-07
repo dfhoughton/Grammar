@@ -274,6 +274,14 @@ public class RuleParser {
 				if (rf instanceof AssertionFragment)
 					throw new GrammarException(
 							"two consecutive assertion markers in " + body);
+				if (rf instanceof BarrierFragment)
+					throw new GrammarException(
+							"assertion marker immediately before backtracking barrier in "
+									+ body);
+				if (rf instanceof ConditionFragment)
+					throw new GrammarException(
+							"assertion marker immediately before condition in "
+									+ body);
 				AssertionFragment af = (AssertionFragment) previous;
 				af.rf = rf;
 				i.remove();
