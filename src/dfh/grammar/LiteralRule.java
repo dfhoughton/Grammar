@@ -146,7 +146,8 @@ public class LiteralRule extends Rule {
 			int index, o = 0;
 			String string = s.subSequence(options.start, options.end)
 					.toString();
-			while ((index = string.indexOf(literal, o)) > -1) {
+			while (o <= string.length()
+					&& (index = string.indexOf(literal, o)) > -1) {
 				Integer i = index + options.start;
 				Match n = new Match(this, i, i + literal.length());
 				if (c == null || c.passes(n, null, s))

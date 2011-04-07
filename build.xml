@@ -46,6 +46,7 @@
 				<include name="examples/**/*.html" />
 				<include name="documentation/**/*.txt" />
 				<include name="documentation/**/*.html" />
+				<include name="documentation/img/*" />
 			</tarfileset>
 		</tar>
 	</target>

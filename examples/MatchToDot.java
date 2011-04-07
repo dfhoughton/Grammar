@@ -44,6 +44,7 @@ public class MatchToDot {
 		File gf = returnAr[0];
 		File inf = returnAr[1];
 		Grammar g = new Grammar(gf);
+		System.out.println(g.describe());
 		String text = fileToText(inf);
 		Matcher m = g.find(text);
 		StringBuilder b = startDot(inf);

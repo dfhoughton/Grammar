@@ -181,7 +181,7 @@ public class LeafRule extends Rule {
 				Match n = new Match(this, m.start(), m.end());
 				subCache.put(i, new CachedMatch(n));
 				int newStart = m.start() + 1;
-				if (newStart == options.end)
+				if (newStart >= options.end)
 					break;
 				m.region(newStart, options.end);
 			}
