@@ -3,11 +3,53 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>dfh.grammar.Grammar</title>
+<link href="grammar.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="scripts/footnotes.js"></script>
 </head>
 <body>
-what this is
-an example with explanation
-how it works
-benchmarks
+	<img width="500px" id="grammar_tree" alt="grammar tree"
+		src="img/grammar_logo.svg"
+		style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 0">
+	<h1 style="text-align: center">Grammar</h1>
+	The
+	<code>dfh.grammar</code>
+	library is a pattern matching library for Java inspired by the enhanced
+	regular expression facilities provided by Perl 5.10+ and Perl 6. The
+	basic functionality in the Perl 5.10+ regex engine is
+	<a href="http://perldoc.perl.org/perlre.html">awesome</a> in itself,
+	but the syntactic sugar provide by
+	<a
+		href="http://search.cpan.org/search?query=Regexp%3A%3AGrammars&mode=module">Regexp::Grammar</a>
+	adds another order or magnitude of awesomeness, and
+	<a href="http://dev.perl.org/perl6/doc/design/exe/E05.html">Perl 6</a>
+	adds another level beyond that. Java's character class syntax is
+	similarly awesome, but Java regular expressions of any size are
+	unreadable I wanted me some of that compositional syntax and recursion.
+	Being too lazy to find someone else's solution, I decided to write one
+	myself. This library, which is still evolving but certainly usable, is
+	the product of this labor of obsession.
+	<h2>The Basic Idea</h2>
+	The image above was produced by taking the grammar
+	<pre>
+&lt;ROOT&gt; = ~&lt;b&gt; &lt;g&gt; &lt;r&gt;?+ &lt;a&gt; &lt;m&gt;{2} &lt;a&gt; &lt;r&gt; ~&lt;b&gt;
+
+   &lt;a&gt; = "a"
+   &lt;b&gt; = / $ | ^ /x
+   &lt;g&gt; = /g/i
+   &lt;m&gt; = "m"
+   &lt;r&gt; = "r"	
+	</pre>
+	and applying it to the word
+	<i>Grammar</i>.
+	<span class="fn">Specifically, I combined the two using the <code>MatchToDot</code>
+		application included with the <code>dfh.grammar</code> distribution,
+		passing that through <a href="http://www.graphviz.org/">GraphViz</a>
+		and rescaling the image a bit with <a href="http://inkscape.org/">Inkscape</a>.
+	</span>
+	<div id="footnotes">
+		<script>
+			footnotes()
+		</script>
+	</div>
 </body>
 </html>

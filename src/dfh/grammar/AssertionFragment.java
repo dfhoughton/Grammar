@@ -31,10 +31,11 @@ public class AssertionFragment implements RuleFragment {
 	protected RuleFragment rf;
 
 	/**
-	 * Generates a fragment from the given reference number.
+	 * Generates a fragment with given assertion status.
 	 * 
-	 * @param id
-	 *            phrase identifying condition
+	 * @param positive
+	 *            whether matching the assertion rule constitutes a match of the
+	 *            assertion
 	 */
 	public AssertionFragment(boolean positive) {
 		this.positive = positive;

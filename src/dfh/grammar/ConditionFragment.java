@@ -10,7 +10,7 @@ package dfh.grammar;
  * </pre>
  * 
  * where <code>{less_than_20}</code> must later be defined by invoking
- * {@link LeafRule#conditionalize(Condition)}.
+ * {@link LeafRule#conditionalize(Condition, String)}.
  * <p>
  * <b>Creation date:</b> Apr 5, 2011
  * 
@@ -21,7 +21,7 @@ public class ConditionFragment implements RuleFragment {
 	protected final String id;
 
 	/**
-	 * Generates a fragment from the given reference number.
+	 * Generates a fragment representing the specified condition.
 	 * 
 	 * @param id
 	 *            phrase identifying condition
