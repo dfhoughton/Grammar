@@ -5,8 +5,13 @@
 <title>dfh.grammar.Grammar</title>
 <link href="grammar.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="scripts/footnotes.js"></script>
+<script type="text/javascript" src="headers.js"></script>
+<script type="text/javascript" src="scripts/headers.js"></script>
 </head>
 <body onLoad="footnotes()">
+	<script type="text/javascript">
+		headers('main', 'dfh.grammar')
+	</script>
 	<img width="500px" id="grammar_tree" alt="grammar tree"
 		src="img/grammar_logo.svg"
 		style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 0">
@@ -38,8 +43,7 @@
    &lt;b&gt; = / $ | ^ /x
    &lt;g&gt; = /g/i
    &lt;m&gt; = "m"
-   &lt;r&gt; = "r"	
-	</pre>
+   &lt;r&gt; = "r"</pre>
 		and applying it to the word <i>Grammar</i>. <span class="fn">Specifically,
 			I combined the two using the <code>MatchToDot</code> application
 			included with the <code>dfh.grammar</code> distribution, passing that
@@ -47,12 +51,77 @@
 			the image a bit with <a href="http://inkscape.org/">Inkscape</a>. </span> As
 		you can see, a grammar looks a lot like a <a
 			href="http://en.wikipedia.org/wiki/Backus%E2%80%93Naur_Form">BNF
-			grammar</a>. It consists of a "root" rule and some number of constituent
-		rules. When the grammar matches against a character sequence, it's the
-		root rule that matches. Constituent rules are invoked as needed by
-		other rules. The atomic elements of a grammar are literals or regular
-		expressions.<span class="fn">Or arbitrary extensions of the <code>dfh.grammar.Rule</code>,
-			as is explained elsewhere.</span>
+			grammar</a>. It consists of a list of named rules. Rule names are
+		sequences of characters in the
+		<code>\w</code>
+		class enclosed in angle brackets. Each line in the grammar consists of
+		a rule name, an equals sign, and a rule definition.<span class="fn">Or
+			a blank line or a comment beginning with <code>#</code>. Rule
+			definitions may also end in a comment.</span> The rule definition consists
+		of one or more elements optionally modified in various ways. A leading
+		<code>~</code>
+		or
+		<code>!</code>
+		marks a forward-looking zero-width assertion.<span class="fn">Variable
+			width backwards assertions are in the works, and of course one may
+			define a rule that provides a <code>java.util.regex.Pattern</code>
+			zero-width assertion, though the grammar will not be able to
+			recognize it as such.</span> Trailing suffixes familiar from Perl-style
+		regular expressions &mdash;
+		<code>*?</code>
+		,
+		<code>{1,2}</code>
+		, etc. &mdash; indicate repetitions. Constituents may be grouped with
+		angle brackets &mdash;
+		<code> [ &lt;a&gt; &lt;b&gt; ]+ </code>
+		. Alternates are marked with
+		<code>|</code>
+		. And so forth.
+	</div>
+	<div>
+		The atomic constituents of rules are literals, marked with single or
+		double quotes, and regular expression.<span class="fn">Or
+			arbitrary extensions of the <code>dfh.grammar.Rule</code>, as is
+			explained elsewhere.</span>
+	</div>
+	<div>
+		Among the rules is a special rule called
+		<code>&lt;ROOT&gt;</code>
+		. For the grammar to match a character sequence the root rule must
+		match. Constituent rules are invoked as needed by other rules.
+	</div>
+	<div>
+		The net result is an object that matches much like a
+		<code>java.util.regex.Pattern</code>
+		. For example, the grammar above is identical to the regex
+		<pre>
+  \b(?i:g)\br?+am{2}ar\b</pre>
+	</div>
+	<h2>Why?</h2>
+	<div>
+		So if grammars are basically regexes, why not use regexes? Well, for
+		simple patterns you probably do want regexes. You can type them in
+		faster and they will match faster. You want a grammar when the pattern
+		is complex, recursive, or requires arbitrary tests not expressible in
+		the standard regular expression syntax. The advantages of a grammar
+		are
+		<ul>
+			<li>Because they are built up compositionally, they are easier
+				to read.
+			<li>They can handle recursive rules.
+			<li>They can take arbitrary post-match conditions such as <pre>
+  &lt;a&gt; = /\b\d++/ (less_than_500)</pre>
+			<li>They allow finer control of backtracking, potentially making
+				excessively complex pattern matching tractable.
+			<li>They provide debugging facilities that record a trace of the
+				matching process.
+			<li>The match object returned records the entire sequence of
+				rules used in the match and the exact offsets at which each sub-rule
+				matched.
+			<li>The match object has methods that facilitate extracting
+				information from it as you would from other tree-structured data
+				such as XML.
+		</ul>
 	</div>
 </body>
 </html>

@@ -27,6 +27,10 @@ a:visited {
 	text-decoration: none;
 }
 
+div {
+	margin-bottom: 1em;
+}
+
 /* footnote styles */
 span.fn {
 	display: none;
