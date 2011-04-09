@@ -5,7 +5,7 @@
 function headers(self, base) {
 	document.title = base + " :: " + self;
 	var div = document.createElement("div");
-	div.setAttribute("style", "margin: 1.5em auto; text-align: center");
+	div.setAttribute("style", "margin: 1.5em auto; text-align: center; white-space: nowrap");
 	var nonInitial = false;
 	for ( var key in hdrs) {
 		if (key == self)

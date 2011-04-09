@@ -4,7 +4,7 @@
 
 var hdrs = {
 	"home" : "http://dfhoughton.com",
-	"main" : "index.html",
+	"Grammar" : "index.html",
 	"syntax" : "syntax.html",
 	"debugging" : "debugging.html",
 	"performance" : "performance.html",

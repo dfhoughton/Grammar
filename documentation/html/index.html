@@ -5,12 +5,13 @@
 <title>dfh.grammar.Grammar</title>
 <link href="grammar.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="scripts/footnotes.js"></script>
+<script type="text/javascript" src="scripts/toc.js"></script>
 <script type="text/javascript" src="headers.json"></script>
 <script type="text/javascript" src="scripts/headers.js"></script>
 </head>
-<body onLoad="footnotes()">
+<body onLoad="footnotes();toc()">
 	<script type="text/javascript">
-		headers('main', 'dfh.grammar')
+		headers('Grammar', 'dfh.grammar')
 	</script>
 	<img width="500px" id="grammar_tree" alt="grammar tree"
 		src="img/grammar_logo.svg"
@@ -33,6 +34,7 @@
 	Being too lazy to find someone else's solution, I decided to write one
 	myself. This library, which is still evolving but certainly usable, is
 	the product of this labor of obsession.
+	<span id="toc"></span>
 	<h2>The Basic Idea</h2>
 	<div>
 		The image above was produced by taking the grammar

@@ -31,6 +31,11 @@ div {
 	margin-bottom: 1em;
 }
 
+div#toc {
+	margin: 1em auto;
+	display: table;
+}
+
 /* footnote styles */
 span.fn {
 	display: none;

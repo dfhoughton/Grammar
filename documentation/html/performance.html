@@ -12,5 +12,110 @@
 	<script type="text/javascript">
 		headers('performance', 'dfh.grammar')
 	</script>
+	<pre>20000 JIT warmup iterations
+50000 test iterations
+
+=============
+
+string: qewrqewrqewraqwreqewr
+
+pattern: [ab]
+45 milliseconds
+
+&lt;ROOT&gt; = "a" | "b"
+
+with studying
+283 milliseconds
+without studying
+707 milliseconds
+
+=============
+
+string: foo bar
+
+pattern: foo\s++bar|quux\s++baz
+159 milliseconds
+
+&lt;ROOT&gt; = &lt;a&gt; | &lt;b&gt;
+
+   &lt;a&gt; = &lt;foo&gt; &lt;s&gt; &lt;bar&gt;
+   &lt;b&gt; = &lt;quux&gt; &lt;s&gt; &lt;baz&gt;
+ &lt;bar&gt; = /bar/
+ &lt;baz&gt; = /baz/
+ &lt;foo&gt; = /foo/
+&lt;quux&gt; = /quux/
+   &lt;s&gt; = /\s++/
+
+with studying
+322 milliseconds
+without studying
+233 milliseconds
+
+=============
+
+string: aabb
+
+pattern: (?:a{0,2}|a{0,2}b){2}b
+17 milliseconds
+
+&lt;ROOT&gt; = [ &lt;c&gt; | &lt;d&gt; ]{2} &lt;d&gt;
+
+   &lt;c&gt; = &lt;a&gt;{,2}
+   &lt;d&gt; = &lt;a&gt; &lt;b&gt;
+   &lt;a&gt; = /a/
+   &lt;b&gt; = /b/
+
+with studying
+503 milliseconds
+without studying
+466 milliseconds
+
+=============
+
+string: qewrqewrqewraqwreqewr
+
+pattern: [ab]
+14 milliseconds
+
+&lt;ROOT&gt; = &lt;c&gt; | &lt;d&gt;
+
+   &lt;c&gt; = /a/
+   &lt;d&gt; = /b/
+
+with studying
+171 milliseconds
+without studying
+725 milliseconds
+
+=============
+
+string: aabb
+
+pattern: (?:a{0,2}|ab){2}ab
+24 milliseconds
+
+&lt;ROOT&gt; = [ &lt;a&gt; | &lt;b&gt; ]{2} &lt;b&gt;
+
+   &lt;a&gt; = "a"{,2}
+   &lt;b&gt; = "ab"
+
+with studying
+330 milliseconds
+without studying
+452 milliseconds
+
+=============
+
+string: xxxxxxxxxxaxxxxxxxxxxbxxxxxxxxxxcxxxxxxxxxxaxxxxxxxxxxbxxxxx... (length 11000)
+
+pattern: [abc]
+9328 milliseconds
+
+&lt;ROOT&gt; = "a" | "b" | "c"
+
+with studying
+65468 milliseconds
+without studying
+64395 milliseconds</pre>
 </body>
 </html>
