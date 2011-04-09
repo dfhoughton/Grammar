@@ -858,12 +858,15 @@ public class Grammar implements Serializable, Cloneable {
 		b.append(String.format(format, root));
 		b.append(' ');
 		b.append(rules.get(root).description());
-		b.append("\n\n");
-		for (Entry<Label, Rule> e : ruleList) {
-			b.append(String.format(format, e.getKey()));
-			b.append(' ');
-			b.append(e.getValue().description());
-			b.append("\n");
+		b.append('\n');
+		if (!ruleList.isEmpty()) {
+			b.append('\n');
+			for (Entry<Label, Rule> e : ruleList) {
+				b.append(String.format(format, e.getKey()));
+				b.append(' ');
+				b.append(e.getValue().description());
+				b.append("\n");
+			}
 		}
 		return b.toString();
 	}

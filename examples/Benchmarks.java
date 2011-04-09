@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 import dfh.grammar.Grammar;
+import dfh.grammar.Grammar.Options;
 import dfh.grammar.GrammarException;
 import dfh.grammar.Matcher;
 
@@ -48,6 +49,11 @@ public class Benchmarks {
 
 	private static void iterate(Pattern p, Grammar g, String s,
 			boolean allMatches) {
+		System.out.println("=============\n");
+		System.out.println("string: "
+				+ (s.length() > 60 ? s.substring(0, 60) + "... (length "
+						+ s.length() + ")" : s));
+		System.out.println();
 		System.out.println("pattern: " + p);
 		for (int i = 0; i < warmup; i++) {
 			if (allMatches) {
@@ -70,7 +76,8 @@ public class Benchmarks {
 		}
 		long end = System.currentTimeMillis();
 		System.out.println(end - start + " milliseconds\n");
-		System.out.println(g.describe().replaceAll("\\s++$", ""));
+		System.out.println(g.describe());
+		System.out.println("with studying");
 		for (int i = 0; i < warmup; i++) {
 			if (allMatches) {
 				Matcher m = g.find(s);
@@ -88,6 +95,30 @@ public class Benchmarks {
 					;
 			} else {
 				g.find(s).match();
+			}
+		}
+		end = System.currentTimeMillis();
+		System.out.println(end - start + " milliseconds");
+		System.out.println("without studying");
+		Options opt = new Options();
+		opt.study(false);
+		for (int i = 0; i < warmup; i++) {
+			if (allMatches) {
+				Matcher m = g.find(s, opt);
+				while (m.match() != null)
+					;
+			} else {
+				g.find(s).match();
+			}
+		}
+		start = System.currentTimeMillis();
+		for (int i = 0; i < iterations; i++) {
+			if (allMatches) {
+				Matcher m = g.find(s);
+				while (m.match() != null)
+					;
+			} else {
+				g.find(s, opt).match();
 			}
 		}
 		end = System.currentTimeMillis();

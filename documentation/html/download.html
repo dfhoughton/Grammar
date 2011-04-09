@@ -12,5 +12,33 @@
 	<script type="text/javascript">
 		headers('download', 'dfh.grammar')
 	</script>
+	<h1>Download</h1>
+	<div>
+		A source tarball with documentation, ant build script, etc: <a
+			href="grammar.tgz">grammar.tgz (179K)</a>
+	</div>
+	<div>
+		For the most up-to-date code, clone the github repository:
+		<pre>
+	git clone https://github.com/dfhoughton/Grammar.git</pre>
+	</div>
+	<div>
+		Once you have the code, most things you may want to do can be
+		accomplished with the build file.
+		<pre>
+houghton@NorthernSpy:/tmp/Grammar$ ant -p
+Buildfile: /tmp/Grammar/build.xml
+Recursive, compositional pattern matching for Java.
+Main targets:
+
+ clean    removes anything created by any other ant task
+ compile  compile source to bytecode
+ jar      packages code into jar
+ javadoc  API for public and protected methods
+ tar      bundle up the source and documentation
+Default target: jar</pre>
+	</div>
+	<div>If you wish to run the unit tests, you will need JUnit 4 on
+		your classpath.</div>
 </body>
 </html>
