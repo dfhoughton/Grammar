@@ -144,18 +144,13 @@ public class RuleParser {
 			int[] offset, char bracket) throws GrammarException {
 		LinkedList<RuleFragment> parse = new LinkedList<RuleFragment>();
 		GroupFragment gf = null;
-		while (offset[0] < body.length()) {
+		OUTER: while (offset[0] < body.length()) {
 			trimWhitespace(body, offset);
 			if (offset[0] == body.length())
 				break;
 			char c = body.charAt(offset[0]);
-			if (c == bracket) {
-				offset[0]++;
-				if (gf != null)
-					gf.done();
-				bracket = 0;
-				break;
-			} else if (c == '[') {
+			switch (c) {
+			case '[':
 				offset[0]++;
 				GroupFragment r = new GroupFragment(
 						parseBody(body, offset, ']'));
@@ -172,7 +167,8 @@ public class RuleParser {
 					r.setRepetition(rep);
 					add(parse, gf, r);
 				}
-			} else if (c == '|') {
+				break;
+			case '|':
 				if (gf == null) {
 					gf = new GroupFragment(parse);
 					parse.clear();
@@ -180,42 +176,25 @@ public class RuleParser {
 				} else
 					gf.newSequence();
 				offset[0]++;
-			} else if (c == '"' || c == '\'') {
-				String literal = getLiteral(body, offset, c);
-				RepeatableRuleFragment r = new LiteralFragment(literal);
-				Repetition rep = getRepetition(body, offset);
-				r.setRepetition(rep);
-				add(parse, gf, r);
-			} else if (c == '#') {
 				break;
-			} else if (Character.isDigit(c)) {
-				int reference = getBackReference(body, offset);
-				if (reference == 0)
-					throw new GrammarException(
-							"back references must be greater than 0");
-				Repetition rep = getRepetition(body, offset);
-				if (rep != Repetition.NONE)
-					throw new GrammarException(
-							"back reference cannot be modified with repetition suffixes");
-				if (gf == null) {
-					if (reference > parse.size())
-						throw new GrammarException("back reference "
-								+ reference + " is too big");
-				} else {
-					if (reference > gf.currentSequence.size())
-						throw new GrammarException("back reference "
-								+ reference + " is too big");
-				}
-				BackReferenceFragment brf = new BackReferenceFragment(reference);
-				add(parse, gf, brf);
-			} else if (c == '(') {
+			case '"':
+			case '\'':
+				String literal = getLiteral(body, offset, c);
+				RepeatableRuleFragment rrf = new LiteralFragment(literal);
+				rep = getRepetition(body, offset);
+				rrf.setRepetition(rep);
+				add(parse, gf, rrf);
+				break;
+			case '#':
+				break OUTER;
+			case '(':
 				if (parse.isEmpty())
 					throw new GrammarException("condition without rule in "
 							+ body);
 				ConditionFragment cond = getCondition(body, offset);
 				parse.add(cond);
-				break;
-			} else if (c == ':') {
+				break OUTER;
+			case ':':
 				BarrierFragment bf = getBarrier(body, offset);
 				if (bf.id.equals(":")) {
 					if (gf != null) {
@@ -229,18 +208,49 @@ public class RuleParser {
 										+ body);
 				}
 				add(parse, gf, bf);
-			} else if (c == '~' || c == '!') {
+				break;
+			case '~':
+			case '!':
 				AssertionFragment as = getAssertion(body, offset);
 				add(parse, gf, as);
-			} else {
-				RuleFragment r = nextRule(body, offset, bracket);
-				if (r instanceof RepeatableRuleFragment) {
-					Repetition rep = getRepetition(body, offset);
-					((RepeatableRuleFragment) r).setRepetition(rep);
+				break;
+			default:
+				if (c == bracket) {
+					offset[0]++;
+					if (gf != null)
+						gf.done();
+					bracket = 0;
+					break OUTER;
+				} else if (Character.isDigit(c)) {
+					int reference = getBackReference(body, offset);
+					if (reference == 0)
+						throw new GrammarException(
+								"back references must be greater than 0");
+					rep = getRepetition(body, offset);
+					if (rep != Repetition.NONE)
+						throw new GrammarException(
+								"back reference cannot be modified with repetition suffixes");
+					if (gf == null) {
+						if (reference > parse.size())
+							throw new GrammarException("back reference "
+									+ reference + " is too big");
+					} else {
+						if (reference > gf.currentSequence.size())
+							throw new GrammarException("back reference "
+									+ reference + " is too big");
+					}
+					BackReferenceFragment brf = new BackReferenceFragment(reference);
+					add(parse, gf, brf);
+				} else {
+					RuleFragment ru = nextRule(body, offset, bracket);
+					if (ru instanceof RepeatableRuleFragment) {
+						rep = getRepetition(body, offset);
+						((RepeatableRuleFragment) ru).setRepetition(rep);
+					}
+					add(parse, gf, ru);
 				}
-				add(parse, gf, r);
 			}
-		}
+		} // OUTER
 		if (bracket > 0)
 			throw new GrammarException("could not find closing '" + bracket
 					+ "' in " + body);
