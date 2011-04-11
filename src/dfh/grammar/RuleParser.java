@@ -303,8 +303,20 @@ public class RuleParser {
 	private static AssertionFragment getAssertion(String body, int[] offset) {
 		// TODO implement modifier for backwards assertions
 		boolean positive = body.charAt(offset[0]) == '~';
+		boolean forward = true;
 		offset[0]++;
-		return new AssertionFragment(positive);
+		// TODO check to see whether this can ever be true
+		if (offset[0] == body.length()) 
+			throw new GrammarException("no rule after assertion marker: " + body);
+		char c = body.charAt(offset[0]);
+		if (c == '+' || c == '-') {
+			forward = c == '+';
+			offset[0]++;
+			// TODO see previous
+			if (offset[0] == body.length()) 
+				throw new GrammarException("no rule after assertion marker: " + body);
+		}
+		return new AssertionFragment(positive, forward);
 	}
 
 	private static int getBackReference(String body, int[] offset) {

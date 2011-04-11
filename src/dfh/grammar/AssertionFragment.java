@@ -29,6 +29,7 @@ package dfh.grammar;
 public class AssertionFragment implements RuleFragment {
 	protected final boolean positive;
 	protected RuleFragment rf;
+	protected final boolean forward;
 
 	/**
 	 * Generates a fragment with given assertion status.
@@ -36,15 +37,18 @@ public class AssertionFragment implements RuleFragment {
 	 * @param positive
 	 *            whether matching the assertion rule constitutes a match of the
 	 *            assertion
+	 * @param forward
 	 */
-	public AssertionFragment(boolean positive) {
+	public AssertionFragment(boolean positive, boolean forward) {
 		this.positive = positive;
+		this.forward = forward;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		b.append(positive ? '~' : '!');
+		b.append(forward ? '+' : '-');
 		b.append(rf);
 		return b.toString();
 	}

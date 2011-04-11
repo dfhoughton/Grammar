@@ -191,4 +191,64 @@ public class AssertionTest {
 			count++;
 		assertTrue("used complex negative native assertion", count == 1);
 	}
+
+	@Test
+	public void nativeNegativeAssertionCompilationComplex2()
+			throws GrammarException, IOException {
+		try {
+			String[] rules = {
+					//
+					"<ROOT> = !+['1'|'2'] <b>",//
+					"<b> = /\\b\\d++/",//
+			};
+			Grammar g = new Grammar(rules);
+		} catch (Exception e) {
+			fail("could not compile a complex negative assertion");
+		}
+	}
+
+	@Test
+	public void nativeNegativeAssertionCompilationSimple2()
+			throws GrammarException, IOException {
+		try {
+			String[] rules = {
+					//
+					"<ROOT> = !+ '1' <b>",//
+					"<b> = /\\b\\d++/",//
+			};
+			Grammar g = new Grammar(rules);
+		} catch (Exception e) {
+			fail("could not compile a simple negative assertion");
+		}
+	}
+
+	@Test
+	public void nativePostiveAssertionCompilationComplex2()
+			throws GrammarException, IOException {
+		try {
+			String[] rules = {
+					//
+					"<ROOT> = ~+['1'|'2'] <b>",//
+					"<b> = /\\b\\d++/",//
+			};
+			Grammar g = new Grammar(rules);
+		} catch (Exception e) {
+			fail("could not compile a complex positive assertion");
+		}
+	}
+
+	@Test
+	public void nativePostiveAssertionCompilationSimple2()
+			throws GrammarException, IOException {
+		try {
+			String[] rules = {
+					//
+					"<ROOT> = ~+ '1' <b>",//
+					"<b> = /\\b\\d++/",//
+			};
+			Grammar g = new Grammar(rules);
+		} catch (Exception e) {
+			fail("could not compile a simple positive assertion");
+		}
+	}
 }
