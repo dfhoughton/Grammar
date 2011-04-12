@@ -6,11 +6,13 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import dfh.grammar.Grammar;
+import dfh.grammar.Grammar.Options;
 import dfh.grammar.GrammarException;
 import dfh.grammar.Match;
 import dfh.grammar.Matcher;
@@ -44,7 +46,6 @@ public class MatchToDot {
 		File gf = returnAr[0];
 		File inf = returnAr[1];
 		Grammar g = new Grammar(gf);
-		System.out.println(g.describe());
 		String text = fileToText(inf);
 		Matcher m = g.find(text);
 		StringBuilder b = startDot(inf);
@@ -74,15 +75,14 @@ public class MatchToDot {
 		b.append("subgraph cluster").append(index[0]).append(" {\n");
 		b.append("label = ");
 		b.append(id(cleanText(n, text))).append("\n");
-		// b.append("graph [rankdir=TB]\n").append('\n');
 		Map<Object, String> idMap = new HashMap<Object, String>();
 		Set<String> sameRank = new TreeSet<String>();
-		for (Match m : n.passingMatches(Match.WIDE)) {
-			String id = "n" + index[0]++;
-			idMap.put(m, id);
+		List<Match> matchList = n.passingMatches(Match.WIDE);
+		for (Match m : matchList) {
+			String id = getId(index, idMap, m);
 			b.append(id).append(' ').append("[label=");
 			b.append(id(m.explicit() ? m.rule().label().toString() : m.rule()
-					.label().id));
+					.description()));
 			if (m.explicit())
 				b.append(",shape=box");
 			b.append("]\n");
@@ -104,7 +104,8 @@ public class MatchToDot {
 				if (count == 1) {
 					for (Match child : m.children()) {
 						if (!child.zeroWidth()) {
-							b.append(idMap.get(m.children()[0]));
+							String id2 = getId(index, idMap, child);
+							b.append(id2);
 							break;
 						}
 					}
@@ -112,7 +113,7 @@ public class MatchToDot {
 					b.append('{');
 					for (Match child : m.children()) {
 						if (!child.zeroWidth()) {
-							String id2 = idMap.get(child);
+							String id2 = getId(index, idMap, child);
 							b.append(' ').append(id2);
 						}
 					}
@@ -129,6 +130,15 @@ public class MatchToDot {
 			b.append("}\n");
 		}
 		b.append("}\n");
+	}
+
+	private static String getId(int[] index, Map<Object, String> idMap, Match m) {
+		String id = idMap.get(m);
+		if (id == null) {
+			id = "n" + index[0]++;
+			idMap.put(m, id);
+		}
+		return id;
 	}
 
 	private static String cleanText(Match n, String text) {
