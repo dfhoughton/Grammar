@@ -78,7 +78,7 @@ public class XMLParser {
 				for (Match n : m.passingMatches(new MatchTest() {
 					@Override
 					public boolean test(Match m) {
-						return m.hasId("comment");
+						return m.hasLabel("comment");
 					}
 				})) {
 					System.out.println(s.substring(n.start(), n.end()));
@@ -88,7 +88,7 @@ public class XMLParser {
 				for (Match n : m.passingMatches(new MatchTest() {
 					@Override
 					public boolean test(Match m) {
-						return m.hasId("entity");
+						return m.hasLabel("entity");
 					}
 				})) {
 					System.out.println(s.substring(n.start(), n.end()));
@@ -98,7 +98,7 @@ public class XMLParser {
 				for (Match n : m.passingMatches(new MatchTest() {
 					@Override
 					public boolean test(Match m) {
-						return m.hasId("content");
+						return m.hasLabel("content");
 					}
 				})) {
 					System.out.println(s.substring(n.start(), n.end()));

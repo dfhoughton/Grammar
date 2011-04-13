@@ -59,7 +59,7 @@
                      <on> = / on /ix
                     <pay> = / pay (?: \s*+ period )? | pp /ix
 <relative_period_no_time> = / yesterday | today /ix
-                      <s> = /\s++/
+                      <s> = /[\s&&[^\n]]++/
                  <second> = /\b\d{2}\b/
             <short_month> = / jan | feb | mar | apr | may | jun | jul | aug | sep | oct | nov | dec /ix
           <short_weekday> = / sun | mon | tue | wed | thu | fri | sat /ix
