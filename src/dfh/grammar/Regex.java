@@ -17,8 +17,9 @@ import java.util.regex.Pattern;
  */
 public class Regex implements RuleFragment {
 	final Pattern re;
+	boolean reversible;
 	private static final Pattern parsingPattern = Pattern
-			.compile("/(.*)/([imsdux]*+)");
+			.compile("/(.*)/([rimsdux]*+)");
 
 	/**
 	 * Generates {@link Regex}, compiling a {@link Pattern} from the given
@@ -49,6 +50,9 @@ public class Regex implements RuleFragment {
 					break;
 				case 'u':
 					options |= Pattern.UNICODE_CASE;
+					break;
+				case 'r':
+					reversible = true;
 					break;
 				default:
 					break;

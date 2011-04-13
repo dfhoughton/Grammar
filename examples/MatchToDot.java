@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import dfh.grammar.Grammar;
-import dfh.grammar.Grammar.Options;
 import dfh.grammar.GrammarException;
 import dfh.grammar.Match;
 import dfh.grammar.Matcher;

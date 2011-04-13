@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import dfh.grammar.Grammar.GlobalState;
 
 /**
  * Rule to handle all the various repetition options.

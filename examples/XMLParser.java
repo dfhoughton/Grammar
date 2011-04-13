@@ -25,7 +25,7 @@ public class XMLParser {
 	private static final String[] rules = {
 			//
 			"       <ROOT> = <declaration>?+ <s>?+ <element> <s>?+",//
-			"     <double> = '<' <tag> [ <ns> <attribute> ]*+ '>' [ <content> | <comment> | <element> ]*+ '</' 2 '>'",//
+			"     <double> = '<' <tag> [ <ns> <attribute> ]*+ '>' :: [ <content> | <comment> | <element> ]*+ '</' 2 '>'",//
 			"    <element> = <single> | <double>",//
 			"     <single> = '<' <tag> [ <ns> <attribute> ]*+ <ns>?+ '/>'",//
 			"  <attribute> = <tag> '=' [ \"'\" <squote> \"'\" | '\"' <dquote> '\"' ]",//

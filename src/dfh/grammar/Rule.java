@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-import dfh.grammar.Grammar.GlobalState;
 
 /**
  * A {@link Matcher} generator. <code>Rules</code> generate
@@ -254,5 +253,28 @@ public abstract class Rule implements Serializable {
 	public Rule conditionalize(Condition c, String id) {
 		throw new GrammarException(this.getClass()
 				+ " cannot be conditionalized");
+	}
+
+	/**
+	 * Returns a {@link Rule} that matches the mirror image of the strings
+	 * matched by this. If this {@link Rule} matches <code>ab+</code>, its
+	 * reverse will match <code>b+a</code>. If it matches <code>abc</code>, it's
+	 * reverse will match <code>cba</code>.
+	 * <p>
+	 * Reversed rules are necessary for variable length backwards look-behind
+	 * assertions. They need not, and should not, implement studying or make any
+	 * use of the offset cache as backwards assertions are not studied and the
+	 * results of matching their constituent components are not cached.
+	 * <p>
+	 * This method must be overridden by child classes which might be reversed
+	 * as the base implementation only throws a {@link GrammarException} when
+	 * called.
+	 * 
+	 * @param c
+	 * @return a {@link Rule} that duplicates this except that it won't return
+	 *         any {@link Match} that doesn't meet the given condition
+	 */
+	public Rule reverse() {
+		throw new GrammarException(this.getClass() + " cannot be reversed");
 	}
 }

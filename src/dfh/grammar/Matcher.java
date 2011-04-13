@@ -1,6 +1,5 @@
 package dfh.grammar;
 
-import dfh.grammar.Grammar.GlobalState;
 
 /**
  * An object associated with a {@link Rule} that can iterate over and return all

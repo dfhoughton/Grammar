@@ -84,152 +84,6 @@ import dfh.grammar.Label.Type;
  */
 public class Grammar implements Serializable, Cloneable {
 	/**
-	 * A structure to hold matching options and define defaults.
-	 * <p>
-	 * <b>Creation date:</b> Mar 28, 2011
-	 * 
-	 * @author David Houghton
-	 * 
-	 */
-	public static class Options {
-
-		/**
-		 * Whether matches may overlap.
-		 */
-		public static final boolean ALLOW_OVERLAP = false;
-		/**
-		 * Whether to study the character sequence before matching to accelerate
-		 * the matching of terminal rules.
-		 */
-		public static final boolean STUDY = true;
-		/**
-		 * Character offset at which to begin matching.
-		 */
-		public static final int START_OFFSET = 0;
-		private boolean allowOverlap = ALLOW_OVERLAP;
-		private boolean study = STUDY;
-		private int start = START_OFFSET;
-		private int end = -1;
-		private PrintStream trace;
-
-		/**
-		 * @return whether matches iterated over may overlap
-		 */
-		public boolean allowOverlap() {
-			return allowOverlap;
-		}
-
-		/**
-		 * @param allowOverlap
-		 *            whether matches iterated over may overlap
-		 */
-		public void allowOverlap(boolean allowOverlap) {
-			this.allowOverlap = allowOverlap;
-		}
-
-		/**
-		 * @return whether the {@link CharSequence} will be studied before
-		 *         matching
-		 */
-		public boolean study() {
-			return study;
-		}
-
-		/**
-		 * @param study
-		 *            whether the {@link CharSequence} will be studied before
-		 *            matching
-		 */
-		public void study(boolean study) {
-			this.study = study;
-		}
-
-		/**
-		 * @return point in {@link CharSequence} at which to begin matching
-		 */
-		public int start() {
-			return start;
-		}
-
-		/**
-		 * @param start
-		 *            point in {@link CharSequence} at which to begin matching
-		 */
-		public void start(int start) {
-			if (start < 0)
-				throw new GrammarException("text offsets must be positive");
-			this.start = start;
-		}
-
-		/**
-		 * Turn match debugging output on or off.
-		 * 
-		 * @param trace
-		 *            data sink for debugging
-		 */
-		public void trace(PrintStream trace) {
-			this.trace = trace;
-		}
-
-		/**
-		 * @return data sink for debugging
-		 */
-		public PrintStream trace() {
-			return trace;
-		}
-
-		/**
-		 * @param end
-		 *            end of region to match
-		 */
-		public void end(int end) {
-			if (end <= start)
-				throw new GrammarException("end offset must follow start");
-			this.end = end;
-		}
-
-		/**
-		 * @return end of region to match; returns -1 if the end is the end of
-		 *         the sequence to match
-		 */
-		public int end() {
-			return end;
-		}
-	}
-
-	/**
-	 * Immutable data structure holding match options.
-	 * <p>
-	 * <b>Creation date:</b> Apr 3, 2011
-	 * 
-	 * @author David Houghton
-	 * 
-	 */
-	public static class GlobalState {
-		public final boolean allowOverlap, study, containsCycles;
-		public final int start, end;
-		public final PrintStream trace;
-		public final boolean debug;
-
-		private GlobalState(Options o, boolean containsCycles) {
-			this.allowOverlap = o.allowOverlap;
-			this.study = o.study;
-			this.start = o.start;
-			this.end = o.end;
-			this.trace = o.trace;
-			this.containsCycles = containsCycles;
-			this.debug = trace != null;
-		}
-
-		@Override
-		public String toString() {
-			return "[overlap: " + allowOverlap + "; study: " + study
-					+ "; start: " + start + "; end: " + end + "; debug: "
-					+ debug + "; cycles: " + containsCycles + "]";
-		}
-	}
-
-	/**
 	 * Special debugging API.
 	 * <p>
 	 * <b>Creation date:</b> Mar 21, 2011
@@ -401,7 +255,6 @@ public class Grammar implements Serializable, Cloneable {
 	 * Keeps track of terminals not defined in initial rule set.
 	 */
 	protected final HashSet<Label> undefinedRules;
-	transient PrintStream trace;
 	private boolean recursive;
 	protected final Map<String, Set<Label>> undefinedConditions;
 	private final Map<String, Set<Rule>> knownConditions;
@@ -525,7 +378,7 @@ public class Grammar implements Serializable, Cloneable {
 			Condition c) throws GrammarException {
 		DeferredDefinitionRule r = checkRuleDefinition(label);
 		Label l = new Label(Type.terminal, label);
-		LeafRule lr = new LeafRule(l, p);
+		LeafRule lr = new LeafRule(l, p, false);
 		if (c != null) {
 			lr = (LeafRule) conditionCheck(id, c, lr);
 		}
@@ -797,18 +650,6 @@ public class Grammar implements Serializable, Cloneable {
 			offsetCache.put(l, new HashMap<Integer, CachedMatch>());
 		}
 		return offsetCache;
-	}
-
-	/**
-	 * Setting this non-null turns on match debugging output. This is a
-	 * transient property of the {@link Grammar} that will not survive
-	 * serialization.
-	 * 
-	 * @param trace
-	 *            sink for debugging trace
-	 */
-	public void setTrace(PrintStream trace) {
-		this.trace = trace;
 	}
 
 	/**

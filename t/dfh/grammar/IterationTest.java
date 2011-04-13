@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import dfh.grammar.Grammar.Options;
 
 /**
  * Make sure we get exactly as many iterations as we expect.

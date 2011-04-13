@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import dfh.grammar.Grammar.GlobalState;
 
 public class ConditionalLeafRule extends LeafRule {
 	private static final long serialVersionUID = 1L;
@@ -78,7 +77,7 @@ public class ConditionalLeafRule extends LeafRule {
 	}
 
 	public ConditionalLeafRule(LeafRule lr, Condition c, String id) {
-		super(lr.label, lr.p);
+		super(lr.label, lr.p, lr.reversible);
 		this.condition = id;
 		this.generation = lr.generation;
 		this.c = c;

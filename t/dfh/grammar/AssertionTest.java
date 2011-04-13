@@ -251,4 +251,105 @@ public class AssertionTest {
 			fail("could not compile a simple positive assertion");
 		}
 	}
+
+	@Test
+	public void nativePostiveBackwardsAssertion() throws GrammarException,
+			IOException {
+		String[] rules = {
+				//
+				"<ROOT> = ~- '@' <b>",//
+				"<b> = /\\b\\d++/",//
+		};
+		Grammar g = new Grammar(rules);
+		Matcher m = g.find("@1 2");
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("used simple positive native assertion", count == 1);
+	}
+
+	@Test
+	public void nativeNegativeBackwardsAssertion() throws GrammarException,
+			IOException {
+		String[] rules = {
+				//
+				"<ROOT> = !- '@' <b>",//
+				"<b> = /\\b\\d++/",//
+		};
+		Grammar g = new Grammar(rules);
+		Matcher m = g.find("@1 2");
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("used simple positive native assertion", count == 1);
+	}
+
+	@Test
+	public void nativeNegativeBackwardsAssertionComplex()
+			throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = !- ['@'|'#'] <b>",//
+				"<b> = /\\b\\d++/",//
+		};
+		Grammar g = new Grammar(rules);
+		Matcher m = g.find("@1 2");
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("used simple positive native assertion", count == 1);
+	}
+
+	@Test
+	public void nativePositiveBackwardsAssertionComplex()
+			throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = ~- ['@'|'#'] <b>",//
+				"<b> = /\\b\\d++/",//
+		};
+		Grammar g = new Grammar(rules);
+		Matcher m = g.find("@1 2");
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("used simple positive native assertion", count == 1);
+	}
+
+	@Test
+	public void nativePositiveBackwardsAssertionVariable()
+			throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = ~- ['@' <s>] <b>",//
+				"<s> = /\\s++/r",//
+				"<b> = /\\b\\d++/",//
+		};
+		Grammar g = new Grammar(rules);
+		System.out.println(g.describe());
+		Matcher m = g.find("@ 1 2");
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("used simple positive native assertion", count == 1);
+	}
+
+	@Test
+	public void nativeNegativeBackwardsAssertionVariable()
+			throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = !- ['@' <s>] <b>",//
+				"<s> = /\\s++/r",//
+				"<b> = /\\b\\d++/",//
+		};
+		Grammar g = new Grammar(rules);
+		System.out.println(g.describe());
+		Matcher m = g.find("@ 1 2");
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("used simple positive native assertion", count == 1);
+	}
+
 }

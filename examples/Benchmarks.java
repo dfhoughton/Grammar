@@ -2,9 +2,9 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 import dfh.grammar.Grammar;
-import dfh.grammar.Grammar.Options;
 import dfh.grammar.GrammarException;
 import dfh.grammar.Matcher;
+import dfh.grammar.Options;
 
 public class Benchmarks {
 

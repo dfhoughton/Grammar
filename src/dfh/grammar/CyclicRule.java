@@ -3,7 +3,6 @@ package dfh.grammar;
 import java.util.Map;
 import java.util.Set;
 
-import dfh.grammar.Grammar.GlobalState;
 
 /**
  * A rule that depends on some other or others in a cycle of dependence. These

@@ -9,8 +9,6 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 
-import dfh.grammar.Grammar.Options;
-import dfh.grammar.Grammar.GlobalState;
 import dfh.grammar.Label.Type;
 
 /**

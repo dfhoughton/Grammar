@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import dfh.grammar.Grammar.GlobalState;
 
 /**
  * {@link Rule} defined over sequence of terminal objects rather than other
@@ -88,6 +87,7 @@ public class LeafRule extends Rule {
 
 	private static final long serialVersionUID = 1L;
 	protected final Pattern p;
+	protected final boolean reversible;
 
 	/**
 	 * Generates {@link LeafRule} with given label and {@link Pattern}.
@@ -95,9 +95,10 @@ public class LeafRule extends Rule {
 	 * @param label
 	 * @param p
 	 */
-	public LeafRule(Label label, Pattern p) {
+	public LeafRule(Label label, Pattern p, boolean reversible) {
 		super(label);
 		this.p = p;
+		this.reversible = reversible;
 	}
 
 	@Override
@@ -145,6 +146,8 @@ public class LeafRule extends Rule {
 		b.append('/');
 		b.append(p.toString());
 		b.append('/');
+		if (reversible)
+			b.append('r');
 		if ((p.flags() & Pattern.CASE_INSENSITIVE) == Pattern.CASE_INSENSITIVE)
 			b.append('i');
 		if ((p.flags() & Pattern.DOTALL) == Pattern.DOTALL)
@@ -198,7 +201,7 @@ public class LeafRule extends Rule {
 
 	@Override
 	public Rule shallowClone() {
-		LeafRule lr = new LeafRule((Label) label.clone(), p);
+		LeafRule lr = new LeafRule((Label) label.clone(), p, reversible);
 		return lr;
 	}
 

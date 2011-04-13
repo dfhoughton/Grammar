@@ -3,7 +3,6 @@ package dfh.grammar;
 import java.util.Map;
 import java.util.Set;
 
-import dfh.grammar.Grammar.GlobalState;
 
 /**
  * A rule undefined at the time of grammar compilation. It will always

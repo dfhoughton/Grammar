@@ -99,9 +99,10 @@ public class Compiler {
 				l = new Label(t, l.id);
 				terminals.add(l);
 				Rule ru;
-				if (rf instanceof Regex)
-					ru = new LeafRule(l, ((Regex) rf).re);
-				else
+				if (rf instanceof Regex) {
+					Regex rx = (Regex) rf;
+					ru = new LeafRule(l, rx.re, rx.reversible);
+				} else
 					ru = new LiteralRule(l, ((LiteralFragment) rf).literal);
 				ru.condition = condition;
 				ru.generation = gen;
@@ -437,7 +438,8 @@ public class Compiler {
 		} else if (r instanceof LiteralRule) {
 			ru = new LiteralRule(label, ((LiteralRule) r).literal);
 		} else if (r instanceof LeafRule) {
-			ru = new LeafRule(label, ((LeafRule) r).p);
+			LeafRule lr = (LeafRule) r;
+			ru = new LeafRule(label, lr.p, lr.reversible);
 		} else if (r instanceof DeferredDefinitionRule) {
 			DeferredDefinitionRule old = (DeferredDefinitionRule) r;
 			DeferredDefinitionRule ddr = new DeferredDefinitionRule(label);
@@ -476,10 +478,19 @@ public class Compiler {
 		if (rf instanceof AssertionFragment) {
 			AssertionFragment af = (AssertionFragment) rf;
 			Rule sr = makeSingle(af.rf, cycleMap, null);
+			String subDescription = null;
+			if (!af.forward) {
+				StringBuilder b = new StringBuilder();
+				Assertion.subDescription(sr, b);
+				subDescription = b.toString();
+				sr = reverse(sr);
+			}
 			String id = (af.positive ? '~' : '!') + subLabel(sr);
 			Label l = new Label(Type.nonTerminal, id);
-			Assertion a = new Assertion(l, sr, af.positive);
+			Assertion a = new Assertion(l, sr, af.positive, af.forward);
 			a.condition = condition;
+			if (subDescription != null)
+				a.setSubDescription(subDescription);
 			return redundancyCheck(a);
 		} else if (rf instanceof BarrierFragment) {
 			BarrierFragment bf = (BarrierFragment) rf;
@@ -574,6 +585,97 @@ public class Compiler {
 		return redundancyCheck(r);
 	}
 
+	private Rule reverse(Rule sr) {
+		Rule ru = null;
+		if (sr instanceof AlternationRule) {
+			AlternationRule ar = (AlternationRule) sr;
+			Rule[] children = new Rule[ar.alternates.length];
+			for (int i = 0; i < children.length; i++)
+				children[i] = reverse(ar.alternates[i]);
+			StringBuilder b = new StringBuilder();
+			b.append('[');
+			boolean nonInitial = false;
+			for (Rule child : children) {
+				if (nonInitial)
+					b.append('|');
+				else
+					nonInitial = true;
+				b.append(subLabel(child));
+			}
+			b.append(']');
+			Label l = new Label(Type.nonTerminal, b.toString());
+			ru = new AlternationRule(l, children);
+		} else if (sr instanceof Assertion) {
+			Assertion as = (Assertion) sr;
+			Rule child = reverse(as.r);
+			String id = (as.positive ? '~' : '!') + subLabel(child);
+			Label l = new Label(Type.nonTerminal, id);
+			ru = new Assertion(l, sr, as.positive, as.forward);
+		} else if (sr instanceof BackReferenceRule) {
+			ru = sr;
+		} else if (sr instanceof BacktrackingBarrier) {
+			ru = sr;
+		} else if (sr instanceof CyclicRule) {
+			throw new GrammarException("currently cyclic rules such as " + sr
+					+ " cannot be used in backwards assertions");
+		} else if (sr instanceof DeferredDefinitionRule) {
+			throw new GrammarException(
+					"currently rules with a deferred definition such as " + sr
+							+ " cannot be used in backwards assertions");
+		} else if (sr instanceof LeafRule) {
+			LeafRule lr = (LeafRule) sr;
+			if (!lr.reversible)
+				throw new GrammarException(
+						"terminal rule "
+								+ lr
+								+ " has not been marked as reversible; it cannot be used in a backwards asswertion");
+			ru = lr;
+		} else if (sr instanceof LiteralRule) {
+			LiteralRule lr = (LiteralRule) sr;
+			ReversedCharSequence rcs = new ReversedCharSequence(lr.literal,
+					lr.literal.length());
+			String s = rcs.toString();
+			Label l = new Label(Type.terminal, '"' + s + '"');
+			ru = new LiteralRule(l, s);
+		} else if (sr instanceof RepetitionRule) {
+			RepetitionRule rr = (RepetitionRule) sr;
+			Rule child = reverse(rr.r);
+			Label l = new Label(Type.nonTerminal, subLabel(child)
+					+ rr.repetition);
+			ru = new RepetitionRule(l, child, rr.repetition);
+		} else if (sr instanceof SequenceRule) {
+			SequenceRule sqr = (SequenceRule) sr;
+			Rule[] children = new Rule[sqr.sequence.length];
+			for (int i = 0; i < children.length; i++) {
+				children[i] = reverse(sqr.sequence[children.length - i - 1]);
+			}
+			for (int i = 0; i < children.length; i++) {
+				if (children[i] instanceof BackReferenceRule) {
+					Rule temp = children[i];
+					children[i] = children[children.length - i - 1];
+					children[children.length - i - 1] = temp;
+				}
+			}
+			StringBuilder b = new StringBuilder();
+			b.append('[');
+			boolean nonInitial = false;
+			for (Rule r : children) {
+				if (nonInitial)
+					b.append(' ');
+				else
+					nonInitial = true;
+				b.append(subLabel(r));
+			}
+			b.append(']');
+			Label l = new Label(Type.nonTerminal, b.toString());
+			ru = new SequenceRule(l, children);
+		}
+		if (sr.condition != null)
+			ru.condition = "r:" + sr.condition;
+		ru.generation = sr.generation;
+		return redundancyCheck(ru);
+	}
+
 	private String subLabel(Rule r) {
 		return r.generation == -1 ? r.label().id : r.label().toString();
 	}
@@ -640,6 +742,11 @@ public class Compiler {
 				for (List<RuleFragment> l : gf.alternates) {
 					allLabels.addAll(allLabels(l));
 				}
+			} else if (rf instanceof AssertionFragment) {
+				AssertionFragment af = (AssertionFragment) rf;
+				List<RuleFragment> list = new ArrayList<RuleFragment>(1);
+				list.add(af.rf);
+				allLabels.addAll(allLabels(list));
 			}
 		}
 		return allLabels;

@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import dfh.grammar.Grammar.GlobalState;
 
 /**
  * For matching a rule literal. E.g., <fred> = "Fred".
@@ -47,14 +46,15 @@ public class LiteralRule extends Rule {
 				if (end <= options.end) {
 					boolean matched = true;
 					for (int i = offset, j = 0; i < end; i++, j++) {
-						if (literal.charAt(j) != s.charAt(i)) {
+						char c1 = literal.charAt(j), c2 = s.charAt(i);
+						if (c1 != c2) {
 							matched = false;
 							break;
 						}
 					}
 					if (matched) {
 						Match m = new Match(LiteralRule.this, offset, end);
-						if (!(c == null || c.passes(m, this, s)))
+						if (c == null || c.passes(m, this, s))
 							cm = new CachedMatch(m);
 						else
 							cm = CachedMatch.MISMATCH;

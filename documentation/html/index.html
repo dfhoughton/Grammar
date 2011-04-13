@@ -8,7 +8,8 @@
 <script type="text/javascript" src="headers.json"></script>
 </head>
 <body onLoad="prepare('Grammar', 'dfh.grammar')">
-	<img width="500px" id="grammar_tree" alt="grammar tree"
+	<img width="500px" id="grammar_tree"
+		alt="Picture of a grammar tree as produced by MatchToDot. If you don't see a picture, your browser can't show in-line svg graphics. Sorry."
 		src="img/grammar_logo.svg"
 		style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 0">
 	<h1 style="text-align: center">Grammar</h1>
@@ -120,5 +121,22 @@
 				such as XML.
 		</ul>
 	</div>
+	<h2>Examples</h2>
+	<h3>Matching</h3>
+	<div>
+		As with
+		<code>java.util.regex.Matcher</code>
+	</div>
+	<pre>		String[] rules = {
+				"&lt;ROOT&gt; = &lt;c&gt; &lt;d&gt;",
+				"&lt;c&gt; = &lt;a&gt;++",
+				"&lt;d&gt; = &lt;a&gt; &lt;b&gt;",
+				"&lt;a&gt; = /a/",
+				"&lt;b&gt; = /b/",
+		};
+		Grammar g = new Grammar(rules);
+		String s = "aab";
+		Matcher m = g.lookingAt(s);
+		Match n = m.match();</pre>
 </body>
 </html>
