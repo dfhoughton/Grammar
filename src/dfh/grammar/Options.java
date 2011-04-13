@@ -2,7 +2,6 @@ package dfh.grammar;
 
 import java.io.PrintStream;
 
-
 /**
  * A structure to hold matching options and define defaults.
  * <p>
@@ -18,8 +17,8 @@ public class Options {
 	 */
 	public static final boolean ALLOW_OVERLAP = false;
 	/**
-	 * Whether to study the character sequence before matching to accelerate
-	 * the matching of terminal rules.
+	 * Whether to study the character sequence before matching to accelerate the
+	 * matching of terminal rules.
 	 */
 	public static final boolean STUDY = true;
 	/**
@@ -67,8 +66,7 @@ public class Options {
 	}
 
 	/**
-	 * @return whether the {@link CharSequence} will be studied before
-	 *         matching
+	 * @return whether the {@link CharSequence} will be studied before matching
 	 */
 	public boolean study() {
 		return study;
@@ -128,8 +126,8 @@ public class Options {
 	}
 
 	/**
-	 * @return end of region to match; returns -1 if the end is the end of
-	 *         the sequence to match
+	 * @return end of region to match; returns -1 if the end is the end of the
+	 *         sequence to match
 	 */
 	public int end() {
 		return end;

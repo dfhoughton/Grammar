@@ -187,21 +187,21 @@ public class Benchmarks {
 	private static void longStringTest() throws IOException {
 		String[] rules = {
 		//
-		"<ROOT> = 'a' | 'b' | 'c'",//
+		"<ROOT> = 'cat' | 'dog' | 'monkey'",//
 		};
-		Pattern p = Pattern.compile("[abc]");
+		Pattern p = Pattern.compile("cat|dog|monkey");
 		StringBuilder b = new StringBuilder();
 		for (int i = 0; i < 1000; i++) {
-			b.append("xxxxxxxxxx");
+			b.append("__________");
 			switch (i % 3) {
 			case 0:
-				b.append('a');
+				b.append("cat");
 				break;
 			case 1:
-				b.append('b');
+				b.append("dog");
 				break;
 			case 2:
-				b.append('c');
+				b.append("monkey");
 			}
 		}
 		String s = b.toString();

@@ -97,7 +97,7 @@ public class Assertion extends Rule {
 		}
 
 		private Match reverse(Match n, int base) {
-			Match reversed = new Match(Assertion.this, base - n.end(), base
+			Match reversed = new Match(n.rule(), base - n.end(), base
 					- n.start());
 			if (n.children() != null) {
 				Match[] children = new Match[n.children().length];

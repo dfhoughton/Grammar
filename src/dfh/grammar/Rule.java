@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * A {@link Matcher} generator. <code>Rules</code> generate
  * <code>Matchers</code> with properly initialized state but have no dynamic
@@ -35,6 +34,8 @@ public abstract class Rule implements Serializable {
 	 * constructing unique ids. See {@link #uniqueId()}.
 	 */
 	String condition;
+
+	private transient String id;
 
 	/**
 	 * Assigns given label to {@link Rule}.
@@ -191,6 +192,19 @@ public abstract class Rule implements Serializable {
 	 * @return a String describing the rule
 	 */
 	public abstract String description();
+
+	/**
+	 * Returns the same {@link String} as {@link #description()} but cached.
+	 * This memoization accelerates methods such as
+	 * {@link Match#hasId(String)}.
+	 * 
+	 * @return the same {@link String} as {@link #description()} but cached
+	 */
+	public synchronized String id() {
+		if (id == null)
+			id = description();
+		return id;
+	}
 
 	/**
 	 * Prepare for matching against the given {@link CharSequence}. This is an

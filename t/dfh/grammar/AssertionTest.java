@@ -326,7 +326,6 @@ public class AssertionTest {
 				"<b> = /\\b\\d++/",//
 		};
 		Grammar g = new Grammar(rules);
-		System.out.println(g.describe());
 		Matcher m = g.find("@ 1 2");
 		int count = 0;
 		while (m.match() != null)
@@ -344,7 +343,6 @@ public class AssertionTest {
 				"<b> = /\\b\\d++/",//
 		};
 		Grammar g = new Grammar(rules);
-		System.out.println(g.describe());
 		Matcher m = g.find("@ 1 2");
 		int count = 0;
 		while (m.match() != null)
