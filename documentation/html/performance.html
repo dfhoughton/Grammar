@@ -8,6 +8,9 @@
 <script type="text/javascript" src="scripts/pageutils.js"></script>
 </head>
 <body onLoad="prepare('performance', 'dfh.grammar')">
+	<span id="toc"></span>
+	<h2>Issues</h2>
+	<h2>Benchmarks</h2>
 	<pre>20000 JIT warmup iterations
 50000 test iterations
 
@@ -16,21 +19,23 @@
 string: qewrqewrqewraqwreqewr
 
 pattern: [ab]
-45 milliseconds
+34 milliseconds
 
 &lt;ROOT&gt; = "a" | "b"
 
 with studying
-283 milliseconds
+305 milliseconds
 without studying
-707 milliseconds
+829 milliseconds
+with studying using LTM
+106 milliseconds
 
 =============
 
 string: foo bar
 
 pattern: foo\s++bar|quux\s++baz
-159 milliseconds
+27 milliseconds
 
 &lt;ROOT&gt; = &lt;a&gt; | &lt;b&gt;
 
@@ -43,16 +48,18 @@ pattern: foo\s++bar|quux\s++baz
    &lt;s&gt; = /\s++/
 
 with studying
-322 milliseconds
+434 milliseconds
 without studying
-233 milliseconds
+336 milliseconds
+with studying using LTM
+307 milliseconds
 
 =============
 
 string: aabb
 
 pattern: (?:a{0,2}|a{0,2}b){2}b
-17 milliseconds
+22 milliseconds
 
 &lt;ROOT&gt; = [ &lt;c&gt; | &lt;d&gt; ]{2} &lt;d&gt;
 
@@ -62,16 +69,18 @@ pattern: (?:a{0,2}|a{0,2}b){2}b
    &lt;b&gt; = /b/
 
 with studying
-503 milliseconds
+508 milliseconds
 without studying
-466 milliseconds
+509 milliseconds
+with studying using LTM
+733 milliseconds
 
 =============
 
 string: qewrqewrqewraqwreqewr
 
 pattern: [ab]
-14 milliseconds
+13 milliseconds
 
 &lt;ROOT&gt; = &lt;c&gt; | &lt;d&gt;
 
@@ -79,16 +88,18 @@ pattern: [ab]
    &lt;d&gt; = /b/
 
 with studying
-171 milliseconds
+162 milliseconds
 without studying
-725 milliseconds
+746 milliseconds
+with studying using LTM
+176 milliseconds
 
 =============
 
 string: aabb
 
 pattern: (?:a{0,2}|ab){2}ab
-24 milliseconds
+26 milliseconds
 
 &lt;ROOT&gt; = [ &lt;a&gt; | &lt;b&gt; ]{2} &lt;b&gt;
 
@@ -96,22 +107,26 @@ pattern: (?:a{0,2}|ab){2}ab
    &lt;b&gt; = "ab"
 
 with studying
-330 milliseconds
+364 milliseconds
 without studying
-452 milliseconds
+391 milliseconds
+with studying using LTM
+544 milliseconds
 
 =============
 
-string: xxxxxxxxxxaxxxxxxxxxxbxxxxxxxxxxcxxxxxxxxxxaxxxxxxxxxxbxxxxx... (length 11000)
+string: __________cat__________dog__________monkey__________cat_____... (length 13999)
 
-pattern: [abc]
-9328 milliseconds
+pattern: cat|dog|monkey
+41609 milliseconds
 
-&lt;ROOT&gt; = "a" | "b" | "c"
+&lt;ROOT&gt; = "cat" | "dog" | "monkey"
 
 with studying
-65468 milliseconds
+67240 milliseconds
 without studying
-64395 milliseconds</pre>
+80010 milliseconds
+with studying using LTM
+79952 milliseconds</pre>
 </body>
 </html>

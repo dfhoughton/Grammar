@@ -46,8 +46,10 @@ public class RepetitionTest {
 				"<a> = /a/",//
 		};
 		Grammar g = new Grammar(rules);
+		Options opt = new Options();
+		opt.longestTokenMatching(false);
 		String s = "aa";
-		Matcher m = g.lookingAt(s);
+		Matcher m = g.lookingAt(s, opt);
 		Match n = m.match();
 		assertTrue("found first instance", n.end() == 0);
 	}

@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-
 /**
  * Make sure we get exactly as many iterations as we expect.
  * <p>
@@ -41,6 +40,7 @@ public class IterationTest {
 		Grammar g = new Grammar(rules);
 		String s = "aaa";
 		Options opt = new Options();
+		opt.longestTokenMatching(false);
 		opt.allowOverlap(true);
 		Matcher m = g.lookingAt(s, opt);
 		int count = 0;

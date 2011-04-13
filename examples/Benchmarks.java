@@ -76,11 +76,36 @@ public class Benchmarks {
 		}
 		long end = System.currentTimeMillis();
 		System.out.println(end - start + " milliseconds\n");
+		Options opt = new Options();
+		opt.longestTokenMatching(false);
 		System.out.println(g.describe());
 		System.out.println("with studying");
 		for (int i = 0; i < warmup; i++) {
 			if (allMatches) {
-				Matcher m = g.find(s);
+				Matcher m = g.find(s, opt);
+				while (m.match() != null)
+					;
+			} else {
+				g.find(s, opt).match();
+			}
+		}
+		start = System.currentTimeMillis();
+		for (int i = 0; i < iterations; i++) {
+			if (allMatches) {
+				Matcher m = g.find(s, opt);
+				while (m.match() != null)
+					;
+			} else {
+				g.find(s, opt).match();
+			}
+		}
+		end = System.currentTimeMillis();
+		System.out.println(end - start + " milliseconds");
+		System.out.println("without studying");
+		opt.study(false);
+		for (int i = 0; i < warmup; i++) {
+			if (allMatches) {
+				Matcher m = g.find(s, opt);
 				while (m.match() != null)
 					;
 			} else {
@@ -94,14 +119,14 @@ public class Benchmarks {
 				while (m.match() != null)
 					;
 			} else {
-				g.find(s).match();
+				g.find(s, opt).match();
 			}
 		}
 		end = System.currentTimeMillis();
 		System.out.println(end - start + " milliseconds");
-		System.out.println("without studying");
-		Options opt = new Options();
-		opt.study(false);
+		System.out.println("with studying using LTM");
+		opt.study(true);
+		opt.longestTokenMatching(true);
 		for (int i = 0; i < warmup; i++) {
 			if (allMatches) {
 				Matcher m = g.find(s, opt);

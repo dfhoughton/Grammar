@@ -25,8 +25,17 @@ public class Options {
 	 * Character offset at which to begin matching.
 	 */
 	public static final int START_OFFSET = 0;
+	/**
+	 * Whether the {@link Matcher} returned by {@link Grammar} should only
+	 * return the longest subsequences that match instead of returning all
+	 * matches in order of discovery. This is only considered by
+	 * {@link Grammar#find(CharSequence, Options)} and
+	 * {@link Grammar#lookingAt(CharSequence, Options)}.
+	 */
+	public static final boolean LONGEST_TOKEN_MATCHING = true;
 	boolean allowOverlap = ALLOW_OVERLAP;
 	boolean study = STUDY;
+	boolean longestTokenMatching = LONGEST_TOKEN_MATCHING;
 	int start = START_OFFSET;
 	int end = -1;
 	PrintStream trace;
@@ -131,5 +140,24 @@ public class Options {
 	 */
 	public int end() {
 		return end;
+	}
+
+	/**
+	 * See {@link #LONGEST_TOKEN_MATCHING}.
+	 * 
+	 * @return whether only the longest matches at a particular offset will be
+	 *         returned
+	 */
+	public boolean longestTokenMatching() {
+		return longestTokenMatching;
+	}
+
+	/**
+	 * See {@link #LONGEST_TOKEN_MATCHING}.
+	 * 
+	 * @param longestTokenMatching
+	 */
+	public void longestTokenMatching(boolean longestTokenMatching) {
+		this.longestTokenMatching = longestTokenMatching;
 	}
 }

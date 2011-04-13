@@ -106,6 +106,45 @@ public class Grammar implements Serializable, Cloneable {
 	}
 
 	/**
+	 * {@link Matcher} wrapper to implement LTM.
+	 * <p>
+	 * <b>Creation date:</b> Apr 13, 2011
+	 * 
+	 * @author David Houghton
+	 * 
+	 */
+	private static class LTMMatcher {
+		private final LinkedList<Match> matches = new LinkedList<Match>();
+
+		LTMMatcher(Matcher m) {
+			int max = -1;
+			try {
+				Match n;
+				while ((n = m.match()) != null) {
+					int w = n.end() - n.start();
+					if (w > max) {
+						matches.clear();
+						max = w;
+					}
+					if (w == max)
+						matches.add(n);
+				}
+			} catch (DoubleColonBarrier e) {
+			}
+		}
+
+		Match match() {
+			if (hasNext())
+				return matches.removeFirst();
+			return null;
+		}
+
+		boolean hasNext() {
+			return !matches.isEmpty();
+		}
+	}
+
+	/**
 	 * For starting the chain of inheritance (in terms of handing down from
 	 * parent to child, not OO) of the rule state map.
 	 * <p>
@@ -146,19 +185,25 @@ public class Grammar implements Serializable, Cloneable {
 		private int index;
 		private boolean firstMatch;
 		private Matcher m;
+		private LTMMatcher ltmm;
 		private LinkedList<Integer> startOffsets;
 		private Map<Label, Map<Integer, CachedMatch>> cache;
 		private Match next;
+		private final boolean ltm;
 
 		FindMatcher(CharSequence s, LinkedList<Integer> startOffsets,
-				Map<Label, Map<Integer, CachedMatch>> cache, GlobalState options) {
+				Map<Label, Map<Integer, CachedMatch>> cache,
+				GlobalState options, boolean ltm) {
 			super(s, options);
 			this.startOffsets = startOffsets;
 			this.cache = cache;
+			this.ltm = ltm;
 			index = options.study && !startOffsets.isEmpty() ? startOffsets
 					.removeFirst() : options.start;
 			firstMatch = true;
 			m = rules.get(root).matcher(s, index, cache, this);
+			if (ltm)
+				ltmm = new LTMMatcher(m);
 			next = fetchNext();
 		}
 
@@ -182,7 +227,7 @@ public class Grammar implements Serializable, Cloneable {
 				Match n = null;
 				if (firstMatch) {
 					try {
-						n = m.match();
+						n = ltm ? ltmm.match() : m.match();
 						firstMatch = false;
 					} catch (DoubleColonBarrier e) {
 					}
@@ -190,7 +235,7 @@ public class Grammar implements Serializable, Cloneable {
 					n = null;
 				else {
 					try {
-						n = m.match();
+						n = ltm ? ltmm.match() : m.match();
 					} catch (DoubleColonBarrier e) {
 					}
 				}
@@ -222,6 +267,8 @@ public class Grammar implements Serializable, Cloneable {
 				if (index >= options.end)
 					break;
 				m = rules.get(root).matcher(s, index, cache, this);
+				if (ltm)
+					ltmm = new LTMMatcher(m);
 			}
 			return null;
 		}
@@ -528,10 +575,12 @@ public class Grammar implements Serializable, Cloneable {
 			throws GrammarException {
 		checkComplete();
 		final GlobalState co = verifyOptions(cs, opt);
-		Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
+		final boolean ltm = opt.longestTokenMatching();
+		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		final Set<Integer> startOffsets = startOffsets(cs, co, cache);
 		final Matcher m = rules.get(root).matcher(cs, co.start, cache,
 				new DummyMatcher(cs, co));
+		final LTMMatcher ltmm = ltm ? new LTMMatcher(m) : null;
 		abstract class LookingAtMatcher extends GrammarMatcher {
 			LookingAtMatcher() {
 				super(cs, co);
@@ -541,6 +590,7 @@ public class Grammar implements Serializable, Cloneable {
 			public String name() {
 				return "lookingAt";
 			}
+
 		}
 		// synchronization wrappers
 		return !co.allowOverlap ? new LookingAtMatcher() {
@@ -551,7 +601,8 @@ public class Grammar implements Serializable, Cloneable {
 				if (options.study && startOffsets.isEmpty())
 					return false;
 				try {
-					return matchedOnce ? false : m.mightHaveNext();
+					return matchedOnce ? false : (ltm ? ltmm.hasNext() : m
+							.mightHaveNext());
 				} catch (DoubleColonBarrier e) {
 					return false;
 				}
@@ -563,7 +614,7 @@ public class Grammar implements Serializable, Cloneable {
 				if (!(matchedOnce || options.study && startOffsets.isEmpty())) {
 					matchedOnce = true;
 					try {
-						n = m.match();
+						n = ltm ? ltmm.match() : m.match();
 					} catch (DoubleColonBarrier e) {
 						return null;
 					}
@@ -579,7 +630,7 @@ public class Grammar implements Serializable, Cloneable {
 				if (options.study && startOffsets.isEmpty())
 					return false;
 				try {
-					return m.mightHaveNext();
+					return ltm ? ltmm.hasNext() : m.mightHaveNext();
 				} catch (DoubleColonBarrier e) {
 					return false;
 				}
@@ -590,7 +641,7 @@ public class Grammar implements Serializable, Cloneable {
 				Match n = null;
 				if (!(options.study && startOffsets.isEmpty())) {
 					try {
-						n = m.match();
+						n = ltm ? ltmm.match() : m.match();
 					} catch (DoubleColonBarrier e) {
 						return null;
 					}
@@ -628,12 +679,13 @@ public class Grammar implements Serializable, Cloneable {
 			throws GrammarException {
 		checkComplete();
 		final GlobalState options = verifyOptions(s, opt);
+		final boolean ltm = opt.longestTokenMatching();
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		List<Integer> list = new ArrayList<Integer>(startOffsets(s, options,
 				cache));
 		Collections.sort(list);
 		final LinkedList<Integer> startOffsets = new LinkedList<Integer>(list);
-		return new FindMatcher(s, startOffsets, cache, options);
+		return new FindMatcher(s, startOffsets, cache, options, ltm);
 	}
 
 	/**

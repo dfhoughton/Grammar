@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * Rule to handle all the various repetition options.
  * <p>
@@ -212,6 +211,7 @@ public class RepetitionRule extends Rule {
 					done = true;
 					matchers = null;
 					matched = null;
+					break;
 				} else if (c == null || c.passes(next, this, s))
 					break;
 			}
