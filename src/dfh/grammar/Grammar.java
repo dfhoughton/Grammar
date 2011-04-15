@@ -306,6 +306,7 @@ public class Grammar implements Serializable, Cloneable {
 	protected final Map<String, Set<Label>> undefinedConditions;
 	private final Map<String, Set<Rule>> knownConditions;
 	private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
+	private Boolean containsAlternation;
 
 	/**
 	 * Delegates to {@link #Grammar(LineReader)}.
@@ -517,7 +518,8 @@ public class Grammar implements Serializable, Cloneable {
 	}
 
 	/**
-	 * Checks to make sure all rules have been defined.
+	 * Checks to make sure all rules have been defined. If they have, it checks
+	 * for alternation.
 	 * 
 	 * @throws GrammarException
 	 */
@@ -547,6 +549,15 @@ public class Grammar implements Serializable, Cloneable {
 			}
 			throw new GrammarException(b.toString());
 		}
+		if (containsAlternation == null) {
+			for (Rule r : rules.values()) {
+				if (r instanceof AlternationRule) {
+					containsAlternation = true;
+					return;
+				}
+			}
+			containsAlternation = false;
+		}
 	}
 
 	/**
@@ -575,7 +586,7 @@ public class Grammar implements Serializable, Cloneable {
 			throws GrammarException {
 		checkComplete();
 		final GlobalState co = verifyOptions(cs, opt);
-		final boolean ltm = opt.longestTokenMatching();
+		final boolean ltm = containsAlternation && opt.longestTokenMatching();
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		final Set<Integer> startOffsets = startOffsets(cs, co, cache);
 		final Matcher m = rules.get(root).matcher(cs, co.start, cache,
@@ -679,7 +690,7 @@ public class Grammar implements Serializable, Cloneable {
 			throws GrammarException {
 		checkComplete();
 		final GlobalState options = verifyOptions(s, opt);
-		final boolean ltm = opt.longestTokenMatching();
+		final boolean ltm = containsAlternation && opt.longestTokenMatching();
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		List<Integer> list = new ArrayList<Integer>(startOffsets(s, options,
 				cache));
