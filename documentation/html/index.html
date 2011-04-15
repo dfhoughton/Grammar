@@ -12,7 +12,7 @@
 		alt="Picture of a grammar tree as produced by MatchToDot. If you don't see a picture, your browser can't show in-line svg graphics. Sorry."
 		src="img/grammar_logo.svg"
 		style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 0">
-	<h1 style="text-align: center">Grammar</h1>
+	<h1>Grammar</h1>
 	The
 	<code>dfh.grammar</code>
 	library is a pattern matching library for Java inspired by the enhanced
@@ -61,16 +61,21 @@
 		or
 		<code>!</code>
 		marks a forward-looking zero-width assertion.<span class="fn">Variable
-			width backwards assertions are in the works, and of course one may
-			define a rule that provides a <code>java.util.regex.Pattern</code>
+			width backwards assertions are indicated by <code>~-</code> or <code>!-</code>;
+			and for symmetry one may use <code>~+</code> and <code>!+</code> to
+			indicate forward assertions. Though the backwards assertions native
+			to <code>dfh.grammar</code> are variable width, unlike those of <code>java.lang.regex.Pattern</code>,
+			they do have limitations that don't pertain to forward assertions.
+			See <a href="syntax.html">syntax</a>. Of course, one may define a
+			terminal rule that provides a <code>java.util.regex.Pattern</code>
 			zero-width assertion, though the grammar will not be able to
 			recognize it as such.</span> Trailing suffixes familiar from Perl-style
-		regular expressions &mdash;
+		regular expressions --
 		<code>*?</code>
 		,
 		<code>{1,2}</code>
-		, etc. &mdash; indicate repetitions. Constituents may be grouped with
-		angle brackets &mdash;
+		, etc. -- indicate repetitions. Constituents may be grouped with angle
+		brackets --
 		<code> [ &lt;a&gt; &lt;b&gt; ]+ </code>
 		. Alternates are marked with
 		<code>|</code>

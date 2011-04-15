@@ -16,6 +16,7 @@ function prepare(self, base) {
 	headers(self, base);
 	toc();
 	footnotes();
+	mdash();
 }
 
 /**
@@ -161,6 +162,7 @@ function toc() {
 		var tocDiv = document.createElement("div");
 		tocDiv.setAttribute("id", "toc");
 		var tocHeader = document.createElement("h3");
+		tocHeader.setAttribute("style", "text-align:center");
 		tocDiv.appendChild(tocHeader);
 		tocHeader.appendChild(document.createTextNode("Table of Contents"));
 		document.body.insertBefore(tocDiv, tocSpan);
@@ -223,4 +225,17 @@ function stringify(node) {
 	for ( var i = 0; i < node.childNodes.length; i++)
 		id += stringify(node.childNodes[i]);
 	return id;
+}
+
+function mdash() {
+	var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT,
+			null, false);
+	while (walker.nextNode()) {
+		if (/--/.test(walker.currentNode.nodeValue)) {
+			var n = walker.currentNode;
+			var str = n.nodeValue;
+			str = str.replace(/--/g, '\u2014');
+			n.nodeValue = str;
+		}
+	}
 }

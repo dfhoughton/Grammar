@@ -8,7 +8,6 @@ var hdrs = {
 	"syntax" : "syntax.html",
 	"debugging" : "debugging.html",
 	"performance" : "performance.html",
-	"MatchToDot" : "matchtodot.html",
 	"api" : "api/index.html",
 	"download" : "download.html"
 };

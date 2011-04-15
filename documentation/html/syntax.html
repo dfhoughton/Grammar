@@ -8,5 +8,34 @@
 <script type="text/javascript" src="scripts/pageutils.js"></script>
 </head>
 <body onLoad="prepare('syntax', 'dfh.grammar')">
+	<h1>Syntax</h1>
+	<div>
+		A grammar is specified via a formalism similar to a <a
+			href="http://en.wikipedia.org/wiki/Backus-Naur_form">Backus-Naur
+			Form</a> grammar, though the point of grammars is not to parse BNF
+		grammars or express <a
+			href="http://en.wikipedia.org/wiki/Context-free_grammar">context-free
+			grammars</a> but to create useful character sequence matchers.
+		Consequenty, no claims are made as to the purity of grammars as CFGs
+		or whatever. Basically, a grammar is a collection of matching rules,
+		where every rule specifies a pattern of terminal expressions --
+		character sequences -- or non-terminal rules.
+	</div>
+	<span id="toc"></span>
+	<h2>General Rules</h2>
+	<h3>Rule</h3>
+	<h3>Root</h3>
+	<h2>Usual Bits</h2>
+	<h3>Sequence</h3>
+	<h3>Alternation</h3>
+	<h3>Repetition</h3>
+	<h3>Back Reference</h3>
+	<h2>Terminal Rules</h2>
+	<h3>Regular Expressions</h3>
+	<h3>Literals</h3>
+	<h2>Deferred Rule Definition</h2>
+	<h2>Conditions</h2>
+	<h2>Assertions</h2>
+	<h2>Options</h2>
 </body>
 </html>
