@@ -44,7 +44,7 @@ public class MultithreadTest {
 	}
 
 	@Test
-	public void aTest() {
+	public void multithreadTest() {
 		final LinkedList<String> phraseList = new LinkedList<String>();
 		for (int i = 0; i < MULTIPLIER; i++) {
 			for (String phrase : testPhrases)

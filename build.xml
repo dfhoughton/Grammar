@@ -2,11 +2,21 @@
 
 <project name="Grammar" basedir="." default="jar">
 	<description>Recursive, compositional pattern matching for Java.</description>
-	<property name="src.dir" value="src" />
-	<property name="build.dir" value="build" />
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="test.dir" value="${basedir}/t" />
 	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="test.classes.dir" value="${build.dir}/test-classes" />
 	<property name="jar.dir" value="${build.dir}/jar" />
 	<property name="doc.dir" value="${basedir}/documentation/html/api" />
+	<path id="junit.path">
+		<pathelement location="/usr/share/java/junit4.jar" />
+	</path>
+	<path id="classpath.test">
+		<pathelement location="${classes.dir}" />
+		<pathelement location="${test.classes.dir}" />
+		<path refid="junit.path" />
+	</path>
 
 	<target name="clean" description="removes anything created by any other ant task">
 		<delete dir="${build.dir}" />
@@ -15,7 +25,7 @@
 
 	<target name="compile" description="compile source to bytecode">
 		<mkdir dir="${classes.dir}" />
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false" />
 	</target>
 
 	<target name="jar" depends="compile" description="packages code into jar">
@@ -51,5 +61,18 @@
 				<include name="documentation/html/scripts/*.js" />
 			</tarfileset>
 		</tar>
+	</target>
+	<target name="test-compile" depends="compile" description="compiles junit tests">
+		<mkdir dir="${test.classes.dir}" />
+		<javac srcdir="${test.dir}" destdir="${test.classes.dir}" includeantruntime="false">
+			<classpath refid="classpath.test" />
+		</javac>
+	</target>
+	<target name="test" depends="test-compile" description="runs junit tests">
+		<junit>
+			<classpath refid="classpath.test" />
+			<formatter type="plain" usefile="false" />
+			<test name="dfh.grammar.AllTests" />
+		</junit>
 	</target>
 </project>
