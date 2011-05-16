@@ -60,6 +60,29 @@ public class ReversedCharSequence implements CharSequence {
 		return s.charAt(zero - index);
 	}
 
+	/**
+	 * Returns underlying index and reading direction relative to reversed
+	 * sequence.
+	 * 
+	 * @param index
+	 * @return corresponding index in bottommost character sequence and whether
+	 *         this sequence is in the same (0) or opposite (1) order to the
+	 *         base sequence
+	 */
+	public int[] translate(int index) {
+		ReversedCharSequence rcs = this;
+		int[] i = { index, 1 };
+		while (true) {
+			i[0] = rcs.zero - i[0];
+			if (rcs.underlyingSequence() instanceof ReversedCharSequence) {
+				rcs = (ReversedCharSequence) rcs.underlyingSequence();
+				i[1] = i[1] == 1 ? 0 : 1;
+			} else
+				break;
+		}
+		return i;
+	}
+
 	@Override
 	public CharSequence subSequence(int start, int end) {
 		return new ReversedCharSequence(s, start - zero, end - zero);
@@ -78,5 +101,17 @@ public class ReversedCharSequence implements CharSequence {
 	 */
 	public CharSequence underlyingSequence() {
 		return s;
+	}
+
+	/**
+	 * @return {@link CharSequence} underlying this and any intervening reversed
+	 *         sequences
+	 */
+	public CharSequence bottomSequence() {
+		CharSequence seq = s;
+		while (s instanceof ReversedCharSequence) {
+			seq = ((ReversedCharSequence) seq).s;
+		}
+		return seq;
 	}
 }
