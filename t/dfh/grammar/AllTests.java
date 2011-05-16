@@ -30,6 +30,7 @@ import org.junit.runners.Suite;
 		ConditionTest.class,//
 		BacktrackingBarrierTest.class,//
 		DeepRecursionTest.class,//
+		OverlapTest.class,//
 })
 public class AllTests {
 }

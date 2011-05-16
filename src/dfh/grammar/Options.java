@@ -217,4 +217,14 @@ public class Options {
 	public void longestTokenMatching(boolean longestTokenMatching) {
 		this.longestTokenMatching = longestTokenMatching;
 	}
+
+	/**
+	 * This is equivalent to setting {@link #longestTokenMatching(boolean)} to
+	 * <code>false</code> and {@link #allowOverlap(boolean)} to
+	 * <code>true</code>.
+	 */
+	public void matchAll() {
+		allowOverlap(true);
+		longestTokenMatching(false);
+	}
 }
