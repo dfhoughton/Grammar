@@ -99,11 +99,15 @@ public abstract class NonterminalMatcher extends Matcher {
 	/**
 	 * @return whether we seem to be in a non-progressing recursive loop
 	 */
-	private boolean cycleCheck() {
+	protected boolean cycleCheck() {
 		Matcher m = master;
+		int count = 0;
 		while (m != null && m.offset == offset) {
-			if (m.rule() == rule)
-				return true;
+			if (m.rule() == rule) {
+				count++;
+				if (count == options.maxDepth)
+					return true;
+			}
 			m = m.master;
 		}
 		return false;

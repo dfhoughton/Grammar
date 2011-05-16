@@ -22,6 +22,7 @@ public class GlobalState {
 	public final PrintStream trace;
 	public final boolean debug;
 	public final Map<Label, Map<Integer, CachedMatch>> backwardsCache;
+	public final int maxDepth;
 
 	/**
 	 * Constructor called in {@link Grammar} only.
@@ -30,8 +31,8 @@ public class GlobalState {
 	 * @param containsCycles
 	 */
 	GlobalState(Options o, boolean containsCycles) {
-		this(o.allowOverlap, o.start, o.end, o.trace, o.study, containsCycles,
-				null);
+		this(o.allowOverlap, o.start, o.end, o.maxRecursionDepth, o.trace,
+				o.study, containsCycles, null);
 	}
 
 	/**
@@ -44,15 +45,17 @@ public class GlobalState {
 	 */
 	GlobalState(GlobalState gs, int end,
 			Map<Label, Map<Integer, CachedMatch>> backwardsCache) {
-		this(gs.allowOverlap, 0, end, gs.trace, false, false, backwardsCache);
+		this(gs.allowOverlap, 0, end, gs.maxDepth, gs.trace, false, false,
+				backwardsCache);
 	}
 
-	private GlobalState(boolean allowOverlap, int start, int end,
+	private GlobalState(boolean allowOverlap, int start, int end, int maxDepth,
 			PrintStream trace, boolean study, boolean containsCycles,
 			Map<Label, Map<Integer, CachedMatch>> backwardsCache) {
 		this.allowOverlap = allowOverlap;
 		this.start = start;
 		this.end = end;
+		this.maxDepth = maxDepth;
 		this.trace = trace;
 		this.containsCycles = containsCycles;
 		this.debug = trace != null;

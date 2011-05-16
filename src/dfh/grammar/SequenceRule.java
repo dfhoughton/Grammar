@@ -155,10 +155,10 @@ public class SequenceRule extends Rule {
 			if (r.generation == -1) {
 				boolean alternation = r instanceof AlternationRule;
 				if (alternation)
-					b.append('[');
+					b.append("[ ");
 				b.append(r.description());
 				if (alternation)
-					b.append(']');
+					b.append(" ]");
 			} else
 				b.append(r.label());
 		}

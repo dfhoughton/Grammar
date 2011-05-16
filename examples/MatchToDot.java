@@ -1,3 +1,7 @@
+import static dfh.grammar.util.Dotify.appendGraph;
+import static dfh.grammar.util.Dotify.endDot;
+import static dfh.grammar.util.Dotify.startDot;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -5,22 +9,21 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import dfh.grammar.Grammar;
 import dfh.grammar.GrammarException;
 import dfh.grammar.Match;
 import dfh.grammar.Matcher;
+import dfh.grammar.util.Dotify;
 
 /**
  * For making graphs showing the structure of matches. The output must be
  * processed with GraphViz or something else that can make graph images from
  * .dot files.
- * <p>
+ * 
+ * This class basically provides a command line interface to {@link Dotify}, a
+ * debugging utility.
+ * 
  * <b>Creation date:</b> Apr 2, 2011
  * 
  * @author David Houghton
@@ -47,12 +50,12 @@ public class MatchToDot {
 		Grammar g = new Grammar(gf);
 		String text = fileToText(inf);
 		Matcher m = g.find(text);
-		StringBuilder b = startDot(inf);
+		StringBuilder b = startGraph(inf);
 		Match n;
 		int[] index = { 1 };
 		while ((n = m.match()) != null) {
 			if (!n.zeroWidth())
-				appendGraph(b, n, text, index);
+				appendGraph(b, n, text, index, null);
 		}
 		endDot(b);
 		dotFile(inf, b);
@@ -65,116 +68,9 @@ public class MatchToDot {
 		writer.close();
 	}
 
-	private static void endDot(StringBuilder b) {
-		b.append("}\n");
-	}
-
-	private static void appendGraph(StringBuilder b, Match n, String text,
-			int[] index) {
-		b.append("subgraph cluster").append(index[0]).append(" {\n");
-		b.append("label = ");
-		b.append(id(cleanText(n, text))).append("\n");
-		Map<Object, String> idMap = new HashMap<Object, String>();
-		Set<String> sameRank = new TreeSet<String>();
-		List<Match> matchList = n.passingMatches(Match.WIDE);
-		for (Match m : matchList) {
-			String id = getId(index, idMap, m);
-			b.append(id).append(' ').append("[label=");
-			b.append(id(m.explicit() ? m.rule().label().toString() : m.rule()
-					.description()));
-			if (m.explicit())
-				b.append(",shape=box");
-			b.append("]\n");
-			if (m.isTerminal()) {
-				String id2 = "n" + index[0]++;
-				sameRank.add(id2);
-				String s = cleanText(m, text);
-				idMap.put(s, id2);
-				b.append(id2).append(' ').append("[label=");
-				b.append(id(s)).append("]\n");
-				b.append(id).append(" -- ").append(id2).append('\n');
-			} else {
-				b.append(id).append(" -- ");
-				int count = 0;
-				for (Match child : m.children()) {
-					if (!child.zeroWidth())
-						count++;
-				}
-				if (count == 1) {
-					for (Match child : m.children()) {
-						if (!child.zeroWidth()) {
-							String id2 = getId(index, idMap, child);
-							b.append(id2);
-							break;
-						}
-					}
-				} else {
-					b.append('{');
-					for (Match child : m.children()) {
-						if (!child.zeroWidth()) {
-							String id2 = getId(index, idMap, child);
-							b.append(' ').append(id2);
-						}
-					}
-					b.append('}');
-				}
-				b.append('\n');
-			}
-		}
-		if (sameRank.size() > 1) {
-			b.append("{ rank = same; ");
-			for (String s : sameRank) {
-				b.append(s).append("; ");
-			}
-			b.append("}\n");
-		}
-		b.append("}\n");
-	}
-
-	private static String getId(int[] index, Map<Object, String> idMap, Match m) {
-		String id = idMap.get(m);
-		if (id == null) {
-			id = "n" + index[0]++;
-			idMap.put(m, id);
-		}
-		return id;
-	}
-
-	private static String cleanText(Match n, String text) {
-		String suffix = "(" + n.start() + ", " + n.end() + ")";
-		if (n.zeroWidth())
-			return suffix;
-		String s = text.substring(n.start(), n.end()).trim();
-		if (s.length() == 0)
-			s = "\" \"";
-		else
-			s = s.replaceAll("\\s++", " ");
-		return s + ' ' + suffix;
-	}
-
-	private static StringBuilder startDot(File inf) {
-		StringBuilder b = new StringBuilder();
-		b.append("graph ");
-		b.append(id(inf.getName()));
-		b.append(" {\n");
-		b.append("node [shape=plaintext,fontsize=10]\n");
-		return b;
-	}
-
-	/**
-	 * @param name
-	 * @return GraphViz ID
-	 */
-	private static String id(String name) {
-		StringBuilder b = new StringBuilder();
-		b.append('"');
-		for (char c : name.toCharArray()) {
-			if (c == '\\' || c == '"')
-				b.append('\\');
-			b.append(c);
-		}
-		b.append('"');
-		return b.toString();
+	private static StringBuilder startGraph(File inf) {
+		String name = inf.getName();
+		return startDot(name);
 	}
 
 	private static String fileToText(File inf) throws FileNotFoundException,

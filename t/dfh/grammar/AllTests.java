@@ -29,6 +29,7 @@ import org.junit.runners.Suite;
 		TerminalGrammarTest.class,//
 		ConditionTest.class,//
 		BacktrackingBarrierTest.class,//
+		DeepRecursionTest.class,//
 })
 public class AllTests {
 }

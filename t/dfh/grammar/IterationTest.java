@@ -28,7 +28,7 @@ public class IterationTest {
 		int count = 0;
 		while (count < 10 && m.match() != null)
 			count++;
-		assertTrue("found joe", count == 3);
+		assertTrue(count == 3);
 	}
 
 	@Test
@@ -46,6 +46,24 @@ public class IterationTest {
 		int count = 0;
 		while (count < 10 && m.match() != null)
 			count++;
-		assertTrue("found joe", count == 3);
+		assertTrue(count == 3);
 	}
+
+	@Test
+	public void overlapTest2() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = 'a'+",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "aaa";
+		Options opt = new Options();
+		opt.allowOverlap(true);
+		Matcher m = g.find(s, opt);
+		int count = 0;
+		while (count < 10 && m.match() != null)
+			count++;
+		assertTrue(count == 6);
+	}
+
 }

@@ -33,7 +33,7 @@ public abstract class Rule implements Serializable {
 	 * Used during compilation to hold condition identifier for use in
 	 * constructing unique ids. See {@link #uniqueId()}.
 	 */
-	String condition;
+	protected String condition;
 
 	/**
 	 * Assigns given label to {@link Rule}.
@@ -79,6 +79,15 @@ public abstract class Rule implements Serializable {
 	}
 
 	/**
+	 * @return memory address, useful for debugging
+	 */
+	protected String address() {
+		String a = super.toString();
+		a = a.substring(a.lastIndexOf('@') + 1);
+		return a;
+	}
+
+	/**
 	 * Returns a {@link String} representing with as much precision as possible
 	 * the pattern applied by this rule. This means if this rule depends on
 	 * other rules its unique id should incorporate their unique ids (but be
@@ -101,7 +110,7 @@ public abstract class Rule implements Serializable {
 	 */
 	protected final void matchTrace(Matcher m) {
 		StringBuilder b = new StringBuilder();
-		b.append(label());
+		b.append('\n').append(label());
 		locate(b, m.s, m.offset);
 		stackTrace(b, m);
 		m.options.trace.println(b);
@@ -124,7 +133,7 @@ public abstract class Rule implements Serializable {
 	}
 
 	private void stackTrace(StringBuilder b, Matcher m) {
-		b.append("\n     ");
+		b.append("\nstack:\n");
 		while (m.rule() != null) {
 			b.append(m.rule().label());
 			b.append(' ');
@@ -169,7 +178,7 @@ public abstract class Rule implements Serializable {
 	 */
 	protected final void matchTrace(Matcher m, Match n) {
 		StringBuilder b = new StringBuilder();
-		b.append("  ");
+		b.append("post match:\n");
 		b.append(label());
 		locate(b, m.s, m.offset);
 		b.append(" returning ");

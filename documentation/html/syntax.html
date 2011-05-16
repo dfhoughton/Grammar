@@ -17,12 +17,66 @@
 			href="http://en.wikipedia.org/wiki/Context-free_grammar">context-free
 			grammars</a> but to create useful character sequence matchers.
 		Consequenty, no claims are made as to the purity of grammars as CFGs
-		or whatever. Basically, a grammar is a collection of matching rules,
-		where every rule specifies a pattern of terminal expressions --
-		character sequences -- or non-terminal rules.
+		or whatever other theoretical construct. Basically, a grammar is a
+		collection of matching rules, where every rule specifies a pattern of
+		terminal expressions -- character sequences -- or non-terminal rules.
 	</div>
 	<span id="toc"></span>
 	<h2>General Rules</h2>
+	<div>
+		Here is the grammar understood by
+		<code>dfh.grammar</code>
+		expressed in its own formalism:
+	</div>
+	<pre>                &lt;ROOT&gt; = &lt;grammar&gt;
+
+             &lt;grammar&gt; = &lt;padding&gt;* &lt;root&gt; &lt;post_root&gt;*
+           &lt;post_root&gt; = [ &lt;non_rule&gt; | &lt;rule&gt; ] &lt;nl&gt;
+                &lt;root&gt; = "&lt;ROOT&gt;" &lt;right_part&gt;
+                &lt;rule&gt; = "&lt;" &lt;identifier&gt; "&gt;" &lt;right_part&gt;
+          &lt;right_part&gt; = &lt;equals&gt; &lt;rule_body&gt;
+           &lt;rule_body&gt; = &lt;main_part&gt; [ &lt;space&gt;? &lt;condition&gt; ]? [ &lt;space&gt;? &lt;comment&gt; ]?
+           &lt;main_part&gt; = &lt;regex&gt; | &lt;element&gt;
+                 &lt;alt&gt; = &lt;element&gt; [ &lt;space&gt;? "|" &lt;element&gt; &lt;space&gt;? ]++
+           &lt;assertion&gt; = &lt;backtracking_barrier&gt; | &lt;forward_assertion&gt; | &lt;backward_assertion&gt;
+  &lt;backward_assertion&gt; = &lt;assertion_marker&gt; "-" &lt;space&gt;? &lt;delimited_element&gt;
+     &lt;complex_element&gt; = &lt;alt&gt; | &lt;seq&gt;
+   &lt;delimited_element&gt; = &lt;simple_element&gt; | "[" &lt;complex_element&gt; "]"
+             &lt;element&gt; = "[" &lt;element&gt; "]" | &lt;modifiable_element&gt; | &lt;assertion&gt;
+   &lt;forward_assertion&gt; = &lt;assertion_marker&gt; "+"? &lt;space&gt;? &lt;delimited_element&gt;
+  &lt;modifiable_element&gt; = &lt;simple_element&gt; | &lt;complex_element&gt;
+                 &lt;rep&gt; = &lt;delimited_element&gt; &lt;repetition&gt;
+                 &lt;seq&gt; = &lt;element&gt; [ &lt;space&gt;? [ &lt;element&gt; | &lt;d&gt;++ ] ]++
+      &lt;simple_element&gt; = &lt;id&gt; | &lt;literal&gt; | &lt;rep&gt;
+             &lt;literal&gt; = &lt;single_quote&gt; | &lt;double_quote&gt;
+             &lt;padding&gt; = &lt;non_rule&gt; &lt;nl&gt;
+           &lt;condition&gt; = "(" &lt;identifier&gt; ")"
+        &lt;double_quote&gt; = '"' [ &lt;ndq&gt; | &lt;escaped&gt; ]++ '"'
+                  &lt;id&gt; = "&lt;" &lt;identifier&gt; "&gt;"
+            &lt;non_rule&gt; = &lt;space&gt;? &lt;comment&gt;?
+          &lt;repetition&gt; = [ &lt;simple_rep&gt; | &lt;delimited_rep&gt; ] [ "?" | "+" ]?
+        &lt;single_quote&gt; = "'" [ &lt;nsq&gt; | &lt;escaped&gt; ]++ "'"
+    &lt;assertion_marker&gt; = "~" | "!"
+       &lt;backreference&gt; = &lt;d&gt;++
+&lt;backtracking_barrier&gt; = ":"{1,2}
+             &lt;comment&gt; = "#" &lt;dot&gt;*
+       &lt;delimited_rep&gt; = "{" [ &lt;d&gt;++ | "," &lt;d&gt;++ | &lt;d&gt;++ "," | &lt;d&gt;++ "," &lt;d&gt;++ ] "}"
+              &lt;equals&gt; = &lt;space&gt;? "=" &lt;space&gt;?
+             &lt;escaped&gt; = "\\\\" &lt;dot&gt;
+          &lt;identifier&gt; = &lt;w&gt;++
+               &lt;regex&gt; = "/" &lt;dot&gt;++ "/" &lt;regex_suffix&gt;?
+          &lt;simple_rep&gt; = "*" | "?" | "+"
+                   &lt;d&gt; = /\d/
+                 &lt;dot&gt; = /./
+                 &lt;ndq&gt; = /[^"\\]/
+                  &lt;nl&gt; = /\n/
+                 &lt;nsq&gt; = /[^'\\]/
+        &lt;regex_suffix&gt; = /[rimsdux]++/
+               &lt;space&gt; = /[\s&amp;&amp;[^\n]]++/
+                   &lt;w&gt; = /\w/</pre>
+	<div>Basically, a grammar expects a set of rules, each of which
+		may define a terminal character sequence or a set of constituent
+		rules.</div>
 	<h3>Rule</h3>
 	<h3>Root</h3>
 	<h2>Usual Bits</h2>
@@ -36,6 +90,40 @@
 	<h2>Deferred Rule Definition</h2>
 	<h2>Conditions</h2>
 	<h2>Assertions</h2>
+	<h3>Zero-Width Matches</h3>
+	<h3>Backtracking Barriers</h3>
+	A backtracking barrier is a sort of meta-assertion. It says, "the
+	matching engine will not have to revisit this decision or anything that
+	precedes it." It serves a function similar to the
+	<code>(?&gt;&nbsp;...&nbsp;)</code>
+	in Perl-compatible regular expressions or possessive quantification. It
+	makes matching more tractable by eliminating at one stroke some number
+	of permutations in the matching engine's search space.'
+	<h4>:</h4>
+	The single-colon barrier indicates that the rule containing it fails if
+	it cannot complete the match after the the barrier without revisiting
+	decisions before the barrier. If you know that the first few elements
+	in a sequence will match only one way if at all, you can follow them
+	with the single-colon barrier.
+	<h4>::</h4>
+	The double-colon barrier indicates that if the portion of the rule
+	after the barrier fails to match then the entire grammar fails to match
+	at the current offset in the character sequence.
 	<h2>Options</h2>
+	With
+	<code>java.regex.Matcher</code>
+	matching, one can modify the matching altering various properties of
+	the matcher object separately. With
+	<code>dfh.grammar</code>
+	matching one must pass all the desired options in as a collection when
+	creating the matcher. This improves efficiency and ensures the
+	immutability of its state aside from its position in the sequence of
+	matches over which it is iterating. The parameter collection is an
+	instance of
+	<code>dfh.grammar.Options</code>
+	. Among other things is specifies which should be regarded as the first
+	and last characters in the sub-sequence to match against, whether
+	overlapping matches should be considered, and whether debugging output
+	should be produced.
 </body>
 </html>

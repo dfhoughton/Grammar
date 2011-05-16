@@ -33,11 +33,68 @@ public class Options {
 	 * {@link Grammar#lookingAt(CharSequence, Options)}.
 	 */
 	public static final boolean LONGEST_TOKEN_MATCHING = true;
+	/**
+	 * Maximum number of times the parser will visit the same rule without any
+	 * forward progress before it gives up on the pattern. So if you have a
+	 * grammar like
+	 * 
+	 * <pre>
+	 * &lt;ROOT&gt; = &lt;AP&gt;
+	 * 
+	 *   &lt;AP&gt; = &lt;DP&gt;? "a"
+	 *   &lt;DP&gt; = &lt;AP&gt; "s"
+	 * </pre>
+	 * 
+	 * which produces left-branching parse trees like
+	 * 
+	 * <pre>
+	 *         AP
+	 *        /  \
+	 *       DP   a
+	 *      /  \
+	 *     AP   s
+	 *    /  \
+	 *   DP   a
+	 *  /  \
+	 * AP   s
+	 * |
+	 * a
+	 * </pre>
+	 * 
+	 * this value determines how deep the tree can grow. Without some limit like
+	 * this the grammar will recurse infinitely while trying to determine how to
+	 * match <code>&lt;AP&gt;</code>.
+	 * 
+	 * The smaller this recursion limit, the faster recursive patterns will
+	 * match (and the less chance one has of overflowing the stack). However,
+	 * you will be unable to parse deeply-recursive left-branching patterns such
+	 * as one finds in the English phrase <i>The Queen's cousins father's
+	 * friend's hat</i>.
+	 */
+	public static final int MAX_RECURSION_DEPTH = 3;
 	boolean allowOverlap = ALLOW_OVERLAP;
 	boolean study = STUDY;
 	boolean longestTokenMatching = LONGEST_TOKEN_MATCHING;
 	int start = START_OFFSET;
 	int end = -1;
+	int maxRecursionDepth = MAX_RECURSION_DEPTH;
+
+	/**
+	 * @return see {@link #MAX_RECURSION_DEPTH}
+	 */
+	public int maxRecursionDepth() {
+		return maxRecursionDepth;
+	}
+
+	/**
+	 * See {@link #MAX_RECURSION_DEPTH}
+	 * 
+	 * @param maxRecursionDepth
+	 */
+	public void maxRecursionDepth(int maxRecursionDepth) {
+		this.maxRecursionDepth = maxRecursionDepth;
+	}
+
 	PrintStream trace;
 
 	/**

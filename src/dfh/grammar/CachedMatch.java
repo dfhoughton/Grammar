@@ -20,7 +20,7 @@ package dfh.grammar;
  * 
  */
 public class CachedMatch {
-	final Match m;
+	public final Match m;
 
 	/**
 	 * To reduce object creation we have a common mismatch object.
