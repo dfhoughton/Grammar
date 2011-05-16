@@ -102,7 +102,7 @@ public abstract class NonterminalMatcher extends Matcher {
 	protected boolean cycleCheck() {
 		Matcher m = master;
 		int count = 0;
-		while (m != null && m.offset == offset) {
+		while (m != null && m.offset.equals(offset)) {
 			if (m.rule() == rule) {
 				count++;
 				if (count == options.maxDepth)
