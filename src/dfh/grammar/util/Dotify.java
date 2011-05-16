@@ -21,6 +21,12 @@ import dfh.grammar.Match;
 public class Dotify {
 
 	/**
+	 * Non-OO class.
+	 */
+	private Dotify() {
+	}
+
+	/**
 	 * Completes GraphViz notation for collection of graphs.
 	 * 
 	 * @param b

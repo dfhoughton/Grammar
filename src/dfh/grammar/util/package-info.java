@@ -1,5 +1,4 @@
-package dfh.grammar.util;
-
 /**
  * A collection of ancillary utilities.
  */
+package dfh.grammar.util;

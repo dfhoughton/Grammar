@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -51,7 +50,7 @@ import dfh.grammar.Label.Type;
  * <h3>Advantages</h3>
  * <ul>
  * <li>Ease of composition, reading, maintenance, anddebugging. See
- * {@link #setTrace(PrintStream)} and {@link #describe()}.
+ * {@link Options#trace()} and {@link #describe()}.
  * <li>One can compose grammars from component {@link Rule rules}, regular
  * expressions, and other grammars. See {@link #defineRule(String, Pattern)},
  * {@link #defineRule(String, Rule)}.

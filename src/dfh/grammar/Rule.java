@@ -278,7 +278,6 @@ public abstract class Rule implements Serializable {
 	 * as the base implementation only throws a {@link GrammarException} when
 	 * called.
 	 * 
-	 * @param c
 	 * @return a {@link Rule} that duplicates this except that it won't return
 	 *         any {@link Match} that doesn't meet the given condition
 	 */
