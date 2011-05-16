@@ -90,9 +90,11 @@ public class Options {
 	 * See {@link #MAX_RECURSION_DEPTH}
 	 * 
 	 * @param maxRecursionDepth
+	 * @return
 	 */
-	public void maxRecursionDepth(int maxRecursionDepth) {
+	public Options maxRecursionDepth(int maxRecursionDepth) {
 		this.maxRecursionDepth = maxRecursionDepth;
+		return this;
 	}
 
 	PrintStream trace;
@@ -126,9 +128,11 @@ public class Options {
 	/**
 	 * @param allowOverlap
 	 *            whether matches iterated over may overlap
+	 * @return self to allow chaining of methods
 	 */
-	public void allowOverlap(boolean allowOverlap) {
+	public Options allowOverlap(boolean allowOverlap) {
 		this.allowOverlap = allowOverlap;
+		return this;
 	}
 
 	/**
@@ -142,9 +146,11 @@ public class Options {
 	 * @param study
 	 *            whether the {@link CharSequence} will be studied before
 	 *            matching
+	 * @return self to allow chaining of methods
 	 */
-	public void study(boolean study) {
+	public Options study(boolean study) {
 		this.study = study;
+		return this;
 	}
 
 	/**
@@ -157,11 +163,13 @@ public class Options {
 	/**
 	 * @param start
 	 *            point in {@link CharSequence} at which to begin matching
+	 * @return self to allow chaining of methods
 	 */
-	public void start(int start) {
+	public Options start(int start) {
 		if (start < 0)
 			throw new GrammarException("text offsets must be positive");
 		this.start = start;
+		return this;
 	}
 
 	/**
@@ -169,9 +177,11 @@ public class Options {
 	 * 
 	 * @param trace
 	 *            data sink for debugging
+	 * @return self to allow chaining of methods
 	 */
-	public void trace(PrintStream trace) {
+	public Options trace(PrintStream trace) {
 		this.trace = trace;
+		return this;
 	}
 
 	/**
@@ -184,11 +194,13 @@ public class Options {
 	/**
 	 * @param end
 	 *            end of region to match
+	 * @return self to allow chaining of methods
 	 */
-	public void end(int end) {
+	public Options end(int end) {
 		if (end <= start)
 			throw new GrammarException("end offset must follow start");
 		this.end = end;
+		return this;
 	}
 
 	/**
@@ -213,18 +225,23 @@ public class Options {
 	 * See {@link #LONGEST_TOKEN_MATCHING}.
 	 * 
 	 * @param longestTokenMatching
+	 * @return self to allow chaining of methods
 	 */
-	public void longestTokenMatching(boolean longestTokenMatching) {
+	public Options longestTokenMatching(boolean longestTokenMatching) {
 		this.longestTokenMatching = longestTokenMatching;
+		return this;
 	}
 
 	/**
 	 * This is equivalent to setting {@link #longestTokenMatching(boolean)} to
 	 * <code>false</code> and {@link #allowOverlap(boolean)} to
 	 * <code>true</code>.
+	 * 
+	 * @return self to allow chaining of methods
 	 */
-	public void matchAll() {
+	public Options matchAll() {
 		allowOverlap(true);
 		longestTokenMatching(false);
+		return this;
 	}
 }
