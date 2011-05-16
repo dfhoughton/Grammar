@@ -4,7 +4,10 @@ package dfh.grammar;
  * {@link CharSequence} that allows the iteration over another
  * {@link CharSequence} in reverse. This is required for variable-length look
  * behind assertions.
- * <p>
+ * 
+ * Note that this class merely tinkers with the index math to retrieve
+ * characters from the underlying sequence.
+ * 
  * <b>Creation date:</b> Apr 10, 2011
  * 
  * @author David Houghton
@@ -68,5 +71,12 @@ public class ReversedCharSequence implements CharSequence {
 		for (int i = zero; i > end; i--)
 			b.append(s.charAt(i));
 		return b.toString();
+	}
+
+	/**
+	 * @return {@link CharSequence} that has been reversed
+	 */
+	public CharSequence underlyingSequence() {
+		return s;
 	}
 }
