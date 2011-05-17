@@ -17,10 +17,6 @@ package dfh.grammar;
  * respectively. Assertions have a width of zero, so they amount to a test which
  * doesn't consume any content.
  * <p>
- * At the moment only forward assertions are implemented. I plan to implement
- * variable width backwards assertions *without regular expressions* in the near
- * future.
- * <p>
  * <b>Creation date:</b> Apr 7, 2011
  * 
  * @author David Houghton
@@ -38,6 +34,8 @@ public class AssertionFragment implements RuleFragment {
 	 *            whether matching the assertion rule constitutes a match of the
 	 *            assertion
 	 * @param forward
+	 *            whether the assertion rule matches what comes after (forward),
+	 *            or what comes before
 	 */
 	public AssertionFragment(boolean positive, boolean forward) {
 		this.positive = positive;

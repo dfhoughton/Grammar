@@ -1,6 +1,7 @@
 package dfh.grammar;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
@@ -8,7 +9,10 @@ import org.junit.Test;
 
 /**
  * Makes sure zero-width assertions work as advertised.
- * <p>
+ * 
+ * TODO: make forwards and backwards tests for {@link BacktrackingBarrier},
+ * {@link BackReferenceRule}, {@link RepetitionRule}, {@link Assertion}
+ * 
  * <b>Creation date:</b> Mar 28, 2011
  * 
  * @author David Houghton

@@ -3,15 +3,17 @@ package dfh.grammar;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * A rule undefined at the time of grammar compilation. It will always
  * correspond to a terminal rule. This class exists so that a {@link Grammar}
  * can be compiled and then certain rules dynamically loaded in later.
- * <p>
+ * 
  * This is similar to Perl's <code>AUTOLOAD</code> mechanism or a function
  * prototype.
- * <p>
+ * 
+ * TODO: figure out how we can include deferred definition rules in backwards
+ * assertions
+ * 
  * <b>Creation date:</b> Mar 16, 2011
  * 
  * @author David Houghton

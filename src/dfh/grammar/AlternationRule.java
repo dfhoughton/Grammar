@@ -15,6 +15,7 @@ import java.util.Set;
  * @author David Houghton
  * 
  */
+@Reversible
 public class AlternationRule extends Rule {
 	private static final long serialVersionUID = 1L;
 

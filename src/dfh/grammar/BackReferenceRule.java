@@ -23,6 +23,7 @@ import dfh.grammar.SequenceRule.SequenceMatcher;
  * @author David Houghton
  * 
  */
+@Reversible
 public class BackReferenceRule extends Rule {
 	private static final long serialVersionUID = 1L;
 	protected final int index;

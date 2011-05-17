@@ -1,6 +1,7 @@
 package dfh.grammar;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -586,6 +587,20 @@ public class Compiler {
 	}
 
 	private Rule reverse(Rule sr) {
+		// check to make sure the class has been annotated as reversible
+		boolean irreversible = true;
+		for (Annotation a : sr.getClass().getAnnotations()) {
+			if (a instanceof Reversible) {
+				irreversible = false;
+				break;
+			}
+		}
+		if (irreversible)
+			throw new GrammarException("cannot reverse " + sr + "; its class, "
+					+ sr.getClass()
+					+ " is not annotated as dfh.grammar.Reversible");
+
+		// all's well, so we reverse the rule
 		Rule ru = null;
 		if (sr instanceof AlternationRule) {
 			AlternationRule ar = (AlternationRule) sr;
@@ -615,13 +630,6 @@ public class Compiler {
 			ru = sr;
 		} else if (sr instanceof BacktrackingBarrier) {
 			ru = sr;
-		} else if (sr instanceof CyclicRule) {
-			throw new GrammarException("currently cyclic rules such as " + sr
-					+ " cannot be used in backwards assertions");
-		} else if (sr instanceof DeferredDefinitionRule) {
-			throw new GrammarException(
-					"currently rules with a deferred definition such as " + sr
-							+ " cannot be used in backwards assertions");
 		} else if (sr instanceof LeafRule) {
 			LeafRule lr = (LeafRule) sr;
 			if (!lr.reversible)
@@ -669,6 +677,8 @@ public class Compiler {
 			b.append(']');
 			Label l = new Label(Type.nonTerminal, b.toString());
 			ru = new SequenceRule(l, children);
+		} else {
+			ru = sr.reverse();
 		}
 		if (sr.condition != null)
 			ru.condition = "r:" + sr.condition;

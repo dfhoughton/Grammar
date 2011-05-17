@@ -5,13 +5,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Implements zero-width forward assertions. See {@link AssertionFragment}.
+ * Implements zero-width assertions. See {@link AssertionFragment}.
  * <p>
  * <b>Creation date:</b> Apr 7, 2011
  * 
  * @author David Houghton
  * 
  */
+@Reversible
 public class Assertion extends Rule {
 	private static final long serialVersionUID = 1L;
 

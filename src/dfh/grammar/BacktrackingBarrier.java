@@ -14,6 +14,7 @@ import dfh.grammar.Label.Type;
  * @author David Houghton
  * 
  */
+@Reversible
 public class BacktrackingBarrier extends Rule {
 	private static final long serialVersionUID = 1L;
 	/**

@@ -12,6 +12,7 @@ import java.util.Set;
  * @author David Houghton
  * 
  */
+@Reversible
 public class RepetitionRule extends Rule {
 	private static final long serialVersionUID = 1L;
 	Rule r;

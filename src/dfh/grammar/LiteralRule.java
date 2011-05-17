@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * For matching a rule literal. E.g., <fred> = "Fred".
  * <p>
@@ -13,6 +12,7 @@ import java.util.Set;
  * @author David Houghton
  * 
  */
+@Reversible
 public class LiteralRule extends Rule {
 	private class LiteralMatcher extends Matcher {
 		private final Map<Integer, CachedMatch> cache;

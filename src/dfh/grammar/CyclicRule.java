@@ -3,7 +3,6 @@ package dfh.grammar;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * A rule that depends on some other or others in a cycle of dependence. These
  * rules must be defined in two steps. For example:
@@ -13,7 +12,9 @@ import java.util.Set;
  * </pre>
  * 
  * which will match <i>(*)</i>, <i>((*))</i>, <i>(((*)))</i>, etc.
- * <p>
+ * 
+ * TODO: make cyclic rules reversible
+ * 
  * <b>Creation date:</b> Mar 25, 2011
  * 
  * @author David Houghton

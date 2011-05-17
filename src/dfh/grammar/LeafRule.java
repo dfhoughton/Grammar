@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-
 /**
  * {@link Rule} defined over sequence of terminal objects rather than other
  * <code>Rules</code>. In particular, this is such a {@link Rule} when the
@@ -15,6 +14,7 @@ import java.util.regex.Pattern;
  * 
  * @author David Houghton
  */
+@Reversible
 public class LeafRule extends Rule {
 	/**
 	 * For normalizing the unique ids of regexes that allow comments.
