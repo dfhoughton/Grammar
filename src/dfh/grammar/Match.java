@@ -372,4 +372,14 @@ public class Match {
 	public boolean explicit() {
 		return r.generation > -1;
 	}
+
+	/**
+	 * Convenience method that applieds {@link #TERMINAL} to
+	 * {@link #passingMatches(MatchTest)}.
+	 * 
+	 * @return list of terminal matches
+	 */
+	public List<Match> leaves() {
+		return passingMatches(TERMINAL);
+	}
 }
