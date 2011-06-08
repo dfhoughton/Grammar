@@ -197,7 +197,7 @@ public class Options {
 	 * @return self to allow chaining of methods
 	 */
 	public Options end(int end) {
-		if (end <= start)
+		if (end > 0 && end <= start)
 			throw new GrammarException("end offset must follow start");
 		this.end = end;
 		return this;

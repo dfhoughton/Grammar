@@ -903,7 +903,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @return clone of given options
 	 */
 	private GlobalState verifyOptions(CharSequence s, Options opt) {
-		if (opt.start() >= s.length())
+		if (opt.start() > 0 && opt.start() >= s.length())
 			throw new GrammarException(
 					"start offset specified beyond end of string");
 		if (opt.end == -1)

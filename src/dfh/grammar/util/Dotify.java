@@ -62,7 +62,7 @@ public class Dotify {
 		b.append(id(caption)).append("\n");
 		Map<Object, String> idMap = new HashMap<Object, String>();
 		Set<String> sameRank = new TreeSet<String>();
-		List<Match> matchList = n.passingMatches(Match.WIDE);
+		List<Match> matchList = n.get(Match.WIDE);
 		for (Match m : matchList) {
 			String id = getId(index, idMap, m);
 			b.append(id).append(' ').append("[label=");

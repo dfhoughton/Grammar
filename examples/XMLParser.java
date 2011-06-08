@@ -6,7 +6,6 @@ import java.io.IOException;
 import dfh.grammar.Grammar;
 import dfh.grammar.GrammarException;
 import dfh.grammar.Match;
-import dfh.grammar.MatchTest;
 
 /**
  * This class implements a useful subset of the XML specification as a
@@ -75,32 +74,17 @@ public class XMLParser {
 				// its not quite XPath, but it shows what can be done
 
 				System.out.println("COMMENTS:");
-				for (Match n : m.passingMatches(new MatchTest() {
-					@Override
-					public boolean test(Match m) {
-						return m.hasLabel("comment");
-					}
-				})) {
+				for (Match n : m.get("comment")) {
 					System.out.println(s.substring(n.start(), n.end()));
 				}
 				System.out.println();
 				System.out.println("ENTITIES:");
-				for (Match n : m.passingMatches(new MatchTest() {
-					@Override
-					public boolean test(Match m) {
-						return m.hasLabel("entity");
-					}
-				})) {
+				for (Match n : m.get("entity")) {
 					System.out.println(s.substring(n.start(), n.end()));
 				}
 				System.out.println();
 				System.out.println("CONTENT:");
-				for (Match n : m.passingMatches(new MatchTest() {
-					@Override
-					public boolean test(Match m) {
-						return m.hasLabel("content");
-					}
-				})) {
+				for (Match n : m.get("content")) {
 					System.out.println(s.substring(n.start(), n.end()));
 				}
 			} else
