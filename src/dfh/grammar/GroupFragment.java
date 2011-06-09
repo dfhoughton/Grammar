@@ -3,6 +3,8 @@ package dfh.grammar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Represents a set of alternates such as
@@ -20,12 +22,14 @@ import java.util.List;
 public class GroupFragment extends RepeatableRuleFragment {
 	List<LinkedList<RuleFragment>> alternates = new LinkedList<LinkedList<RuleFragment>>();
 	LinkedList<RuleFragment> currentSequence = new LinkedList<RuleFragment>();
+	Set<String> alternateTags = new TreeSet<String>();
 	private boolean did = false;
 
-	public GroupFragment(List<RuleFragment> list) {
+	public GroupFragment(List<RuleFragment> list, Set<String> alternateTags) {
 		currentSequence.addAll(list);
 		alternates.add(currentSequence);
 		currentSequence = new LinkedList<RuleFragment>();
+		this.alternateTags.addAll(alternateTags);
 	}
 
 	public void add(RuleFragment fragment) {
@@ -67,7 +71,7 @@ public class GroupFragment extends RepeatableRuleFragment {
 	 */
 	public GroupFragment noRep() {
 		Iterator<LinkedList<RuleFragment>> i = alternates.iterator();
-		GroupFragment clone = new GroupFragment(i.next());
+		GroupFragment clone = new GroupFragment(i.next(), alternateTags);
 		clone.rep = Repetition.NONE;
 		while (i.hasNext())
 			clone.alternates.add(i.next());

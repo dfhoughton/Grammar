@@ -3,6 +3,8 @@ package dfh.grammar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -152,8 +154,9 @@ public class RuleParser {
 			switch (c) {
 			case '[':
 				offset[0]++;
+				Set<String> alternateTags = alternateTags(body, offset);
 				GroupFragment r = new GroupFragment(
-						parseBody(body, offset, ']'));
+						parseBody(body, offset, ']'), alternateTags);
 				Repetition rep = getRepetition(body, offset);
 				if (rep.redundant() && r.alternates.size() == 1
 						&& r.alternates.get(0).size() == 1) {
@@ -170,7 +173,7 @@ public class RuleParser {
 				break;
 			case '|':
 				if (gf == null) {
-					gf = new GroupFragment(parse);
+					gf = new GroupFragment(parse, new TreeSet<String>());
 					parse.clear();
 					parse.add(gf);
 				} else
@@ -239,7 +242,8 @@ public class RuleParser {
 							throw new GrammarException("back reference "
 									+ reference + " is too big");
 					}
-					BackReferenceFragment brf = new BackReferenceFragment(reference);
+					BackReferenceFragment brf = new BackReferenceFragment(
+							reference);
 					add(parse, gf, brf);
 				} else {
 					RuleFragment ru = nextRule(body, offset, bracket);
@@ -260,6 +264,50 @@ public class RuleParser {
 			gf.done();
 		completeAssertions(parse, body);
 		return parse;
+	}
+
+	/**
+	 * Parses out tags after square brackets. E.g.,
+	 * 
+	 * <pre>
+	 *   &lt;a&gt; = [{foo} 'a'++ 'b' ] | [{quux} 'c'++ 'd']
+	 * </pre>
+	 * 
+	 * @param body
+	 * @param offset
+	 * @return set of tags found
+	 */
+	private static Set<String> alternateTags(String body, int[] offset) {
+		trimWhitespace(body, offset);
+		Set<String> alternateTags = new TreeSet<String>();
+		if (body.charAt(offset[0]) == '{') {
+			offset[0]++;
+			boolean escaped = false, foundClose = false;
+			int start = offset[0];
+			while (!foundClose && offset[0] < body.length()) {
+				if (escaped) {
+					escaped = false;
+				} else {
+					char c = body.charAt(offset[0]);
+					switch (c) {
+					case '\\':
+						escaped = true;
+						break;
+					case '}':
+						foundClose = true;
+					case ',':
+						String tag = body.substring(start, offset[0]);
+						if (tag.length() == 0)
+							throw new GrammarException("zero length tag in "
+									+ body);
+						alternateTags.add(tag);
+						break;
+					}
+				}
+				offset[0]++;
+			}
+		}
+		return alternateTags;
 	}
 
 	/**
@@ -306,15 +354,17 @@ public class RuleParser {
 		boolean forward = true;
 		offset[0]++;
 		// TODO check to see whether this can ever be true
-		if (offset[0] == body.length()) 
-			throw new GrammarException("no rule after assertion marker: " + body);
+		if (offset[0] == body.length())
+			throw new GrammarException("no rule after assertion marker: "
+					+ body);
 		char c = body.charAt(offset[0]);
 		if (c == '+' || c == '-') {
 			forward = c == '+';
 			offset[0]++;
 			// TODO see previous
-			if (offset[0] == body.length()) 
-				throw new GrammarException("no rule after assertion marker: " + body);
+			if (offset[0] == body.length())
+				throw new GrammarException("no rule after assertion marker: "
+						+ body);
 		}
 		return new AssertionFragment(positive, forward);
 	}
