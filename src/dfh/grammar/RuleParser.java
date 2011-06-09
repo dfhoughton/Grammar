@@ -73,34 +73,12 @@ public class RuleParser {
 				t = Type.indeterminate;
 			// we've parsed out the rule label
 			parse.add(new Label(t, id));
-			if (remainder.charAt(0) == '/') {
-				int i1 = remainder.lastIndexOf('/'), i2 = remainder
-						.lastIndexOf('(');
-				if (i1 == 0)
-					throw new GrammarException(
-							"no terminal slash in regular expression "
-									+ remainder);
-				int i3 = remainder.indexOf('#', i1);
-				if (i3 > i1) {
-					remainder = remainder.substring(0, i3);
-					if (i2 > i3)
-						i2 = -1;
-				}
-				if (i2 > i1) {
-					parse.add(new Regex(remainder.substring(0, i2)));
-					int[] offset = { i2 };
-					ConditionFragment c = getCondition(remainder, offset);
-					parse.add(c);
-				} else
-					parse.add(new Regex(remainder));
-			} else {
-				int[] offset = { 0 };
-				LinkedList<RuleFragment> body = parseBody(remainder, offset,
-						(char) 0);
-				checkBarriers(body.peekLast() instanceof ConditionFragment ? body
-						.subList(0, body.size() - 1) : body);
-				parse.addAll(body);
-			}
+			int[] offset = { 0 };
+			LinkedList<RuleFragment> body = parseBody(remainder, offset,
+					(char) 0);
+			checkBarriers(body.peekLast() instanceof ConditionFragment ? body
+					.subList(0, body.size() - 1) : body);
+			parse.addAll(body);
 			return parse;
 		} else
 			throw new GrammarException("ill-formed rule: " + line);
@@ -179,6 +157,10 @@ public class RuleParser {
 				} else
 					gf.newSequence();
 				offset[0]++;
+				break;
+			case '/':
+				Regex rx = getRegex(body, offset);
+				add(parse, gf, rx);
 				break;
 			case '"':
 			case '\'':
@@ -264,6 +246,41 @@ public class RuleParser {
 			gf.done();
 		completeAssertions(parse, body);
 		return parse;
+	}
+
+	private static Regex getRegex(String body, int[] offset) {
+		boolean escaped = false, terminated = false;
+		int start = offset[0];
+		OUTER: while (++offset[0] < body.length()) {
+			char c = body.charAt(offset[0]);
+			if (terminated) {
+				switch (c) {
+				case 'r':
+				case 'i':
+				case 'm':
+				case 's':
+				case 'd':
+				case 'u':
+				case 'x':
+					break;
+				default:
+					break OUTER;
+				}
+			} else {
+				if (escaped) {
+					escaped = false;
+				} else {
+					switch (c) {
+					case '\\':
+						escaped = true;
+						break;
+					case '/':
+						terminated = true;
+					}
+				}
+			}
+		}
+		return new Regex(body.substring(start, offset[0]));
 	}
 
 	/**

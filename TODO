@@ -2,7 +2,7 @@ Desired items are preceded by a '.'; completed items, by a '*'.
 
 . implement regex reversal
 . implement tagging
-. implement in-line regexes
+* implement in-line regexes
 . implement reversibility of externally defined rules
 . keep rules distinct by tags but allow functionally equivalent rules to share offset cache
 * change default study value based on match type

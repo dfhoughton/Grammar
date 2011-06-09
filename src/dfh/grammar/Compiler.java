@@ -528,6 +528,12 @@ public class Compiler {
 			Rule r = new BackReferenceRule(l, brf.reference);
 			r.condition = condition;
 			return redundancyCheck(r);
+		} else if (rf instanceof Regex) {
+			Regex rx = (Regex) rf;
+			Label l = new Label(Type.terminal, rf.toString());
+			Rule r = new LeafRule(l, rx.re, rx.reversible);
+			r.condition = condition;
+			return redundancyCheck(r);
 		}
 		GroupFragment gf = (GroupFragment) rf;
 		if (gf.alternates.size() == 1) {

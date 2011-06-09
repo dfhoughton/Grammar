@@ -31,6 +31,7 @@ import org.junit.runners.Suite;
 		BacktrackingBarrierTest.class,//
 		DeepRecursionTest.class,//
 		OverlapTest.class,//
+		InlineRegexTest.class,//
 })
 public class AllTests {
 }
