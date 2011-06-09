@@ -508,12 +508,15 @@ public class Grammar implements Serializable, Cloneable {
 	 * sequence (or at the offset specified in the {@link Options} object) and
 	 * ending on the last character.
 	 * 
+	 * {@link Options#study()} is set to <code>false</code>. If different
+	 * behavior is desired, use {@link #matches(CharSequence, Options)}.
+	 * 
 	 * @param s
 	 * @return {@link Matcher} iterating over matches
 	 * @throws GrammarException
 	 */
 	public Matcher matches(CharSequence s) throws GrammarException {
-		return matches(s, new Options());
+		return matches(s, new Options().study(false));
 	}
 
 	/**
@@ -563,12 +566,15 @@ public class Grammar implements Serializable, Cloneable {
 	 * Generates iterator over matches whose start offset is the beginning of
 	 * the given {@link CharSequence}.
 	 * 
+	 * {@link Options#study()} is set to <code>false</code>. If different
+	 * behavior is desired, use {@link #lookingAt(CharSequence, Options)}.
+	 * 
 	 * @param s
 	 * @return iterator over matches
 	 * @throws GrammarException
 	 */
 	public Matcher lookingAt(CharSequence s) throws GrammarException {
-		return lookingAt(s, new Options());
+		return lookingAt(s, new Options().study(false));
 	}
 
 	/**
@@ -666,6 +672,9 @@ public class Grammar implements Serializable, Cloneable {
 	/**
 	 * Creates iterator over matches occurring anywhere in given
 	 * {@link CharSequence}.
+	 * 
+	 * {@link Options#study()} is set to <code>true</code>. If different
+	 * behavior is desired, use {@link #find(CharSequence, Options)}.
 	 * 
 	 * @param s
 	 * @return object iterating over matches
