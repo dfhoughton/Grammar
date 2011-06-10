@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -18,10 +19,11 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class SequenceRule extends Rule {
+public class SequenceRule extends Rule implements IdentifyChild {
 	private static final long serialVersionUID = 1L;
 	final Rule[] sequence;
 	private Condition c;
+	final List<Set<String>> tagList;
 
 	class SequenceMatcher extends NonterminalMatcher {
 		LinkedList<Matcher> matchers = new LinkedList<Matcher>();
@@ -105,8 +107,8 @@ public class SequenceRule extends Rule {
 	 * @param l
 	 * @param list
 	 */
-	public SequenceRule(Label l, List<Rule> list) {
-		this(l, list.toArray(new Rule[list.size()]));
+	public SequenceRule(Label l, List<Rule> list, List<Set<String>> tagList) {
+		this(l, list.toArray(new Rule[list.size()]), tagList);
 	}
 
 	/**
@@ -114,10 +116,12 @@ public class SequenceRule extends Rule {
 	 * 
 	 * @param label
 	 * @param sequence
+	 * @param tagList
 	 */
-	public SequenceRule(Label label, Rule[] sequence) {
+	public SequenceRule(Label label, Rule[] sequence, List<Set<String>> tagList) {
 		super(label);
 		this.sequence = sequence;
+		this.tagList = tagList;
 	}
 
 	@Override
@@ -202,7 +206,8 @@ public class SequenceRule extends Rule {
 	@Override
 	public Rule shallowClone() {
 		SequenceRule sr = new SequenceRule((Label) label.clone(),
-				Arrays.copyOf(sequence, sequence.length));
+				Arrays.copyOf(sequence, sequence.length),
+				new ArrayList<Set<String>>(tagList));
 		return sr;
 	}
 
@@ -211,5 +216,19 @@ public class SequenceRule extends Rule {
 		this.c = c;
 		this.condition = id;
 		return this;
+	}
+
+	@Override
+	public boolean is(Match parent, Match child, String label) {
+		int index = 0;
+		for (Match m : parent.children()) {
+			if (m == child)
+				break;
+			index++;
+		}
+		if (index < sequence.length) {
+			return tagList.get(index).contains(label);
+		}
+		return false;
 	}
 }

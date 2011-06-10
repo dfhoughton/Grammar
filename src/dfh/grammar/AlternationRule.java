@@ -1,6 +1,7 @@
 package dfh.grammar;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -16,7 +17,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class AlternationRule extends Rule {
+public class AlternationRule extends Rule implements IdentifyChild {
 	private static final long serialVersionUID = 1L;
 
 	private class AlternationMatcher extends NonterminalMatcher {
@@ -62,16 +63,20 @@ public class AlternationRule extends Rule {
 
 	protected final Rule[] alternates;
 	protected Condition c;
+	Map<String, Rule> tagMap;
 
 	/**
 	 * Generates a rule from the given label and alternates.
 	 * 
 	 * @param label
 	 * @param alternates
+	 * @param tagMap
 	 */
-	public AlternationRule(Label label, Rule[] alternates) {
+	public AlternationRule(Label label, Rule[] alternates,
+			Map<String, Rule> tagMap) {
 		super(label);
 		this.alternates = alternates;
+		this.tagMap = tagMap;
 	}
 
 	@Override
@@ -139,7 +144,8 @@ public class AlternationRule extends Rule {
 	@Override
 	public Rule shallowClone() {
 		AlternationRule ar = new AlternationRule((Label) label.clone(),
-				Arrays.copyOf(alternates, alternates.length));
+				Arrays.copyOf(alternates, alternates.length),
+				new HashMap<String, Rule>(tagMap));
 		return ar;
 	}
 
@@ -148,5 +154,13 @@ public class AlternationRule extends Rule {
 		this.c = c;
 		this.condition = id;
 		return this;
+	}
+
+	@Override
+	public boolean is(Match parent, Match child, String label) {
+		Rule r = tagMap.get(label);
+		if (r != null)
+			return r == child.rule();
+		return false;
 	}
 }

@@ -137,7 +137,9 @@ public class RuleParser {
 						parseBody(body, offset, ']'), alternateTags);
 				Repetition rep = getRepetition(body, offset);
 				if (rep.redundant() && r.alternates.size() == 1
-						&& r.alternates.get(0).size() == 1) {
+						&& r.alternates.get(0).size() == 1
+						&& alternateTags.isEmpty()) {
+					// redundant brackets
 					if (gf == null)
 						parse.addAll(r.alternates.get(0));
 					else {
@@ -280,6 +282,9 @@ public class RuleParser {
 				}
 			}
 		}
+		if (!terminated)
+			throw new GrammarException("unterminated regular expression in "
+					+ body);
 		return new Regex(body.substring(start, offset[0]));
 	}
 
@@ -318,6 +323,7 @@ public class RuleParser {
 							throw new GrammarException("zero length tag in "
 									+ body);
 						alternateTags.add(tag);
+						start = offset[0] + 1;
 						break;
 					}
 				}

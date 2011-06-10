@@ -32,6 +32,7 @@ import org.junit.runners.Suite;
 		DeepRecursionTest.class,//
 		OverlapTest.class,//
 		InlineRegexTest.class,//
+		TaggingTest.class,//
 })
 public class AllTests {
 }

@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -13,11 +14,12 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class RepetitionRule extends Rule {
+public class RepetitionRule extends Rule implements IdentifyChild {
 	private static final long serialVersionUID = 1L;
 	Rule r;
 	final Repetition repetition;
 	protected Condition c;
+	final Set<String> alternateTags;
 
 	private abstract class RepetitionMatcher extends NonterminalMatcher {
 		protected LinkedList<Match> matched;
@@ -261,11 +263,14 @@ public class RepetitionRule extends Rule {
 	 * @param label
 	 * @param r
 	 * @param rep
+	 * @param alternateTags
 	 */
-	public RepetitionRule(Label label, Rule r, Repetition rep) {
+	public RepetitionRule(Label label, Rule r, Repetition rep,
+			Set<String> alternateTags) {
 		super(label);
 		this.r = r;
 		this.repetition = rep;
+		this.alternateTags = alternateTags;
 	}
 
 	@Override
@@ -321,7 +326,7 @@ public class RepetitionRule extends Rule {
 	@Override
 	public Rule shallowClone() {
 		RepetitionRule rr = new RepetitionRule((Label) label.clone(), r,
-				repetition);
+				repetition, new HashSet<String>(alternateTags));
 		return rr;
 	}
 
@@ -330,5 +335,10 @@ public class RepetitionRule extends Rule {
 		this.c = c;
 		this.condition = id;
 		return this;
+	}
+
+	@Override
+	public boolean is(Match parent, Match child, String label) {
+		return alternateTags.contains(label);
 	}
 }
