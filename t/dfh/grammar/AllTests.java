@@ -33,6 +33,7 @@ import org.junit.runners.Suite;
 		OverlapTest.class,//
 		InlineRegexTest.class,//
 		TaggingTest.class,//
+		NoBracketsStyleCompilationTest.class,//
 })
 public class AllTests {
 }

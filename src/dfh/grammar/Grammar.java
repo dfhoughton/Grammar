@@ -724,18 +724,33 @@ public class Grammar implements Serializable, Cloneable {
 	}
 
 	/**
-	 * The canonical order, at the moment, is to sort them primarily by their
-	 * degree of independence from other rules and secondarily by their label.
-	 * The root rule comes first, separated by a blank line, then they descend
-	 * in order of abstraction and alphabet. Terminal rules are always last.
-	 * <p>
-	 * I may change the canonical order in the future. It has the advantage of
-	 * putting rules immediately above those rules they depend on most directly
-	 * but the disadvantage of making it hard to find an arbitrary rule.
+	 * Prints out nicely formatted rule definitions for grammar, ordering the
+	 * rules in descending order by independence. The least independent rule is
+	 * <code>ROOT</code>, which is listed first. The most independent rules are
+	 * the terminal rules, which are listed last.
 	 * 
-	 * @return canonical description of {@link Grammar}
+	 * This method delegates to {@link #describe(boolean)}, setting the
+	 * <code>alphabetized</code> parameter to <code>false</code>.
+	 * 
+	 * @return pretty-printed grammar definition
 	 */
 	public String describe() {
+		return describe(false);
+	}
+
+	/**
+	 * Prints out nicely formatted rule definitions for grammar, ordering the
+	 * rules either alphabetically or in order of dependence. In the latter
+	 * case, terminal rules are listed last, preceded by rules that depend only
+	 * on terminal rules, and so forth up the to the root rule. Rules of equal
+	 * independence are listed in alphabetical order.
+	 * 
+	 * @param alphabetized
+	 *            whether non-root rules should be listed in alphabetical order
+	 *            or in order of independence
+	 * @return pretty-printed grammar definition
+	 */
+	public String describe(final boolean alphabetized) {
 		List<Entry<Label, Rule>> ruleList = new ArrayList<Map.Entry<Label, Rule>>(
 				rules.entrySet());
 		int maxLabel = -1;
@@ -746,7 +761,7 @@ public class Grammar implements Serializable, Cloneable {
 				i.remove();
 				continue;
 			}
-			int l = r.label().toString().length();
+			int l = r.label().id.length();
 			if (l > maxLabel)
 				maxLabel = l;
 			if (r == rules.get(root))
@@ -757,7 +772,7 @@ public class Grammar implements Serializable, Cloneable {
 		Collections.sort(ruleList, new Comparator<Entry<Label, Rule>>() {
 			@Override
 			public int compare(Entry<Label, Rule> o1, Entry<Label, Rule> o2) {
-				int comparison = o2.getValue().generation
+				int comparison = alphabetized ? 0 : o2.getValue().generation
 						- o1.getValue().generation;
 				if (comparison == 0)
 					comparison = o1.getKey().toString()
@@ -767,14 +782,14 @@ public class Grammar implements Serializable, Cloneable {
 		});
 
 		StringBuilder b = new StringBuilder();
-		b.append(String.format(format, root));
+		b.append(String.format(format, root.id));
 		b.append(' ');
 		b.append(rules.get(root).description());
 		b.append('\n');
 		if (!ruleList.isEmpty()) {
 			b.append('\n');
 			for (Entry<Label, Rule> e : ruleList) {
-				b.append(String.format(format, e.getKey()));
+				b.append(String.format(format, e.getKey().id));
 				b.append(' ');
 				b.append(e.getValue().description());
 				b.append("\n");

@@ -24,6 +24,12 @@ public class RuleParser {
 	 */
 	public static final Pattern labelPattern = Pattern.compile("<(\\w++)>");
 	/**
+	 * Pattern matching the rule identifier to the left of the equals sign in a
+	 * rule definition.
+	 */
+	public static final Pattern leftValuePattern = Pattern
+			.compile("(?:<(\\w++)>|(\\w++))");
+	/**
 	 * Character class for characters in condition identifiers.
 	 */
 	public static final Pattern conditionLabelPattern = Pattern.compile("\\w");
@@ -31,7 +37,7 @@ public class RuleParser {
 	 * Pattern that defines a rule as "<"<name>">" "=" <remainder>
 	 */
 	public static final Pattern basePattern = Pattern.compile("\\s*+"
-			+ labelPattern + "\\s*+=\\s*+(.*?)\\s*+");
+			+ leftValuePattern + "\\s*+=\\s*+(.*?)\\s*+");
 	/**
 	 * Pattern of repetition symbols such as <code>*</code>.
 	 */
@@ -61,8 +67,8 @@ public class RuleParser {
 			return null;
 		Matcher m = basePattern.matcher(line);
 		if (m.matches()) {
-			String id = m.group(1);
-			String remainder = m.group(2);
+			String id = m.group(1) == null ? m.group(2) : m.group(1);
+			String remainder = m.group(3);
 			if (remainder.length() == 0)
 				throw new GrammarException("no rule body provided in " + line);
 			LinkedList<RuleFragment> parse = new LinkedList<RuleFragment>();

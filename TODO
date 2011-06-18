@@ -1,5 +1,7 @@
 Desired items are preceded by a '.'; completed items, by a '*'.
 
+* change parsing rules so that angle brackets are only required to the right of '='
+* parameterize describe() so it either alphabetizes of lists rules in order of dependence
 . implement regex reversal
 * implement tagging
 * implement in-line regexes
