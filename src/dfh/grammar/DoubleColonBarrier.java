@@ -10,7 +10,7 @@ package dfh.grammar;
  * @author David Houghton
  * 
  */
-public class DoubleColonBarrier extends GrammarException {
+public class DoubleColonBarrier extends BarrierException {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -18,6 +18,6 @@ public class DoubleColonBarrier extends GrammarException {
 	 *            barrier rule's matcher
 	 */
 	public DoubleColonBarrier(Matcher m) {
-		super("hit :: barrier in " + m.master.rule().label);
+		super(m, "::");
 	}
 }
