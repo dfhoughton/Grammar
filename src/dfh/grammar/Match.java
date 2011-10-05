@@ -83,6 +83,16 @@ public class Match {
 			return !m.zeroWidth();
 		}
 	};
+	/**
+	 * {@link MatchTest} that finds matches with non-zero width leaves. For use
+	 * in {@link #get(MatchTest)} and {@link #passes(MatchTest)}.
+	 */
+	public static final MatchTest WIDE_LEAF = new MatchTest() {
+		@Override
+		public boolean test(Match m) {
+			return m.isTerminal() && !m.zeroWidth();
+		}
+	};
 	private final Rule r;
 	private final int start;
 	private int end = -1;
@@ -427,13 +437,23 @@ public class Match {
 	}
 
 	/**
-	 * Convenience method that applieds {@link #TERMINAL} to
+	 * Convenience method that applies {@link #TERMINAL} to
 	 * {@link #get(MatchTest)}.
 	 * 
 	 * @return list of terminal matches
 	 */
 	public List<Match> leaves() {
 		return get(TERMINAL);
+	}
+
+	/**
+	 * Convenience method that applies {@link #WIDE_LEAF} to
+	 * {@link #get(MatchTest)}.
+	 * 
+	 * @return list of terminal matches
+	 */
+	public List<Match> wideLeaves() {
+		return get(WIDE_LEAF);
 	}
 
 	/**
