@@ -159,8 +159,11 @@ public class AlternationRule extends Rule implements IdentifyChild {
 	@Override
 	public boolean is(Match parent, Match child, String label) {
 		Rule r = tagMap.get(label);
-		if (r != null)
+		if (r != null) {
+			if (r instanceof CyclicRule)
+				return ((CyclicRule) r).r == child.rule();
 			return r == child.rule();
+		}
 		return false;
 	}
 }

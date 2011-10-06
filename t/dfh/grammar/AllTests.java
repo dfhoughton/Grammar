@@ -34,6 +34,7 @@ import org.junit.runners.Suite;
 		InlineRegexTest.class,//
 		TaggingTest.class,//
 		NoBracketsStyleCompilationTest.class,//
+		EscapesInLiterals.class,//
 })
 public class AllTests {
 }

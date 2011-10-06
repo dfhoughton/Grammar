@@ -421,7 +421,7 @@ public class RuleParser {
 	 * @return quote delimited String literal
 	 */
 	private static String getLiteral(String body, int[] offset, char delimiter) {
-		boolean escaped = false;
+		boolean escaped = false, everEscaped = false;
 		int start = offset[0] + 1;
 		boolean found = false;
 		while (offset[0] + 1 < body.length()) {
@@ -430,7 +430,7 @@ public class RuleParser {
 			if (escaped)
 				escaped = false;
 			else if (c == '\\')
-				escaped = true;
+				everEscaped = escaped = true;
 			else if (c == delimiter) {
 				found = true;
 				break;
@@ -440,7 +440,48 @@ public class RuleParser {
 			throw new GrammarException("could not find closing \" in " + body);
 		String s = body.substring(start, offset[0]);
 		offset[0]++;
-		return s;
+		return everEscaped ? cleanEscapes(s) : s;
+	}
+
+	private static String cleanEscapes(String s) {
+		StringBuilder b = new StringBuilder();
+		boolean escaped = false;
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			switch (c) {
+			case 'n':
+				b.append(escaped ? '\n' : c);
+				escaped = false;
+				break;
+			case 'r':
+				b.append(escaped ? '\r' : c);
+				escaped = false;
+				break;
+			case 'f':
+				b.append(escaped ? '\f' : c);
+				escaped = false;
+				break;
+			case 't':
+				b.append(escaped ? '\t' : c);
+				escaped = false;
+				break;
+			case 'b':
+				b.append(escaped ? '\b' : c);
+				escaped = false;
+				break;
+			case '\\':
+				if (escaped) {
+					b.append(c);
+					escaped = false;
+				} else
+					escaped = true;
+				break;
+			default:
+				escaped = false;
+				b.append(c);
+			}
+		}
+		return b.toString();
 	}
 
 	private static Repetition getRepetition(String body, int[] offset)
