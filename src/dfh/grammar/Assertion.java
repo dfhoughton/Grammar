@@ -65,7 +65,7 @@ public class Assertion extends Rule {
 					}
 					cm = n == null ? CachedMatch.MISMATCH : CachedMatch.MATCH;
 					subCache.put(offset, cm);
-					return n;
+					return register(n);
 				} else if (cm == CachedMatch.MISMATCH)
 					return null;
 				else if (positive) {
@@ -78,10 +78,10 @@ public class Assertion extends Rule {
 					}
 					Match next = new Match(Assertion.this, offset, offset);
 					next.setChildren(new Match[] { n });
-					return next;
+					return register(next);
 				} else {
 					Match n = new Match(Assertion.this, offset, offset);
-					return n;
+					return register(n);
 				}
 			}
 			return null;

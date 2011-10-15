@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-
 public class ConditionalLeafRule extends LeafRule {
 	private static final long serialVersionUID = 1L;
 	private final Condition c;
@@ -35,7 +34,7 @@ public class ConditionalLeafRule extends LeafRule {
 				} else {
 					if (options.debug)
 						ConditionalLeafRule.this.matchTrace(this, cm.m);
-					return cm.m;
+					return register(cm.m);
 				}
 				java.util.regex.Matcher m = p.matcher(s);
 				m.region(offset, options.end);
@@ -53,7 +52,7 @@ public class ConditionalLeafRule extends LeafRule {
 				cache.put(offset, cm);
 				if (options.debug)
 					ConditionalLeafRule.this.matchTrace(this, cm.m);
-				return cm.m;
+				return register(cm.m);
 			}
 			if (options.debug)
 				ConditionalLeafRule.this.matchTrace(this, null);

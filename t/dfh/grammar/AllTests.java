@@ -35,6 +35,7 @@ import org.junit.runners.Suite;
 		TaggingTest.class,//
 		NoBracketsStyleCompilationTest.class,//
 		EscapesInLiterals.class,//
+		MismatchTest.class,//
 })
 public class AllTests {
 }

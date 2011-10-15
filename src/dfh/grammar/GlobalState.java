@@ -17,7 +17,7 @@ import java.util.Map.Entry;
  * 
  */
 public class GlobalState {
-	public final boolean allowOverlap, study, containsCycles, reversed;
+	public final boolean allowOverlap, study, containsCycles, reversed, keepRightmost;
 	public final int start, end;
 	public final PrintStream trace;
 	public final boolean debug;
@@ -32,7 +32,7 @@ public class GlobalState {
 	 */
 	GlobalState(Options o, boolean containsCycles) {
 		this(o.allowOverlap, o.start, o.end, o.maxRecursionDepth, o.trace,
-				o.study, containsCycles, null);
+				o.study, containsCycles, o.keepRightmost, null);
 	}
 
 	/**
@@ -45,12 +45,12 @@ public class GlobalState {
 	 */
 	GlobalState(GlobalState gs, int end,
 			Map<Label, Map<Integer, CachedMatch>> backwardsCache) {
-		this(gs.allowOverlap, 0, end, gs.maxDepth, gs.trace, false, false,
+		this(gs.allowOverlap, 0, end, gs.maxDepth, gs.trace, false, false,gs.keepRightmost,
 				backwardsCache);
 	}
 
 	private GlobalState(boolean allowOverlap, int start, int end, int maxDepth,
-			PrintStream trace, boolean study, boolean containsCycles,
+			PrintStream trace, boolean study, boolean containsCycles, boolean keepRightmost,
 			Map<Label, Map<Integer, CachedMatch>> backwardsCache) {
 		this.allowOverlap = allowOverlap;
 		this.start = start;
@@ -58,6 +58,7 @@ public class GlobalState {
 		this.maxDepth = maxDepth;
 		this.trace = trace;
 		this.containsCycles = containsCycles;
+		this.keepRightmost = keepRightmost;
 		this.debug = trace != null;
 		if (backwardsCache != null) {
 			this.study = false;

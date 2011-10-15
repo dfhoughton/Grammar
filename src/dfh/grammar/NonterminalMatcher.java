@@ -83,7 +83,7 @@ public abstract class NonterminalMatcher extends Matcher {
 		next = null;
 		if (options.debug)
 			rule.matchTrace(this, n);
-		return n;
+		return register(n);
 	}
 
 	@Override

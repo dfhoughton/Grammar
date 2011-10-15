@@ -72,9 +72,16 @@ public class Options {
 	 * friend's hat</i>.
 	 */
 	public static final int MAX_RECURSION_DEPTH = 3;
+	/**
+	 * Whether to keep the rightmost successful submatch by default. This
+	 * information assists in debugging a failed match but adds overhead during
+	 * matching.
+	 */
+	public static final boolean KEEP_RIGHTMOST = false;
 	boolean allowOverlap = ALLOW_OVERLAP;
 	boolean study = STUDY;
 	boolean longestTokenMatching = LONGEST_TOKEN_MATCHING;
+	boolean keepRightmost = KEEP_RIGHTMOST;
 	int start = START_OFFSET;
 	int end = -1;
 	int maxRecursionDepth = MAX_RECURSION_DEPTH;
@@ -242,6 +249,33 @@ public class Options {
 	public Options matchAll() {
 		allowOverlap(true);
 		longestTokenMatching(false);
+		return this;
+	}
+
+	/**
+	 * Returns whether the rightmost successful submatch will be retained by the
+	 * {@link Matcher}. This information is useful in debugging but adds a
+	 * slight overhead. The default values is {@value #KEEP_RIGHTMOST}.
+	 * 
+	 * @return whether the rightmost successful submatch will be retained by the
+	 *         {@link Matcher}
+	 */
+	public boolean keepRightmost() {
+		return keepRightmost;
+	}
+
+	/**
+	 * Sets whether the rightmost successful submatch will be retained by the
+	 * {@link Matcher}. This information is useful in debugging but adds a
+	 * slight overhead. The default values is {@value #KEEP_RIGHTMOST}.
+	 * 
+	 * @param keepRightmost
+	 *            whether the rightmost successful submatch should be retained
+	 *            by the {@link Matcher}
+	 * @return self to allow chaining of methods
+	 */
+	public Options keepRightmost(boolean keepRightmost) {
+		this.keepRightmost = keepRightmost;
 		return this;
 	}
 }

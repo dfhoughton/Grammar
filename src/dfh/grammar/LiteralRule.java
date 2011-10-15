@@ -40,7 +40,7 @@ public class LiteralRule extends Rule {
 				} else {
 					if (options.debug)
 						LiteralRule.this.matchTrace(this, cm.m);
-					return cm.m;
+					return register(cm.m);
 				}
 				int end = offset + literal.length();
 				if (end <= options.end) {
@@ -65,7 +65,7 @@ public class LiteralRule extends Rule {
 				cache.put(offset, cm);
 				if (options.debug)
 					LiteralRule.this.matchTrace(this, cm.m);
-				return cm.m;
+				return register(cm.m);
 			}
 			if (options.debug)
 				LiteralRule.this.matchTrace(this, null);

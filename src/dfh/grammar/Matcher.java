@@ -1,6 +1,5 @@
 package dfh.grammar;
 
-
 /**
  * An object associated with a {@link Rule} that can iterate over and return all
  * the possible parse trees meeting the matching conditions (pattern and start
@@ -29,6 +28,10 @@ public abstract class Matcher {
 	 * Reference to the matching parameters in use in this context.
 	 */
 	protected final GlobalState options;
+	/**
+	 * Rightmost match found by this {@link Matcher} or any of its descendants.
+	 */
+	protected Match rightmost = null;
 
 	/**
 	 * Generate a {@link Matcher} with the given state.
@@ -52,8 +55,7 @@ public abstract class Matcher {
 	 * @param master
 	 * @param ruleStates
 	 */
-	Matcher(CharSequence s, Integer offset, Matcher master,
-			GlobalState options) {
+	Matcher(CharSequence s, Integer offset, Matcher master, GlobalState options) {
 		this.s = s;
 		this.offset = offset;
 		this.master = master;
@@ -89,4 +91,34 @@ public abstract class Matcher {
 	 * @return the {@link Rule} that generated this {@link Matcher}
 	 */
 	protected abstract Rule rule();
+
+	/**
+	 * Returns the rightmost {@link Match} found in the last attempt to obtain a
+	 * {@link Match} from this {@link Matcher}. In the event of a successful
+	 * match this is just the same as {@link #match()}. The result differs in
+	 * the event of a failure to match and can be used to determine either how
+	 * the sequence matched against is invalid or the grammar itself is flawed.
+	 * 
+	 * @return the rightmost {@link Match} found in the last attempt to obtain a
+	 *         {@link Match} from this {@link Matcher}
+	 */
+	public Match rightmostMatch() {
+		return rightmost;
+	}
+
+	/**
+	 * Updates {@link #rightmost} and returns input parameter.
+	 * 
+	 * @param m
+	 * @return the input {@link Match}
+	 */
+	protected Match register(Match m) {
+		if (options.keepRightmost && m != null
+				&& (rightmost == null || rightmost.end() <= m.end())) {
+			rightmost = m;
+			if (master != null)
+				master.register(m);
+		}
+		return m;
+	}
 }

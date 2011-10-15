@@ -48,7 +48,7 @@ public class LeafRule extends Rule {
 				} else {
 					if (options.debug)
 						LeafRule.this.matchTrace(this, cm.m);
-					return cm.m;
+					return register(cm.m);
 				}
 				java.util.regex.Matcher m = p.matcher(s);
 				m.region(offset, options.end);
@@ -62,7 +62,7 @@ public class LeafRule extends Rule {
 				cache.put(offset, cm);
 				if (options.debug)
 					LeafRule.this.matchTrace(this, cm.m);
-				return cm.m;
+				return register(cm.m);
 			}
 			if (options.debug)
 				LeafRule.this.matchTrace(this, null);

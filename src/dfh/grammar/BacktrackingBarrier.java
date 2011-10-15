@@ -49,7 +49,8 @@ public class BacktrackingBarrier extends Rule {
 		public Match match() {
 			if (fresh) {
 				fresh = false;
-				return new Match(BacktrackingBarrier.this, offset, offset);
+				return register(new Match(BacktrackingBarrier.this, offset,
+						offset));
 			}
 			throwBarrierException();
 			return null;

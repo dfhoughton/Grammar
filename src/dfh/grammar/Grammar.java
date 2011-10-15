@@ -217,6 +217,11 @@ public class Grammar implements Serializable, Cloneable {
 			}
 			return null;
 		}
+		
+		@Override
+		public Match rightmostMatch() {
+			return m.rightmost;
+		}
 
 		private Match fetchNext() {
 			if (options.study && index == -1)
@@ -639,6 +644,11 @@ public class Grammar implements Serializable, Cloneable {
 				}
 				return n;
 			}
+			@Override
+			public Match rightmostMatch() {
+				return m.rightmost;
+			}
+
 		} : new LookingAtMatcher() {
 
 			@Override
@@ -665,6 +675,11 @@ public class Grammar implements Serializable, Cloneable {
 						n.establishParentage();
 				}
 				return n;
+			}
+			
+			@Override
+			public Match rightmostMatch() {
+				return m.rightmost;
 			}
 		};
 	}
@@ -887,6 +902,11 @@ public class Grammar implements Serializable, Cloneable {
 					return n;
 				}
 				return null;
+			}
+			
+			@Override
+			public Match rightmostMatch() {
+				return m.rightmost;
 			}
 
 			@Override

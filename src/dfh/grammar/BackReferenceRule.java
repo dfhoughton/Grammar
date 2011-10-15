@@ -64,7 +64,7 @@ public class BackReferenceRule extends Rule {
 				}
 				if (options.debug)
 					BackReferenceRule.this.matchTrace(this, n);
-				return n;
+				return register(n);
 			}
 			if (options.debug)
 				BackReferenceRule.this.matchTrace(this, null);
