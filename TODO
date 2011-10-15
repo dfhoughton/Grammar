@@ -9,4 +9,4 @@ Desired items are preceded by a '.'; completed items, by a '*'.
 . keep rules distinct by tags but allow functionally equivalent rules to share offset cache
 * change default study value based on match type
 . fix external rule renaming bug
-. preserve rightmost offset matched to to improve debugging
+* preserve rightmost offset matched to to improve debugging
