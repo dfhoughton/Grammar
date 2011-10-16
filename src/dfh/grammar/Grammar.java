@@ -49,24 +49,25 @@ import dfh.grammar.Label.Type;
  * <p>
  * <h3>Advantages</h3>
  * <ul>
- * <li>Ease of composition, reading, maintenance, anddebugging. See
- * {@link Options#trace()} and {@link #describe()}.
+ * <li>Ease of composition, reading, maintenance, and debugging. See
+ * {@link Options#trace(java.io.PrintStream))},
+ * {@link Options#keepRightmost(boolean)}, and {@link #describe()}.
  * <li>One can compose grammars from component {@link Rule rules}, regular
  * expressions, and other grammars. See {@link #defineRule(String, Pattern)},
  * {@link #defineRule(String, Rule)}.
  * <li>One can iterate over all possible ways of matching a {@link CharSequence}
  * , not just a non-overlapping subset.
  * <li>Given a {@link Match} one can find the precise way the pattern matches,
- * each rule and subrule that participated in the match and which offsets is
+ * each rule and subrule that participated in the match and which offsets it
  * applied to.
  * </ul>
  * <h3>Disadvantages</h3>
- * I am certain that someone who didn't write these classes would find
+ * I am certain that someone who hadn't written these classes would find
  * infelicities to enumerate in the API. The chief disadvantage that I am aware
- * of is that matchign with a {@link Grammar} is about an order of magnitude
+ * of is that matching with a {@link Grammar} is about an order of magnitude
  * slower than matching with a simple {@link Pattern}. For one thing, fewer
- * people have spent less time optimizing the code. But even were Oracle to take
- * over this project the scope for efficiency is less simply because the task
+ * people have spent time optimizing the code. But even were Oracle to take over
+ * this project the scope for efficiency is less simply because the task
  * attempted is greater.
  * <h2>Rule Definition</h2>
  * <h2>Acknowledgements</h2> This class and its supporting classes was inspired
@@ -313,7 +314,8 @@ public class Grammar implements Serializable, Cloneable {
 	private Boolean containsAlternation;
 
 	/**
-	 * Delegates to {@link #Grammar(LineReader)}.
+	 * Delegates to {@link #Grammar(String[], Map)}, setting the second
+	 * parameter to <code>null</code>.
 	 * 
 	 * @param lines
 	 *            rule source
@@ -321,7 +323,22 @@ public class Grammar implements Serializable, Cloneable {
 	 * @throws IOException
 	 */
 	public Grammar(String[] lines) throws GrammarException, IOException {
-		this(new ArrayLineReader(lines));
+		this(lines, null);
+	}
+
+	/**
+	 * Delegates to {@link #Grammar(LineReader, Map)}.
+	 * 
+	 * @param lines
+	 *            rule source
+	 * @param precompiledRules
+	 *            definitions for {@link Rule} symbols
+	 * @throws GrammarException
+	 * @throws IOException
+	 */
+	public Grammar(String[] lines, Map<String, Rule> precompiledRules)
+			throws GrammarException, IOException {
+		this(new ArrayLineReader(lines), precompiledRules);
 	}
 
 	/**
@@ -339,8 +356,8 @@ public class Grammar implements Serializable, Cloneable {
 	}
 
 	/**
-	 * Delegates to {@link #Grammar(Reader)} and ultimately
-	 * {@link #Grammar(LineReader)}.
+	 * Delegates to {@link #Grammar(File, Map)}, setting the second parameter to
+	 * <code>null</code>.
 	 * 
 	 * @param f
 	 *            rule source
@@ -350,12 +367,28 @@ public class Grammar implements Serializable, Cloneable {
 	 */
 	public Grammar(File f) throws GrammarException, FileNotFoundException,
 			IOException {
-		this(new FileReader(f));
+		this(f, null);
 	}
 
 	/**
-	 * Delegates to {@link #Grammar(Reader)} and ultimately
-	 * {@link #Grammar(LineReader)}.
+	 * Delegates to {@link #Grammar(Reader, Map)}.
+	 * 
+	 * @param f
+	 *            rule source
+	 * @param precompiledRules
+	 *            definitions for {@link Rule} symbols
+	 * @throws GrammarException
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public Grammar(File f, Map<String, Rule> precompiledRules)
+			throws GrammarException, FileNotFoundException, IOException {
+		this(new FileReader(f), precompiledRules);
+	}
+
+	/**
+	 * Delegates to {@link #Grammar(InputStream, Map)}, setting the second
+	 * parameter to <code>null</code>.
 	 * 
 	 * @param is
 	 *            rule source
@@ -363,12 +396,27 @@ public class Grammar implements Serializable, Cloneable {
 	 * @throws IOException
 	 */
 	public Grammar(InputStream is) throws GrammarException, IOException {
-		this(new InputStreamReader(is));
+		this(is, null);
 	}
 
 	/**
-	 * Delegates to {@link #Grammar(BufferedReader)} and ultimately
-	 * {@link #Grammar(LineReader)}.
+	 * Delegates to {@link #Grammar(Reader, Map)}.
+	 * 
+	 * @param is
+	 *            rule source
+	 * @param precompiledRules
+	 *            definitions for {@link Rule} symbols
+	 * @throws GrammarException
+	 * @throws IOException
+	 */
+	public Grammar(InputStream is, Map<String, Rule> precompiledRules)
+			throws GrammarException, IOException {
+		this(new InputStreamReader(is), precompiledRules);
+	}
+
+	/**
+	 * Delegates to {@link #Grammar(Reader, Map)}, setting the second parameter
+	 * to <code>null</code>.
 	 * 
 	 * @param r
 	 *            rule source
@@ -376,12 +424,27 @@ public class Grammar implements Serializable, Cloneable {
 	 * @throws IOException
 	 */
 	public Grammar(Reader r) throws GrammarException, IOException {
-		this(new BufferedReader(r));
+		this(r, null);
 	}
 
 	/**
-	 * Delegates to {@link #Grammar(BufferedReader)} and ultimately to
-	 * {@link #Grammar(LineReader)}.
+	 * Delegates to {@link #Grammar(BufferedReader, Map)}.
+	 * 
+	 * @param r
+	 *            rule source
+	 * @param precompiledRules
+	 *            definitions for {@link Rule} symbols
+	 * @throws GrammarException
+	 * @throws IOException
+	 */
+	public Grammar(Reader r, Map<String, Rule> precompiledRules)
+			throws GrammarException, IOException {
+		this(new BufferedReader(r), precompiledRules);
+	}
+
+	/**
+	 * Delegates to {@link #Grammar(BufferedReader, Map)}, setting the second
+	 * parameter to <code>null</code>.
 	 * 
 	 * @param r
 	 *            rule source
@@ -389,19 +452,60 @@ public class Grammar implements Serializable, Cloneable {
 	 * @throws IOException
 	 */
 	public Grammar(BufferedReader r) throws GrammarException, IOException {
-		this(new BufferedLineReader(r));
+		this(r, null);
 	}
 
 	/**
-	 * Creates a {@link Compiler} to parse input and prepares a {@link Grammar}
-	 * to generate {@link Matcher} objects.
+	 * Delegates to {@link #Grammar(LineReader, Map)}.
+	 * 
+	 * @param r
+	 *            rule source
+	 * @param precompiledRules
+	 *            definitions for {@link Rule} symbols
+	 * @throws GrammarException
+	 * @throws IOException
+	 */
+	public Grammar(BufferedReader r, Map<String, Rule> precompiledRules)
+			throws GrammarException, IOException {
+		this(new BufferedLineReader(r), precompiledRules);
+	}
+
+	/**
+	 * Delegates to {@link #Grammar(LineReader, Map)}, setting the second
+	 * parameter to <code>null</code>.
 	 * 
 	 * @param reader
+	 *            rule source
 	 * @throws GrammarException
 	 * @throws IOException
 	 */
 	public Grammar(LineReader reader) throws GrammarException, IOException {
-		Compiler c = new Compiler(reader);
+		this(reader, null);
+	}
+
+	/**
+	 * Creates a {@link Compiler} to parse the rules, intializing a
+	 * {@link Grammar} with which to generate {@link Matcher} objects. The
+	 * optional <code>precompiledRules</code> parameter contains implementations
+	 * of what would other wise be {@link DeferredDefinitionRule} objects --
+	 * rules whose body is not specified in the grammar. It is necessary to
+	 * provide this parameter if you wish to use your own {@link Reversible}
+	 * {@link Rule} in a backwards {@link Assertion}, as rules defined by
+	 * {@link #defineRule(String, Rule)} cannot be used in backwards assertions
+	 * -- assertions equivalent to <code>(?&lt;=...)</code> and
+	 * <code>(?&lt;!...)</code> in ordinary Java regular expressions.
+	 * 
+	 * @param reader
+	 *            rule source
+	 * 
+	 * @param precompiledRules
+	 *            definitions for {@link Rule} symbols
+	 * @throws GrammarException
+	 * @throws IOException
+	 */
+	public Grammar(LineReader reader, Map<String, Rule> precompiledRules)
+			throws GrammarException, IOException {
+		Compiler c = new Compiler(reader, precompiledRules);
 		root = c.root();
 		rules = c.rules();
 		terminalLabelMap = c.terminalLabelMap();

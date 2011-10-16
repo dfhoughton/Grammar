@@ -48,8 +48,11 @@ public class Compiler {
 	 * @throws GrammarException
 	 * @throws IOException
 	 */
-	public Compiler(LineReader reader) throws GrammarException, IOException {
+	public Compiler(LineReader reader, Map<String, Rule> precompiledRules)
+			throws GrammarException, IOException {
 		String line = null;
+		if (precompiledRules == null)
+			precompiledRules = new HashMap<String, Rule>(0);
 		Map<Label, List<RuleFragment>> map = new HashMap<Label, List<RuleFragment>>();
 		Label r = null;
 		while ((line = reader.readLine()) != null) {
@@ -116,7 +119,8 @@ public class Compiler {
 					rules.put(l, old);
 			}
 		}
-		// now we extract all the deferred definition rules
+		// now we extract all the deferred definition rules and incorporate
+		// pre-compiled rules
 		gen = 0;
 		Set<String> knownIds = new HashSet<String>(map.size() + rules.size());
 		for (Label l : map.keySet())
@@ -127,12 +131,20 @@ public class Compiler {
 			Set<Label> labels = allLabels(list);
 			for (Label l : labels) {
 				if (l.t == Type.indeterminate && !knownIds.contains(l.id)) {
-					l = new Label(Type.terminal, l.id);
-					DeferredDefinitionRule ddr = new DeferredDefinitionRule(l);
-					ddr.generation = gen;
-					undefinedRules.add(l);
-					rules.put(l, ddr);
-					terminals.add(l);
+					if (precompiledRules.containsKey(l.id)) {
+						Rule ru = precompiledRules.get(l.id);
+						ru.setLabel(l.id);
+						rules.put(ru.label(), ru);
+						terminals.add(ru.label());
+					} else {
+						l = new Label(Type.terminal, l.id);
+						DeferredDefinitionRule ddr = new DeferredDefinitionRule(
+								l);
+						ddr.generation = gen;
+						undefinedRules.add(l);
+						rules.put(l, ddr);
+						terminals.add(l);
+					}
 				}
 			}
 		}

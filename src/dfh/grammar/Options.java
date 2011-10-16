@@ -97,7 +97,7 @@ public class Options {
 	 * See {@link #MAX_RECURSION_DEPTH}
 	 * 
 	 * @param maxRecursionDepth
-	 * @return
+	 * @return self to allow chaining of methods
 	 */
 	public Options maxRecursionDepth(int maxRecursionDepth) {
 		this.maxRecursionDepth = maxRecursionDepth;

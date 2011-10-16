@@ -36,6 +36,7 @@ import org.junit.runners.Suite;
 		NoBracketsStyleCompilationTest.class,//
 		EscapesInLiterals.class,//
 		MismatchTest.class,//
+		ExternalRuleBackwardsAssertionTest.class,//
 })
 public class AllTests {
 }

@@ -73,7 +73,7 @@ public class AssertionTest {
 	}
 
 	@Test
-	public void nativePostiveAssertionCompilationSimple()
+	public void nativePositiveAssertionCompilationSimple()
 			throws GrammarException, IOException {
 		try {
 			String[] rules = {
@@ -103,7 +103,7 @@ public class AssertionTest {
 	}
 
 	@Test
-	public void nativePostiveAssertionCompilationComplex()
+	public void nativePositiveAssertionCompilationComplex()
 			throws GrammarException, IOException {
 		try {
 			String[] rules = {
