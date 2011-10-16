@@ -8,5 +8,5 @@ Desired items are preceded by a '.'; completed items, by a '*'.
 . implement reversibility of externally defined rules
 . keep rules distinct by tags but allow functionally equivalent rules to share offset cache
 * change default study value based on match type
-. fix external rule renaming bug
+* fix external rule renaming bug
 * preserve rightmost offset matched to to improve debugging

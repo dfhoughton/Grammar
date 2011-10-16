@@ -21,9 +21,10 @@ public abstract class Rule implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * the rule's name
+	 * The rule's name. Though it is not <code>final</code>, it should be
+	 * treated as such.
 	 */
-	protected final Label label;
+	protected Label label;
 	/**
 	 * Used by {@link Grammar#describe()}.
 	 */
@@ -261,6 +262,20 @@ public abstract class Rule implements Serializable {
 	public Rule conditionalize(Condition c, String id) {
 		throw new GrammarException(this.getClass()
 				+ " cannot be conditionalized");
+	}
+
+	/**
+	 * Method required by {@link Grammar#defineRule(String, Rule)}. It should
+	 * not be used otherwise.
+	 * 
+	 * @param s
+	 */
+	void setLabel(String s) {
+		label = new Label(label.t, s);
+	}
+
+	public Rule reLabel(String s) {
+		throw new GrammarException(this.getClass() + " ");
 	}
 
 	/**

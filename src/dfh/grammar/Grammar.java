@@ -217,7 +217,7 @@ public class Grammar implements Serializable, Cloneable {
 			}
 			return null;
 		}
-		
+
 		@Override
 		public Match rightmostMatch() {
 			return m.rightmost;
@@ -644,6 +644,7 @@ public class Grammar implements Serializable, Cloneable {
 				}
 				return n;
 			}
+
 			@Override
 			public Match rightmostMatch() {
 				return m.rightmost;
@@ -676,7 +677,7 @@ public class Grammar implements Serializable, Cloneable {
 				}
 				return n;
 			}
-			
+
 			@Override
 			public Match rightmostMatch() {
 				return m.rightmost;
@@ -833,6 +834,7 @@ public class Grammar implements Serializable, Cloneable {
 		} catch (Exception e1) {
 			throw new GrammarException("rule must be clonable: " + e1);
 		}
+		rule.setLabel(label);
 		DeferredDefinitionRule r = checkRuleDefinition(label);
 		Map<String, Label> idMap = new HashMap<String, Label>(rules.size());
 		for (Entry<Label, Rule> e : rules.entrySet())
@@ -903,7 +905,7 @@ public class Grammar implements Serializable, Cloneable {
 				}
 				return null;
 			}
-			
+
 			@Override
 			public Match rightmostMatch() {
 				return m.rightmost;

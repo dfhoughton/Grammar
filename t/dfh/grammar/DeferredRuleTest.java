@@ -36,103 +36,104 @@ public class DeferredRuleTest {
 		assertNotNull("found ned", n);
 	}
 
-	@Test
-	public void arbitraryRuleTest() throws GrammarException, IOException {
-		class ARule extends Rule implements Cloneable {
-			class AMatcher extends Matcher {
-				private final Map<Integer, CachedMatch> cache;
-				private boolean fresh = true;
+	class ARule extends Rule implements Cloneable {
+		class AMatcher extends Matcher {
+			private final Map<Integer, CachedMatch> cache;
+			private boolean fresh = true;
 
-				public AMatcher(CharSequence s, Integer offset,
-						Map<Label, Map<Integer, CachedMatch>> cache,
-						Matcher master) {
-					super(s, offset, master);
-					this.cache = cache.get(label);
-				}
-
-				@Override
-				public Match match() {
-					if (fresh) {
-						fresh = false;
-						CachedMatch cm = cache.get(offset);
-						if (cm == null) {
-							boolean found = false;
-							int i = offset;
-							for (; i < options.end; i++) {
-								if (Character.isLetterOrDigit(s.charAt(i)))
-									found = true;
-								else
-									break;
-							}
-							if (found) {
-								Match n = new Match(ARule.this, offset, i);
-								cm = new CachedMatch(n);
-							} else
-								cm = CachedMatch.MISMATCH;
-							cache.put(offset, cm);
-						}
-						return cm.m;
-					}
-					return null;
-				}
-
-				@Override
-				protected boolean mightHaveNext() {
-					return fresh;
-				}
-
-				@Override
-				protected Rule rule() {
-					return ARule.this;
-				}
-
-			}
-
-			private static final long serialVersionUID = 1L;
-
-			ARule(Label label) {
-				super(label);
-			}
-
-			@Override
-			protected String uniqueId() {
-				return label.toString();
-			}
-
-			@Override
-			public Matcher matcher(CharSequence s, Integer offset,
+			public AMatcher(CharSequence s, Integer offset,
 					Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
-				return new AMatcher(s, offset, cache, master);
+				super(s, offset, master);
+				this.cache = cache.get(label);
 			}
 
 			@Override
-			public String description() {
-				return "foo bar";
-			}
-
-			@Override
-			public Set<Integer> study(CharSequence s,
-					Map<Label, Map<Integer, CachedMatch>> cache,
-					Set<Rule> studiedRules, GlobalState options) {
-				// we won't study for this
+			public Match match() {
+				if (fresh) {
+					fresh = false;
+					CachedMatch cm = cache.get(offset);
+					if (cm == null) {
+						boolean found = false;
+						int i = offset;
+						for (; i < options.end; i++) {
+							if (Character.isLetterOrDigit(s.charAt(i)))
+								found = true;
+							else
+								break;
+						}
+						if (found) {
+							Match n = new Match(ARule.this, offset, i);
+							cm = new CachedMatch(n);
+						} else
+							cm = CachedMatch.MISMATCH;
+						cache.put(offset, cm);
+					}
+					return cm.m;
+				}
 				return null;
 			}
 
 			@Override
-			public boolean zeroWidth() {
-				return false;
+			protected boolean mightHaveNext() {
+				return fresh;
 			}
 
 			@Override
-			public Rule shallowClone() {
-				return this;
+			protected Rule rule() {
+				return ARule.this;
 			}
 
-			@Override
-			public Object clone() {
-				return this;
-			}
 		}
+
+		private static final long serialVersionUID = 1L;
+
+		ARule(Label label) {
+			super(label);
+		}
+
+		@Override
+		protected String uniqueId() {
+			return label.toString();
+		}
+
+		@Override
+		public Matcher matcher(CharSequence s, Integer offset,
+				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			return new AMatcher(s, offset, cache, master);
+		}
+
+		@Override
+		public String description() {
+			return "foo bar";
+		}
+
+		@Override
+		public Set<Integer> study(CharSequence s,
+				Map<Label, Map<Integer, CachedMatch>> cache,
+				Set<Rule> studiedRules, GlobalState options) {
+			// we won't study for this
+			return null;
+		}
+
+		@Override
+		public boolean zeroWidth() {
+			return false;
+		}
+
+		@Override
+		public Rule shallowClone() {
+			return this;
+		}
+
+		@Override
+		public Object clone() {
+			return this;
+		}
+	}
+
+	@Test
+	public void arbitraryRuleTest1() throws GrammarException, IOException {
+
 		String[] rules = {
 		//
 		"<ROOT> = <q> <text> 1",//
@@ -140,6 +141,24 @@ public class DeferredRuleTest {
 		Grammar g = new Grammar(rules);
 		g.defineRule("q", Pattern.compile("[\"']"));
 		g.defineRule("text", new ARule(new Label(Type.terminal, "text")));
+		String s = "'ned'";
+		Options options = new Options();
+		options.study(false);
+		Matcher m = g.find(s, options);
+		Match n = m.match();
+		assertNotNull("found ned", n);
+	}
+
+	@Test
+	public void arbitraryRuleTest2() throws GrammarException, IOException {
+	
+		String[] rules = {
+		//
+		"<ROOT> = <q> <text> 1",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineRule("q", Pattern.compile("[\"']"));
+		g.defineRule("text", new ARule(new Label(Type.terminal, "foo")));
 		String s = "'ned'";
 		Options options = new Options();
 		options.study(false);
