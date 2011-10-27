@@ -708,11 +708,16 @@ public class Compiler {
 			for (int i = 0; i < children.length; i++) {
 				children[i] = reverse(sqr.sequence[children.length - i - 1]);
 			}
+			Set<Integer> swapped = new HashSet<Integer>(children.length);
 			for (int i = 0; i < children.length; i++) {
+				if (swapped.contains(i))
+					continue;
 				if (children[i] instanceof BackReferenceRule) {
 					Rule temp = children[i];
-					children[i] = children[children.length - i - 1];
-					children[children.length - i - 1] = temp;
+					int si = children.length - i - 1;
+					children[i] = children[si];
+					children[si] = temp;
+					swapped.add(si);
 				}
 			}
 			StringBuilder b = new StringBuilder();

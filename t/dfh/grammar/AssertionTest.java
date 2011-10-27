@@ -354,4 +354,21 @@ public class AssertionTest {
 		assertTrue("used simple positive native assertion", count == 1);
 	}
 
+	@Test
+	public void nativePostiveBackwardsWithBackReference()
+			throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = ~-[ ['_'|'-'] 'foo' 1 ] 'bar'",//
+		};
+		Grammar g = new Grammar(rules);
+		Matcher m = g.find("-foo-bar _foo_bar -foo_bar _foo-bar");
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue(
+				"used back reference in simple positive native backwards assertion",
+				count == 2);
+	}
+
 }

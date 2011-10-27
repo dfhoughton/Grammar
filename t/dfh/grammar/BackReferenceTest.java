@@ -2,6 +2,7 @@ package dfh.grammar;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -16,6 +17,21 @@ import org.junit.Test;
  * 
  */
 public class BackReferenceTest {
+
+	@Test
+	public void simpleTest() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = [ '-' | '_' ] 'foo' 1",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "-foo- _foo_ -foo_ _foo-";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found all foo", count == 2);
+	}
 
 	@Test
 	public void goodTest() throws GrammarException, IOException {
