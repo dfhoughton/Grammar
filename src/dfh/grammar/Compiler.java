@@ -704,21 +704,22 @@ public class Compiler {
 					new HashSet<String>(rr.alternateTags));
 		} else if (sr instanceof SequenceRule) {
 			SequenceRule sqr = (SequenceRule) sr;
+			// reverse order of last backreference in sequence and submatch 
+			// referred to before reversing order of entire sequence
+			Set<Integer> swapped = new HashSet<Integer>(sqr.sequence.length);
+			for (int i = sqr.sequence.length - 1; i >=0 ; i--) {
+				if (sqr.sequence[i] instanceof BackReferenceRule) {
+					BackReferenceRule temp = (BackReferenceRule) sqr.sequence[i];
+					if (swapped.contains(temp.index))
+						continue;
+					sqr.sequence[i] = sqr.sequence[temp.index];
+					sqr.sequence[temp.index] = temp;
+					swapped.add(temp.index);
+				}
+			}
 			Rule[] children = new Rule[sqr.sequence.length];
 			for (int i = 0; i < children.length; i++) {
 				children[i] = reverse(sqr.sequence[children.length - i - 1]);
-			}
-			Set<Integer> swapped = new HashSet<Integer>(children.length);
-			for (int i = 0; i < children.length; i++) {
-				if (swapped.contains(i))
-					continue;
-				if (children[i] instanceof BackReferenceRule) {
-					Rule temp = children[i];
-					int si = children.length - i - 1;
-					children[i] = children[si];
-					children[si] = temp;
-					swapped.add(si);
-				}
 			}
 			StringBuilder b = new StringBuilder();
 			b.append('[');
