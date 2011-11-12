@@ -37,6 +37,7 @@ import org.junit.runners.Suite;
 		EscapesInLiterals.class,//
 		MismatchTest.class,//
 		ExternalRuleBackwardsAssertionTest.class,//
+		RegexTest.class,//
 })
 public class AllTests {
 }

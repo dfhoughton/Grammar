@@ -168,6 +168,8 @@ public class RuleParser {
 				break;
 			case '/':
 				Regex rx = getRegex(body, offset);
+				rep = getRepetition(body, offset);
+				rx.setRepetition(rep);
 				add(parse, gf, rx);
 				break;
 			case '"':

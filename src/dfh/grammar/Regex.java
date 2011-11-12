@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * @author David Houghton
  * 
  */
-public class Regex implements RuleFragment {
+public class Regex extends RepeatableRuleFragment {
 	final Pattern re;
 	boolean reversible;
 	private static final Pattern parsingPattern = Pattern
