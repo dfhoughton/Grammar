@@ -17,12 +17,12 @@ Grammar can handle the following:
      <rule> = [ <a> | <b> ] <c> 1 # the digit is a one-based index of constituents of the same rule
                                   # in this case '1' must match verbatim whatever '[ <a> | <b> ]' matched
                                   # NOTE: back references can't take repetition suffixes
-9) terminal regular expressions
-     <rule> = <a> <s> <b>
-        <s> = /\s++/
+9) regular expressions
+     <rule> = <a> /\s++/ <b>
 10) reasonably thorough optimization and error checking
 11) memoization of matching success where possible -- actual matches are recorded for literals and regexes, success 
-    or failure for all other rules except back references, whose success or failure cannot easily be cached
+    or failure for all other rules except back references and the constituents of lookbehind assertions, whose 
+    success or failure cannot easily be cached
 12) every Grammar must have a root rule, the basis of all matching, called ROOT; e.g.,
      <ROOT> = <a> <b>
 13) all rule labels must be some sequence of \w characters
@@ -33,13 +33,28 @@ Grammar can handle the following:
      * other grammars
 15) pretty printing of grammars
 16) debugging mode
-17) native zero-width forward assertions (variable length backwards assertions in works)
+17) native zero-width forward assertions
      <rule> = ~<a> <b> # <a> must be able to match where <b> matches
      <rule> = !<a> <b> # <a> must not be able to match where <b> matches
-18) backtracking barriers
+    which can also be written
+     <rule> = ~+<a> <b>
+     <rule> = !+<a> <b>
+18) native zero-width backwards assertions
+     <rule> = ~-<a> <b> # <a> must be able to match where <b> matches
+     <rule> = !-<a> <b> # <a> must not be able to match where <b> matches
+    unlike lookbehinds in Perl 5 and Java, and like Perl 6, these can be variable width with one large caveat:
+    any native Java regular expressions included in a lookbehind rule must match identically forward and
+    backward and be marked as such with the 'r' ("reversible") modifier. 
+    E.g., /a|b/r, /\s++/r, /[\p{Lu}&&[^K]]/r. Basically, palindromes -- /\s++/, /aa/, /aba/, etc. -- and 
+    alternations of palindromes are reversible. In principle one could write a function to reverse any
+    regular expression, but it becomes complicated due to backreferences and the need to replace inherently
+    directional constructs such as assertions, so I haven't done it yet. Importantly, the thing that has
+    no analog in Grammars -- character classes -- are reversible, so any regular expression you wish to
+    put in a variable width lookbehind you can rewrite using Grammar rules and reversible regular expressions.
+19) backtracking barriers
      <rule> = <a> : <b>  # never backtrack into <a> in this rule once you've matched!
      <rule> = <a> :: <b> # if <b> fails to match, the grammar cannot match at this offset
-19) impose arbitrary conditions on rule to be tested after rule matches
+20) impose arbitrary conditions on rule to be tested after rule matches
      <rule> = <a> <b> <c> (length_less_than_20)
     in this case one must instantiate a Condition that contains the desired test code, this object will be passed 
     the character sequence, the Match, and the Matcher that produced it.
