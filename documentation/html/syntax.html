@@ -74,19 +74,160 @@
         &lt;regex_suffix&gt; = /[rimsdux]++/
                &lt;space&gt; = /[\s&amp;&amp;[^\n]]++/
                    &lt;w&gt; = /\w/</pre>
-	<div>Basically, a grammar expects a set of rules, each of which
-		may define a terminal character sequence or a set of constituent
-		rules.</div>
+	<p>Basically, a grammar expects a set of rules, each of which may
+		define a terminal character pattern or a set of constituent rules. The
+		matching is top-down: the grammar attempts to match a master rule,
+		which generally requires matching constituent rules.</p>
 	<h3>Rule</h3>
+	<p>
+		A rule is composed of two parts: a label and a body. The label must
+		match the pattern
+		<code>/&lt;\w+&gt;|\w+/</code>
+		, that is, a sequence of word characters, optionally surrounded by
+		angle brackets. The label is separated from the body by the
+		<code>=</code>
+		character. The rule body consists of a list of constituent rules and
+		may optionally end in a post-match condition and/or comment. If a
+		constituent rule is a labeled rule, it is referred to by its label
+		inside angle brackets. Some examples:
+	<pre>&lt;r1&gt; = 'a'
+ r2  = &lt;r1&gt; 'b'
+&lt;r3&gt; = /\b regex \b/ix
+&lt;r4&gt; = "alt" | "ernation" # a comment
+&lt;r5&gt; = 'c' (condition)</pre>
+	</p>
+	<p>Except in quoting expressions &mdash; a sequence inside a pair
+		of angle brackets, single quotes, double quotes, or forward slashes
+		&mdash; whitespace is ignored, so you can format your rules however
+		you wish; but every rule definition must fit on a single line.</p>
 	<h3>Root</h3>
+	<pre>&lt;ROOT&gt; = 'some' 'rule'</pre>
+	<p>
+		The root rule is a rule like any other: a label followed by a
+		definition. It always has the label
+		<code>&lt;ROOT&gt;</code>
+		, however, and it is always the rule the grammar first tries to match.
+		If the grammar can match the root rule against the character sequence,
+		then the grammar matches; it not, it doesn't.
+	</p>
+	<p>It is convenient to list the root rule first in the grammar but
+		this is not required. It is identified not by its position but by its
+		label.</p>
+	<h3>Comments</h3>
+	<p>
+		The grammar parser ignores blank lines. The comment character is
+		<code>#</code>
+		. If this character appears outside of some quoting construction
+		&mdash; double or single quotes or the forward slashes bracketing a
+		regular expression &mdash; everything after it is ignored.
+	<pre>
+		
+# this and the previous line are ignored
+rule = 'a' # and this is ignored as well</pre>
+	</p>
 	<h2>Usual Bits</h2>
 	<h3>Sequence</h3>
+	<pre>rule = 'a' 'b'</pre>
 	<h3>Alternation</h3>
+	<pre>rule = 'a' <b>|</b> 'b'</pre>
 	<h3>Repetition</h3>
+	<pre>rule = 'a'<b>*</b> 'b'<b>?</b> 'c'<b>+</b> 'd'<b>*?</b> 'e'<b>??</b> 'f'<b>+?</b> 'g'<b>*+</b> 'h'<b>?+</b> 'i'<b>++</b> 'j'<b>{2}</b> 'k'<b>{1,5}?</b> # etc</pre>
+	<h3>Group</h3>
+	<pre>rule = <b>[</b> 'a' | 'b' <b>]</b>{3,}+ # the "{3,}+" is just to give the group syntax a purpose</pre>
 	<h3>Back Reference</h3>
+	<pre>rule = /["'"]/ /\w++/ <b>1</b>
+	</pre>
 	<h2>Terminal Rules</h2>
+	<p>
+		Terminals rules have no constituent rules. They match against a
+		character sequence at some offset or they don't. If a grammar has no
+		terminal rules, it never makes contact with the underlying character
+		sequence and hence can never match.<span class="fn">This state
+			of affairs will be found during compilation and a <code>dfh.grammar.GrammarException</code>
+			will be thrown, aborting the program. The exception will carry an
+			explanatory message such as "cycle found in rules: &lt;b&gt;,
+			&lt;a&gt;".
+		</span>
+	</p>
+	<p>During matching, the matcher will cache some information about
+		attempted matches by various rules at various offsets in the character
+		sequence. For non-terminal rules all that is cached is the success or
+		failure of the match. This is to prevent the cache from consuming too
+		much memory &mdash; a particular non-terminal rule can potentially
+		match exponentially many ways at a given offset. Because the number of
+		possible terminal matches is linear in the length of the sequence, the
+		whole match object is stored for terminal matches, accelerating the
+		match process.</p>
 	<h3>Regular Expressions</h3>
+	<pre>rule = <b>/</b>^ foo \b<b>/imx</b>
+	</pre>
+	<p>
+		Any Java regular expression (aside from multi-line expressions with
+		the
+		<code>x</code>
+		modifier) can be placed inside forward slashes and used in a rule.
+		Modifiers can either be included inside the slashes like so
+	<pre>rule = /(?i:foo)/</pre>
+	or appended after the last slash as in Perl.
+	<pre>rule = /foo/i</pre>
+	</p>
+	<h4>Regex modifiers</h4>
+	<p>
+		Regular expressions can take all the modifiers understood by
+		<code>java.util.Pattern</code>
+		plus one more:
+	</p>
+	<style type="text/css">
+#modifier_table {
+	margin: 1em;
+}
+
+#modifier_table td:first-child {
+	padding-right: 1em;
+	font-weight: bold;
+	text-align: right;
+}
+</style>
+	<table id="modifier_table">
+		<tr>
+			<td>i</td>
+			<td><code>Pattern.CASE_INSENSITIVE</code></td>
+		</tr>
+		<tr>
+			<td>m</td>
+			<td><code>Pattern.MULTILINE</code></td>
+		</tr>
+		<tr>
+			<td>s</td>
+			<td><code>Pattern.DOTALL</code></td>
+		</tr>
+		<tr>
+			<td>x</td>
+			<td><code>Pattern.COMMENTS</code></td>
+		</tr>
+		<tr>
+			<td>d</td>
+			<td><code>Pattern.UNIX_LINES</code></td>
+		</tr>
+		<tr>
+			<td>u</td>
+			<td><code>Pattern.UNICODE_CASE</code></td>
+		</tr>
+		<tr>
+			<td>r</td>
+			<td>expression is reversible &mdash; if it matches a sequence it
+				will also match the reverse of this sequence &mdash; so it is usable
+				in a lookbehind assertion</td>
+		</tr>
+	</table>
+	<p>
+		This last modifier <em>cannot</em> be placed inside the slashes but
+		must be appended after.
+	</p>
 	<h3>Literals</h3>
+	<pre>rule1 = <b>'</b>"foo"<b>'</b>
+rule2 = <b>"</b>'foo'<b>"</b>
+	</pre>
 	<h2>Deferred Rule Definition</h2>
 	<h2>Conditions</h2>
 	<h2>Assertions</h2>

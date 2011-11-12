@@ -34,7 +34,7 @@
 		Grammar g = new Grammar(rules);
 		g.lookingAt("babs", <b>new Options().trace(System.err)</b>);</pre>
 	produces
-	<pre>&lt;ROOT&gt; at 0 (_"babs ")
+	<pre class="results">&lt;ROOT&gt; at 0 (_"babs ")
 stack:
 &lt;ROOT&gt; 0 :: 
 
@@ -71,7 +71,7 @@ post match:
 		System.out.println(m.match());
 		System.out.println(m.rightmostMatch());</pre>
 	produces
-	<pre>null
+	<pre class="results">null
 ("a"++: 0, 6 [("a": 0, 1), ("a": 1, 2), ("a": 2, 3), ("a": 3, 4), ("a": 4, 5), ("a": 5, 6)])</pre>
 	<h2>Logging with Conditions</h2>
 	<p>
@@ -117,7 +117,7 @@ post match:
 		while (m.match() != null);
 	</pre>
 	produces
-	<pre>at an a: ("a"(report_a): 4, 5)
+	<pre class="results">at an a: ("a"(report_a): 4, 5)
 at an a: ("a"(report_a): 8, 9)
 at a b: b</pre>
 	</p>
@@ -135,7 +135,7 @@ at a b: b</pre>
 		<code>dfh.grammar</code>
 		<a href="download.html">download</a> which provides a sort of
 		graphical matching trace.
-	<pre>USAGE: MatchToDot [options] &lt;file&gt;*
+	<pre class="results">USAGE: MatchToDot [options] &lt;file&gt;*
 
 	convert dfh.grammar matches to GraphViz graphs
 
@@ -149,10 +149,10 @@ If no output file is provided, it will write its output to STDOUT.</pre>
 	This is mostly useful for understanding how your grammar matches
 	strings. So, for example, suppose you have the grammar
 	<code>/tmp/test.grammar</code>
-	<pre>ROOT = 'th' [ 'ose' | 'is' | 'e' 'se'? | 'at' ]</pre>
+	<pre class="results">ROOT = 'th' [ 'ose' | 'is' | 'e' 'se'? | 'at' ]</pre>
 	and the text
 	<code>/tmp/test.txt</code>
-	<pre>What does this match?</pre>
+	<pre class="results">What does this match?</pre>
 	The commands
 	<pre> $ java MatchToDot -g /tmp/test.grammar -o /tmp/test.dot /tmp/test.txt
  $ dot -Tsvg -o /tmp/test.svg /tmp/test.dot</pre>
