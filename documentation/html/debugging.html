@@ -10,15 +10,166 @@
 <body onLoad="prepare('debugging', 'dfh.grammar')">
 	<span id="toc"></span>
 	<h2>Stepping Through</h2>
+	<p>
+		If you've got a debugger you can simply step through a match to see
+		what it does and where it goes wrong. All the objects you may want to
+		examine along the way have nice
+		<code>toString()</code>
+		methods, which makes things easier. Even for the experienced, though,
+		this is a convoluted and slow spelunking expedition. You can speed
+		things up by the positioning of conditional breakpoints, but you may
+		want to try the other methods listed below first.
+	</p>
 	<h2>Match Trace</h2>
+	<p>
+		Assign a
+		<code>PrintStream</code>
+		to which debugging information should be sent and the grammar will
+		provide a trace of the entire matching process. This is in effect a
+		very detailed, human readable log. E.g.,
+	<pre>		String[] rules = {
+		//
+		"ROOT = 'a' | 'b'",//
+		};
+		Grammar g = new Grammar(rules);
+		g.lookingAt("babs", <b>new Options().trace(System.err)</b>);</pre>
+	produces
+	<pre>&lt;ROOT&gt; at 0 (_"babs ")
+stack:
+&lt;ROOT&gt; 0 :: 
+
+&lt;"a"&gt; at 0 (_"babs ")
+stack:
+&lt;"a"&gt; 0 :: &lt;ROOT&gt; 0 :: 
+post match:
+&lt;"a"&gt; at 0 (_"babs ") returning null
+stack:
+&lt;"a"&gt; 0 :: &lt;ROOT&gt; 0 :: 
+
+&lt;"b"&gt; at 0 (_"babs ")
+stack:
+&lt;"b"&gt; 0 :: &lt;ROOT&gt; 0 :: 
+post match:
+&lt;"b"&gt; at 0 (_"babs ") returning ("b": 0, 1) = 'b'</pre>
+	and so forth.
+	</p>
+	<h2>Rightmost Match</h2>
+	<p>
+		Even if the grammar fails to match, if you ask it to it will retain
+		the rightmost
+		<code>Match</code>
+		it obtained while trying to apply the grammar to the character
+		sequence. This allows you to examine the failure point in the string
+		to discover where your rule goes wrong. E.g.,
+	</p>
+	<pre>		String[] rules = {
+		//
+		"ROOT = 'a'++  'b'",//
+		};
+		Grammar g = new Grammar(rules);
+		Matcher m = g.lookingAt("aaaaaargh", <b>new Options().keepRightmost(true)</b>);
+		System.out.println(m.match());
+		System.out.println(m.rightmostMatch());</pre>
+	produces
+	<pre>null
+("a"++: 0, 6 [("a": 0, 1), ("a": 1, 2), ("a": 2, 3), ("a": 3, 4), ("a": 4, 5), ("a": 5, 6)])</pre>
 	<h2>Logging with Conditions</h2>
-	<h2>MatchToDot</h2>
-	<div>
-		The <code>MatchToDot</code> utility
-		included in the
+	<p>
+		When all else fails, or sometimes long before all else fails, one can
+		put
+		<code>System.err.println()</code>
+		statements into one's code to reveal the evolution of state, the order
+		of events, and whatnot. One can do this with
+		<code>dfh.grammar.Grammar</code>
+		as well using post-match conditions.
+	<pre>	rule = &lt;a&gt; | &lt;a&gt; (arbitrary_condition)</pre>
+	The intended function of these conditions is to veto a match using
+	conditions not easily expressed in the grammar formalism itself. E.g.,
+	<pre>	rule = /\b\d++\b/ (between_10_and_59)</pre>
+	One can co-opt them however to hook arbitrary code
+	<span class="fn">But beware any code that has side effects,
+		particularly side effects that affect the matching process. Logging is
+		safe. Altering the underlying character sequence, to pick an egregious
+		example, is not.</span> into the matching process. So
+	<pre>		String[] rules = {
+				//
+				"ROOT = &lt;a&gt; | &lt;b&gt;",//
+				"a = 'a' (report_a)",//
+				"b = 'b' (report_b)",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("report_a", new Condition() {
+			@Override
+			public boolean passes(Match n, Matcher m, CharSequence s) {
+				System.err.println("at an a: " + n);
+				return true;
+			}
+		});
+		g.defineCondition("report_b", new Condition() {
+			@Override
+			public boolean passes(Match n, Matcher m, CharSequence s) {
+				System.err.println("at a b: "
+						+ s.subSequence(n.start(), n.end()));
+				return true;
+			}
+		});
+		Matcher m = g.find("confabulate");
+		while (m.match() != null);
+	</pre>
+	produces
+	<pre>at an a: ("a"(report_a): 4, 5)
+at an a: ("a"(report_a): 8, 9)
+at a b: b</pre>
+	</p>
+	<h2>
+		<code>MatchToDot</code>
+		and
+		<code>dfh.grammar.util.Dotify</code>
+	</h2>
+	<p>
+		Last but prettiest we have
+		<code>MatchToDot</code>
+		<span class="fn">This code depends on <code>dfh.cli</code> for
+			command line parsing. You must download this separately.
+		</span>, a utility included in the
 		<code>dfh.grammar</code>
-		<a href="download.html">download</a> provides a sort of graphical
-		matching trace.
-	</div>
+		<a href="download.html">download</a> which provides a sort of
+		graphical matching trace.
+	<pre>USAGE: MatchToDot [options] &lt;file&gt;*
+
+	convert dfh.grammar matches to GraphViz graphs
+
+	--grammar | -g   &lt;file&gt;  grammar file; required
+	--out | -o       &lt;file&gt;  file to receive output
+	--help | -? | -h         print usage information
+
+MatchToDot converts text to .dot format text suitable for converting into a graph with GraphViz (http://www.graphviz.org/),
+or any other utility that can read this format. If no file arguments are provided , it will expect input from STDIN.
+If no output file is provided, it will write its output to STDOUT.</pre>
+	This is mostly useful for understanding how your grammar matches
+	strings. So, for example, suppose you have the grammar
+	<code>/tmp/test.grammar</code>
+	<pre>ROOT = 'th' [ 'ose' | 'is' | 'e' 'se'? | 'at' ]</pre>
+	and the text
+	<code>/tmp/test.txt</code>
+	<pre>What does this match?</pre>
+	The commands
+	<pre> $ java MatchToDot -g /tmp/test.grammar -o /tmp/test.dot /tmp/test.txt
+ $ dot -Tsvg -o /tmp/test.svg /tmp/test.dot</pre>
+	would produce for you the image
+	<img style="display: block; margin: 1em" src="img/test.svg">
+	</p>
+	<p>
+		If you don't wish to use
+		<code>MatchToDot</code>
+		, you can use
+		<code>dfh.grammar.util.Dotify</code>
+		itself. The former is just a wrapper for the latter. The code for
+		<code>MatchToDot</code>
+		is a mere 133 lines including imports, blank lines, and comments, so
+		it would be a good place to start if you're thinking of using
+		<code>Dotify</code>
+		programmatically.
+	</p>
 </body>
 </html>

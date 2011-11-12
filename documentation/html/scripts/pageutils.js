@@ -171,6 +171,7 @@ function toc() {
 				var indent = n.nodeName.substring(1, n.nodeName.length);
 				indent += 'em';
 				var id = stringify(n);
+				id = id.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
 				id = makeUnique(id);
 				var tocLine = document.createElement("a");
 				tocLine.setAttribute("style", "display: block; margin-left: "

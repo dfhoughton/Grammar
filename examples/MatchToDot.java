@@ -4,12 +4,16 @@ import static dfh.grammar.util.Dotify.startDot;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import dfh.cli.Cli;
+import dfh.cli.Cli.Opt;
+import dfh.cli.Modifiers;
 import dfh.grammar.Grammar;
 import dfh.grammar.GrammarException;
 import dfh.grammar.Match;
@@ -32,45 +36,86 @@ import dfh.grammar.util.Dotify;
 public class MatchToDot {
 
 	/**
-	 * Applies the grammar to the file, creating a dot file with graphs of all
-	 * matches. The output file is named by appending ".dot" to the name of the
-	 * text file.
+	 * Run with --help option to see usage information.
 	 * 
 	 * @param args
-	 *            grammar file and text file
+	 *            files to match against
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 * @throws GrammarException
 	 */
 	public static void main(String[] args) throws GrammarException,
 			FileNotFoundException, IOException {
-		File[] returnAr = validateArgs(args);
-		File gf = returnAr[0];
-		File inf = returnAr[1];
-		Grammar g = new Grammar(gf);
-		String text = fileToText(inf);
-		Matcher m = g.find(text);
-		StringBuilder b = startGraph(inf);
-		Match n;
+		Object[][][] spec = {
+				//
+				{ { Opt.NAME, MatchToDot.class.getName() } },//
+				{ { Opt.ARGS, "file", Opt.STAR } },//
+				{ { "grammar", 'g', String.class },
+						{ "grammar file; required", "file" }, { Cli.REQUIRED } },//
+				{ { "out", 'o', String.class },
+						{ "file to receive output", "file" } },//
+				{ {
+						Opt.USAGE,
+						"convert dfh.grammar matches to GraphViz graphs",
+						MatchToDot.class.getName()
+								+ " converts text to .dot format text suitable for converting into a graph with GraphViz (http://www.graphviz.org/),\n"
+								+ "or any other utility that can read this format. If no file arguments are provided , it will expect input from STDIN.\n"
+								+ "If no output file is provided, it will write its output to STDOUT." } },//
+		};
+		Cli cli = new Cli(spec, Modifiers.HELP);
+		cli.parse(args);
+		Grammar g = null;
+		File gf = new File(cli.string("grammar"));
+		try {
+			g = new Grammar(gf);
+		} catch (Exception e) {
+			cli.error("could not compile grammar: " + e);
+			cli.usage(1);
+		}
+		StringBuilder b;
+		if (cli.argList().isEmpty()) {
+			b = startDot("STDIN");
+		} else if (cli.argList().size() == 1) {
+			String name = new File(cli.argument("file")).getName();
+			b = startDot(name);
+		} else {
+			b = startDot("multiple_files");
+		}
 		int[] index = { 1 };
-		while ((n = m.match()) != null) {
-			if (!n.zeroWidth())
-				appendGraph(b, n, text, index, null);
+		if (cli.argList().isEmpty()) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			byte[] buf = new byte[1024];
+			int i;
+			while ((i = System.in.read(buf)) > -1)
+				baos.write(buf, 0, i);
+			String text = new String(baos.toByteArray());
+			baos = null;
+			Matcher m = g.find(text);
+			Match n;
+			while ((n = m.match()) != null) {
+				if (!n.zeroWidth())
+					appendGraph(b, n, text, index, null);
+			}
+		} else {
+			for (String fn : cli.argList()) {
+				File f = new File(fn);
+				String text = fileToText(f);
+				Matcher m = g.find(text);
+				Match n;
+				while ((n = m.match()) != null) {
+					if (!n.zeroWidth())
+						appendGraph(b, n, text, index, null);
+				}
+			}
 		}
 		endDot(b);
-		dotFile(inf, b);
-	}
-
-	private static void dotFile(File inf, StringBuilder b) throws IOException {
-		File outf = new File(inf.getPath() + ".dot");
-		BufferedWriter writer = new BufferedWriter(new FileWriter(outf));
-		writer.write(b.toString());
-		writer.close();
-	}
-
-	private static StringBuilder startGraph(File inf) {
-		String name = inf.getName();
-		return startDot(name);
+		if (cli.string("out") != null) {
+			File outf = new File(cli.string("out"));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(outf));
+			writer.write(b.toString());
+			writer.close();
+		} else
+			System.out.println(b);
 	}
 
 	private static String fileToText(File inf) throws FileNotFoundException,
@@ -85,26 +130,4 @@ public class MatchToDot {
 		String text = b.toString();
 		return text;
 	}
-
-	private static File[] validateArgs(String[] args) {
-		if (args.length != 2)
-			usage("two arguments expected");
-		String grammarDoc = args[0];
-		File grammarFile = new File(grammarDoc);
-		if (!(grammarFile.exists() && grammarFile.canRead()))
-			usage(grammarDoc + " must be a readable grammar file");
-		String fileToMatch = args[1];
-		File matchingFile = new File(fileToMatch);
-		if (!(matchingFile.exists() && matchingFile.canRead()))
-			usage(matchingFile + " must be a readable text file");
-		File[] returnAr = { grammarFile, matchingFile };
-		return returnAr;
-	}
-
-	private static void usage(String string) {
-		System.err.println("ERROR: " + string);
-		System.err.println("USAGE: <executable> <grammar file> <text file>");
-		System.exit(1);
-	}
-
 }
