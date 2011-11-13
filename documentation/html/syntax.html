@@ -128,14 +128,55 @@ rule = 'a' # and this is ignored as well</pre>
 	<h2>Usual Bits</h2>
 	<h3>Sequence</h3>
 	<pre>rule = 'a' 'b'</pre>
+	<p>As in Java regular expressions.</p>
 	<h3>Alternation</h3>
 	<pre>rule = 'a' <b>|</b> 'b'</pre>
+	<p>As in Java regular expressions.</p>
 	<h3>Repetition</h3>
 	<pre>rule = 'a'<b>*</b> 'b'<b>?</b> 'c'<b>+</b> 'd'<b>*?</b> 'e'<b>??</b> 'f'<b>+?</b> 'g'<b>*+</b> 'h'<b>?+</b> 'i'<b>++</b> 'j'<b>{2}</b> 'k'<b>{1,5}?</b> # etc</pre>
+	<p>
+		As in Java regular expressions. The curly bracket notation accepts
+		<code>
+			{,<i>n</i>}
+		</code>
+		as a synonym for
+		<code>
+			{0,<i>n</i>}
+		</code>
+		.
+	</p>
 	<h3>Group</h3>
-	<pre>rule = <b>[</b> 'a' | 'b' <b>]</b>{3,}+ # the "{3,}+" is just to give the group syntax a purpose</pre>
+	<pre>rule1 = <b>[</b> 'a' | 'b' <b>]</b>{3,}+ # the "{3,}+" is just to give the group syntax a purpose
+rule2 = <b>[</b> 'a'* 'b' <b>]{1}+</b>   # a non-backtracking group</pre>
+	<p>
+		Unlike in Java and Perl 5, but following the convention of Perl 6, the
+		grouping brackets are not
+		<code>()</code>
+		but
+		<code>[]</code>
+		. Round brackets are reserved for conditions. Note that
+		<code>dfh.grammar</code>
+		lacks its own character class syntax &mdash; for that you must use
+		Java native regular expressions. Also, there are no subvarieties of
+		grouping expressions are there are in Java and Perl. Every group is a
+		capturing group inasmuch as every match retains the entire match tree.
+		There are (currently) no in-line match modifiers; for this you must
+		rely on native regular expressions. For the equivalent of
+		<code>(?&gt;...)</code>
+		you must use the repetition suffix
+		<code>{1}+</code>
+		. Perhaps at some future date I will add a shorthand notation for
+		this.
+	</p>
 	<h3>Back Reference</h3>
-	<pre>rule = /["'"]/ /\w++/ <b>1</b></pre>
+	<pre>rule = /["'"]/ /\w++/ <b>1</b> </pre>
+	<p>
+		Note: no group construct is required but the index is relative to the
+		elements <em>of the same rule</em>. This is due to the complexity of
+		interpreting backreferences in recursive patterns. If you need
+		something more powerful than this you can do it with conditions,
+		though this will cost you efficiency.
+	</p>
 	<h2>Terminal Rules</h2>
 	<p>
 		Terminals rules have no constituent rules. They match against a
@@ -158,7 +199,7 @@ rule = 'a' # and this is ignored as well</pre>
 		whole match object is stored for terminal matches, accelerating the
 		match process.</p>
 	<h3>Regular Expressions</h3>
-	<pre>rule = <b>/</b>^ foo \b<b>/imx</b></pre>
+	<pre>rule = <b>/</b>^ foo \b<b>/imx</b> </pre>
 	<p>
 		Any Java regular expression (aside from multi-line expressions with
 		the
@@ -219,18 +260,17 @@ rule = 'a' # and this is ignored as well</pre>
 		might wonder why these are necessary at all. It is because
 		<code>dfh.grammar.Grammar</code>
 	<ol>
-		<li>lacks the semantics of anchors &mdash; <code>\b</code> , <code>^</code>
+		<li>lacks anchor constructs &mdash; <code>\b</code> , <code>^</code>
 			, <code>$</code> , <code>\A</code> , <code>\Z</code> and so forth
 		</li>
-		<li>lacks character class semantics, which are particularly nice
-			in Java</li>
+		<li>lacks character classes, which are particularly nice in Java</li>
 		<li>lacks modifiers equivalent to <code>Pattern.CASE_INSENSITIVE</code>
 			or <code>Pattern.MULTILINE</code>.
 		</li>
-		<li>If you can make do with the more impoverished semantics and
-			pattern capturing ability of regular expressions, they're much
-			faster, so the more you can rely on them rather than grammars the
-			faster your code will be.</li>
+		<li>If you can make do with the more impoverished pattern
+			capturing ability of regular expressions, they're much faster, so the
+			more you can rely on them rather than grammars the faster your code
+			will be.</li>
 		<li>If you have pre-existing regular expressions, it is
 			convenient to be able plug them into grammars unchanged.</li>
 	</ol>
@@ -248,10 +288,192 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 		<code>dfh.grammar</code>
 		string literals.
 	</p>
-	<h2>Deferred Rule Definition</h2>
+	<h2>External Rule Definition</h2>
+	<p>
+		You may wish to build grammars compositionally by using one to define
+		a rule in another, to plug your own extensions of
+		<code>dfh.grammar.Rule</code>
+		in, or to build large or variable regular expressions programmatically
+		and then plug them into a static grammar. There are two ways to do
+		this.
+	</p>
+	<h3>Pre-loading Rules</h3>
+	<p>you may load in a mapping from rule labels to rules in while
+		compiling the grammar
+	<pre>		Map&lt;String, Rule&gt; map = new HashMap&lt;String, Rule&gt;(1);
+		map.put("r", whateverRule);
+		String[] rules = {
+		//
+		"ROOT = ~- &lt;r&gt; 'bar'",//
+		};
+		Grammar g = new Grammar(rules, map);</pre>
+	It is necessary to pre-load rules if you wish to use them in lookbehind
+	assertions, as in this example. The compiler needs to confirm that any
+	rule in a lookbehind is reversible and it is only able to do this if it
+	already has the rules on hand during compilation.
+	</p>
+	<h3>Deferred Rule Definition</h3>
+	<p>If you do not plan to use the rules in lookbehinds you may
+		compile a grammar with undefined rules and define these after.
+	<pre>		String[] rules = {
+		//
+		"ROOT = &lt;q&gt; &lt;text&gt; &lt;bar&gt; 1",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineRule("q", Pattern.compile("[\"']")); // <b>deferred regular expression</b>
+		g.defineRule("text", whateverRule);          // <b>deferred arbitrary rule</b>
+		g.defineRule("bar","quux");                  // <b>deferred string literal</b>
+	</pre>
+	As you can see from this example, deferred rule definition is somewhat
+	more convenient than pre-loaded rules. For one thing, it is more
+	concise and hence easier to read. For another, there are convenience
+	methods for defining deferred rules when they are to match literal
+	character sequences or regular expressions.
+	</p>
+	<p>
+		Naturally, if you attempt to match a grammar with undefined rules
+		against a character sequence a
+		<code>dfh.grammar.GrammarException</code>
+		will be thrown.
+	</p>
 	<h2>Conditions</h2>
+	<pre>		String[] rules = {
+		//
+		"ROOT = /\\b\\d++\\b/ <b>(less_than_100)</b>",//
+		};
+		Grammar g = new Grammar(rules);
+		<b>g.defineCondition("less_than_100", new Condition() {
+			public boolean passes(Match m, Matcher n, CharSequence s) {
+				int i = Integer.parseInt(s.subSequence(m.start(), m.end())
+						.toString());
+				return i < 100;
+			}
+		});</b>
+		String s = "99 100 1000";
+		Matcher m = g.find(s);
+		Match n;
+		while ((n = m.match()) != null)
+			System.out.println(s.substring(n.start(), n.end()));</pre>
+	<p>Conditions are perhaps the most powerful feature grammars have
+		beyond those they share with regular expressions. These are arbitrary
+		tests that can be applied after a rule has matched. The example above
+		produces
+	<pre class="results">99</pre>
+	</p>
+	<p>Caution should be taken when using conditions. In particular,
+		they should be functional: a condition that matches at a particular
+		offset in a character sequence should always match. Do not make
+		conditions dependent on unrelated state such as the weather at
+		matching time, the phase of the moon, or the contents of a dynamic
+		database. To do otherwise would invalidate the results cached when
+		matches at this offset are attempted and possibly lead to false
+		negatives when matching.</p>
+	<p>Also, you may not realize how frequently a condition needs to be
+		tested. Matching recursive patterns is exponentially complex. The
+		grammar is able to store whether the conditionalized rule ever matches
+		at a particular offset but not all the ways it can match. Hence
+		conditions are a good way to slow down a match. If you find the
+		condition slows down the match unacceptably you may need to remove
+		condition testing to a post-processing stage. This has the
+		disadvantage that it is less declarative and may require iterating
+		over a great many matches in post-processing &mdash; you probably will
+		want to iterate over all possible matches, not merely all
+		non-overlapping matches. On the other hand, you will most likely need
+		to apply the test less often than you would in the midst of matching.</p>
 	<h2>Assertions</h2>
+	<p>Assertions are in effect special conditions that may appear
+		anywhere in a rule. They do not move the character matching offset but
+		will cause the rule or match to fail if some condition is not met.</p>
 	<h3>Zero-Width Matches</h3>
+	<p>Zero-width matches are rules that test whether the characters
+		adjacent to the current offset meet some condition. You may define a
+		great many of these with ordinary regular expressions:</p>
+	<pre>String[] rules = {
+        //
+        "  ROOT = &lt;matt&gt; &lt;s&gt; &lt;joe&gt; &lt;s&gt; &lt;is_sue&gt;",//
+        "   joe = /\\bjoe\\b/i",//
+        "is_sue = /(?=sue)/i",//   <b>looks ahead</b>
+        "is_mat = /(?&lt;=matt)/i",// <b>looks behind</b>
+        "     s = /\\s++/",//
+};</pre>
+	<p>The problem with doing this this way, though, is that</p>
+	<ol>
+		<li>you are limited to terminal rules</li>
+		<li>your backwards assertions must be fixed-width</li>
+	</ol>
+	<p>
+		So
+		<code>dfh.grammar</code>
+		provides its own assertion syntax with which you can define assertions
+		which are variable width in either direction.
+	</p>
+	<h4>Lookaheads</h4>
+	<pre>String[] rules = {
+        //
+        "ROOT = &lt;a&gt; /\\s++/ &lt;b&gt; /\\s++/ &lt;c&gt; /\\s++/ &lt;d&gt;",//
+        "   a = ~  '1' /\\b\\d++/",// <b>the number must begin with 1</b>
+        "   b = ~+ '2' /\\b\\d++/",// <b>long form: the '+' here simply means "forward"</b>
+        "   c = !  '3' /\\b\\d++/",// <b>the number must not begin with 3</b>
+        "   d = !+ '4' /\\b\\d++/",//
+};</pre>
+	<p>
+		The examples above are silly but they serve to illustrate the syntax.
+		A positive assertion has the prefix
+		<code>~</code>
+		; a negative,
+		<code>!</code>
+		. You may append the suffix
+		<code>+</code>
+		to this to make clear that this is a forward assertion: the following
+		rule must match at the offset and preceding to the right. And the rule
+		marked as an assertion is that immediately after the lookahead symbol.
+	</p>
+	<h4>Lookbehinds</h4>
+	<pre>String[] rules = {
+        //
+        "ROOT = &lt;a&gt; /\\s++/ &lt;b&gt;",//
+        "   a = /\\b\\d++/ ~- '1'",// <b>the number must end in 1</b>
+        "   b = /\\b\\d++/ !- '2'",// <b>the number must not end in 2</b>
+};</pre>
+	<p>
+		There is no short form to lookbehinds; them must always carry the
+		suffix
+		<code>-</code>
+		indicating they match backwards from the current offset. Note that you
+		do not write the rule they modify backwards. The grammar compiler will
+		do this for you. So for example
+	</p>
+	<pre>		String[] rules = {
+				//
+				"ROOT = !- [ &lt;fred&gt; /\\s++/r ] &lt;fred&gt;",//
+				"fred = 'fred'",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "fred fred bob";
+		Matcher m = g.find(s);
+		Match n;
+		while ((n = m.match()) != null)
+			System.out.println(n);</pre>
+	<p>produces</p>
+	<pre class="results">(!-[ &lt;fred&gt; /\s++/r ] &lt;fred&gt;: 0, 4 [(!-[ &lt;fred&gt; /\s++/r ]: 0, 0), ("fred": 0, 4)])</pre>
+	<p>
+		That is, it only finds the first <i>fred</i>, and the stringification
+		of the match keeps the description facing forwards.
+	</p>
+	<p>
+		Note the
+		<code>r</code>
+		modifier on the regular expression. A regular expression can only be
+		used in a backwards assertion if it carries this modifier, which
+		simply marks it as reversible. Reversible regular expressions are
+		those which only match palindromes. In this case, a block of all the
+		same character class will be a palindrome, so it's reversible. This
+		powerful restriction on the regular expressions usable in backwards
+		assertions actually limits their power very little inasmuch as the
+		rest of the machinery of matching can be provided by
+		<code>dfh.grammar</code>
+		itself.
+	</p>
 	<h3>Backtracking Barriers</h3>
 	A backtracking barrier is a sort of meta-assertion. It says, "the
 	matching engine will not have to revisit this decision or anything that
