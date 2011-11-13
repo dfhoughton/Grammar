@@ -151,7 +151,7 @@ public class DeferredRuleTest {
 
 	@Test
 	public void arbitraryRuleTest2() throws GrammarException, IOException {
-	
+
 		String[] rules = {
 		//
 		"<ROOT> = <q> <text> 1",//
@@ -166,4 +166,23 @@ public class DeferredRuleTest {
 		Match n = m.match();
 		assertNotNull("found ned", n);
 	}
+
+	@Test
+	public void literalDeferredRuleTest() throws GrammarException, IOException {
+
+		String[] rules = {
+		//
+		"<ROOT> = <q> <text> 1",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineRule("q", Pattern.compile("[\"']"));
+		g.defineRule("text", "text");
+		String s = "'text'";
+		Options options = new Options();
+		options.study(false);
+		Matcher m = g.find(s, options);
+		Match n = m.match();
+		assertNotNull("found text", n);
+	}
+
 }
