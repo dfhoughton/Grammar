@@ -135,8 +135,7 @@ rule = 'a' # and this is ignored as well</pre>
 	<h3>Group</h3>
 	<pre>rule = <b>[</b> 'a' | 'b' <b>]</b>{3,}+ # the "{3,}+" is just to give the group syntax a purpose</pre>
 	<h3>Back Reference</h3>
-	<pre>rule = /["'"]/ /\w++/ <b>1</b>
-	</pre>
+	<pre>rule = /["'"]/ /\w++/ <b>1</b></pre>
 	<h2>Terminal Rules</h2>
 	<p>
 		Terminals rules have no constituent rules. They match against a
@@ -159,8 +158,7 @@ rule = 'a' # and this is ignored as well</pre>
 		whole match object is stored for terminal matches, accelerating the
 		match process.</p>
 	<h3>Regular Expressions</h3>
-	<pre>rule = <b>/</b>^ foo \b<b>/imx</b>
-	</pre>
+	<pre>rule = <b>/</b>^ foo \b<b>/imx</b></pre>
 	<p>
 		Any Java regular expression (aside from multi-line expressions with
 		the
@@ -177,18 +175,7 @@ rule = 'a' # and this is ignored as well</pre>
 		<code>java.util.Pattern</code>
 		plus one more:
 	</p>
-	<style type="text/css">
-#modifier_table {
-	margin: 1em;
-}
-
-#modifier_table td:first-child {
-	padding-right: 1em;
-	font-weight: bold;
-	text-align: right;
-}
-</style>
-	<table id="modifier_table">
+	<table class="dictionary_table">
 		<tr>
 			<td>i</td>
 			<td><code>Pattern.CASE_INSENSITIVE</code></td>
@@ -224,10 +211,43 @@ rule = 'a' # and this is ignored as well</pre>
 		This last modifier <em>cannot</em> be placed inside the slashes but
 		must be appended after.
 	</p>
+	<h4>Why regular expressions in grammars</h4>
+	<p>
+		Since a
+		<code>dfh.grammar.Grammar</code>
+		duplicates almost every capability of a Java regular expression you
+		might wonder why these are necessary at all. It is because
+		<code>dfh.grammar.Grammar</code>
+	<ol>
+		<li>lacks the semantics of anchors &mdash; <code>\b</code> , <code>^</code>
+			, <code>$</code> , <code>\A</code> , <code>\Z</code> and so forth
+		</li>
+		<li>lacks character class semantics, which are particularly nice
+			in Java</li>
+		<li>lacks modifiers equivalent to <code>Pattern.CASE_INSENSITIVE</code>
+			or <code>Pattern.MULTILINE</code>.
+		</li>
+		<li>If you can make do with the more impoverished semantics and
+			pattern capturing ability of regular expressions, they're much
+			faster, so the more you can rely on them rather than grammars the
+			faster your code will be.</li>
+		<li>If you have pre-existing regular expressions, it is
+			convenient to be able plug them into grammars unchanged.</li>
+	</ol>
+	</p>
 	<h3>Literals</h3>
 	<pre>rule1 = <b>'</b>"foo"<b>'</b>
-rule2 = <b>"</b>'foo'<b>"</b>
-	</pre>
+rule2 = <b>"</b>'foo'<b>"</b> </pre>
+	<p>String literals are sequences of characters enclosed in double
+		or single quotes. Every character in the literal must be identical to
+		the corresponding character in the sequence matched against for a
+		literal rule to match.</p>
+	<h4>Escape sequences</h4>
+	<p>
+		All the escape sequences that work in Java string literals work in
+		<code>dfh.grammar</code>
+		string literals.
+	</p>
 	<h2>Deferred Rule Definition</h2>
 	<h2>Conditions</h2>
 	<h2>Assertions</h2>

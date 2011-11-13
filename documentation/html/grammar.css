@@ -27,7 +27,7 @@ pre.results {
 	border: thin solid red;
 }
 
-pre > b {
+pre>b {
 	color: red;
 }
 
@@ -66,4 +66,14 @@ div#footnotes {
 	margin-top: 1em;
 	padding-top: 1em;
 	border-top: thin solid black;
+}
+
+.dictionary_table {
+	margin: 1em;
+}
+
+.dictionary_table  td:first-child {
+	padding-right: 1em;
+	font-weight: bold;
+	text-align: right;
 }
