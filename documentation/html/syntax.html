@@ -158,7 +158,7 @@ rule2 = <b>[</b> 'a'* 'b' <b>]{1}+</b>   # a non-backtracking group</pre>
 		<code>dfh.grammar</code>
 		lacks its own character class syntax &mdash; for that you must use
 		Java native regular expressions. Also, there are no subvarieties of
-		grouping expressions are there are in Java and Perl. Every group is a
+		grouping expressions as there are in Java and Perl. Every group is a
 		capturing group inasmuch as every match retains the entire match tree.
 		There are (currently) no in-line match modifiers; for this you must
 		rely on native regular expressions. For the equivalent of
@@ -493,7 +493,15 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 	after the barrier fails to match then the entire grammar fails to match
 	at the current offset in the character sequence.
 	<h2>Options</h2>
-	With
+	<pre>Matcher m = g.find(s);                                               // <b>use all defaults</b>
+...
+m = g.find(s, new Options().allowOverlap(true).longestMatch(false)); // <b>change two parameters</b>
+...
+Options opt = new Options().allowOverlap(true).longestMatch(false);  // <b>options are reusable</b>
+m = g.find(s2, opt);
+...
+m = g.find(s3, opt);</pre>
+	<p>With
 	<code>java.regex.Matcher</code>
 	matching, one can modify the matching altering various properties of
 	the matcher object separately. With
@@ -507,6 +515,33 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 	. Among other things is specifies which should be regarded as the first
 	and last characters in the sub-sequence to match against, whether
 	overlapping matches should be considered, and whether debugging output
-	should be produced.
+	should be produced.</p>
+	<h3>start</h3>
+	<pre>Options opt = new Options().start(10);
+System.out.println(opt.start());       // 10</pre>
+	<h3>end</h3>
+	<pre>Options opt = new Options().end(10);
+System.out.println(opt.end());       // 10</pre>
+	<h3>allow overlap</h3>
+	<pre>Options opt = new Options().allowOverlap(true);
+System.out.println(opt.allowOverlap());         // true</pre>
+	<h3>keep rightmost match</h3>
+	<pre>Options opt = new Options().keepRightmost(true);
+System.out.println(opt.keepRightmost());         // true</pre>
+	<h3>longest match</h3>
+	<pre>Options opt = new Options().longestMatch(true);
+System.out.println(opt.longestMatch());         // true</pre>
+	<h3>match all</h3>
+	<pre>Options opt = new Options().matchAll(true);
+System.out.println(opt.matchAll());         // true</pre>
+	<h3>maximum recursion depth</h3>
+	<pre>Options opt = new Options().maxRecursionDepth(10);
+System.out.println(opt.maxRecursionDepth());       // 10</pre>
+	<h3>study</h3>
+	<pre>Options opt = new Options().study(false);
+System.out.println(opt.study());          // false</pre>
+	<h3>trace</h3>
+	<pre>Options opt = new Options().trace(System.err);
+opt.trace().println(10);                       // 10</pre>
 </body>
 </html>

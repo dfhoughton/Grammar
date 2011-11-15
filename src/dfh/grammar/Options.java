@@ -68,7 +68,7 @@ public class Options {
 	 * The smaller this recursion limit, the faster recursive patterns will
 	 * match (and the less chance one has of overflowing the stack). However,
 	 * you will be unable to parse deeply-recursive left-branching patterns such
-	 * as one finds in the English phrase <i>The Queen's cousins father's
+	 * as one finds in the English phrase <i>The Queen's cousin's father's
 	 * friend's hat</i>.
 	 */
 	public static final int MAX_RECURSION_DEPTH = 3;
