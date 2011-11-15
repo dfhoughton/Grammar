@@ -32,7 +32,7 @@ public class Options {
 	 * {@link Grammar#find(CharSequence, Options)} and
 	 * {@link Grammar#lookingAt(CharSequence, Options)}.
 	 */
-	public static final boolean LONGEST_TOKEN_MATCHING = true;
+	public static final boolean LONGEST_MATCH = true;
 	/**
 	 * Maximum number of times the parser will visit the same rule without any
 	 * forward progress before it gives up on the pattern. So if you have a
@@ -80,7 +80,7 @@ public class Options {
 	public static final boolean KEEP_RIGHTMOST = false;
 	boolean allowOverlap = ALLOW_OVERLAP;
 	boolean study = STUDY;
-	boolean longestTokenMatching = LONGEST_TOKEN_MATCHING;
+	boolean longestMatch = LONGEST_MATCH;
 	boolean keepRightmost = KEEP_RIGHTMOST;
 	int start = START_OFFSET;
 	int end = -1;
@@ -219,28 +219,28 @@ public class Options {
 	}
 
 	/**
-	 * See {@link #LONGEST_TOKEN_MATCHING}.
+	 * See {@link #LONGEST_MATCH}.
 	 * 
 	 * @return whether only the longest matches at a particular offset will be
 	 *         returned
 	 */
-	public boolean longestTokenMatching() {
-		return longestTokenMatching;
+	public boolean longestMatch() {
+		return longestMatch;
 	}
 
 	/**
-	 * See {@link #LONGEST_TOKEN_MATCHING}.
+	 * See {@link #LONGEST_MATCH}.
 	 * 
-	 * @param longestTokenMatching
+	 * @param longestMatch
 	 * @return self to allow chaining of methods
 	 */
-	public Options longestTokenMatching(boolean longestTokenMatching) {
-		this.longestTokenMatching = longestTokenMatching;
+	public Options longestMatch(boolean longestMatch) {
+		this.longestMatch = longestMatch;
 		return this;
 	}
 
 	/**
-	 * This is equivalent to setting {@link #longestTokenMatching(boolean)} to
+	 * This is equivalent to setting {@link #longestMatch(boolean)} to
 	 * <code>false</code> and {@link #allowOverlap(boolean)} to
 	 * <code>true</code>.
 	 * 
@@ -248,7 +248,7 @@ public class Options {
 	 */
 	public Options matchAll() {
 		allowOverlap(true);
-		longestTokenMatching(false);
+		longestMatch(false);
 		return this;
 	}
 
