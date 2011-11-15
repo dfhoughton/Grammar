@@ -29,7 +29,7 @@ public class OverlapTest {
 		String s = "a b";
 		Options opt = new Options();
 		opt.allowOverlap(true);
-		opt.longestTokenMatching(false);
+		opt.longestMatch(false);
 		Matcher m = g.find(s, opt);
 		@SuppressWarnings("unused")
 		Match n;

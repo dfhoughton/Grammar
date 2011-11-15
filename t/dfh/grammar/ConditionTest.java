@@ -128,7 +128,7 @@ public class ConditionTest {
 		});
 		String s = "aaaaaa a";
 		Options opt = new Options();
-		opt.longestTokenMatching(false);
+		opt.longestMatch(false);
 		Matcher m = g.find(s, opt);
 		int count = 0;
 		while (m.match() != null)
@@ -176,7 +176,7 @@ public class ConditionTest {
 		});
 		String s = "aaaaaa a";
 		Options opt = new Options();
-		opt.longestTokenMatching(false);
+		opt.longestMatch(false);
 		Matcher m = g.find(s, opt);
 		int count = 0;
 		while (m.match() != null)

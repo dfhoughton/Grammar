@@ -700,7 +700,7 @@ public class Grammar implements Serializable, Cloneable {
 			throws GrammarException {
 		checkComplete();
 		final GlobalState co = verifyOptions(cs, opt);
-		final boolean ltm = containsAlternation && opt.longestTokenMatching();
+		final boolean ltm = containsAlternation && opt.longestMatch();
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		final Set<Integer> startOffsets = startOffsets(cs, co, cache);
 		final Matcher m = rules.get(root).matcher(cs, co.start, cache,
@@ -818,7 +818,7 @@ public class Grammar implements Serializable, Cloneable {
 			throws GrammarException {
 		checkComplete();
 		final GlobalState options = verifyOptions(s, opt);
-		final boolean ltm = containsAlternation && opt.longestTokenMatching();
+		final boolean ltm = containsAlternation && opt.longestMatch();
 		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
 		List<Integer> list = new ArrayList<Integer>(startOffsets(s, options,
 				cache));

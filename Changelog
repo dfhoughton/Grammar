@@ -2,3 +2,4 @@
   * updated version number from .25 to 1.0 in one fell swoop
   * began Changelog
   * made regexes repeatable
+  * renamed longestTokenMatching to longestMatch

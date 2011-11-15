@@ -47,7 +47,7 @@ public class RepetitionTest {
 		};
 		Grammar g = new Grammar(rules);
 		Options opt = new Options();
-		opt.longestTokenMatching(false);
+		opt.longestMatch(false);
 		String s = "aa";
 		Matcher m = g.lookingAt(s, opt);
 		Match n = m.match();

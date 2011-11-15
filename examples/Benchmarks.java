@@ -77,7 +77,7 @@ public class Benchmarks {
 		long end = System.currentTimeMillis();
 		System.out.println(end - start + " milliseconds\n");
 		Options opt = new Options();
-		opt.longestTokenMatching(false);
+		opt.longestMatch(false);
 		System.out.println(g.describe());
 		System.out.println("with studying");
 		for (int i = 0; i < warmup; i++) {
@@ -126,7 +126,7 @@ public class Benchmarks {
 		System.out.println(end - start + " milliseconds");
 		System.out.println("with studying using LTM");
 		opt.study(true);
-		opt.longestTokenMatching(true);
+		opt.longestMatch(true);
 		for (int i = 0; i < warmup; i++) {
 			if (allMatches) {
 				Matcher m = g.find(s, opt);

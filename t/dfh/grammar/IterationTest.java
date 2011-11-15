@@ -40,7 +40,7 @@ public class IterationTest {
 		Grammar g = new Grammar(rules);
 		String s = "aaa";
 		Options opt = new Options();
-		opt.longestTokenMatching(false);
+		opt.longestMatch(false);
 		opt.allowOverlap(true);
 		Matcher m = g.lookingAt(s, opt);
 		int count = 0;
