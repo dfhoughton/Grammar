@@ -81,8 +81,14 @@ div#footnotes {
 	margin: 1em;
 }
 
+.dictionary_table td {
+	vertical-align: top;
+}
+
 .dictionary_table  td:first-child {
 	padding-right: 1em;
 	font-weight: bold;
 	text-align: right;
+	position: relative;
+	top: -0.2em;
 }

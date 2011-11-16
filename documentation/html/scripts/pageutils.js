@@ -151,7 +151,8 @@ var dfh = {
 	 * contents, replacing the empty 'toc' span with a 'toc' div. Every header
 	 * *which is a child of the body element* will have a link in this table of
 	 * contents. The identation of this line will be a multiple of the number of
-	 * the corresponding header.
+	 * the corresponding header. The headers themselves will all have a 'top' link
+	 * which takes you back to the table of contents.
 	 */
 	toc : function() {
 		var tocSpan = document.getElementById("toc");
@@ -189,7 +190,6 @@ var dfh = {
 					top.setAttribute('class', 'toc_top');
 					top.innerHTML = 'top';
 					n.appendChild(top);
-					// document.body.insertBefore(top, n.nextSibling);
 				}
 				n = n.nextSibling;
 			}
@@ -237,17 +237,24 @@ var dfh = {
 
 	/**
 	 * we look for -- and replace it with an em dash
+	 * except in pre and code elements
+	 * only -- is transformed, not ---, etc.
 	 */
 	mdash : function() {
 		var walker = document.createTreeWalker(document.body,
-				NodeFilter.SHOW_TEXT, null, false);
+				NodeFilter.SHOW_ALL, function(node) {
+					if (node.tagName == "PRE" || node.tagName == "CODE")
+						return NodeFilter.FILTER_REJECT;
+					return NodeFilter.FILTER_ACCEPT;
+				}, false);
 		while (walker.nextNode()) {
-			if (/--/.test(walker.currentNode.nodeValue)) {
+			if (walker.currentNode.nodeType == 3
+					&& /--/.test(walker.currentNode.nodeValue)) {
 				var n = walker.currentNode;
 				var str = n.nodeValue;
-				str = str.replace(/--/g, '\u2014');
+				str = str.replace(/(^|[^-])--(?!-)/mg, '$1\u2014');
 				n.nodeValue = str;
 			}
 		}
 	},
-}
+};

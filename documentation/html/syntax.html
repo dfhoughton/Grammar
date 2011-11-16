@@ -96,10 +96,10 @@
 &lt;r4&gt; = "alt" | "ernation" # a comment
 &lt;r5&gt; = 'c' (condition)</pre>
 	</p>
-	<p>Except in quoting expressions &mdash; a sequence inside a pair
-		of angle brackets, single quotes, double quotes, or forward slashes
-		&mdash; whitespace is ignored, so you can format your rules however
-		you wish; but every rule definition must fit on a single line.</p>
+	<p>Except in quoting expressions -- a sequence inside a pair of
+		angle brackets, single quotes, double quotes, or forward slashes --
+		whitespace is ignored, so you can format your rules however you wish;
+		but every rule definition must fit on a single line.</p>
 	<h3>Root</h3>
 	<pre>&lt;ROOT&gt; = 'some' 'rule'</pre>
 	<p>
@@ -117,9 +117,9 @@
 	<p>
 		The grammar parser ignores blank lines. The comment character is
 		<code>#</code>
-		. If this character appears outside of some quoting construction
-		&mdash; double or single quotes or the forward slashes bracketing a
-		regular expression &mdash; everything after it is ignored.
+		. If this character appears outside of some quoting construction --
+		double or single quotes or the forward slashes bracketing a regular
+		expression -- everything after it is ignored.
 	<pre>
 		
 # this and the previous line are ignored
@@ -156,8 +156,8 @@ rule2 = <b>[</b> 'a'* 'b' <b>]{1}+</b>   # a non-backtracking group</pre>
 		<code>[]</code>
 		. Round brackets are reserved for conditions. Note that
 		<code>dfh.grammar</code>
-		lacks its own character class syntax &mdash; for that you must use
-		Java native regular expressions. Also, there are no subvarieties of
+		lacks its own character class syntax -- for that you must use Java
+		native regular expressions. Also, there are no subvarieties of
 		grouping expressions as there are in Java and Perl. Every group is a
 		capturing group inasmuch as every match retains the entire match tree.
 		There are (currently) no in-line match modifiers; for this you must
@@ -193,8 +193,8 @@ rule2 = <b>[</b> 'a'* 'b' <b>]{1}+</b>   # a non-backtracking group</pre>
 		attempted matches by various rules at various offsets in the character
 		sequence. For non-terminal rules all that is cached is the success or
 		failure of the match. This is to prevent the cache from consuming too
-		much memory &mdash; a particular non-terminal rule can potentially
-		match exponentially many ways at a given offset. Because the number of
+		much memory -- a particular non-terminal rule can potentially match
+		exponentially many ways at a given offset. Because the number of
 		possible terminal matches is linear in the length of the sequence, the
 		whole match object is stored for terminal matches, accelerating the
 		match process.</p>
@@ -243,9 +243,11 @@ rule2 = <b>[</b> 'a'* 'b' <b>]{1}+</b>   # a non-backtracking group</pre>
 		</tr>
 		<tr>
 			<td>r</td>
-			<td>expression is reversible &mdash; if it matches a sequence it
-				will also match the reverse of this sequence &mdash; so it is usable
-				in a lookbehind assertion</td>
+			<td>expression is reversible -- if it matches a sequence it will
+				also match the reverse of this sequence -- or reversed; so it is
+				usable in a lookbehind assertion. In the latter case, where it is
+				reversed, <em>it cannot be used except in backwards assertions</em>.
+			</td>
 		</tr>
 	</table>
 	<p>
@@ -260,8 +262,8 @@ rule2 = <b>[</b> 'a'* 'b' <b>]{1}+</b>   # a non-backtracking group</pre>
 		might wonder why these are necessary at all. It is because
 		<code>dfh.grammar.Grammar</code>
 	<ol>
-		<li>lacks anchor constructs &mdash; <code>\b</code> , <code>^</code>
-			, <code>$</code> , <code>\A</code> , <code>\Z</code> and so forth
+		<li>lacks anchor constructs -- <code>\b</code> , <code>^</code> ,
+			<code>$</code> , <code>\A</code> , <code>\Z</code> and so forth
 		</li>
 		<li>lacks character classes, which are particularly nice in Java</li>
 		<li>lacks modifiers equivalent to <code>Pattern.CASE_INSENSITIVE</code>
@@ -376,10 +378,10 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 		condition slows down the match unacceptably you may need to remove
 		condition testing to a post-processing stage. This has the
 		disadvantage that it is less declarative and may require iterating
-		over a great many matches in post-processing &mdash; you probably will
-		want to iterate over all possible matches, not merely all
-		non-overlapping matches. On the other hand, you will most likely need
-		to apply the test less often than you would in the midst of matching.</p>
+		over a great many matches in post-processing -- you probably will want
+		to iterate over all possible matches, not merely all non-overlapping
+		matches. On the other hand, you will most likely need to apply the
+		test less often than you would in the midst of matching.</p>
 	<h2>Assertions</h2>
 	<p>Assertions are in effect special conditions that may appear
 		anywhere in a rule. They do not move the character matching offset but
@@ -436,12 +438,12 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
         "   b = /\\b\\d++/ !- '2'",// <b>the number must not end in 2</b>
 };</pre>
 	<p>
-		There is no short form to lookbehinds; them must always carry the
+		There is no short form to lookbehinds; they must always carry the
 		suffix
 		<code>-</code>
 		indicating they match backwards from the current offset. Note that you
-		do not write the rule they modify backwards. The grammar compiler will
-		do this for you. So for example
+		do not write the rule backwards that they modify. The grammar compiler
+		will do this for you. So for example
 	</p>
 	<pre>		String[] rules = {
 				//
@@ -474,6 +476,30 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 		<code>dfh.grammar</code>
 		itself.
 	</p>
+	<b>how it works</b>
+	<p>
+		Backwards assertions work by wrapping the relevant portion of the
+		character sequence in a class that in effect reverses it, so character
+		indexes count back from the end and index 0 refers to the last
+		character. To this reversed character sequence it applies a rule
+		identical to the one defined in your grammar but with all sequences
+		reversed, so
+		<code>'cat'</code>
+		covertly becomes
+		<code>'tac'</code>
+		. This reversal of the sequences occurs at compilation time and it
+		works on a copy of the reversed rule tree, so these same rules can be
+		applied in a forward direction elsewhere. Regular expressions, because
+		of their branching, back references, directional assertions, and so
+		forth, are non-trivial to reverse. Also, one could plug in quite vast
+		regular expressions which would take some time to reverse during
+		compilation. The
+		<code>r</code>
+		modifier on a regular expression marks it as reversible or reversed --
+		already written to be used on a reversed sequence. Only palindromic
+		regular expressions may be used both inside and outside backwards
+		assertions.
+	</p>
 	<h3>Backtracking Barriers</h3>
 	A backtracking barrier is a sort of meta-assertion. It says, "the
 	matching engine will not have to revisit this decision or anything that
@@ -492,6 +518,41 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 	The double-colon barrier indicates that if the portion of the rule
 	after the barrier fails to match then the entire grammar fails to match
 	at the current offset in the character sequence.
+	<h2>Named Captures</h2>
+	<pre>&lt;ROOT&gt; = [<b>{a}</b>'a']++
+&lt;ROOT&gt; = [<b>{foo}</b> 'a' /\\s++/ 'b']++ [<b>{bar}</b> 'c'] [<b>{baz,quux}</b> 'd' | 'e']</pre>
+	<p>
+		Some regular expression engines, such as those of Python, Perl, and
+		the PCRE library, provide a syntax for naming captured groups. It
+		began with Python, where the syntax was
+		<code>(?P&lt;name&gt;pattern)</code>
+		. This construction assigns a name to whatever
+		<code>pattern</code>
+		matches, so later one can fetch it for whatever purpose. Other
+		languages then adopted similar syntax for this purpose. Perl, for
+		instance, provides
+		<code>/(?&lt;name&gt;pattern)/</code>
+		. Well, for
+		<code>dfh.grammar</code>
+		I preferred to use the angle brackets, as in BNF, to label rules, so
+		you can assign a label to a group in
+		<code>dfh.grammar</code>
+		using curly brackets instead, as illustrated above.
+	</p>
+	<p>
+		Unlike these various regular expression engines,
+		<code>dfh.grammar</code>
+		always captures and returns the entire match tree, so all the matches
+		are there regardless of whether you've named them or bracketed them.
+		The names merely serve to facilitate finding the bits matched by
+		particular rules. Furthermore, every named rule always tags its match
+		with its name. The curly bracket notation is chiefly useful for what
+		would otherwise be anonymous rules. Also, as illustrated in the second
+		example above, you may provide more than one name inside the curly
+		brackets -- names have the same restrictions as rule labels; the name
+		separator inside the brackets is the comma. This allows you to
+		multiply categorize matches, both dates and numbers, say.
+	</p>
 	<h2>Options</h2>
 	<pre>Matcher m = g.find(s);                                               // <b>use all defaults</b>
 ...
@@ -501,21 +562,23 @@ Options opt = new Options().allowOverlap(true).longestMatch(false);  // <b>optio
 m = g.find(s2, opt);
 ...
 m = g.find(s3, opt);</pre>
-	<p>With
-	<code>java.regex.Matcher</code>
-	matching, one can modify the matching altering various properties of
-	the matcher object separately. With
-	<code>dfh.grammar</code>
-	matching one must pass all the desired options in as a collection when
-	creating the matcher. This improves efficiency and ensures the
-	immutability of its state aside from its position in the sequence of
-	matches over which it is iterating. The parameter collection is an
-	instance of
-	<code>dfh.grammar.Options</code>
-	. Among other things is specifies which should be regarded as the first
-	and last characters in the sub-sequence to match against, whether
-	overlapping matches should be considered, and whether debugging output
-	should be produced.</p>
+	<p>
+		With
+		<code>java.regex.Matcher</code>
+		matching, one can modify the matching altering various properties of
+		the matcher object separately. With
+		<code>dfh.grammar</code>
+		matching one must pass all the desired options in as a collection when
+		creating the matcher. This improves efficiency and ensures the
+		immutability of its state aside from its position in the sequence of
+		matches over which it is iterating. The parameter collection is an
+		instance of
+		<code>dfh.grammar.Options</code>
+		. Among other things is specifies which should be regarded as the
+		first and last characters in the sub-sequence to match against,
+		whether overlapping matches should be considered, and whether
+		debugging output should be produced.
+	</p>
 	<h3>start</h3>
 	<pre>Options opt = new Options().start(10);
 System.out.println(opt.start());       // 10</pre>
