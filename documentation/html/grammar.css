@@ -62,6 +62,15 @@ a.footnote {
 	color: red;
 }
 
+a.toc_top {
+	vertical-align: baseline;
+	font-size: .6em;
+	position: relative;
+	top: -0.6em;
+	color: red;
+	margin-left: 1em;
+}
+
 div#footnotes {
 	margin-top: 1em;
 	padding-top: 1em;
