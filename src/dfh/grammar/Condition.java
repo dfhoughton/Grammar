@@ -10,7 +10,9 @@ import java.io.Serializable;
  * @author David Houghton
  * 
  */
-public interface Condition extends Serializable {
+public abstract class Condition implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Returns whether the {@link Match} meets the given condition.
 	 * <em>Note</em>: a condition should have no mutable state or side effects,
@@ -18,6 +20,10 @@ public interface Condition extends Serializable {
 	 * extent that they have side-effects and mutable state they risk producing
 	 * concurrency issues and/or context dependent bugs that are hard to
 	 * reproduce and fix.
+	 * <p>
+	 * Unless overridden, this method will merely delegate its job to
+	 * {@link #passes(Match, CharSequence)}, ignoring the {@link Matcher}
+	 * argument.
 	 * 
 	 * @param n
 	 *            {@link Match} being tested
@@ -27,5 +33,73 @@ public interface Condition extends Serializable {
 	 *            {@link CharSequence} being matched against
 	 * @return whether the {@link Match} meets the condition
 	 */
-	boolean passes(Match n, Matcher m, CharSequence s);
+	public boolean passes(Match n, Matcher m, CharSequence s) {
+		return passes(n, s);
+	}
+
+	/**
+	 * Returns whether the {@link Match} meets the given condition. See
+	 * {@link #passes(Match, Matcher, CharSequence)} for caveats.
+	 * <p>
+	 * Unless overridden, this method will merely delegate its job to
+	 * {@link #passes(CharSequence)}, ignoring the {@link Match} argument. The
+	 * {@link CharSequence} passed will have its order corrected via
+	 * {@link #subsequence(Match, CharSequence)}, so in a backwards assertion
+	 * {@link #passes(CharSequence)} will not see a reversed sequence.
+	 * 
+	 * @param n
+	 *            {@link Match} being tested
+	 * @param s
+	 *            {@link CharSequence} being matched against
+	 * @return whether the {@link Match} meets the condition
+	 */
+	public boolean passes(Match n, CharSequence s) {
+		return passes(subsequence(n, s));
+	}
+
+	/**
+	 * Whether the character subsequence matched meets the given condition.
+	 * Unless overridden, this method will always return <code>true</code>. See
+	 * {@link #passes(Match, Matcher, CharSequence)} for caveats.
+	 * 
+	 * @param s
+	 *            {@link CharSequence} being matched against
+	 * @return whether the subsequence matched meets the condition
+	 */
+	public boolean passes(CharSequence subsequence) {
+		return true;
+	}
+
+	/**
+	 * Character subsequence of {@link CharSequence} matched by given
+	 * {@link Match}. The order of the subsequence will be fixed in the case
+	 * where it has been reversed inside a backwards assertion. This ensures
+	 * that the same condition can be used inside and outside lookbehind
+	 * assertions as in
+	 * 
+	 * <pre>
+	 * a = ~- &lt;b&gt; 'foo' &lt;b&gt;
+	 * b = /\d++/r (greater_than_5)
+	 * </pre>
+	 * 
+	 * Without correcting for reversion, <i>10foo10</i> would fail to match
+	 * <code>&lt;a&gt;</code> because the condition would see <i>01</i> rather
+	 * than <i>10</i> when tested for the first <code>&lt;b&gt;</code>.
+	 * 
+	 * @param n
+	 *            {@link Match} found in character sequence
+	 * @param s
+	 *            {@link CharSequence} matched against
+	 * @return order-adjusted subsequence matched
+	 */
+	public static CharSequence subsequence(Match n, CharSequence s) {
+		if (s instanceof ReversedCharSequence
+				&& ((ReversedCharSequence) s).isReversed()) {
+			StringBuilder b = new StringBuilder(n.end() - n.start());
+			for (int i = n.end() - 1; i >= n.start(); i--)
+				b.append(s.charAt(i));
+			return b;
+		}
+		return s.subSequence(n.start(), n.end());
+	}
 }

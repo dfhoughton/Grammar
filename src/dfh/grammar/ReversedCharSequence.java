@@ -17,6 +17,7 @@ public class ReversedCharSequence implements CharSequence {
 
 	private final int zero, end, length;
 	private final CharSequence s;
+	private final boolean reversed;
 
 	/**
 	 * @param s
@@ -32,6 +33,8 @@ public class ReversedCharSequence implements CharSequence {
 	public ReversedCharSequence(CharSequence s, int offset, int end) {
 		this.s = s;
 		this.end = end - 1;
+		this.reversed = s instanceof ReversedCharSequence ? !((ReversedCharSequence) s)
+				.isReversed() : true;
 		if (end < -1 || offset > s.length()) {
 			String baseError = "reversed character sequence must be a subsequence of parent sequence";
 			if (end < -1)
@@ -113,5 +116,15 @@ public class ReversedCharSequence implements CharSequence {
 			seq = ((ReversedCharSequence) seq).s;
 		}
 		return seq;
+	}
+
+	/**
+	 * Returns whether this sequence is reversed relative to the base sequence.
+	 * This will necessarily be true except within nested backwards assertions.
+	 * 
+	 * @return whether this sequence is reversed relative to the base sequence
+	 */
+	public boolean isReversed() {
+		return reversed;
 	}
 }
