@@ -3,3 +3,7 @@
   * began Changelog
   * made regexes repeatable
   * renamed longestTokenMatching to longestMatch
+  * converted Condition from interface to abstract class and added code
+    to handle reversed character sequences
+  * added method to ReversedCharSequence to show whether it is reversed
+    relative to the base sequence
