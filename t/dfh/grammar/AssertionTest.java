@@ -10,8 +10,7 @@ import org.junit.Test;
 /**
  * Makes sure zero-width assertions work as advertised.
  * 
- * TODO: make forwards and backwards tests for {@link BacktrackingBarrier},
- * {@link RepetitionRule}
+ * TODO: make forwards and backwards tests for {@link BacktrackingBarrier}
  * 
  * <b>Creation date:</b> Mar 28, 2011
  * 
@@ -390,7 +389,7 @@ public class AssertionTest {
 	}
 
 	@Test
-	public void doubleReversedAssertionTest() throws GrammarException,
+	public void doubleReversedAssertionTest1() throws GrammarException,
 			IOException {
 		String[] rules = {
 				//
@@ -405,6 +404,24 @@ public class AssertionTest {
 		while (m.match() != null)
 			count++;
 		assertTrue("found match", count == 2);
+	}
+
+	@Test
+	public void doubleReversedAssertionTest2() throws GrammarException,
+			IOException {
+		String[] rules = {
+				//
+				"<ROOT> = ~- <b> 'foo'",//
+				"<b> = ~- <a> 'bar'",//
+				"<a> = 'quux'",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "quuxbarfoo";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found match", count == 1);
 	}
 
 	@Test
@@ -441,4 +458,37 @@ public class AssertionTest {
 			count++;
 		assertTrue("found match", count == 2);
 	}
+
+	@Test
+	public void forwardsRepetitionTest() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = 'foo' ~<b>",//
+				"<b> = 'bar'{1,3} !'bar'",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "foobar foobarbar foobarbarbarbar";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found match", count == 2);
+	}
+
+	@Test
+	public void backwardsRepetitionTest() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = ~-<b> 'foo'",//
+				"<b> = !- 'bar' 'bar'{1,3}",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "barfoo barbarfoo barbarbarbarfoo";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found match", count == 2);
+	}
+
 }

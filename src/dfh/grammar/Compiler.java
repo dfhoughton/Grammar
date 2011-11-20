@@ -673,12 +673,11 @@ public class Compiler {
 					ar.tagMap));
 		} else if (sr instanceof Assertion) {
 			Assertion as = (Assertion) sr;
-			Rule child = reverse(as.r);
+			Rule child = as.forward ? reverse(as.r) : as.r;
 			String id = (as.positive ? '~' : '!') + (as.forward ? "-" : "+")
 					+ subLabel(child);
 			Label l = new Label(Type.nonTerminal, id);
-			ru = new Assertion(l, reverse(((Assertion) sr).r), as.positive,
-					!as.forward);
+			ru = new Assertion(l, child, as.positive, !as.forward);
 		} else if (sr instanceof BackReferenceRule) {
 			ru = sr;
 		} else if (sr instanceof BacktrackingBarrier) {
