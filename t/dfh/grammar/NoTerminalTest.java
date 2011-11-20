@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -20,7 +21,8 @@ public class NoTerminalTest {
 			new Grammar(rules);
 			fail("error should be thrown when compiling a grammar with no possible terminal rules");
 		} catch (GrammarException e) {
-			System.err.println(e.getMessage());
+			assertTrue("found cycle",
+					e.getMessage().indexOf("cycle found") > -1);
 		}
 	}
 }
