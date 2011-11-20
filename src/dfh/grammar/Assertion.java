@@ -44,7 +44,8 @@ public class Assertion extends Rule {
 		public Match match() {
 			if (fresh) {
 				fresh = false;
-				CachedMatch cm = subCache.get(offset); // TODO: should we check cache here at all?
+				CachedMatch cm = subCache.get(offset); // TODO: should we check
+														// cache here at all?
 				if (cm == null) {
 					Match n = r.matcher(s, backward ? 0 : offset, cache, this)
 							.match();

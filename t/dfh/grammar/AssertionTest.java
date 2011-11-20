@@ -11,8 +11,7 @@ import org.junit.Test;
  * Makes sure zero-width assertions work as advertised.
  * 
  * TODO: make forwards and backwards tests for {@link BacktrackingBarrier},
- * {@link RepetitionRule}; forward test for {@link Assertion},
- * {@link BackReferenceRule}
+ * {@link RepetitionRule}; forward test for {@link BackReferenceRule}
  * 
  * <b>Creation date:</b> Mar 28, 2011
  * 
@@ -401,6 +400,24 @@ public class AssertionTest {
 		};
 		Grammar g = new Grammar(rules);
 		String s = "5barfoo 11barfoo";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found match", count == 2);
+	}
+
+	@Test
+	public void doubleForwardAssertionTest() throws GrammarException,
+			IOException {
+		String[] rules = {
+				//
+				"<ROOT> = 'foo' ~<b>",//
+				"<b> = 'bar' ~<a>",//
+				"<a> = /(?<!\\d)\\d++(?!\\d)/r",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "foobar5 foobar5";
 		Matcher m = g.find(s);
 		int count = 0;
 		while (m.match() != null)
