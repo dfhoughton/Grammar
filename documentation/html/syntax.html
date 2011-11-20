@@ -493,12 +493,31 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 		of their branching, back references, directional assertions, and so
 		forth, are non-trivial to reverse. Also, one could plug in quite vast
 		regular expressions which would take some time to reverse during
-		compilation. The
+		compilation. Furthermore, backreferences make some regular expressions
+		virtually impossible to handle by reversing the sequence.
+	</p>
+	<p>
+		The
 		<code>r</code>
 		modifier on a regular expression marks it as reversible or reversed --
 		already written to be used on a reversed sequence. Only palindromic
 		regular expressions may be used both inside and outside backwards
 		assertions.
+	</p>
+	<p>Backtracking barriers may produce confusing results if used in a
+		backwards assertion. Consider the rules</p>
+	<pre>ROOT = ~- &lt;a&gt; 'bar'
+   a = 'b'+ : 'bc'</pre>
+	<p>
+		Looking at rule
+		<code>&lt;a&gt;</code>
+		it appears that it will always fail to match. First it matches a
+		sequence of one or more <i>b</i>s. Then it puts up a barrier to any
+		backtracking. Then it attempts to match another <i>b</i>. But it
+		already matched all the <i>b</i>s it could find, so it must fail! But
+		matching from right to left, as the backwards assertion does, means it
+		can grab a <i>b</i> before hitting the barrier. In fact, in this case
+		the grammar will match <i>bbcbar</i>.
 	</p>
 	<h3>Backtracking Barriers</h3>
 	A backtracking barrier is a sort of meta-assertion. It says, "the
@@ -507,7 +526,7 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 	<code>(?&gt;&nbsp;...&nbsp;)</code>
 	in Perl-compatible regular expressions or possessive quantification. It
 	makes matching more tractable by eliminating at one stroke some number
-	of permutations in the matching engine's search space.'
+	of permutations in the matching engine's search space.
 	<h4>:</h4>
 	The single-colon barrier indicates that the rule containing it fails if
 	it cannot complete the match after the the barrier without revisiting
