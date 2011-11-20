@@ -10,8 +10,6 @@ import org.junit.Test;
 /**
  * Makes sure zero-width assertions work as advertised.
  * 
- * TODO: make forwards and backwards tests for {@link BacktrackingBarrier}
- * 
  * <b>Creation date:</b> Mar 28, 2011
  * 
  * @author David Houghton
@@ -491,4 +489,20 @@ public class AssertionTest {
 		assertTrue("found match", count == 2);
 	}
 
+	@Test
+	public void forwardsBacktrackingBarrier() throws GrammarException,
+			IOException {
+		String[] rules = {
+				//
+				"<ROOT> = 'a' ~ <b>",//
+				"<b> = 'b'+ : 'bc'",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "abbc";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("could not match due to barrier", count == 0);
+	}
 }

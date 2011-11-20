@@ -55,7 +55,7 @@ public class BacktrackingBarrierTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			fail("didn't catch singleton '::' error");
+			fail("didn't catch initial '::' error");
 		} catch (Exception e) {
 		}
 	}
@@ -97,7 +97,7 @@ public class BacktrackingBarrierTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			fail("didn't too many colons error");
+			fail("didn't catch too many colons error");
 		} catch (Exception e) {
 		}
 	}
