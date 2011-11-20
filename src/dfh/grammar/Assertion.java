@@ -44,7 +44,7 @@ public class Assertion extends Rule {
 		public Match match() {
 			if (fresh) {
 				fresh = false;
-				CachedMatch cm = subCache.get(offset);
+				CachedMatch cm = subCache.get(offset); // TODO: should we check cache here at all?
 				if (cm == null) {
 					Match n = r.matcher(s, backward ? 0 : offset, cache, this)
 							.match();
@@ -131,7 +131,7 @@ public class Assertion extends Rule {
 
 	}
 
-	protected final Rule r;
+	protected Rule r;
 	protected final boolean positive;
 	protected final boolean forward;
 	private String subDescription;
@@ -159,6 +159,7 @@ public class Assertion extends Rule {
 	protected String uniqueId() {
 		StringBuilder b = new StringBuilder();
 		b.append(positive ? '~' : '!');
+		b.append(forward ? '+' : '-');
 		b.append(r.uniqueId());
 		return b.toString();
 	}

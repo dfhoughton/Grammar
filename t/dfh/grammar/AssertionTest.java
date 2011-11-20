@@ -11,7 +11,8 @@ import org.junit.Test;
  * Makes sure zero-width assertions work as advertised.
  * 
  * TODO: make forwards and backwards tests for {@link BacktrackingBarrier},
- * {@link BackReferenceRule}, {@link RepetitionRule}, {@link Assertion}
+ * {@link RepetitionRule}; forward test for {@link Assertion},
+ * {@link BackReferenceRule}
  * 
  * <b>Creation date:</b> Mar 28, 2011
  * 
@@ -370,6 +371,7 @@ public class AssertionTest {
 				"used back reference in simple positive native backwards assertion",
 				count == 2);
 	}
+
 	@Test
 	public void nativePostiveBackwardsWithDoubleBackReference()
 			throws GrammarException, IOException {
@@ -378,13 +380,32 @@ public class AssertionTest {
 		"<ROOT> = ~-[ ['_'|'-'] 'foo' 1 'quux' 1 ] 'bar'",//
 		};
 		Grammar g = new Grammar(rules);
-		Matcher m = g.find("-foo-quux-bar _foo_quux_bar -foo_quux_bar _foo-quux-bar");
+		Matcher m = g
+				.find("-foo-quux-bar _foo_quux_bar -foo_quux_bar _foo-quux-bar");
 		int count = 0;
 		while (m.match() != null)
 			count++;
 		assertTrue(
 				"used back reference in simple positive native backwards assertion",
 				count == 2);
+	}
+
+	@Test
+	public void doubleReversedAssertionTest() throws GrammarException,
+			IOException {
+		String[] rules = {
+				//
+				"<ROOT> = ~- <b> 'foo'",//
+				"<b> = ~- <a> 'bar'",//
+				"<a> = /(?<!\\d)\\d++(?!\\d)/r",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "5barfoo 11barfoo";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found match", count == 2);
 	}
 
 }

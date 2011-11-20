@@ -501,7 +501,8 @@ public class Compiler {
 				subDescription = b.toString();
 				sr = reverse(sr);
 			}
-			String id = (af.positive ? '~' : '!') + subLabel(sr);
+			String id = (af.positive ? '~' : '!') + (af.forward ? "+" : "-")
+					+ subLabel(sr);
 			Label l = new Label(Type.nonTerminal, id);
 			Assertion a = new Assertion(l, sr, af.positive, af.forward);
 			a.condition = condition;
@@ -673,9 +674,11 @@ public class Compiler {
 		} else if (sr instanceof Assertion) {
 			Assertion as = (Assertion) sr;
 			Rule child = reverse(as.r);
-			String id = (as.positive ? '~' : '!') + subLabel(child);
+			String id = (as.positive ? '~' : '!') + (as.forward ? "-" : "+")
+					+ subLabel(child);
 			Label l = new Label(Type.nonTerminal, id);
-			ru = new Assertion(l, sr, as.positive, as.forward);
+			ru = new Assertion(l, reverse(((Assertion) sr).r), as.positive,
+					!as.forward);
 		} else if (sr instanceof BackReferenceRule) {
 			ru = sr;
 		} else if (sr instanceof BacktrackingBarrier) {
@@ -686,7 +689,7 @@ public class Compiler {
 				throw new GrammarException(
 						"terminal rule "
 								+ lr
-								+ " has not been marked as reversible; it cannot be used in a backwards asswertion");
+								+ " has not been marked as reversible; it cannot be used in a backwards assertion");
 			ru = lr;
 		} else if (sr instanceof LiteralRule) {
 			LiteralRule lr = (LiteralRule) sr;
@@ -704,10 +707,10 @@ public class Compiler {
 					new HashSet<String>(rr.alternateTags));
 		} else if (sr instanceof SequenceRule) {
 			SequenceRule sqr = (SequenceRule) sr;
-			// reverse order of last backreference in sequence and submatch 
+			// reverse order of last backreference in sequence and submatch
 			// referred to before reversing order of entire sequence
 			Set<Integer> swapped = new HashSet<Integer>(sqr.sequence.length);
-			for (int i = sqr.sequence.length - 1; i >=0 ; i--) {
+			for (int i = sqr.sequence.length - 1; i >= 0; i--) {
 				if (sqr.sequence[i] instanceof BackReferenceRule) {
 					BackReferenceRule temp = (BackReferenceRule) sqr.sequence[i];
 					if (swapped.contains(temp.index))

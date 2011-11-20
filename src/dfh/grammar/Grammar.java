@@ -1292,6 +1292,10 @@ public class Grammar implements Serializable, Cloneable {
 				CyclicRule cr = (CyclicRule) r;
 				if (cr.r == ru)
 					cr.r = nru;
+			} else if (r instanceof Assertion) {
+				Assertion a = (Assertion) r;
+				if (a.r == ru)
+					a.r = nru;
 			}
 		}
 	}
