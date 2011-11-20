@@ -18,7 +18,7 @@ import org.junit.Test;
 public class ConditionTest {
 
 	@Test
-	public void leafTest() throws GrammarException, IOException {
+	public void leafTest1() throws GrammarException, IOException {
 		String[] rules = {
 		//
 		"<ROOT> = /\\b\\d++\\b/ (less_than_100)",//
@@ -229,6 +229,139 @@ public class ConditionTest {
 		while (m.match() != null)
 			count2++;
 		assertTrue("changed match count", count1 == 3 && count2 == 2);
+	}
+
+	@Test
+	public void leafTest2() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = /\\b\\d++\\b/ (less_than_100)",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("less_than_100", new Condition() {
+			@Override
+			public boolean passes(Match m, CharSequence s) {
+				int i = Integer.parseInt(s.subSequence(m.start(), m.end())
+						.toString());
+				return i < 100;
+			}
+		});
+		String s = "99 100 1000";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("only found value lower than 100", count == 1);
+	}
+
+	@Test
+	public void leafTest3() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = /\\b\\d++\\b/ (less_than_100)",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("less_than_100", new Condition() {
+			@Override
+			public boolean passes(CharSequence s) {
+				int i = Integer.parseInt(s.toString());
+				return i < 100;
+			}
+		});
+		String s = "99 100 1000";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("only found value lower than 100", count == 1);
+	}
+
+	@Test
+	public void integerConditionTest() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = /\\b\\d++\\b/ (less_than_100)",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("less_than_100", new IntegerCondition() {
+			@Override
+			public boolean passes(int i) {
+				return i < 100;
+			}
+		});
+		String s = "99 100 1000";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("only found value lower than 100", count == 1);
+	}
+
+	@Test
+	public void doubleConditionTest() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = /\\b\\d++(?:\\.\\d++)?\\b/ (less_than_100)",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("less_than_100", new FloatingPointCondition() {
+			@Override
+			public boolean passes(double d) {
+				return d < 100;
+			}
+		});
+		String s = "9.9 100 1000";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("only found value lower than 100", count == 1);
+	}
+
+	@Test
+	public void reversedConditionTest() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = ~- <b> 'foo' ~ <b>",//
+				"<b> = /(?<!\\d)\\d++(?!\\d)/r (range_5_to_10)",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("range_5_to_10", new IntegerCondition() {
+			@Override
+			public boolean passes(int i) {
+				return i >= 5 && i <= 10;
+			}
+		});
+		String s = "10foo10 4foo11";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found match", count == 1);
+	}
+
+	@Test
+	public void doubleReversedConditionTest() throws GrammarException,
+			IOException {
+		String[] rules = {
+				//
+				"<ROOT> = ~- <b> 'foo'",//
+				"<b> = ~- <a> 'bar'",//
+				"<a> = /(?<!\\d)\\d++(?!\\d)/r (range_5_to_10)",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("range_5_to_10", new IntegerCondition() {
+			@Override
+			public boolean passes(int i) {
+				return i >= 5 && i <= 10;
+			}
+		});
+		String s = "5barfoo 11barfoo";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found match", count == 1);
 	}
 
 }
