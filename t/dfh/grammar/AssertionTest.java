@@ -423,6 +423,25 @@ public class AssertionTest {
 	}
 
 	@Test
+	public void tripleReversedAssertionTest() throws GrammarException,
+			IOException {
+		String[] rules = {
+				//
+				"<ROOT> = ~- <b> 'foo'",//
+				"<b> = ~- <a> 'bar'",//
+				"<a> = ~- <c> 'quux'",//
+				"<c> = 'baz'",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "bazquuxbarfoo";
+		Matcher m = g.find(s);
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("found match", count == 1);
+	}
+
+	@Test
 	public void doubleForwardAssertionTest() throws GrammarException,
 			IOException {
 		String[] rules = {
