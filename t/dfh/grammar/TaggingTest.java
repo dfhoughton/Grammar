@@ -49,7 +49,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  ba\tbcd";
 		Match m = g.matches(s).match();
-		assertNotNull(m.getFirst("foo"));
+		assertNotNull(m.choose("foo"));
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  ba\tbcd";
 		Match m = g.matches(s).match();
-		assertNotNull(m.getFirst("bar"));
+		assertNotNull(m.choose("bar"));
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  ba\tbcd";
 		Match m = g.matches(s).match();
-		assertNotNull(m.getFirst("baz"));
+		assertNotNull(m.choose("baz"));
 	}
 
 	@Test
@@ -85,7 +85,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  ba\tbcd";
 		Match m = g.matches(s).match();
-		assertNotNull(m.getFirst("quux"));
+		assertNotNull(m.choose("quux"));
 	}
 
 	@Test
@@ -99,7 +99,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  a";
 		Match m = g.matches(s).match();
-		assertNotNull(m.getFirst("a"));
+		assertNotNull(m.choose("a"));
 	}
 
 	@Test
@@ -113,7 +113,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  a";
 		Match m = g.matches(s).match();
-		assertNotNull(m.getFirst("b"));
+		assertNotNull(m.choose("b"));
 	}
 
 	@Test
@@ -128,7 +128,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  a";
 		Match m = g.matches(s).match();
-		assertNotNull(m.getFirst("a"));
+		assertNotNull(m.choose("a"));
 	}
 
 	@Test
@@ -142,7 +142,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  a";
 		Match m = g.matches(s).match();
-		assertNotNull(m.getFirst("c"));
+		assertNotNull(m.choose("c"));
 	}
 
 	@Test
