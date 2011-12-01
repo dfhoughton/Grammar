@@ -9,3 +9,4 @@
     relative to the base sequence
   * replaced Match.getFirst(MatchTest) with Match.choose(MatchTest); new
     method is slightly more efficient
+  * added overlap() method to Match to facilitate finding overlapping matches

@@ -626,4 +626,16 @@ public class Match {
 	public boolean selfOrAncestorPasses(MatchTest t) {
 		return t.test(this) || ancestorPasses(t);
 	}
+
+	/**
+	 * Tests whether the two matches cover a common subsequence.
+	 * 
+	 * @param other
+	 * @return whether matches have a common subsequence
+	 */
+	public boolean overlaps(Match other) {
+		if (end <= other.start || other.end <= start)
+			return false;
+		return true;
+	}
 }
