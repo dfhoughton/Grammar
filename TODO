@@ -1,8 +1,8 @@
-Desired items are preceded by a '.'; completed items, by a '*'.
+Desired items are preceded by a '.'; completed items, by a '*'; discarded items, by a '-'.
 
 * change parsing rules so that angle brackets are only required to the right of '='
 * parameterize describe() so it either alphabetizes of lists rules in order of dependence
-. implement regex reversal
+- implement regex reversal
 * implement tagging
 * implement in-line regexes
 * implement reversibility of externally defined rules
@@ -10,3 +10,6 @@ Desired items are preceded by a '.'; completed items, by a '*'.
 * change default study value based on match type
 * fix external rule renaming bug
 * preserve rightmost offset matched to to improve debugging
+. allow boolean combinations of conditions
+. allow special notation for non-reversible, non-same-rule backreferences
+. allow notation to selectively disable studying of certain expressions
