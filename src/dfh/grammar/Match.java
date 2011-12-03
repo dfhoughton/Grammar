@@ -98,6 +98,7 @@ public class Match {
 	private int end = -1;
 	private Match parent;
 	private Match[] children;
+	private String group;
 	/**
 	 * Used as a placeholder in offset cache.
 	 */
@@ -637,5 +638,34 @@ public class Match {
 		if (end <= other.start || other.end <= start)
 			return false;
 		return true;
+	}
+
+	/**
+	 * Returns a string corresponding to the subsequence matched.
+	 * <p>
+	 * Note that the group is not recorded until the {@link Match} is returned
+	 * by the {@link Grammar}, so this string isn't available during the
+	 * matching process. If you need this during debugging you'll have to use
+	 * {@link CharSequence#subSequence(int, int)}, using {@link Match#start()}
+	 * and {@link Match#end()} as the two parameters.
+	 * 
+	 * @return a string corresponding to the subsequence matched
+	 */
+	public String group() {
+		return group;
+	}
+
+	/**
+	 * Records subsequence this match corresponds to.
+	 * 
+	 * @param s
+	 *            mother sequence of match
+	 */
+	void setGroup(CharSequence s) {
+		group = s.subSequence(start, end).toString();
+		if (children != null) {
+			for (Match child : children)
+				child.setGroup(s);
+		}
 	}
 }

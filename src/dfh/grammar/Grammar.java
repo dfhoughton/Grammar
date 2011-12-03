@@ -212,8 +212,10 @@ public class Grammar implements Serializable, Cloneable {
 			if (mightHaveNext()) {
 				Match n = next;
 				next = fetchNext();
-				if (n != null)
+				if (n != null) {
 					n.establishParentage();
+					n.setGroup(s);
+				}
 				return n;
 			}
 			return null;
@@ -743,8 +745,10 @@ public class Grammar implements Serializable, Cloneable {
 					} catch (DoubleColonBarrier e) {
 						return null;
 					}
-					if (n != null)
+					if (n != null) {
 						n.establishParentage();
+						n.setGroup(s);
+					}
 				}
 				return n;
 			}
@@ -776,8 +780,10 @@ public class Grammar implements Serializable, Cloneable {
 					} catch (DoubleColonBarrier e) {
 						return null;
 					}
-					if (n != null)
+					if (n != null) {
 						n.establishParentage();
+						n.setGroup(s);
+					}
 				}
 				return n;
 			}
@@ -1003,8 +1009,10 @@ public class Grammar implements Serializable, Cloneable {
 					Match n = next;
 					next = fetchNext();
 					matchedOnce = true;
-					if (n != null)
+					if (n != null) {
 						n.establishParentage();
+						n.setGroup(s);
+					}
 					return n;
 				}
 				return null;
