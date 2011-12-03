@@ -3,15 +3,15 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>dfh.grammar.Grammar</title>
-<link href="grammar.css" rel="stylesheet" type="text/css">
+<link href="../css/dfh.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="headers.json"></script>
-<script type="text/javascript" src="scripts/pageutils.js"></script>
+<script type="text/javascript" src="../scripts/pageutils.js"></script>
 </head>
 <body onLoad="dfh.prepare('performance', 'dfh.grammar')">
 	<span id="toc"></span>
 	<h2>Issues</h2>
 	<h2>Benchmarks</h2>
-	<pre>20000 JIT warmup iterations
+	<pre class="results">20000 JIT warmup iterations
 50000 test iterations
 
 =============
@@ -19,61 +19,61 @@
 string: qewrqewrqewraqwreqewr
 
 pattern: [ab]
-34 milliseconds
+56 milliseconds
 
-&lt;ROOT&gt; = "a" | "b"
+ROOT = "a" | "b"
 
 with studying
-305 milliseconds
+170 milliseconds
 without studying
-829 milliseconds
+550 milliseconds
 with studying using LTM
-106 milliseconds
+110 milliseconds
 
 =============
 
 string: foo bar
 
 pattern: foo\s++bar|quux\s++baz
-27 milliseconds
+35 milliseconds
 
-&lt;ROOT&gt; = &lt;a&gt; | &lt;b&gt;
+ROOT = &lt;a&gt; | &lt;b&gt;
 
-   &lt;a&gt; = &lt;foo&gt; &lt;s&gt; &lt;bar&gt;
-   &lt;b&gt; = &lt;quux&gt; &lt;s&gt; &lt;baz&gt;
- &lt;bar&gt; = /bar/
- &lt;baz&gt; = /baz/
- &lt;foo&gt; = /foo/
-&lt;quux&gt; = /quux/
-   &lt;s&gt; = /\s++/
+   a = &lt;foo&gt; &lt;s&gt; &lt;bar&gt;
+   b = &lt;quux&gt; &lt;s&gt; &lt;baz&gt;
+ bar = /bar/
+ baz = /baz/
+ foo = /foo/
+quux = /quux/
+   s = /\s++/
 
 with studying
-434 milliseconds
+353 milliseconds
 without studying
-336 milliseconds
+340 milliseconds
 with studying using LTM
-307 milliseconds
+353 milliseconds
 
 =============
 
 string: aabb
 
 pattern: (?:a{0,2}|a{0,2}b){2}b
-22 milliseconds
+17 milliseconds
 
-&lt;ROOT&gt; = [ &lt;c&gt; | &lt;d&gt; ]{2} &lt;d&gt;
+ROOT = [ &lt;c&gt; | &lt;d&gt; ]{2} &lt;d&gt;
 
-   &lt;c&gt; = &lt;a&gt;{,2}
-   &lt;d&gt; = &lt;a&gt; &lt;b&gt;
-   &lt;a&gt; = /a/
-   &lt;b&gt; = /b/
+   c = &lt;a&gt;{,2}
+   d = &lt;a&gt; &lt;b&gt;
+   a = /a/
+   b = /b/
 
 with studying
-508 milliseconds
+524 milliseconds
 without studying
-509 milliseconds
+521 milliseconds
 with studying using LTM
-733 milliseconds
+837 milliseconds
 
 =============
 
@@ -82,51 +82,51 @@ string: qewrqewrqewraqwreqewr
 pattern: [ab]
 13 milliseconds
 
-&lt;ROOT&gt; = &lt;c&gt; | &lt;d&gt;
+ROOT = &lt;c&gt; | &lt;d&gt;
 
-   &lt;c&gt; = /a/
-   &lt;d&gt; = /b/
+   c = /a/
+   d = /b/
 
 with studying
-162 milliseconds
+173 milliseconds
 without studying
-746 milliseconds
+804 milliseconds
 with studying using LTM
-176 milliseconds
+181 milliseconds
 
 =============
 
 string: aabb
 
 pattern: (?:a{0,2}|ab){2}ab
-26 milliseconds
+24 milliseconds
 
-&lt;ROOT&gt; = [ &lt;a&gt; | &lt;b&gt; ]{2} &lt;b&gt;
+ROOT = [ &lt;a&gt; | &lt;b&gt; ]{2} &lt;b&gt;
 
-   &lt;a&gt; = "a"{,2}
-   &lt;b&gt; = "ab"
+   a = "a"{,2}
+   b = "ab"
 
 with studying
-364 milliseconds
+379 milliseconds
 without studying
-391 milliseconds
+410 milliseconds
 with studying using LTM
-544 milliseconds
+567 milliseconds
 
 =============
 
 string: __________cat__________dog__________monkey__________cat_____... (length 13999)
 
 pattern: cat|dog|monkey
-41609 milliseconds
+40899 milliseconds
 
-&lt;ROOT&gt; = "cat" | "dog" | "monkey"
+ROOT = "cat" | "dog" | "monkey"
 
 with studying
-67240 milliseconds
+68686 milliseconds
 without studying
-80010 milliseconds
+81711 milliseconds
 with studying using LTM
-79952 milliseconds</pre>
+81584 milliseconds</pre>
 </body>
 </html>
