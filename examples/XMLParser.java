@@ -30,7 +30,7 @@ public class XMLParser {
 			"  <attribute> = <tag> '=' [ \"'\" <squote> \"'\" | '\"' <dquote> '\"' ]",//
 			"    <content> = [ <c> | <entity> ]++",//
 			"          <c> = /[^&<]/",//
-			"    <comment> = /(?s:<!--.*?-->)/",//
+			"    <comment> = /(?s:<!--.*?-->)/ ::",//
 			"<declaration> = /<\\?xml[\\s&&[^\\n]]++version=([\"'])\\d++(?:\\.\\d++)?\\1[\\s&&[^\\n]]++encoding=([\"'])[\\w-]++\\2[\\s&&[^\\n]]*+\\?>\\n/",//
 			"     <dquote> = /[^\\n\"]*+/",//
 			"     <entity> = /&(?:#(?:\\d++|x[\\da-f]++)|\\w++);/",//
@@ -75,17 +75,17 @@ public class XMLParser {
 
 				System.out.println("COMMENTS:");
 				for (Match n : m.get("comment")) {
-					System.out.println(s.substring(n.start(), n.end()));
+					System.out.println(n.group());
 				}
 				System.out.println();
 				System.out.println("ENTITIES:");
 				for (Match n : m.get("entity")) {
-					System.out.println(s.substring(n.start(), n.end()));
+					System.out.println(n.group());
 				}
 				System.out.println();
 				System.out.println("CONTENT:");
 				for (Match n : m.get("content")) {
-					System.out.println(s.substring(n.start(), n.end()));
+					System.out.println(n.group());
 				}
 			} else
 				System.out.println("invalid XML document");

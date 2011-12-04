@@ -1,11 +1,9 @@
 import java.io.IOException;
 
-import dfh.grammar.Condition;
 import dfh.grammar.Grammar;
 import dfh.grammar.GrammarException;
 import dfh.grammar.Match;
 import dfh.grammar.Matcher;
-import dfh.grammar.Options;
 
 public class BackwardsAssertionExample {
 
