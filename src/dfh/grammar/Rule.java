@@ -1,6 +1,9 @@
 package dfh.grammar;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -111,7 +114,7 @@ public abstract class Rule implements Serializable {
 	 */
 	protected final void matchTrace(Matcher m) {
 		StringBuilder b = new StringBuilder();
-		b.append('\n').append(label());
+		b.append("\nmatching ").append(label()).append("\n\t");
 		locate(b, m.s, m.offset);
 		stackTrace(b, m);
 		m.options.trace.println(b);
@@ -134,17 +137,21 @@ public abstract class Rule implements Serializable {
 	}
 
 	private void stackTrace(StringBuilder b, Matcher m) {
-		b.append("\nstack:\n");
+		b.append("\nstack:\n\t");
+		List<String> labels = new ArrayList<String>();
 		while (m.rule() != null) {
-			b.append(m.rule().label());
-			b.append(' ');
-			b.append(m.offset);
-			if (m.master == null)
-				break;
-			else {
-				b.append(" :: ");
+			labels.add(String.format("%s %d", m.rule().label(), m.offset));
+			if (m.master != null)
 				m = m.master;
-			}
+		}
+		Collections.reverse(labels);
+		boolean nonInitial = false;
+		for (String s : labels) {
+			if (nonInitial)
+				b.append(" :: ");
+			else
+				nonInitial = true;
+			b.append(s);
 		}
 	}
 
@@ -155,6 +162,8 @@ public abstract class Rule implements Serializable {
 		int start = Math.max(0, offset - 5);
 		int end = Math.min(s.length(), offset + 5);
 		if (start < offset) {
+			if (start > 0)
+				b.append("...");
 			b.append('"');
 			b.append(s.subSequence(start, offset));
 			b.append('"');
@@ -164,6 +173,8 @@ public abstract class Rule implements Serializable {
 			b.append('"');
 			b.append(s.subSequence(offset, end));
 			b.append('"');
+			if (end < s.length())
+				b.append("...");
 		}
 		b.append(')');
 	}
@@ -179,17 +190,12 @@ public abstract class Rule implements Serializable {
 	 */
 	protected final void matchTrace(Matcher m, Match n) {
 		StringBuilder b = new StringBuilder();
-		b.append("post match:\n");
-		b.append(label());
-		locate(b, m.s, m.offset);
-		b.append(" returning ");
-		b.append(n);
-		if (n != null) {
-			b.append(" = '");
-			b.append(m.s.subSequence(n.start(), n.end()));
-			b.append('\'');
-		}
-		stackTrace(b, m);
+		b.append("result for ").append(m.rule().label).append("\n\t");
+		if (n == null)
+			b.append("NO MATCH");
+		else
+			b.append(String.format("(%d, %d) \"%s\"", n.start(), n.end(),
+					m.s.subSequence(n.start(), n.end())));
 		m.options.trace.println(b);
 	}
 

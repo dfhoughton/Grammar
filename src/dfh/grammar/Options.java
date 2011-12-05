@@ -182,19 +182,19 @@ public class Options {
 	/**
 	 * Turn match debugging output on or off.
 	 * 
-	 * @param trace
+	 * @param log
 	 *            data sink for debugging
 	 * @return self to allow chaining of methods
 	 */
-	public Options trace(PrintStream trace) {
-		this.trace = trace;
+	public Options log(PrintStream log) {
+		this.trace = log;
 		return this;
 	}
 
 	/**
 	 * @return data sink for debugging
 	 */
-	public PrintStream trace() {
+	public PrintStream log() {
 		return trace;
 	}
 
