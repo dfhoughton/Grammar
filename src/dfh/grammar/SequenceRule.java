@@ -36,68 +36,67 @@ public class SequenceRule extends Rule implements IdentifyChild {
 
 		@Override
 		protected void fetchNext() {
-			while (true) {
-				if (matched.size() > 0) {
-					while (!matched.isEmpty()) {
-						matched.removeLast();
-						if (matchers.peekLast().mightHaveNext())
-							break;
-						else
-							matchers.removeLast();
-					}
-					if (matchers.isEmpty()) {
-						next = null;
-						done = true;
-						return;
-					}
-				}
-				next = null;
-				boolean found = true;
-				while (matched.size() < sequence.length) {
-					Matcher m;
-					if (matchers.isEmpty()) {
-						m = sequence[0].matcher(s, offset, cache, this);
-						matchers.add(m);
-					} else
-						m = matchers.peekLast();
-					Match n = null;
-					try {
-						n = m.mightHaveNext() ? m.match() : null;
-					} catch (SingleColonBarrier s) {
-						done = true;
-						found = false;
-						break;
-					}
-					if (n == null) {
-						matchers.removeLast();
-						if (!matched.isEmpty()) {
+			try {
+				while (true) {
+					if (matched.size() > 0) {
+						while (!matched.isEmpty()) {
 							matched.removeLast();
+							if (matchers.peekLast().mightHaveNext())
+								break;
+							else
+								matchers.removeLast();
 						}
 						if (matchers.isEmpty()) {
+							next = null;
 							done = true;
-							found = false;
-							break;
-						}
-					} else {
-						matched.add(n);
-						if (matched.size() < sequence.length) {
-							m = sequence[matched.size()].matcher(s, n.end(),
-									cache, this);
-							matchers.add(m);
+							return;
 						}
 					}
-				}
-				if (found) {
-					next = new Match(SequenceRule.this, offset, matched
-							.peekLast().end());
-					Match[] children = matched
-							.toArray(new Match[sequence.length]);
-					next.setChildren(children);
-					if (c == null || c.passes(next, this, s))
+					next = null;
+					boolean found = true;
+					while (matched.size() < sequence.length) {
+						Matcher m;
+						if (matchers.isEmpty()) {
+							m = sequence[0].matcher(s, offset, cache, this);
+							matchers.add(m);
+						} else
+							m = matchers.peekLast();
+						Match n = m.mightHaveNext() ? m.match() : null;
+						if (n == null) {
+							matchers.removeLast();
+							if (!matched.isEmpty()) {
+								matched.removeLast();
+							}
+							if (matchers.isEmpty()) {
+								done = true;
+								found = false;
+								break;
+							}
+						} else {
+							matched.add(n);
+							if (matched.size() < sequence.length) {
+								m = sequence[matched.size()].matcher(s,
+										n.end(), cache, this);
+								matchers.add(m);
+							}
+						}
+					}
+					if (found) {
+						next = new Match(SequenceRule.this, offset, matched
+								.peekLast().end());
+						Match[] children = matched
+								.toArray(new Match[sequence.length]);
+						next.setChildren(children);
+						if (c == null || c.passes(next, this, s))
+							break;
+					} else
 						break;
-				} else
-					break;
+				}
+			} catch (SingleColonBarrier s) {
+				done = true;
+				next = null;
 			}
+
 		}
 	}
 

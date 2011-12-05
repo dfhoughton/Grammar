@@ -13,3 +13,5 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 . allow boolean combinations of conditions
 . allow special notation for non-reversible, non-same-rule backreferences
 . allow notation to selectively disable studying of certain expressions
+. call setGroup() on righmost match in event of failure
+. make sure non-terminal matches are using their subcache

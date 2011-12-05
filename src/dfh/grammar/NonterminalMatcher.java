@@ -94,6 +94,22 @@ public abstract class NonterminalMatcher extends Matcher {
 		if (next == null && !(options.containsCycles && cycleCheck()))
 			fetchNext();
 		return next != null;
+		// TODO make sure following is not necessary
+		// CachedMatch cm = subCache.get(offset);
+		// if (cm == null || cm == CachedMatch.MATCH) {
+		// if (next == null && !(options.containsCycles && cycleCheck()))
+		// fetchNext();
+		// if (next == null) {
+		// if (cm == null)
+		// subCache.put(offset, CachedMatch.MISMATCH);
+		// return false;
+		// } else {
+		// if (cm == null)
+		// subCache.put(offset, CachedMatch.MATCH);
+		// return true;
+		// }
+		// } else
+		// return false;
 	}
 
 	/**
