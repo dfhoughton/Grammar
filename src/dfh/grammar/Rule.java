@@ -129,9 +129,11 @@ public abstract class Rule implements Serializable {
 	protected final void event(Matcher m, String message) {
 		if (m.options.debug) {
 			StringBuilder b = new StringBuilder();
-			b.append(message).append(' ');
+			b.append("{{ event: ");
+			b.append(message);
 			locate(b, m.s, m.offset);
 			stackTrace(b, m);
+			b.append("\n}}");
 			m.options.trace.println(b);
 		}
 	}
