@@ -41,7 +41,7 @@ public class Compiler {
 	private Map<Label, String> conditionMap = new HashMap<Label, String>();
 	public static final String[] conditionGrammar = {
 			//
-			" ROOT = /\\s*+/ <exp> /\\s*+/",//
+			" ROOT = /\\s*+/ <exp> ",//
 			"  exp = <group> | <neg> | <conj> | <xor> | <disj> | <cnd>",//
 			"  neg = '!' /\\s*+/ [ <cnd> | <group> ] :",//
 			"group = '(' /\\s*+/ <exp> /\\s*+/ ')' :",//
@@ -58,8 +58,6 @@ public class Compiler {
 			throw new RuntimeException(e);
 		}
 	}
-	private static final Options conditionOptions = new Options()
-			.keepRightmost(true);
 
 	/**
 	 * Generates a {@link Compiler} reading rules from the given
@@ -83,16 +81,17 @@ public class Compiler {
 			Label l = (Label) list.removeFirst();
 			if (list.peekLast() instanceof ConditionFragment) {
 				ConditionFragment cf = (ConditionFragment) list.removeLast();
-				Matcher cgm = cg.matches(cf.id, conditionOptions);
+				Matcher cgm = cg.matches(cf.id, new Options().keepRightmost(true));
 				Match m = cgm.match();
 				if (m == null) {
 					StringBuilder b = new StringBuilder();
 					b.append("bad condition in line ").append(line);
 					m = cgm.rightmostMatch();
 					if (m != null) {
-						b.append("\n");
+						b.append("\n\t");
 						b.append(cf.id.substring(0, m.end()));
-						b.append(" <-- HERE");
+						b.append("<-- HERE -->");
+						b.append(cf.id.substring(m.end()));
 					}
 					throw new GrammarException(b.toString());
 				}

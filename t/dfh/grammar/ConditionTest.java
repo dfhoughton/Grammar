@@ -1,6 +1,7 @@
 package dfh.grammar;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
@@ -362,6 +363,45 @@ public class ConditionTest {
 		while (m.match() != null)
 			count++;
 		assertTrue("found match", count == 1);
+	}
+
+	@Test
+	public void conditionError1() throws IOException {
+		String[] rules = {
+		//
+		"<ROOT> = 'foo' (con*dition)",//
+		};
+		try {
+			new Grammar(rules);
+			fail("should have throw exception");
+		} catch (GrammarException e) {
+		}
+	}
+
+	@Test
+	public void conditionError2() throws IOException {
+		String[] rules = {
+		//
+		"<ROOT> = 'foo' (con()dition)",//
+		};
+		try {
+			new Grammar(rules);
+			fail("should have throw exception");
+		} catch (GrammarException e) {
+		}
+	}
+
+	@Test
+	public void conditionError3() throws IOException {
+		String[] rules = {
+		//
+		"<ROOT> = 'foo' (con||dition)",//
+		};
+		try {
+			new Grammar(rules);
+			fail("should have throw exception");
+		} catch (GrammarException e) {
+		}
 	}
 
 }
