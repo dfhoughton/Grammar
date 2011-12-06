@@ -30,10 +30,6 @@ public class RuleParser {
 	public static final Pattern leftValuePattern = Pattern
 			.compile("(?:<(\\w++)>|(\\w++))");
 	/**
-	 * Character class for characters in condition identifiers.
-	 */
-	public static final Pattern conditionLabelPattern = Pattern.compile("\\w");
-	/**
 	 * Pattern that defines a rule as "<"<name>">" "=" <remainder>
 	 */
 	public static final Pattern basePattern = Pattern.compile("\\s*+"
@@ -590,22 +586,23 @@ public class RuleParser {
 	private static ConditionFragment getCondition(String body, int[] offset)
 			throws GrammarException {
 		offset[0]++;
-		int start = offset[0];
-		Matcher m = conditionLabelPattern.matcher(body);
-		while (offset[0] < body.length()) {
-			if (body.charAt(offset[0]) == ')')
+		int start = offset[0], bracketCount = 1;
+		while (offset[0] < body.length() && bracketCount > 0) {
+			switch(body.charAt(offset[0]++)) {
+			case '(':
+				bracketCount++;
 				break;
-			m.region(offset[0], offset[0] + 1);
-			if (m.matches())
-				offset[0]++;
-			else
-				throw new GrammarException("ill-formed condition at end of "
-						+ body);
+			case  ')':
+				bracketCount--;
+				break;
+			}
 		}
-		if (start == offset[0])
+		if (bracketCount > 0)
+			throw new GrammarException("ill formed condition in " + body);
+		int end = offset[0] - 1;
+		if (start - end == 1)
 			throw new GrammarException("zero-width condition identifier in "
 					+ body);
-		int end = offset[0]++;
 		@SuppressWarnings("unused")
 		String s = body.substring(start, end);
 		trimWhitespace(body, offset);
