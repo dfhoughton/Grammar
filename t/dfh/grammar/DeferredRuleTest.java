@@ -129,6 +129,10 @@ public class DeferredRuleTest {
 		public Object clone() {
 			return this;
 		}
+
+		@Override
+		protected void setCondition(Condition c) {
+		}
 	}
 
 	@Test

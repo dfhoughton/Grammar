@@ -23,6 +23,7 @@ public class AlternationRule extends Rule implements IdentifyChild {
 	private class AlternationMatcher extends NonterminalMatcher {
 		int index = 0;
 		Matcher mostRecent = null;
+		protected Condition c;
 
 		public AlternationMatcher(CharSequence cs, Integer offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
@@ -62,8 +63,8 @@ public class AlternationRule extends Rule implements IdentifyChild {
 	}
 
 	protected final Rule[] alternates;
-	protected Condition c;
 	Map<String, Rule> tagMap;
+	protected Condition c;
 
 	/**
 	 * Generates a rule from the given label and alternates.
@@ -165,5 +166,10 @@ public class AlternationRule extends Rule implements IdentifyChild {
 			return r == child.rule();
 		}
 		return false;
+	}
+
+	@Override
+	protected void setCondition(Condition c) {
+		this.c  = c;
 	}
 }

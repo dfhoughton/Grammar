@@ -209,4 +209,8 @@ public class LeafRule extends Rule {
 	public Rule conditionalize(Condition c, String id) {
 		return new ConditionalLeafRule(this, c, id);
 	}
+
+	@Override
+	protected void setCondition(Condition c) {
+	}
 }

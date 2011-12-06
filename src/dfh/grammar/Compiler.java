@@ -38,10 +38,13 @@ public class Compiler {
 	private final Label root;
 	private boolean recursive;
 	private Map<String, Set<Label>> undefinedConditions = new HashMap<String, Set<Label>>();
-	private Map<Label, String> conditionMap = new HashMap<Label, String>();
+	private Map<Label, Match> conditionMap = new HashMap<Label, Match>();
+	/**
+	 * The grammar of conditions at the end of rules.
+	 */
 	public static final String[] conditionGrammar = {
 			//
-			" ROOT = /\\s*+/ <exp> ",//
+			" ROOT = <exp> ",//
 			"  exp = <group> | <neg> | <conj> | <xor> | <disj> | <cnd>",//
 			"  neg = '!' /\\s*+/ [ <cnd> | <group> ] :",//
 			"group = '(' /\\s*+/ <exp> /\\s*+/ ')' :",//
@@ -81,7 +84,9 @@ public class Compiler {
 			Label l = (Label) list.removeFirst();
 			if (list.peekLast() instanceof ConditionFragment) {
 				ConditionFragment cf = (ConditionFragment) list.removeLast();
-				Matcher cgm = cg.matches(cf.id, new Options().keepRightmost(true));
+				String cnd = cf.id.trim();
+				Matcher cgm = cg
+						.matches(cnd, new Options().keepRightmost(true));
 				Match m = cgm.match();
 				if (m == null) {
 					StringBuilder b = new StringBuilder();
@@ -89,19 +94,28 @@ public class Compiler {
 					m = cgm.rightmostMatch();
 					if (m != null) {
 						b.append("\n\t");
-						b.append(cf.id.substring(0, m.end()));
+						b.append(cnd.substring(0, m.end()));
 						b.append("<-- HERE -->");
-						b.append(cf.id.substring(m.end()));
+						b.append(cnd.substring(m.end()));
 					}
 					throw new GrammarException(b.toString());
+				}
+				Set<String> cnds = new TreeSet<String>();
+				for (Match cm : m.get("cnd")) {
+					String cs = cm.group();
+					Set<Label> set = undefinedConditions.get(cs);
+					if (set == null) {
+						set = new TreeSet<Label>();
+						undefinedConditions.put(cs, set);
+					}
+					set.add(l);
 				}
 				Set<Label> set = undefinedConditions.get(cf.id);
 				if (set == null) {
 					set = new TreeSet<Label>();
 					undefinedConditions.put(cf.id, set);
 				}
-				conditionMap.put(l, cf.id);
-				set.add(l);
+				conditionMap.put(l, m);
 			}
 			if (map.containsKey(l))
 				throw new GrammarException("rule " + l + " redefined at line "
@@ -130,7 +144,7 @@ public class Compiler {
 						&& !((RepeatableRuleFragment) rf).rep.redundant())
 					continue;
 				Label l = e.getKey();
-				String condition = conditionMap.get(l);
+				Match condition = conditionMap.get(l);
 				i.remove();
 				Type t = rf instanceof Regex ? Type.terminal : Type.literal;
 				l = new Label(t, l.id);
@@ -141,7 +155,7 @@ public class Compiler {
 					ru = new LeafRule(l, rx.re, rx.reversible);
 				} else
 					ru = new LiteralRule(l, ((LiteralFragment) rf).literal);
-				ru.condition = condition;
+				ru.condition = makeCondition(condition);
 				ru.generation = gen;
 				String id = ru.uniqueId();
 				Rule old = redundancyMap.get(id);
@@ -266,6 +280,11 @@ public class Compiler {
 		redundancyMap.keySet().removeAll(redundantLabels);
 		for (Rule ru : redundancyMap.values())
 			rules.put(ru.label(), ru);
+	}
+
+	private Condition makeCondition(Match condition) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -469,10 +488,10 @@ public class Compiler {
 	 * 
 	 * @param label
 	 * @param r
-	 * @param condition
+	 * @param match
 	 * @return named {@link Rule}
 	 */
-	static Rule fixLabel(Label label, Rule r, String condition) {
+	static Rule fixLabel(Label label, Rule r, Match match) {
 		Rule ru = null;
 		if (r instanceof AlternationRule) {
 			ru = new AlternationRule(label, ((AlternationRule) r).alternates,
@@ -498,8 +517,8 @@ public class Compiler {
 		if (ru == null)
 			throw new GrammarException("unanticipated rule type: "
 					+ r.getClass().getName());
-		if (condition != null)
-			ru.condition = condition;
+		if (match != null)
+			ru.condition = match;
 		else if (r.condition != null) {
 			ru.condition = r.condition;
 		}
@@ -523,7 +542,7 @@ public class Compiler {
 	 * @return
 	 */
 	private Rule makeSingle(RuleFragment rf, Map<Label, CyclicRule> cycleMap,
-			String condition) {
+			Match condition) {
 		if (rf instanceof AssertionFragment) {
 			AssertionFragment af = (AssertionFragment) rf;
 			Rule sr = makeSingle(af.rf, cycleMap, null);
@@ -538,7 +557,6 @@ public class Compiler {
 					+ subLabel(sr);
 			Label l = new Label(Type.nonTerminal, id);
 			Assertion a = new Assertion(l, sr, af.positive, af.forward);
-			a.condition = condition;
 			if (subDescription != null)
 				a.setSubDescription(subDescription);
 			return redundancyCheck(a);
@@ -557,14 +575,20 @@ public class Compiler {
 			Set<String> tags = new HashSet<String>(1);
 			tags.add(l.id);
 			r = new RepetitionRule(label, r, l.rep, tags);
-			r.condition = condition;
+			if (condition != null) {
+				r.condition = condition.group();
+				r.condition = makeCondition(condition);
+			}
 			return redundancyCheck(r);
 		} else if (rf instanceof LiteralFragment) {
 			LiteralFragment lf = (LiteralFragment) rf;
 			Label l = new Label(Type.literal, '"' + lf.literal + '"');
 			Rule r = new LiteralRule(l, lf.literal);
 			if (lf.rep.redundant()) {
-				r.condition = condition;
+				if (condition != null) {
+					r.condition = condition.group();
+					r.condition = makeCondition(condition);
+				}
 				r = redundancyCheck(r);
 				return r;
 			}
@@ -572,20 +596,25 @@ public class Compiler {
 			l = new Label(Type.nonTerminal, lf.toString());
 			Set<String> tags = new HashSet<String>(1);
 			r = new RepetitionRule(l, r, lf.rep, tags);
-			r.condition = condition;
+			if (condition != null) {
+				r.condition = condition.group();
+				r.condition = makeCondition(condition);
+			}
 			tags.add(r.uniqueId());
 			return redundancyCheck(r);
 		} else if (rf instanceof BackReferenceFragment) {
 			BackReferenceFragment brf = (BackReferenceFragment) rf;
 			Label l = new Label(Type.backreference, rf.toString());
 			Rule r = new BackReferenceRule(l, brf.reference);
-			r.condition = condition;
 			return redundancyCheck(r);
 		} else if (rf instanceof Regex) {
 			Regex rx = (Regex) rf;
 			Label l = new Label(Type.terminal, rf.toString());
 			Rule r = new LeafRule(l, rx.re, rx.reversible);
-			r.condition = condition;
+			if (condition != null) {
+				r.condition = condition.group();
+				r.condition = makeCondition(condition);
+			}
 			return redundancyCheck(r);
 		}
 		GroupFragment gf = (GroupFragment) rf;
@@ -594,7 +623,10 @@ public class Compiler {
 			if (gf.alternates.get(0).size() == 1) {
 				Rule r = makeSingle(gf.alternates.get(0).get(0), cycleMap, null);
 				if (gf.rep.redundant()) {
-					r.condition = condition;
+					if (condition != null) {
+						r.condition = condition.group();
+						r.setCondition(makeCondition(condition));
+					}
 					return redundancyCheck(r);
 				} else {
 					// handle tags here

@@ -341,4 +341,9 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 	public boolean is(Match parent, Match child, String label) {
 		return alternateTags.contains(label);
 	}
+
+	@Override
+	protected void setCondition(Condition c) {
+		this.c = c;
+	}
 }

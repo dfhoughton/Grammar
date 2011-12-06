@@ -230,4 +230,9 @@ public class SequenceRule extends Rule implements IdentifyChild {
 		}
 		return false;
 	}
+
+	@Override
+	protected void setCondition(Condition c) {
+		this.c = c;
+	}
 }

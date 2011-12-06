@@ -273,6 +273,15 @@ public abstract class Rule implements Serializable {
 	}
 
 	/**
+	 * Used during compilation to set a rule's condition.
+	 * <p>
+	 * 
+	 * @param c
+	 *            condition
+	 */
+	protected abstract void setCondition(Condition c);
+
+	/**
 	 * Method required by {@link Grammar#defineRule(String, Rule)}. It should
 	 * not be used otherwise.
 	 * 

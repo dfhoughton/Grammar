@@ -112,4 +112,8 @@ public class BacktrackingBarrier extends Rule {
 		return new BacktrackingBarrier(isSingle);
 	}
 
+	@Override
+	protected void setCondition(Condition c) {
+	}
+
 }

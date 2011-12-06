@@ -126,4 +126,9 @@ public class ConditionalLeafRule extends LeafRule {
 				+ " cannot be re-conditionalized");
 	}
 
+	@Override
+	public void setCondition(Condition c) {
+		this.c = c;
+	}
+
 }

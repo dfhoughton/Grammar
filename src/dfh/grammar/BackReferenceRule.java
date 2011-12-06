@@ -129,4 +129,8 @@ public class BackReferenceRule extends Rule {
 		return brr;
 	}
 
+	@Override
+	protected void setCondition(Condition c) {
+	}
+
 }

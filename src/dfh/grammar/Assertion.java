@@ -218,4 +218,8 @@ public class Assertion extends Rule {
 		this.subDescription = subDescription;
 	}
 
+	@Override
+	protected void setCondition(Condition c) {
+	}
+
 }

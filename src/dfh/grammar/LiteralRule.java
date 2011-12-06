@@ -178,4 +178,9 @@ public class LiteralRule extends Rule {
 		this.condition = id;
 		return this;
 	}
+
+	@Override
+	protected void setCondition(Condition c) {
+		this.c = c; // TODO is it worth it to create separate ConditionalLiteral?
+	}
 }
