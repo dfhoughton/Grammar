@@ -43,8 +43,6 @@ public class Dotify {
 	 *            {@link StringBuilder} accumulating GraphViz notation
 	 * @param n
 	 *            match to graph
-	 * @param text
-	 *            text matched against
 	 * @param index
 	 *            single-element integer array used as a source of unique
 	 *            identifiers for graph nodes; each time a new node is created
@@ -53,10 +51,10 @@ public class Dotify {
 	 *            any label to attach to graph; <code>text</code> will be used
 	 *            if left <code>null</code>
 	 */
-	public static void appendGraph(StringBuilder b, Match n, CharSequence text,
-			int[] index, String caption) {
+	public static void appendGraph(StringBuilder b, Match n, int[] index,
+			String caption) {
 		if (caption == null)
-			caption = cleanText(n, text);
+			caption = cleanText(n);
 		b.append("subgraph cluster").append(index[0]).append(" {\n");
 		b.append("label = ");
 		b.append(id(caption)).append("\n");
@@ -74,7 +72,7 @@ public class Dotify {
 			if (m.isTerminal()) {
 				String id2 = "n" + index[0]++;
 				sameRank.add(id2);
-				String s = cleanText(m, text);
+				String s = cleanText(m);
 				idMap.put(s, id2);
 				b.append(id2).append(' ').append("[label=");
 				b.append(id(s)).append("]\n");
@@ -126,11 +124,11 @@ public class Dotify {
 		return id;
 	}
 
-	private static String cleanText(Match n, CharSequence text) {
+	private static String cleanText(Match n) {
 		String suffix = "(" + n.start() + ", " + n.end() + ")";
 		if (n.zeroWidth())
 			return suffix;
-		String s = text.subSequence(n.start(), n.end()).toString().trim();
+		String s = n.group().trim();
 		if (s.length() == 0)
 			s = "\" \"";
 		else
@@ -178,23 +176,33 @@ public class Dotify {
 	 * Convenience method wrapping others. This returns a string one can paste
 	 * in as the entire contents of a .dot file.
 	 * 
-	 * @param text
-	 *            {@link CharSequence} matched against
 	 * @param n
 	 *            match; empty graph returned for <code>null</code>
 	 * @param message
 	 *            optional message to display with graph
 	 * @return single graph for match
 	 */
-	public static String dot(CharSequence text, Match n, String message) {
+	public static String dot(Match n, String message) {
 		if (n == null) {
 			String label = message == null ? "match" : message;
 			label = id(label);
 			return "graph " + label + " {\nlabel=\"no match\"\n}";
 		}
 		StringBuilder b = startDot(message);
-		appendGraph(b, n, text, new int[] { 0 }, message);
+		appendGraph(b, n, new int[] { 0 }, message);
 		endDot(b);
 		return b.toString();
+	}
+
+	/**
+	 * Delegates to {@link #dot(Match, String)} with <code>null</code> as the
+	 * second parameter.
+	 * 
+	 * @param n
+	 *            match; empty graph returned for <code>null</code>
+	 * @return graph for match
+	 */
+	public static String dot(Match n) {
+		return dot(n, null);
 	}
 }
