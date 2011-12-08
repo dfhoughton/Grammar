@@ -339,7 +339,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @throws IOException
 	 */
 	public Grammar(String[] lines, Map<String, Rule> precompiledRules)
-			throws GrammarException, IOException {
+			throws GrammarException {
 		this(new ArrayLineReader(lines), precompiledRules);
 	}
 
@@ -506,7 +506,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @throws IOException
 	 */
 	public Grammar(LineReader reader, Map<String, Rule> precompiledRules)
-			throws GrammarException, IOException {
+			throws GrammarException {
 		Compiler c = new Compiler(reader, precompiledRules);
 		root = c.root();
 		rules = c.rules();

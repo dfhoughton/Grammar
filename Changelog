@@ -1,5 +1,6 @@
 1.01
   * fixed failure to catch single colon barrier exception
+  * made all exceptions thrown by grammar code runtime exceptions
 
 1.0, 5 December 2011
   * updated version number from .25 to 1.0 in one fell swoop

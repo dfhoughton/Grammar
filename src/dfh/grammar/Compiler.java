@@ -128,43 +128,47 @@ public class Compiler {
 	 * @throws IOException
 	 */
 	public Compiler(LineReader reader, Map<String, Rule> precompiledRules)
-			throws GrammarException, IOException {
+			throws GrammarException {
 		String line = null;
 		if (precompiledRules == null)
 			precompiledRules = new HashMap<String, Rule>(0);
 		Map<Label, List<RuleFragment>> map = new HashMap<Label, List<RuleFragment>>();
 		Label r = null;
-		while ((line = reader.readLine()) != null) {
-			LinkedList<RuleFragment> list = RuleParser.parse(line);
-			if (list == null)
-				continue; // blank line or comment
-			Label l = (Label) list.removeFirst();
-			if (list.peekLast() instanceof ConditionFragment) {
-				ConditionFragment cf = (ConditionFragment) list.removeLast();
-				String cnd = cf.id.trim();
-				Match m = parseCondition(line, cnd);
-				for (Match cm : m.get("cnd")) {
-					String cs = cm.group();
-					Set<Label> set = undefinedConditions.get(cs);
+		try {
+			while ((line = reader.readLine()) != null) {
+				LinkedList<RuleFragment> list = RuleParser.parse(line);
+				if (list == null)
+					continue; // blank line or comment
+				Label l = (Label) list.removeFirst();
+				if (list.peekLast() instanceof ConditionFragment) {
+					ConditionFragment cf = (ConditionFragment) list.removeLast();
+					String cnd = cf.id.trim();
+					Match m = parseCondition(line, cnd);
+					for (Match cm : m.get("cnd")) {
+						String cs = cm.group();
+						Set<Label> set = undefinedConditions.get(cs);
+						if (set == null) {
+							set = new TreeSet<Label>();
+							undefinedConditions.put(cs, set);
+						}
+						set.add(l);
+					}
+					Set<Label> set = undefinedConditions.get(cf.id);
 					if (set == null) {
 						set = new TreeSet<Label>();
-						undefinedConditions.put(cs, set);
+						undefinedConditions.put(cf.id, set);
 					}
-					set.add(l);
+					conditionMap.put(l, m);
 				}
-				Set<Label> set = undefinedConditions.get(cf.id);
-				if (set == null) {
-					set = new TreeSet<Label>();
-					undefinedConditions.put(cf.id, set);
-				}
-				conditionMap.put(l, m);
+				if (map.containsKey(l))
+					throw new GrammarException("rule " + l + " redefined at line "
+							+ reader.lineNumber());
+				map.put(l, list);
+				if (l.t == Type.root)
+					r = l;
 			}
-			if (map.containsKey(l))
-				throw new GrammarException("rule " + l + " redefined at line "
-						+ reader.lineNumber());
-			map.put(l, list);
-			if (l.t == Type.root)
-				r = l;
+		} catch (IOException e1) {
+			throw new GrammarException(e1);
 		}
 		if (r == null)
 			throw new GrammarException("no root rule found");

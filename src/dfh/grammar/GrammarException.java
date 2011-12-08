@@ -1,5 +1,7 @@
 package dfh.grammar;
 
+import java.io.IOException;
+
 /**
  * Exception class for exceptions anticipated by this library. This is made an
  * extension of {@link RuntimeException} to reduce the necessity for error
@@ -17,5 +19,14 @@ public class GrammarException extends RuntimeException {
 
 	public GrammarException(String message) {
 		super(message);
+	}
+
+	/**
+	 * Wrapper for {@link IOException} to reduce exception handling clutter.
+	 * 
+	 * @param e
+	 */
+	public GrammarException(IOException e) {
+		super(e);
 	}
 }
