@@ -10,7 +10,7 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 * change default study value based on match type
 * fix external rule renaming bug
 * preserve rightmost offset matched to to improve debugging
-. allow boolean combinations of conditions
+* allow boolean combinations of conditions
 . allow special notation for non-reversible, non-same-rule backreferences
 . allow notation to selectively disable studying of certain expressions
 . call setGroup() on righmost match in event of failure
