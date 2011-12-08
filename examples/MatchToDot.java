@@ -94,7 +94,7 @@ public class MatchToDot {
 			Match n;
 			while ((n = m.match()) != null) {
 				if (!n.zeroWidth())
-					appendGraph(b, n, text, index, null);
+					appendGraph(b, n, index, null);
 			}
 		} else {
 			for (String fn : cli.argList()) {
@@ -104,7 +104,7 @@ public class MatchToDot {
 				Match n;
 				while ((n = m.match()) != null) {
 					if (!n.zeroWidth())
-						appendGraph(b, n, text, index, null);
+						appendGraph(b, n, index, null);
 				}
 			}
 		}
