@@ -174,13 +174,25 @@ public class LiteralRule extends Rule {
 
 	@Override
 	public Rule conditionalize(Condition c, String id) {
-		this.c = c;
-		this.condition = id;
+		if (this.c == null) {
+			this.c = c;
+			this.condition = id;
+		} else {
+			if (this.c instanceof LogicalCondition) {
+				if (!((LogicalCondition) this.c).replace(id, c))
+					throw new GrammarException("could not define " + id
+							+ " in this condition");
+			} else if (this.c instanceof LeafCondition) {
+				LeafCondition lc = (LeafCondition) this.c;
+				if (lc.cnd.equals(id))
+					this.c = c;
+				else
+					throw new GrammarException("rule " + this
+							+ " does not carry condition " + id);
+			} else
+				throw new GrammarException("condition on rule " + this
+						+ " cannot be redefined");
+		}
 		return this;
-	}
-
-	@Override
-	protected void setCondition(Condition c) {
-		this.c = c; // TODO is it worth it to create separate ConditionalLiteral?
 	}
 }

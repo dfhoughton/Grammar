@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+@Reversible
 public class ConditionalLeafRule extends LeafRule {
 	private static final long serialVersionUID = 1L;
 	private Condition c;
@@ -122,13 +123,26 @@ public class ConditionalLeafRule extends LeafRule {
 
 	@Override
 	public Rule conditionalize(Condition c, String id) {
-		throw new GrammarException(this.getClass()
-				+ " cannot be re-conditionalized");
-	}
-
-	@Override
-	public void setCondition(Condition c) {
-		this.c = c;
+		if (this.c == null) {
+			this.c = c;
+			this.condition = id;
+		} else {
+			if (this.c instanceof LogicalCondition) {
+				if (!((LogicalCondition) this.c).replace(id, c))
+					throw new GrammarException("could not defined " + id
+							+ " in this condition");
+			} else if (this.c instanceof LeafCondition) {
+				LeafCondition lc = (LeafCondition) this.c;
+				if (lc.cnd.equals(id))
+					this.c = c;
+				else
+					throw new GrammarException("rule " + this
+							+ " does not carry condition " + id);
+			} else
+				throw new GrammarException("condition on rule " + this
+						+ " cannot be redefined");
+		}
+		return this;
 	}
 
 }

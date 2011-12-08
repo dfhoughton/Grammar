@@ -78,9 +78,4 @@ public class CyclicRule extends Rule {
 		cr.r = r;
 		return cr;
 	}
-
-	@Override
-	protected void setCondition(Condition c) {
-		r.setCondition(c);
-	}
 }

@@ -195,9 +195,14 @@ public class Compiler {
 				if (rf instanceof Regex) {
 					Regex rx = (Regex) rf;
 					ru = new LeafRule(l, rx.re, rx.reversible);
-				} else
+					if (condition != null)
+						ru = new ConditionalLeafRule((LeafRule) ru,
+								LogicalCondition.manufacture(condition),
+								condition.group());
+				} else {
 					ru = new LiteralRule(l, ((LiteralFragment) rf).literal);
-				setCondition(condition, ru);
+					setCondition(condition, ru);
+				}
 				ru.generation = gen;
 				String id = ru.uniqueId();
 				Rule old = redundancyMap.get(id);
@@ -585,8 +590,8 @@ public class Compiler {
 		setCondition(match, ru);
 
 		if (match != null) {
-			ru.condition = match.group();
-			ru.setCondition(LogicalCondition.manufacture(match));
+			ru.conditionalize(LogicalCondition.manufacture(match),
+					match.group());
 		} else if (r.condition != null) {
 			ru.condition = r.condition;
 		}
@@ -757,7 +762,8 @@ public class Compiler {
 	private static void setCondition(Match condition, Rule r) {
 		if (condition != null) {
 			r.condition = condition.group();
-			r.setCondition(LogicalCondition.manufacture(condition));
+			r.conditionalize(LogicalCondition.manufacture(condition),
+					r.condition);
 		}
 	}
 

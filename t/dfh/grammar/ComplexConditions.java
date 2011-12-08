@@ -58,4 +58,55 @@ public class ComplexConditions {
 		assertNotNull("simple disjunction", g.matches("5").match());
 	}
 
+	@Test
+	public void simpleXor() {
+		String[] rules = {
+		//
+		"ROOT = /\\d++/ (gt10 ^ eq5)",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("eq5", eq5);
+		g.defineCondition("gt10", gt10);
+		assertNotNull("simple xor", g.matches("5").match());
+	}
+
+	@Test
+	public void simpleXor2() {
+		String[] rules = {
+		//
+		"ROOT = /\\d++/ (eq5 ^ eq5)",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("eq5", eq5);
+		assertNull("simple xor false", g.matches("5").match());
+	}
+
+	@Test
+	public void simpleXorNeg() {
+		String[] rules = {
+		//
+		"ROOT = /\\d++/ (eq5 ^ !eq5)",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("eq5", eq5);
+		assertNotNull("redundant xor", g.matches("5").match());
+	}
+
+	@Test
+	public void group() {
+		String[] rules = {
+		//
+		"ROOT = /\\d++/ (eq5 | (gt10 & lt100))",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("eq5", eq5);
+		g.defineCondition("gt10", gt10);
+		g.defineCondition("lt100", lt100);
+		int count = 0;
+		Matcher m = g.find("5 11");
+		while (m.match() != null)
+			count++;
+		assertTrue("parsed group", count == 2);
+	}
+
 }

@@ -83,9 +83,4 @@ public class DeferredDefinitionRule extends Rule {
 		ddr.r = r;
 		return ddr;
 	}
-
-	@Override
-	protected void setCondition(Condition c) {
-		r.setCondition(c);
-	}
 }
