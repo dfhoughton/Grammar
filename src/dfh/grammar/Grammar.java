@@ -324,7 +324,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @throws GrammarException
 	 * @throws IOException
 	 */
-	public Grammar(String[] lines) throws GrammarException, IOException {
+	public Grammar(String[] lines) throws GrammarException {
 		this(lines, null);
 	}
 
@@ -367,8 +367,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public Grammar(File f) throws GrammarException, FileNotFoundException,
-			IOException {
+	public Grammar(File f) throws GrammarException, FileNotFoundException {
 		this(f, null);
 	}
 
@@ -384,7 +383,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @throws IOException
 	 */
 	public Grammar(File f, Map<String, Rule> precompiledRules)
-			throws GrammarException, FileNotFoundException, IOException {
+			throws GrammarException, FileNotFoundException {
 		this(new FileReader(f), precompiledRules);
 	}
 
@@ -440,7 +439,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @throws IOException
 	 */
 	public Grammar(Reader r, Map<String, Rule> precompiledRules)
-			throws GrammarException, IOException {
+			throws GrammarException {
 		this(new BufferedReader(r), precompiledRules);
 	}
 
@@ -453,7 +452,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @throws GrammarException
 	 * @throws IOException
 	 */
-	public Grammar(BufferedReader r) throws GrammarException, IOException {
+	public Grammar(BufferedReader r) throws GrammarException {
 		this(r, null);
 	}
 
@@ -468,7 +467,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @throws IOException
 	 */
 	public Grammar(BufferedReader r, Map<String, Rule> precompiledRules)
-			throws GrammarException, IOException {
+			throws GrammarException {
 		this(new BufferedLineReader(r), precompiledRules);
 	}
 

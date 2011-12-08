@@ -141,7 +141,8 @@ public class Compiler {
 					continue; // blank line or comment
 				Label l = (Label) list.removeFirst();
 				if (list.peekLast() instanceof ConditionFragment) {
-					ConditionFragment cf = (ConditionFragment) list.removeLast();
+					ConditionFragment cf = (ConditionFragment) list
+							.removeLast();
 					String cnd = cf.id.trim();
 					Match m = parseCondition(line, cnd);
 					for (Match cm : m.get("cnd")) {
@@ -153,16 +154,11 @@ public class Compiler {
 						}
 						set.add(l);
 					}
-					Set<Label> set = undefinedConditions.get(cf.id);
-					if (set == null) {
-						set = new TreeSet<Label>();
-						undefinedConditions.put(cf.id, set);
-					}
 					conditionMap.put(l, m);
 				}
 				if (map.containsKey(l))
-					throw new GrammarException("rule " + l + " redefined at line "
-							+ reader.lineNumber());
+					throw new GrammarException("rule " + l
+							+ " redefined at line " + reader.lineNumber());
 				map.put(l, list);
 				if (l.t == Type.root)
 					r = l;

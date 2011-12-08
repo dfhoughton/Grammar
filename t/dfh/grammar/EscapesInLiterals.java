@@ -27,8 +27,6 @@ public class EscapesInLiterals {
 			assertNotNull("found \\t", m);
 		} catch (GrammarException e) {
 			fail(e.getMessage());
-		} catch (IOException e) {
-			fail(e.getMessage());
 		}
 	}
 
@@ -41,8 +39,6 @@ public class EscapesInLiterals {
 			Match m = g.matches("a\nb").match();
 			assertNotNull("found \\n", m);
 		} catch (GrammarException e) {
-			fail(e.getMessage());
-		} catch (IOException e) {
 			fail(e.getMessage());
 		}
 	}
@@ -57,8 +53,6 @@ public class EscapesInLiterals {
 			assertNotNull("found \\f", m);
 		} catch (GrammarException e) {
 			fail(e.getMessage());
-		} catch (IOException e) {
-			fail(e.getMessage());
 		}
 	}
 
@@ -71,8 +65,6 @@ public class EscapesInLiterals {
 			Match m = g.matches("a\rb").match();
 			assertNotNull("found \\r", m);
 		} catch (GrammarException e) {
-			fail(e.getMessage());
-		} catch (IOException e) {
 			fail(e.getMessage());
 		}
 	}
@@ -87,8 +79,6 @@ public class EscapesInLiterals {
 			assertNotNull("found \\b", m);
 		} catch (GrammarException e) {
 			fail(e.getMessage());
-		} catch (IOException e) {
-			fail(e.getMessage());
 		}
 	}
 
@@ -101,8 +91,6 @@ public class EscapesInLiterals {
 			Match m = g.matches("a\\b").match();
 			assertNotNull("found \\", m);
 		} catch (GrammarException e) {
-			fail(e.getMessage());
-		} catch (IOException e) {
 			fail(e.getMessage());
 		}
 	}
