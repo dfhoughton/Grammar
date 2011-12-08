@@ -39,6 +39,7 @@ import org.junit.runners.Suite;
 		ExternalRuleBackwardsAssertionTest.class,//
 		RegexTest.class,//
 		NoTerminalTest.class,//
+		ComplexConditions.class,//
 })
 public class AllTests {
 }
