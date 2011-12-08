@@ -3,6 +3,8 @@ package dfh.grammar;
 import java.util.ArrayList;
 import java.util.List;
 
+import dfh.grammar.util.Dotify;
+
 /**
  * Base class for conditions representing logical combinations of other
  * conditions.
@@ -25,13 +27,17 @@ public abstract class LogicalCondition extends Condition {
 	}
 	
 	static Condition manufacture(Match m) {
+		m = m.children()[0];
 		if (m.hasLabel("cnd"))
 			return new LeafCondition(m.group());
+//		System.out.println(Dotify.dot(m));
+		System.exit(1);
 		List<Condition> list = new ArrayList<Condition>();
 		m = m.choose("exp");
 		if (m.hasLabel("conj")) {
 			
 		}
+		return null;
 	}
 
 	/**

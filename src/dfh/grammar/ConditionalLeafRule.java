@@ -6,7 +6,7 @@ import java.util.Set;
 
 public class ConditionalLeafRule extends LeafRule {
 	private static final long serialVersionUID = 1L;
-	private final Condition c;
+	private Condition c;
 
 	private class LeafMatcher extends Matcher {
 		private Map<Integer, CachedMatch> cache;

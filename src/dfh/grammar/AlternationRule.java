@@ -23,7 +23,6 @@ public class AlternationRule extends Rule implements IdentifyChild {
 	private class AlternationMatcher extends NonterminalMatcher {
 		int index = 0;
 		Matcher mostRecent = null;
-		protected Condition c;
 
 		public AlternationMatcher(CharSequence cs, Integer offset,
 				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {

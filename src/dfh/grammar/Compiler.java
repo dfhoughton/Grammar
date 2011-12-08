@@ -17,8 +17,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import sun.rmi.log.LogOutputStream;
-
 import dfh.grammar.Label.Type;
 
 /**
@@ -48,12 +46,69 @@ public class Compiler {
 			//
 			" ROOT = <exp> ",//
 			"  exp = <group> | <neg> | <conj> | <xor> | <disj> | <cnd>",//
-			"  neg = '!' /\\s*+/ [ <cnd> | <group> ] :",//
-			"group = '(' /\\s*+/ <exp> /\\s*+/ ')' :",//
-			" conj = <exp> [ [ /\\s*+/ '&' /\\s*+/ | /\\s++/ ] <exp> ]++ :",//
-			" disj = <exp> [ /\\s*+/ '|' /\\s*+/ <exp> ]++ :",//
-			"  xor = <exp> [ /\\s*+/ '^' /\\s*+/ <exp> ]++ :",//
+			"  neg = '!' /\\s*+/ [ <cnd> | <group> ]",//
+			"group = '(' /\\s*+/ <exp> /\\s*+/ ')'",//
+			" conj = <exp> [ [ /\\s*+/ '&' /\\s*+/ | /\\s++/ ] <exp> ]+",//
+			" disj = <exp> [ /\\s*+/ '|' /\\s*+/ <exp> ]+",//
+			"  xor = <exp> [ /\\s*+/ '^' /\\s*+/ <exp> ]+",//
 			"  cnd = /\\w++/",//
+	};
+	/**
+	 * {@link MatchTest} that filters out parse trees that don't respect the
+	 * usual rules of precedence among the logical operators and which enforces
+	 * a normal form, so a & b & c is represented as a single complex
+	 * conjunction rather than a conjunction of conjunctions.
+	 */
+	public static final MatchTest badMatch = new MatchTest() {
+		MatchTest expTest = new MatchTest() {
+			@Override
+			public boolean test(Match m) {
+				return m.hasLabel("exp") || m.hasLabel("group");
+			}
+		};
+
+		@Override
+		public boolean test(Match m) {
+			if (m.hasLabel("conj")) {
+				if (found(m, "disj", "xor", "conj")) {
+					return true;
+				}
+			} else if (m.hasLabel("xor")) {
+				if (found(m, "disj", "xor")) {
+					return true;
+				}
+			} else if (m.hasLabel("disj")) {
+				if (found(m, "disj")) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private boolean found(Match c, String... tags) {
+			Set<String> tagset = new HashSet<String>(tags.length);
+			for (String s : tags)
+				tagset.add(s);
+			return found(c, tagset);
+		}
+
+		private boolean found(Match c, Set<String> tagset) {
+			@SuppressWarnings("unused")
+			String debug = c.group(), debug2;
+			List<Match> exps = c.getClosestDescendants(expTest);
+			if (exps.isEmpty())
+				return false;
+			for (Match exp : exps) {
+				if (exp.hasLabel("group"))
+					continue;
+				debug2 = exp.group();
+				for (String s : tagset) {
+					if (exp.children()[0].hasLabel(s))
+						return true;
+				}
+			}
+			return false;
+		}
 	};
 	private static Grammar cg;
 	static {
@@ -87,22 +142,7 @@ public class Compiler {
 			if (list.peekLast() instanceof ConditionFragment) {
 				ConditionFragment cf = (ConditionFragment) list.removeLast();
 				String cnd = cf.id.trim();
-				Matcher cgm = cg
-						.matches(cnd, new Options().keepRightmost(true));
-				Match m = cgm.match();
-				if (m == null) {
-					StringBuilder b = new StringBuilder();
-					b.append("bad condition in line ").append(line);
-					m = cgm.rightmostMatch();
-					if (m != null) {
-						b.append("\n\t");
-						b.append(cnd.substring(0, m.end()));
-						b.append("<-- HERE -->");
-						b.append(cnd.substring(m.end()));
-					}
-					throw new GrammarException(b.toString());
-				}
-				Set<String> cnds = new TreeSet<String>();
+				Match m = parseCondition(line, cnd);
 				for (Match cm : m.get("cnd")) {
 					String cs = cm.group();
 					Set<Label> set = undefinedConditions.get(cs);
@@ -282,6 +322,33 @@ public class Compiler {
 		redundancyMap.keySet().removeAll(redundantLabels);
 		for (Rule ru : redundancyMap.values())
 			rules.put(ru.label(), ru);
+	}
+
+	static Match parseCondition(String line, String cnd) {
+		if (cnd == null)
+			return null;
+		Matcher cgm = cg.matches(cnd, new Options().keepRightmost(true)
+				.allowOverlap(true));
+		Match m;
+		while ((m = cgm.match()) != null) {
+			if (m.passes(badMatch))
+				continue;
+			else
+				break;
+		}
+		if (m == null) {
+			StringBuilder b = new StringBuilder();
+			b.append("bad condition in line ").append(line);
+			m = cgm.rightmostMatch();
+			if (m != null) {
+				b.append("\n\t");
+				b.append(cnd.substring(0, m.end()));
+				b.append("<-- HERE -->");
+				b.append(cnd.substring(m.end()));
+			}
+			throw new GrammarException(b.toString());
+		}
+		return m;
 	}
 
 	/**

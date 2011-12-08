@@ -1156,7 +1156,8 @@ public class Grammar implements Serializable, Cloneable {
 			boolean isRoot = l.equals(g.root);
 			String s = label + ':' + l.id;
 			l = new Label(l.t, s);
-			Rule nru = Compiler.fixLabel(l, ru, ru.condition);
+			Rule nru = Compiler.fixLabel(l, ru,
+					Compiler.parseCondition(null, ru.condition));
 			fix(g, ru, nru);
 			g.rules.put(l, nru);
 			if (isRoot) {
