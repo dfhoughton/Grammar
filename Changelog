@@ -1,4 +1,4 @@
-1.01
+1.01, 8 December 2011
   * fixed failure to catch single colon barrier exception
   * made all exceptions thrown by grammar code runtime exceptions
   * complex conditions implemented
