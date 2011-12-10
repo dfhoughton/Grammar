@@ -227,7 +227,7 @@ public class RuleParser {
 					if (!(rep == Repetition.NONE || isUpLevel)) {
 						throw new GrammarException(
 								"simple back reference cannot be modified with repetition suffix; use uplevel backreference; e.g., "
-										+ reference + "^");
+										+ reference + "^" + rep);
 					}
 					if (!isUpLevel) {
 						if (gf == null) {

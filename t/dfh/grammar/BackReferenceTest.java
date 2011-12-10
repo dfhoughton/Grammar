@@ -145,7 +145,7 @@ public class BackReferenceTest {
 		} catch (GrammarException e) {
 			assertTrue(e
 					.getMessage()
-					.equals("simple back reference cannot be modified with repetition suffix; use uplevel backreference; e.g., 1^"));
+					.equals("simple back reference cannot be modified with repetition suffix; use uplevel backreference; e.g., 1^{2,}"));
 		}
 	}
 
