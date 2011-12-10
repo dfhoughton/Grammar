@@ -118,13 +118,8 @@ public class RuleParser {
 				ubf.level += level;
 			} else if (rf instanceof GroupFragment) {
 				GroupFragment gf = (GroupFragment) rf;
-				int addition = 1;
-				if (!gf.rep.redundant())
-					addition++;
-				if (gf.alternates.size() > 1)
-					addition++;
-				for (List<RuleFragment> sl: gf.alternates) {
-					checkUplevelBackReferences(line, sl, level + addition, cpos);
+				for (List<RuleFragment> sl : gf.alternates) {
+					checkUplevelBackReferences(line, sl, level + 1, cpos);
 				}
 			}
 		}
