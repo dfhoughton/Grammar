@@ -671,6 +671,19 @@ public class Compiler {
 			Label l = new Label(Type.backreference, rf.toString());
 			Rule r = new BackReferenceRule(l, brf.reference);
 			return redundancyCheck(r);
+		} else if (rf instanceof UplevelBackReferenceFragment) {
+			UplevelBackReferenceFragment ubf = (UplevelBackReferenceFragment) rf;
+			Label l = new Label(Type.uplevelbackreference, rf.toString());
+			UpLevelBackReferenceRule ulbr = new UpLevelBackReferenceRule(l,
+					ubf.reference, ubf.level);
+			Rule r = redundancyCheck(ulbr);
+			if (ubf.rep.redundant())
+				return r;
+			l = new Label(Type.nonTerminal, ubf.toString());
+			Set<String> tags = new HashSet<String>(1);
+			r = new UncachedRepetitionRule(l, r, ubf.rep, tags);
+			tags.add(r.uniqueId());
+			return redundancyCheck(r);
 		} else if (rf instanceof Regex) {
 			Regex rx = (Regex) rf;
 			Label l = new Label(Type.terminal, rf.toString());

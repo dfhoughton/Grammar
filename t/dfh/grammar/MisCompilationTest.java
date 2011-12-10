@@ -205,28 +205,6 @@ public class MisCompilationTest {
 	}
 
 	@Test
-	public void backReferenceRepetition() {
-		String[] rules = {
-				//
-				"<ROOT> = <a> | <b>", //
-				"<a> = <b> 1++",//
-				"<b> = 'a'",//
-		};
-		try {
-			@SuppressWarnings("unused")
-			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover repeated back reference");
-		} catch (Exception e) {
-			org.junit.Assert
-					.assertTrue(
-							"back reference cannot be modified with repetition suffixes",
-							e.getMessage()
-									.indexOf(
-											"back reference cannot be modified with repetition suffixes") > -1);
-		}
-	}
-
-	@Test
 	public void backReferenceRepetitionMiscount1() {
 		String[] rules = {
 				//

@@ -78,12 +78,56 @@ public class RuleParser {
 			int[] offset = { 0 };
 			LinkedList<RuleFragment> body = parseBody(remainder, offset,
 					(char) 0);
-			checkBarriers(body.peekLast() instanceof ConditionFragment ? body
-					.subList(0, body.size() - 1) : body);
+			List<RuleFragment> nonconditions = body.peekLast() instanceof ConditionFragment ? body
+					.subList(0, body.size() - 1) : body;
+			checkUplevelBackReferences(line, nonconditions, 0, 0);
+			checkBarriers(nonconditions);
 			parse.addAll(body);
 			return parse;
 		} else
 			throw new GrammarException("ill-formed rule: " + line);
+	}
+
+	/**
+	 * Adjusts {@link UplevelBackReferenceFragment#level} as appropriate or
+	 * replaces these fragments with {@link BackReferenceFragment} fragments
+	 * where appropriate.
+	 * 
+	 * @param frags
+	 */
+	private static void checkUplevelBackReferences(String line,
+			List<RuleFragment> frags, int level, int pos) {
+		for (int i = 0; i < frags.size(); i++) {
+			RuleFragment rf = frags.get(i);
+			int cpos = level == 0 ? i : pos;
+			if (rf instanceof UplevelBackReferenceFragment) {
+				UplevelBackReferenceFragment ubf = (UplevelBackReferenceFragment) rf;
+				if (ubf.reference > cpos)
+					throw new GrammarException("uplevel back reference " + ubf
+							+ " in " + line
+							+ " references position after its own");
+				if (ubf.reference == cpos)
+					throw new GrammarException("uplevel back reference " + ubf
+							+ " in " + line + " references its own position");
+				if (ubf.rep.redundant()) {
+					if (level == 0) {
+						frags.set(i, new BackReferenceFragment(ubf.reference));
+					}
+				} else
+					ubf.level = 1;
+				ubf.level += level;
+			} else if (rf instanceof GroupFragment) {
+				GroupFragment gf = (GroupFragment) rf;
+				int addition = 1;
+				if (!gf.rep.redundant())
+					addition++;
+				if (gf.alternates.size() > 1)
+					addition++;
+				for (List<RuleFragment> sl: gf.alternates) {
+					checkUplevelBackReferences(line, sl, level + addition, cpos);
+				}
+			}
+		}
 	}
 
 	/**

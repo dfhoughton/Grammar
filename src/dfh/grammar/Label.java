@@ -42,6 +42,11 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		 */
 		backreference(4),
 		/**
+		 * Like {@link #backreference} but allows repetition and branching and
+		 * cannot be used in lookbehinds
+		 */
+		uplevelbackreference(5),
+		/**
 		 * The root rule of the grammar. Every grammar must have one and only
 		 * one root and it can parse a string only if it passes the root rule.
 		 */

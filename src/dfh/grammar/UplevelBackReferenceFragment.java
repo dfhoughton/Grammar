@@ -11,7 +11,7 @@ package dfh.grammar;
  */
 public class UplevelBackReferenceFragment extends RepeatableRuleFragment {
 
-	protected int reference;
+	protected int reference, level = 0;
 
 	/**
 	 * Generates a fragment from the given reference number.
