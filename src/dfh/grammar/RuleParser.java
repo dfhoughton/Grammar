@@ -217,22 +217,39 @@ public class RuleParser {
 					if (reference == 0)
 						throw new GrammarException(
 								"back references must be greater than 0");
-					rep = getRepetition(body, offset);
-					if (rep != Repetition.NONE)
-						throw new GrammarException(
-								"back reference cannot be modified with repetition suffixes");
-					if (gf == null) {
-						if (reference > parse.size())
-							throw new GrammarException("back reference "
-									+ reference + " is too big");
-					} else {
-						if (reference > gf.currentSequence.size())
-							throw new GrammarException("back reference "
-									+ reference + " is too big");
+					boolean isUpLevel = false;
+					if (offset[0] < body.length()
+							&& body.charAt(offset[0]) == '^') {
+						isUpLevel = true;
+						offset[0]++;
 					}
-					BackReferenceFragment brf = new BackReferenceFragment(
-							reference);
-					add(parse, gf, brf);
+					rep = getRepetition(body, offset);
+					if (!(rep == Repetition.NONE || isUpLevel)) {
+						throw new GrammarException(
+								"simple back reference cannot be modified with repetition suffix; use uplevel backreference; e.g., "
+										+ reference + "^");
+					}
+					if (!isUpLevel) {
+						if (gf == null) {
+							if (reference > parse.size())
+								throw new GrammarException("back reference "
+										+ reference + " is too big");
+						} else {
+							if (reference > gf.currentSequence.size())
+								throw new GrammarException("back reference "
+										+ reference + " is too big");
+						}
+					}
+					if (isUpLevel) {
+						UplevelBackReferenceFragment ubrf = new UplevelBackReferenceFragment(
+								reference);
+						ubrf.setRepetition(rep);
+						add(parse, gf, ubrf);
+					} else {
+						BackReferenceFragment brf = new BackReferenceFragment(
+								reference);
+						add(parse, gf, brf);
+					}
 				} else {
 					RuleFragment ru = nextRule(body, offset, bracket);
 					if (ru instanceof RepeatableRuleFragment) {
@@ -588,11 +605,11 @@ public class RuleParser {
 		offset[0]++;
 		int start = offset[0], bracketCount = 1;
 		while (offset[0] < body.length() && bracketCount > 0) {
-			switch(body.charAt(offset[0]++)) {
+			switch (body.charAt(offset[0]++)) {
 			case '(':
 				bracketCount++;
 				break;
-			case  ')':
+			case ')':
 				bracketCount--;
 				break;
 			}
