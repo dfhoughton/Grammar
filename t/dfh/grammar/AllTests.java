@@ -40,6 +40,7 @@ import org.junit.runners.Suite;
 		RegexTest.class,//
 		NoTerminalTest.class,//
 		ComplexConditions.class,//
+		UplevelBackreferenceTest.class,//
 })
 public class AllTests {
 }

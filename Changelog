@@ -1,4 +1,5 @@
-1.02
+1.02, 10 December 2011
+  * added n^ construct to allow repetition and nesting of back references
 
 1.01, 8 December 2011
   * fixed failure to catch single colon barrier exception
