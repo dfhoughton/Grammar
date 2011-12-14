@@ -1,4 +1,4 @@
-1.03
+1.03 14 December 2011
   * fixed zero-width final leaf bug where studying was causing <rule> /\s*/,
     for example, to always fail to match
   * establish parentage and group of rightmost match in case of mismatch
