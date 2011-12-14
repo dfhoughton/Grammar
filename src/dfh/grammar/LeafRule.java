@@ -41,6 +41,8 @@ public class LeafRule extends Rule {
 				CachedMatch cm = cache.get(offset);
 				if (cm == null) {
 					if (options.study) {
+						if (matchesTrivially)
+							return new Match(rule(), offset, offset);
 						if (options.debug)
 							LeafRule.this.matchTrace(this, null);
 						return null;
@@ -88,6 +90,7 @@ public class LeafRule extends Rule {
 	private static final long serialVersionUID = 1L;
 	protected final Pattern p;
 	protected final boolean reversible;
+	protected boolean matchesTrivially;
 
 	/**
 	 * Generates {@link LeafRule} with given label and {@link Pattern}.
@@ -99,6 +102,7 @@ public class LeafRule extends Rule {
 		super(label);
 		this.p = p;
 		this.reversible = reversible;
+		this.matchesTrivially = p.matcher("").matches();
 	}
 
 	@Override
@@ -181,6 +185,8 @@ public class LeafRule extends Rule {
 			while (m.find()) {
 				Integer i = m.start();
 				startOffsets.add(i);
+				if (matchesTrivially && m.start() == m.end())
+					continue;
 				Match n = new Match(this, m.start(), m.end());
 				subCache.put(i, new CachedMatch(n));
 				int newStart = m.start() + 1;
