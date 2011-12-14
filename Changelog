@@ -1,6 +1,7 @@
 1.03
   * fixed zero-width final leaf bug where studying was causing <rule> /\s*/,
     for example, to always fail to match
+  * establish parentage and group of rightmost match in case of mismatch
 
 1.02, 10 December 2011
   * added n^ construct to allow repetition and nesting of back references

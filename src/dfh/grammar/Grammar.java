@@ -103,6 +103,39 @@ public class Grammar implements Serializable, Cloneable {
 		protected Rule rule() {
 			return null;
 		}
+
+		/**
+		 * Callback that fixes up returned nodes before returning them.
+		 * 
+		 * @param n
+		 *            possibly good node
+		 * @param m
+		 *            {@link Matcher} that produced the possibly good node
+		 * @return possibly good node
+		 */
+		protected Match maybeGood(Match n, Matcher m) {
+			if (n == null)
+				return bad(m);
+			n.establishParentage();
+			n.setGroup(s);
+			return n;
+		}
+
+		/**
+		 * Callback that fixes up rightmost match, if any, before returning
+		 * <code>null</code> when grammar fails to match.
+		 * 
+		 * @param m
+		 *            {@link Matcher} that failed to match
+		 * @return null
+		 */
+		protected Match bad(Matcher m) {
+			if (options.keepRightmost && m.rightmost != null) {
+				m.rightmost.establishParentage();
+				m.rightmost.setGroup(s);
+			}
+			return null;
+		}
 	}
 
 	/**
@@ -212,13 +245,9 @@ public class Grammar implements Serializable, Cloneable {
 			if (mightHaveNext()) {
 				Match n = next;
 				next = fetchNext();
-				if (n != null) {
-					n.establishParentage();
-					n.setGroup(s);
-				}
-				return n;
+				return maybeGood(n, m);
 			}
-			return null;
+			return bad(m);
 		}
 
 		@Override
@@ -742,14 +771,11 @@ public class Grammar implements Serializable, Cloneable {
 					try {
 						n = ltm ? ltmm.match() : m.match();
 					} catch (DoubleColonBarrier e) {
-						return null;
+						return bad(m);
 					}
-					if (n != null) {
-						n.establishParentage();
-						n.setGroup(s);
-					}
+					return maybeGood(n, m);
 				}
-				return n;
+				return bad(m);
 			}
 
 			@Override
@@ -777,14 +803,11 @@ public class Grammar implements Serializable, Cloneable {
 					try {
 						n = ltm ? ltmm.match() : m.match();
 					} catch (DoubleColonBarrier e) {
-						return null;
+						return bad(m);
 					}
-					if (n != null) {
-						n.establishParentage();
-						n.setGroup(s);
-					}
+					return maybeGood(n, m);
 				}
-				return n;
+				return bad(m);
 			}
 
 			@Override
@@ -1008,13 +1031,9 @@ public class Grammar implements Serializable, Cloneable {
 					Match n = next;
 					next = fetchNext();
 					matchedOnce = true;
-					if (n != null) {
-						n.establishParentage();
-						n.setGroup(s);
-					}
-					return n;
+					return maybeGood(n, m);
 				}
-				return null;
+				return bad(m);
 			}
 
 			@Override

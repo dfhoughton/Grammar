@@ -88,4 +88,13 @@ public class MismatchTest {
 		assertNotNull("there is rightmost match", m.rightmostMatch());
 		assertTrue("rightmost offset is 2", m.rightmostMatch().end() == 2);
 	}
+
+	@Test
+	public void rightmostHasGroup() {
+		String s = "aab";
+		Matcher m = g.find(s, opt);
+		Match n = m.match();
+		assertNull("no match", n);
+		assertNotNull("rightmost has group", m.rightmostMatch().group());
+	}
 }
