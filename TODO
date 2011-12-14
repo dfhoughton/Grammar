@@ -16,3 +16,4 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 * call setGroup() on righmost match in event of failure
 . make sure non-terminal matches are using their subcache
 . add zero-width optimizations to conditionalized leaf rules
+. add labels() method to Match
