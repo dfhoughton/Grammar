@@ -41,6 +41,7 @@ import org.junit.runners.Suite;
 		NoTerminalTest.class,//
 		ComplexConditions.class,//
 		UplevelBackreferenceTest.class,//
+		Regression.class,//
 })
 public class AllTests {
 }
