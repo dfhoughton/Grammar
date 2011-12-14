@@ -1,3 +1,5 @@
+1.04
+  
 1.03 14 December 2011
   * fixed zero-width final leaf bug where studying was causing <rule> /\s*/,
     for example, to always fail to match
