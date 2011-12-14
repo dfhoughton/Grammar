@@ -40,9 +40,7 @@ public class LeafRule extends Rule {
 				fresh = false;
 				CachedMatch cm = cache.get(offset);
 				if (cm == null) {
-					if (options.study) {
-						if (matchesTrivially)
-							return new Match(rule(), offset, offset);
+					if (options.study && !matchesTrivially) {
 						if (options.debug)
 							LeafRule.this.matchTrace(this, null);
 						return null;

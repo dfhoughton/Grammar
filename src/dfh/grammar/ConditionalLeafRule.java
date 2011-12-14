@@ -27,7 +27,8 @@ public class ConditionalLeafRule extends LeafRule {
 				fresh = false;
 				CachedMatch cm = cache.get(offset);
 				if (cm == null) {
-					if (options.study) {
+					if (options.study
+							&& (!matchesTrivially || offset < options.end)) {
 						if (options.debug)
 							ConditionalLeafRule.this.matchTrace(this, null);
 						return null;
