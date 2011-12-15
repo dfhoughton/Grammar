@@ -1,4 +1,5 @@
 1.04
+  * fixed tagging bug in alternation rules such as foo = [{bar} 'a' | 'b' ]
   
 1.03 14 December 2011
   * fixed zero-width final leaf bug where studying was causing <rule> /\s*/,
