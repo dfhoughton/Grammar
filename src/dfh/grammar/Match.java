@@ -1,7 +1,9 @@
 package dfh.grammar;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Node in an match tree.
@@ -293,6 +295,22 @@ public class Match {
 			return ((IdentifyChild) parent.r).is(parent, this, name);
 		}
 		return r.label().id.equals(name);
+	}
+
+	/**
+	 * Returns set of strings to which {@link #hasLabel(String)} will return
+	 * <code>true</code> for this {@link Match}. This method is useful for
+	 * debugging but not optimized for speed.
+	 * 
+	 * @return set of strings to which {@link #hasLabel(String)} will return
+	 *         <code>true</code> for this {@link Match}
+	 */
+	public Set<String> labels() {
+		if (parent != null && parent.r instanceof IdentifyChild)
+			return ((IdentifyChild) parent.r).labels(parent, this);
+		Set<String> set = new HashSet<String>(1);
+		set.add(r.label().id);
+		return set;
 	}
 
 	/**

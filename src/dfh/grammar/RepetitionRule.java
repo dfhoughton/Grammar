@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Rule to handle all the various repetition options.
@@ -357,5 +358,10 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 	@Override
 	public boolean is(Match parent, Match child, String label) {
 		return alternateTags.contains(label);
+	}
+
+	@Override
+	public Set<String> labels(Match parent, Match child) {
+		return new TreeSet<String>(alternateTags);
 	}
 }

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Matches a sequence of sub-rules. E.g.,
@@ -246,5 +247,20 @@ public class SequenceRule extends Rule implements IdentifyChild {
 			return tagList.get(index).contains(label);
 		}
 		return false;
+	}
+
+	@Override
+	public Set<String> labels(Match parent, Match child) {
+		Set<String> labels = new TreeSet<String>();
+		int index = 0;
+		for (Match m : parent.children()) {
+			if (m == child)
+				break;
+			index++;
+		}
+		if (index < sequence.length) {
+			labels.addAll(tagList.get(index));
+		}
+		return labels;
 	}
 }

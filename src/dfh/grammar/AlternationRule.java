@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.Map.Entry;
 
 /**
  * The object implementing rules such as
@@ -186,8 +188,20 @@ public class AlternationRule extends Rule implements IdentifyChild {
 
 	@Override
 	public Set<String> labels(Match parent, Match child) {
-		Rule r;
-		// TODO figure this out
-		return null;
+		Set<Rule> rs = new HashSet<Rule>();
+		for (Rule r : tagMap.values()) {
+			if (r == child.rule())
+				rs.add(r);
+			else if (r instanceof CyclicRule) {
+				if (((CyclicRule) r).r == child.rule())
+					rs.add(r);
+			}
+		}
+		Set<String> labels = new TreeSet<String>();
+		for (Entry<String, Rule> e : tagMap.entrySet()) {
+			if (rs.contains(e.getValue()))
+				labels.add(e.getKey());
+		}
+		return labels;
 	}
 }
