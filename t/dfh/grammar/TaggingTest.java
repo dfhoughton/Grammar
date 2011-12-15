@@ -89,6 +89,19 @@ public class TaggingTest {
 	}
 
 	@Test
+	public void tagTest5() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = [{foo} 'a' | 'b' ]",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "a";
+		Match m = g.matches(s).match();
+		assertNotNull(m.choose("ROOT"));
+		assertNotNull(m.choose("foo"));
+	}
+
+	@Test
 	public void labelTest1() throws GrammarException, IOException {
 		String[] rules = {
 				//
@@ -129,6 +142,8 @@ public class TaggingTest {
 		String s = "a  a";
 		Match m = g.matches(s).match();
 		assertNotNull(m.choose("a"));
+		assertNotNull(m.choose("b"));
+		assertNotNull(m.choose("c"));
 	}
 
 	@Test

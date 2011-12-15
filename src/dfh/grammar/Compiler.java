@@ -696,6 +696,15 @@ public class Compiler {
 			Set<String> tags;
 			if (gf.alternates.get(0).size() == 1) {
 				Rule r = makeSingle(gf.alternates.get(0).get(0), cycleMap, null);
+				if (r instanceof AlternationRule) {
+					// fix tags
+					AlternationRule ar = (AlternationRule) r;
+					Set<Rule> rs = new HashSet<Rule>(ar.tagMap.values());
+					for (String s : gf.alternateTags) {
+						for (Rule sr : rs)
+							ar.tagMap.put(s, sr);
+					}
+				}
 				if (gf.rep.redundant()) {
 					setCondition(condition, r);
 					return redundancyCheck(r);
@@ -723,6 +732,7 @@ public class Compiler {
 			tags.add(r.uniqueId());
 			return redundancyCheck(r);
 		}
+		// is necessarily alternation at this point
 		Rule[] alternates = new Rule[gf.alternates.size()];
 		int index = 0;
 		StringBuilder b = new StringBuilder();
@@ -754,6 +764,9 @@ public class Compiler {
 			else
 				nonInitial = true;
 			b.append(subLabel(r));
+			for (String s : gf.alternateTags) {
+				tagMap.put(s, r);
+			}
 		}
 		b.append(']');
 		Label l = new Label(Type.nonTerminal, b.toString());

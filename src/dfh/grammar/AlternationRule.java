@@ -183,4 +183,11 @@ public class AlternationRule extends Rule implements IdentifyChild {
 		}
 		return false;
 	}
+
+	@Override
+	public Set<String> labels(Match parent, Match child) {
+		Rule r;
+		// TODO figure this out
+		return null;
+	}
 }
