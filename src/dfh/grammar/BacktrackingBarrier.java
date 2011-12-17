@@ -80,7 +80,7 @@ public class BacktrackingBarrier extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence s, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		return new BarrierMatcher(s, offset, master);
 	}
 

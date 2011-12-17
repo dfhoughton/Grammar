@@ -27,7 +27,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 		protected LinkedList<Matcher> matchers;
 
 		public RepetitionMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
+				Map<Integer, CachedMatch>[] cache, Label label,
 				Matcher master) {
 			super(cs, offset, cache, RepetitionRule.this, master);
 		}
@@ -57,7 +57,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 		private final boolean backtracks;
 
 		protected GreedyAndPossessive(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
+				Map<Integer, CachedMatch>[] cache, Label label,
 				boolean backtracks, Matcher master) {
 			super(cs, offset, cache, label, master);
 			this.backtracks = backtracks;
@@ -91,7 +91,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 	 */
 	private class GreedyMatcher extends GreedyAndPossessive {
 		protected GreedyMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
+				Map<Integer, CachedMatch>[] cache, Label label,
 				Matcher master) {
 			super(cs, offset, cache, label, true, master);
 		}
@@ -145,7 +145,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 		private int goal;
 
 		protected StingyMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
+				Map<Integer, CachedMatch>[] cache, Label label,
 				Matcher master) {
 			super(cs, offset, cache, label, master);
 			matchers = new LinkedList<Matcher>();
@@ -225,7 +225,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 	private class PossessiveMatcher extends GreedyAndPossessive {
 
 		protected PossessiveMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
+				Map<Integer, CachedMatch>[] cache, Label label,
 				Matcher master) {
 			super(cs, offset, cache, label, false, master);
 		}
@@ -276,7 +276,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 
 	@Override
 	public Matcher matcher(CharSequence cs, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		switch (repetition.t) {
 		case possessive:
 			return new PossessiveMatcher(cs, offset, cache, label, master);

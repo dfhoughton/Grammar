@@ -24,7 +24,7 @@ public class UncachedRepetitionRule extends RepetitionRule {
 		protected LinkedList<Matcher> matchers;
 
 		public UncachedRepetitionMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
+				Map<Integer, CachedMatch>[] cache, Label label,
 				Matcher master) {
 			super(cs, offset, cache, UncachedRepetitionRule.this, master);
 		}
@@ -73,7 +73,7 @@ public class UncachedRepetitionRule extends RepetitionRule {
 		private final boolean backtracks;
 
 		protected GreedyAndPossessive(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
+				Map<Integer, CachedMatch>[] cache, Label label,
 				boolean backtracks, Matcher master) {
 			super(cs, offset, cache, label, master);
 			this.backtracks = backtracks;
@@ -107,7 +107,7 @@ public class UncachedRepetitionRule extends RepetitionRule {
 	 */
 	private class GreedyMatcher extends GreedyAndPossessive {
 		protected GreedyMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
+				Map<Integer, CachedMatch>[] cache, Label label,
 				Matcher master) {
 			super(cs, offset, cache, label, true, master);
 		}
@@ -161,7 +161,7 @@ public class UncachedRepetitionRule extends RepetitionRule {
 		private int goal;
 
 		protected StingyMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
+				Map<Integer, CachedMatch>[] cache, Label label,
 				Matcher master) {
 			super(cs, offset, cache, label, master);
 			matchers = new LinkedList<Matcher>();
@@ -241,7 +241,7 @@ public class UncachedRepetitionRule extends RepetitionRule {
 	private class PossessiveMatcher extends GreedyAndPossessive {
 
 		protected PossessiveMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
+				Map<Integer, CachedMatch>[] cache, Label label,
 				Matcher master) {
 			super(cs, offset, cache, label, false, master);
 		}
@@ -289,7 +289,7 @@ public class UncachedRepetitionRule extends RepetitionRule {
 
 	@Override
 	public Matcher matcher(CharSequence cs, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		switch (repetition.t) {
 		case possessive:
 			return new PossessiveMatcher(cs, offset, cache, label, master);

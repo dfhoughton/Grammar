@@ -32,6 +32,7 @@ public abstract class Rule implements Serializable {
 	 * Cached unique id.
 	 */
 	protected String uid;
+	protected int cacheIndex;
 	/**
 	 * Used by {@link Grammar#describe()}.
 	 */
@@ -79,7 +80,7 @@ public abstract class Rule implements Serializable {
 	 *         offset
 	 */
 	public abstract Matcher matcher(CharSequence s, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master);
+			Map<Integer, CachedMatch>[] cache, Matcher master);
 
 	@Override
 	public String toString() {

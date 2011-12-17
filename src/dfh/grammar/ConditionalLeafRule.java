@@ -14,9 +14,9 @@ public class ConditionalLeafRule extends LeafRule {
 		private boolean fresh = true;
 
 		public LeafMatcher(CharSequence s, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Matcher master) {
 			super(s, offset, master);
-			this.cache = cache.get(label);
+			this.cache = cache[rule().cacheIndex];
 		}
 
 		@Override
@@ -86,7 +86,7 @@ public class ConditionalLeafRule extends LeafRule {
 
 	@Override
 	public Matcher matcher(CharSequence s, final Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		return new LeafMatcher(s, offset, cache, master);
 	}
 

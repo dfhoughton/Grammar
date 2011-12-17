@@ -33,7 +33,7 @@ public class BackReferenceRule extends Rule {
 		private boolean fresh = true;
 
 		public BackReferenceMatcher(CharSequence s, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Matcher master) {
 			super(s, offset, master);
 		}
 
@@ -95,7 +95,7 @@ public class BackReferenceRule extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence s, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		return new BackReferenceMatcher(s, offset, cache, master);
 	}
 

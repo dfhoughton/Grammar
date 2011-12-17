@@ -3,7 +3,6 @@ package dfh.grammar;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * Immutable* data structure holding match options.
@@ -17,11 +16,12 @@ import java.util.Map.Entry;
  * 
  */
 public class GlobalState {
-	public final boolean allowOverlap, study, containsCycles, reversed, keepRightmost;
+	public final boolean allowOverlap, study, containsCycles, reversed,
+			keepRightmost;
 	public final int start, end;
 	public final PrintStream trace;
 	public final boolean debug;
-	public final Map<Label, Map<Integer, CachedMatch>> backwardsCache;
+	public final Map<Integer, CachedMatch>[] backwardsCache;
 	public final int maxDepth;
 
 	/**
@@ -44,14 +44,15 @@ public class GlobalState {
 	 * @param backwardsCache
 	 */
 	GlobalState(GlobalState gs, int end,
-			Map<Label, Map<Integer, CachedMatch>> backwardsCache) {
-		this(gs.allowOverlap, 0, end, gs.maxDepth, gs.trace, false, false,gs.keepRightmost,
-				backwardsCache);
+			Map<Integer, CachedMatch>[] backwardsCache) {
+		this(gs.allowOverlap, 0, end, gs.maxDepth, gs.trace, false, false,
+				gs.keepRightmost, backwardsCache);
 	}
 
+	@SuppressWarnings("unchecked")
 	private GlobalState(boolean allowOverlap, int start, int end, int maxDepth,
-			PrintStream trace, boolean study, boolean containsCycles, boolean keepRightmost,
-			Map<Label, Map<Integer, CachedMatch>> backwardsCache) {
+			PrintStream trace, boolean study, boolean containsCycles,
+			boolean keepRightmost, Map<Integer, CachedMatch>[] backwardsCache) {
 		this.allowOverlap = allowOverlap;
 		this.start = start;
 		this.end = end;
@@ -63,12 +64,9 @@ public class GlobalState {
 		if (backwardsCache != null) {
 			this.study = false;
 			this.reversed = true;
-			this.backwardsCache = new HashMap<Label, Map<Integer, CachedMatch>>(
-					backwardsCache.size());
-			for (Entry<Label, Map<Integer, CachedMatch>> e : backwardsCache
-					.entrySet()) {
-				this.backwardsCache.put(e.getKey(),
-						new HashMap<Integer, CachedMatch>());
+			this.backwardsCache = new Map[backwardsCache.length];
+			for (int i = 0; i < backwardsCache.length; i++) {
+				this.backwardsCache[i] = new HashMap<Integer, CachedMatch>();
 			}
 		} else {
 			this.study = study;

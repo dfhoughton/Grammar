@@ -27,7 +27,7 @@ public class AlternationRule extends Rule implements IdentifyChild {
 		Matcher mostRecent = null;
 
 		public AlternationMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Matcher master) {
 			super(cs, offset, cache, AlternationRule.this, master);
 		}
 
@@ -83,7 +83,7 @@ public class AlternationRule extends Rule implements IdentifyChild {
 
 	@Override
 	public Matcher matcher(CharSequence cs, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		return new AlternationMatcher(cs, offset, cache, master);
 	}
 

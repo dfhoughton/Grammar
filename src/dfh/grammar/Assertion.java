@@ -17,24 +17,24 @@ public class Assertion extends Rule {
 	private static final long serialVersionUID = 1L;
 
 	private class AssertionMatcher extends Matcher {
-		private final Map<Label, Map<Integer, CachedMatch>> cache;
+		private final Map<Integer, CachedMatch>[] cache;
 		private final Map<Integer, CachedMatch> subCache;
 		private final boolean backward;
 
 		private AssertionMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Matcher master) {
 			super(cs, offset, master);
 			this.cache = cache;
-			this.subCache = cache.get(label);
+			this.subCache = cache[rule().cacheIndex];
 			backward = false;
 		}
 
 		public AssertionMatcher(CharSequence reversed, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master,
+				Map<Integer, CachedMatch>[] cache, Matcher master,
 				GlobalState gs) {
 			super(reversed, offset, master, gs);
 			this.cache = gs.backwardsCache;
-			this.subCache = cache.get(label);
+			this.subCache = cache[rule().cacheIndex];
 			backward = true;
 		}
 
@@ -146,7 +146,7 @@ public class Assertion extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence s, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		if (forward)
 			return new AssertionMatcher(s, offset, cache, master);
 		CharSequence reversed = new ReversedCharSequence(s, offset,
