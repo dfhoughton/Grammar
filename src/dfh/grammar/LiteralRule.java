@@ -195,10 +195,4 @@ public class LiteralRule extends Rule {
 		}
 		return this;
 	}
-
-	@Override
-	protected void setUid() {
-		if (uid == null)
-			uid = uniqueId();
-	}
 }
