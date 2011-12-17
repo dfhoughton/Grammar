@@ -204,4 +204,11 @@ public class AlternationRule extends Rule implements IdentifyChild {
 		}
 		return labels;
 	}
+
+	@Override
+	protected void setUid() {
+		uid = uniqueId();
+		for (Rule r : alternates)
+			r.setUid();
+	}
 }

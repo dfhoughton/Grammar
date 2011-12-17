@@ -78,4 +78,12 @@ public class CyclicRule extends Rule {
 		cr.r = r;
 		return cr;
 	}
+
+	@Override
+	protected void setUid() {
+		if (uid == null) {
+			uid = uniqueId();
+			r.setUid();
+		}
+	}
 }

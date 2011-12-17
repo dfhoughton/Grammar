@@ -29,6 +29,10 @@ public abstract class Rule implements Serializable {
 	 */
 	protected Label label;
 	/**
+	 * Cached unique id.
+	 */
+	protected String uid;
+	/**
 	 * Used by {@link Grammar#describe()}.
 	 */
 	int generation = -1;
@@ -80,6 +84,15 @@ public abstract class Rule implements Serializable {
 	@Override
 	public String toString() {
 		return label.id;
+	}
+
+	public String uid() {
+		return uid;
+	}
+
+	protected void setUid() {
+		if (uid == null)
+			uid = uniqueId();
 	}
 
 	/**

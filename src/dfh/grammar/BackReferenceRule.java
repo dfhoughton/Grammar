@@ -128,5 +128,4 @@ public class BackReferenceRule extends Rule {
 				index);
 		return brr;
 	}
-
 }

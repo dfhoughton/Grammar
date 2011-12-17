@@ -83,4 +83,12 @@ public class DeferredDefinitionRule extends Rule {
 		ddr.r = r;
 		return ddr;
 	}
+
+	@Override
+	protected void setUid() {
+		if (uid == null) {
+			uid = uniqueId();
+			r.setUid();
+		}
+	}
 }

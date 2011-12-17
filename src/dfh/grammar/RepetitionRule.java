@@ -364,4 +364,12 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 	public Set<String> labels(Match parent, Match child) {
 		return new TreeSet<String>(alternateTags);
 	}
+
+	@Override
+	protected void setUid() {
+		if (uid == null) {
+			uid = uniqueId();
+			r.setUid();
+		}
+	}
 }

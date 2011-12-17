@@ -217,5 +217,4 @@ public class Assertion extends Rule {
 					"one cannot reset an assertion sub-descriptoin");
 		this.subDescription = subDescription;
 	}
-
 }

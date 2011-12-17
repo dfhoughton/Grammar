@@ -263,4 +263,13 @@ public class SequenceRule extends Rule implements IdentifyChild {
 		}
 		return labels;
 	}
+
+	@Override
+	protected void setUid() {
+		if (uid == null) {
+			uid = uniqueId();
+			for (Rule r : sequence)
+				r.setUid();
+		}
+	}
 }

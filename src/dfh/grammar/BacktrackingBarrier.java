@@ -111,5 +111,4 @@ public class BacktrackingBarrier extends Rule {
 	public Rule shallowClone() {
 		return new BacktrackingBarrier(isSingle);
 	}
-
 }
