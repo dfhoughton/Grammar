@@ -243,8 +243,8 @@ public abstract class Rule implements Serializable {
 	 * @return set of start offsets of matches
 	 */
 	public abstract Set<Integer> study(CharSequence s,
-			Map<Integer, CachedMatch>[] cache,
-			Set<Rule> studiedRules, GlobalState options);
+			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
+			GlobalState options);
 
 	/**
 	 * Returns whether this rule can match the null string. This method is used
@@ -348,5 +348,10 @@ public abstract class Rule implements Serializable {
 			return currentMax;
 		visited.add(this);
 		return Math.max(cacheIndex, currentMax);
+	}
+
+	protected void rules(Map<String, Rule> map) {
+		if (!map.containsKey(uid()))
+			map.put(uid(), this);
 	}
 }

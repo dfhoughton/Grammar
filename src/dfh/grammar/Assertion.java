@@ -232,11 +232,27 @@ public class Assertion extends Rule {
 	}
 
 	@Override
+	protected void setUid() {
+		if (uid == null) {
+			uid = uniqueId();
+			r.setUid();
+		}
+	}
+
+	@Override
 	protected int maxCacheIndex(int currentMax, Set<Rule> visited) {
 		if (visited.contains(this))
 			return currentMax;
 		visited.add(this);
 		int max = Math.max(cacheIndex, currentMax);
 		return r.maxCacheIndex(max, visited);
+	}
+
+	@Override
+	protected void rules(Map<String, Rule> map) {
+		if (!map.containsKey(uid())) {
+			map.put(uid(), this);
+			r.rules(map);
+		}
 	}
 }

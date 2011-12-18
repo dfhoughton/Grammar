@@ -237,4 +237,13 @@ public class AlternationRule extends Rule implements IdentifyChild {
 			max = Math.max(max, r.maxCacheIndex(max, visited));
 		return max;
 	}
+
+	@Override
+	protected void rules(Map<String, Rule> map) {
+		if (!map.containsKey(uid())) {
+			map.put(uid(), this);
+			for (Rule r : alternates)
+				r.rules(map);
+		}
+	}
 }

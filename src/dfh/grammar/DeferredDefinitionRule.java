@@ -113,4 +113,12 @@ public class DeferredDefinitionRule extends Rule {
 		int max = Math.max(cacheIndex, currentMax);
 		return r.maxCacheIndex(max, visited);
 	}
+
+	@Override
+	protected void rules(Map<String, Rule> map) {
+		if (!map.containsKey(uid())) {
+			map.put(uid(), this);
+			r.rules(map);
+		}
+	}
 }

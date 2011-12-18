@@ -344,6 +344,7 @@ public class Grammar implements Serializable, Cloneable {
 	private final Map<String, Set<Rule>> knownConditions;
 	private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
 	private Boolean containsAlternation;
+	private Set<Rule> ruleSet;
 
 	/**
 	 * Delegates to {@link #Grammar(String[], Map)}, setting the second
@@ -1060,7 +1061,7 @@ public class Grammar implements Serializable, Cloneable {
 		if (options.study) {
 			Set<Rule> studiedRules = new HashSet<Rule>();
 			if (options.containsCycles) {
-				for (Rule r : rules.values()) {
+				for (Rule r : rules()) {
 					if (r instanceof AlternationRule
 							|| r instanceof SequenceRule
 							|| r instanceof RepetitionRule
@@ -1074,6 +1075,15 @@ public class Grammar implements Serializable, Cloneable {
 						studiedRules, options));
 		}
 		return startOffsets;
+	}
+
+	private synchronized Set<Rule> rules() {
+		if (ruleSet == null) {
+			Map<String, Rule> map = new HashMap<String, Rule>();
+			getRoot().rules(map);
+			ruleSet = new HashSet<Rule>(map.values());
+		}
+		return ruleSet;
 	}
 
 	/**
