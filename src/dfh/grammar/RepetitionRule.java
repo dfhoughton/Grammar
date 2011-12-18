@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Rule to handle all the various repetition options.
@@ -15,7 +14,7 @@ import java.util.TreeSet;
  * 
  */
 @Reversible
-public class RepetitionRule extends Rule implements IdentifyChild {
+public class RepetitionRule extends Rule {
 	private static final long serialVersionUID = 1L;
 	Rule r;
 	final Repetition repetition;
@@ -352,13 +351,8 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 	}
 
 	@Override
-	public boolean is(Match parent, Match child, String label) {
-		return alternateTags.contains(label);
-	}
-
-	@Override
-	public Set<String> labels(Match parent, Match child) {
-		return new TreeSet<String>(alternateTags);
+	protected void addLabels(Match match, Set<String> labels) {
+		labels.addAll(alternateTags);
 	}
 
 	@Override

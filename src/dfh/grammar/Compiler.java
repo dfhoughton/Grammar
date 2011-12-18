@@ -32,7 +32,6 @@ public class Compiler {
 	private Map<String, Label> terminalLabelMap;
 	private Collection<Label> undefinedRules = new HashSet<Label>();
 	private Map<Label, Set<Label>> dependencyMap = new HashMap<Label, Set<Label>>();
-	private List<String> redundantLabels = new LinkedList<String>();
 	private final Label root;
 	private boolean recursive;
 	private Map<String, Set<Label>> undefinedConditions = new HashMap<String, Set<Label>>();
@@ -316,10 +315,10 @@ public class Compiler {
 			terminalLabelMap.put(l.id, l);
 
 		// TODO check to make sure this is unnecessary
-//		// now we add in all the synthetic rules
-//		redundancyMap.keySet().removeAll(redundantLabels);
-//		for (Rule ru : redundancyMap.values())
-//			rules.put(ru.label(), ru);
+		// // now we add in all the synthetic rules
+		// redundancyMap.keySet().removeAll(redundantLabels);
+		// for (Rule ru : redundancyMap.values())
+		// rules.put(ru.label(), ru);
 	}
 
 	static Match parseCondition(String line, String cnd) {
@@ -514,11 +513,26 @@ public class Compiler {
 	private Rule parseRule(Label label, List<RuleFragment> fragments,
 			Map<Label, CyclicRule> cycleMap) {
 		Rule r;
-		if (fragments.size() == 1)
-			r = makeSingle(label, fragments.get(0), cycleMap);
-		else
+		if (fragments.size() == 1) {
+			RuleFragment rf = fragments.get(0);
+			if (isNamedCapture(rf)) {
+				GroupFragment gf = (GroupFragment) rf;
+				r = parseRule(label, gf.alternates.get(0), cycleMap);
+				r.setLabels(gf.alternateTags);
+			} else
+				r = makeSingle(label, fragments.get(0), cycleMap);
+		} else
 			r = makeSequence(label, fragments, cycleMap);
 		return r;
+	}
+
+	private boolean isNamedCapture(RuleFragment rf) {
+		if (rf instanceof GroupFragment) {
+			GroupFragment gf = (GroupFragment) rf;
+			return (gf.alternates.size() == 1 && gf.rep.redundant() && !gf.alternateTags
+					.isEmpty());
+		}
+		return false;
 	}
 
 	private Rule makeSingle(Label label, RuleFragment ruleFragment,
@@ -623,9 +637,7 @@ public class Compiler {
 			if (l.rep.redundant())
 				return r;
 			Label label = new Label(Type.nonTerminal, l.toString());
-			Set<String> tags = new HashSet<String>(1);
-			tags.add(l.id);
-			r = new RepetitionRule(label, r, l.rep, tags);
+			r = new RepetitionRule(label, r, l.rep, new HashSet<String>(0));
 			setCondition(condition, r);
 			return r;
 		} else if (rf instanceof LiteralFragment) {
@@ -637,10 +649,8 @@ public class Compiler {
 				return r;
 			}
 			l = new Label(Type.nonTerminal, lf.toString());
-			Set<String> tags = new HashSet<String>(1);
-			r = new RepetitionRule(l, r, lf.rep, tags);
+			r = new RepetitionRule(l, r, lf.rep, new HashSet<String>(0));
 			setCondition(condition, r);
-			tags.add(r.uniqueId());
 			return r;
 		} else if (rf instanceof BackReferenceFragment) {
 			BackReferenceFragment brf = (BackReferenceFragment) rf;
@@ -668,6 +678,18 @@ public class Compiler {
 			return r;
 		}
 		GroupFragment gf = (GroupFragment) rf;
+		Set<String> tags = gf.alternateTags;
+		// if we've gotten here then the !gf.rep.redundant(), because these cases are handled by the sequence parser or the initial rule body parser
+			if (gf.alternates.size() == 1) {
+				if (gf.alternates.get(0).size() == 1) {
+					// repeated rule with capture
+				} else {
+					// repeated sequence
+				}
+			} else {
+				// repeated alternation
+				
+			}
 		if (gf.alternates.size() == 1) {
 			Set<String> tags;
 			if (gf.alternates.get(0).size() == 1) {
@@ -749,10 +771,8 @@ public class Compiler {
 		Rule r = new AlternationRule(l, alternates, tagMap);
 		if (gf.rep.redundant()) {
 			setCondition(condition, r);
-			r = r;
 			return r;
 		}
-		r = r;
 		l = new Label(Type.nonTerminal, l.toString() + gf.rep);
 		Set<String> tags = new HashSet<String>(1);
 		r = new RepetitionRule(l, r, gf.rep, tags);
@@ -973,5 +993,25 @@ public class Compiler {
 
 	public Map<String, Set<Label>> undefinedConditions() {
 		return new HashMap<String, Set<Label>>(undefinedConditions);
+	}
+
+	private Set<String> namedCapture(List<RuleFragment> ruleBody) {
+		if (ruleBody.size() == 1) {
+			RuleFragment rf = ruleBody.get(0);
+			return namedCapture(rf);
+		}
+		return null;
+	}
+
+	private Set<String> namedCapture(RuleFragment rf) {
+		if (rf instanceof GroupFragment) {
+			GroupFragment gf = (GroupFragment) rf;
+			if (!gf.alternateTags.isEmpty())
+				;
+			Set<String> namedCapture = new HashSet<String>(gf.alternateTags);
+			gf.alternateTags.clear();
+			return namedCapture;
+		} else
+			return null;
 	}
 }

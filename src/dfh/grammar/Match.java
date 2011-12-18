@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Node in an match tree.
@@ -101,6 +102,7 @@ public class Match {
 	private Match parent;
 	private Match[] children;
 	private String group;
+	private Set<String> labels;
 	/**
 	 * Used as a placeholder in offset cache.
 	 */
@@ -291,10 +293,7 @@ public class Match {
 	 *         the given id
 	 */
 	public boolean hasLabel(String name) {
-		if (parent != null && parent.r instanceof IdentifyChild) {
-			return ((IdentifyChild) parent.r).is(parent, this, name);
-		}
-		return r.label().id.equals(name);
+		return labels().contains(name);
 	}
 
 	/**
@@ -305,12 +304,16 @@ public class Match {
 	 * @return set of strings to which {@link #hasLabel(String)} will return
 	 *         <code>true</code> for this {@link Match}
 	 */
-	public Set<String> labels() {
-		if (parent != null && parent.r instanceof IdentifyChild)
-			return ((IdentifyChild) parent.r).labels(parent, this);
-		Set<String> set = new HashSet<String>(1);
-		set.add(r.label().id);
-		return set;
+	public synchronized Set<String> labels() {
+		if (labels == null) {
+			labels = new TreeSet<String>();
+			labels.add(r.label.id);
+			labels.add(r.uid());
+			r.addLabels(labels);
+			if (parent != null)
+				parent.r.addLabels(this, labels);
+		}
+		return labels;
 	}
 
 	/**

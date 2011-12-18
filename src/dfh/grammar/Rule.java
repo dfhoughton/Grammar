@@ -49,6 +49,19 @@ public abstract class Rule implements Serializable {
 	protected String condition;
 
 	/**
+	 * A set of labels associated with this rule wherever it appears. Such
+	 * labels are assigned like so:
+	 * 
+	 * <pre>
+	 * foo = [{bar,quux} "the rule" ]
+	 * baz = "qux" [{twiddle} /in line regex/ ]
+	 * </pre>
+	 * 
+	 * That is, it is a pure "named capture".
+	 */
+	private Set<String> labels;
+
+	/**
 	 * Assigns given label to {@link Rule}.
 	 * 
 	 * @param label
@@ -353,5 +366,38 @@ public abstract class Rule implements Serializable {
 	protected void rules(Map<String, Rule> map) {
 		if (!map.containsKey(uid()))
 			map.put(uid(), this);
+	}
+
+	/**
+	 * Add to the label set any additional tags associated with all instances of
+	 * this rule.
+	 * 
+	 * @param labels
+	 */
+	protected void addLabels(Set<String> labels) {
+		if (this.labels != null)
+			labels.addAll(this.labels);
+	}
+
+	/**
+	 * Add to the labels of the child match any tags associated with the child
+	 * rule only in this parent rule.
+	 * 
+	 * @param match
+	 *            the match of a child rule of this rule
+	 * @param labels
+	 */
+	protected void addLabels(Match match, Set<String> labels) {
+	}
+
+	/**
+	 * Assign a set of alternate labels to the rule. This is only used during
+	 * compilation.
+	 * 
+	 * @param labels
+	 *            tags assigned by a named capture expression
+	 */
+	void setLabels(Set<String> labels) {
+		this.labels = labels;
 	}
 }
