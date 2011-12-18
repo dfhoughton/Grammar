@@ -17,3 +17,4 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 . make sure non-terminal matches are using their subcache
 . add zero-width optimizations to conditionalized leaf rules
 . add labels() method to Match
+. make cyclic rules reversible
