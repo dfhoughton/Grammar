@@ -211,4 +211,30 @@ public class AlternationRule extends Rule implements IdentifyChild {
 		for (Rule r : alternates)
 			r.setUid();
 	}
+
+	@Override
+	protected void setCacheIndex(Map<String, Integer> uids) {
+		if (cacheIndex == -1) {
+			Integer i = uids.get(uid());
+			if (i == null) {
+				i = uids.size();
+				uids.put(uid(), i);
+			}
+			cacheIndex = i;
+			for (Rule r : alternates)
+				r.setCacheIndex(uids);
+		}
+
+	}
+
+	@Override
+	protected int maxCacheIndex(int currentMax, Set<Rule> visited) {
+		if (visited.contains(this))
+			return currentMax;
+		visited.add(this);
+		int max = Math.max(cacheIndex, currentMax);
+		for (Rule r : alternates)
+			max = Math.max(max, r.maxCacheIndex(max, visited));
+		return max;
+	}
 }

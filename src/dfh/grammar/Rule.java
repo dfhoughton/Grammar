@@ -32,7 +32,11 @@ public abstract class Rule implements Serializable {
 	 * Cached unique id.
 	 */
 	protected String uid;
-	protected int cacheIndex;
+	/**
+	 * The index of the offset cache for this rule. Set to -1 until it is set by
+	 * {@link #setCacheIndex(Map)}.
+	 */
+	protected int cacheIndex = -1;
 	/**
 	 * Used by {@link Grammar#describe()}.
 	 */
@@ -320,5 +324,29 @@ public abstract class Rule implements Serializable {
 	 */
 	public Rule reverse() {
 		throw new GrammarException(this.getClass() + " cannot be reversed");
+	}
+
+	/**
+	 * Sets index of cache for this rule in offset matching cache.
+	 * 
+	 * @param uids
+	 *            a map from unique ids to indices
+	 */
+	protected void setCacheIndex(Map<String, Integer> uids) {
+		if (cacheIndex == -1) {
+			Integer i = uids.get(uid());
+			if (i == null) {
+				i = uids.size();
+				uids.put(uid(), i);
+			}
+			cacheIndex = i;
+		}
+	}
+
+	protected int maxCacheIndex(int currentMax, Set<Rule> visited) {
+		if (visited.contains(this))
+			return currentMax;
+		visited.add(this);
+		return Math.max(cacheIndex, currentMax);
 	}
 }

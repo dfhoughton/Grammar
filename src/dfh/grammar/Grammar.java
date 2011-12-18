@@ -220,12 +220,12 @@ public class Grammar implements Serializable, Cloneable {
 		private Matcher m;
 		private LTMMatcher ltmm;
 		private LinkedList<Integer> startOffsets;
-		private Map<Label, Map<Integer, CachedMatch>> cache;
+		private Map<Integer, CachedMatch>[] cache;
 		private Match next;
 		private final boolean ltm;
 
 		FindMatcher(CharSequence s, LinkedList<Integer> startOffsets,
-				Map<Label, Map<Integer, CachedMatch>> cache,
+				Map<Integer, CachedMatch>[] cache,
 				GlobalState options, boolean ltm) {
 			super(s, options);
 			this.startOffsets = startOffsets;
@@ -731,7 +731,7 @@ public class Grammar implements Serializable, Cloneable {
 		checkComplete();
 		final GlobalState co = verifyOptions(cs, opt);
 		final boolean ltm = containsAlternation && opt.longestMatch();
-		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
+		final Map<Integer, CachedMatch>[] cache = offsetCache();
 		final Set<Integer> startOffsets = startOffsets(cs, co, cache);
 		final Matcher m = rules.get(root).matcher(cs, co.start, cache,
 				new DummyMatcher(cs, co));
@@ -861,7 +861,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @return map from labels to sets of offsets where the associated rules are
 	 *         known not to match
 	 */
-	private Map<Label, Map<Integer, CachedMatch>> offsetCache() {
+	private Map<Integer, CachedMatch>[] offsetCache() {
 		Map<Label, Map<Integer, CachedMatch>> offsetCache = new HashMap<Label, Map<Integer, CachedMatch>>(
 				rules.size());
 		for (Label l : rules.keySet()) {

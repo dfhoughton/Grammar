@@ -27,8 +27,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 		protected LinkedList<Matcher> matchers;
 
 		public RepetitionMatcher(CharSequence cs, Integer offset,
-				Map<Integer, CachedMatch>[] cache, Label label,
-				Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Label label, Matcher master) {
 			super(cs, offset, cache, RepetitionRule.this, master);
 		}
 
@@ -91,8 +90,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 	 */
 	private class GreedyMatcher extends GreedyAndPossessive {
 		protected GreedyMatcher(CharSequence cs, Integer offset,
-				Map<Integer, CachedMatch>[] cache, Label label,
-				Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Label label, Matcher master) {
 			super(cs, offset, cache, label, true, master);
 		}
 
@@ -145,8 +143,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 		private int goal;
 
 		protected StingyMatcher(CharSequence cs, Integer offset,
-				Map<Integer, CachedMatch>[] cache, Label label,
-				Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Label label, Matcher master) {
 			super(cs, offset, cache, label, master);
 			matchers = new LinkedList<Matcher>();
 			matched = new LinkedList<Match>();
@@ -225,8 +222,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 	private class PossessiveMatcher extends GreedyAndPossessive {
 
 		protected PossessiveMatcher(CharSequence cs, Integer offset,
-				Map<Integer, CachedMatch>[] cache, Label label,
-				Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Label label, Matcher master) {
 			super(cs, offset, cache, label, false, master);
 		}
 
@@ -371,5 +367,27 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 			uid = uniqueId();
 			r.setUid();
 		}
+	}
+
+	@Override
+	protected void setCacheIndex(Map<String, Integer> uids) {
+		if (cacheIndex == -1) {
+			Integer i = uids.get(uid());
+			if (i == null) {
+				i = uids.size();
+				uids.put(uid(), i);
+			}
+			cacheIndex = i;
+			r.setCacheIndex(uids);
+		}
+	}
+
+	@Override
+	protected int maxCacheIndex(int currentMax, Set<Rule> visited) {
+		if (visited.contains(this))
+			return currentMax;
+		visited.add(this);
+		int max = Math.max(cacheIndex, currentMax);
+		return r.maxCacheIndex(max, visited);
 	}
 }
