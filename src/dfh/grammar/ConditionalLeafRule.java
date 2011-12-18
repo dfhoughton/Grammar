@@ -92,9 +92,9 @@ public class ConditionalLeafRule extends LeafRule {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, GlobalState options) {
-		Map<Integer, CachedMatch> subCache = cache.get(label);
+			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
+			GlobalState options) {
+		Map<Integer, CachedMatch> subCache = cache[cacheIndex];
 		Set<Integer> startOffsets = new HashSet<Integer>();
 		if (subCache.keySet().isEmpty()) {
 			if (studiedRules.contains(this))

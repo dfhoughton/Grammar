@@ -96,8 +96,8 @@ public class BacktrackingBarrier extends Rule {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, GlobalState options) {
+			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
+			GlobalState options) {
 		// one cannot study barriers
 		return new HashSet<Integer>(0);
 	}

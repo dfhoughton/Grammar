@@ -126,8 +126,8 @@ public class AlternationRule extends Rule implements IdentifyChild {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, GlobalState options) {
+			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
+			GlobalState options) {
 		Set<Integer> startOffsets = new HashSet<Integer>();
 		for (Rule r : alternates)
 			startOffsets.addAll(r.study(s, cache, studiedRules, options));

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import dfh.grammar.Label.Type;
@@ -225,8 +226,8 @@ public class Grammar implements Serializable, Cloneable {
 		private final boolean ltm;
 
 		FindMatcher(CharSequence s, LinkedList<Integer> startOffsets,
-				Map<Integer, CachedMatch>[] cache,
-				GlobalState options, boolean ltm) {
+				Map<Integer, CachedMatch>[] cache, GlobalState options,
+				boolean ltm) {
 			super(s, options);
 			this.startOffsets = startOffsets;
 			this.cache = cache;
@@ -847,7 +848,7 @@ public class Grammar implements Serializable, Cloneable {
 		checkComplete();
 		final GlobalState options = verifyOptions(s, opt);
 		final boolean ltm = containsAlternation && opt.longestMatch();
-		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
+		final Map<Integer, CachedMatch>[] cache = offsetCache();
 		List<Integer> list = new ArrayList<Integer>(startOffsets(s, options,
 				cache));
 		Collections.sort(list);
@@ -862,13 +863,18 @@ public class Grammar implements Serializable, Cloneable {
 	 *         known not to match
 	 */
 	private Map<Integer, CachedMatch>[] offsetCache() {
-		Map<Label, Map<Integer, CachedMatch>> offsetCache = new HashMap<Label, Map<Integer, CachedMatch>>(
-				rules.size());
-		for (Label l : rules.keySet()) {
-			// might use TreeMap to save a little memory
-			offsetCache.put(l, new HashMap<Integer, CachedMatch>());
-		}
+		getRoot().setUid();
+		getRoot().setCacheIndex(new HashMap<String, Integer>());
+		int max = getRoot().maxCacheIndex(-1, new HashSet<Rule>());
+		@SuppressWarnings("unchecked")
+		Map<Integer, CachedMatch>[] offsetCache = new Map[max + 1];
+		for (int i = 0; i < offsetCache.length; i++)
+			offsetCache[i] = new TreeMap<Integer, CachedMatch>();
 		return offsetCache;
+	}
+
+	private Rule getRoot() {
+		return rules.get(root);
 	}
 
 	/**
@@ -996,7 +1002,7 @@ public class Grammar implements Serializable, Cloneable {
 			throws GrammarException {
 		checkComplete();
 		final GlobalState options = verifyOptions(s, opt);
-		final Map<Label, Map<Integer, CachedMatch>> cache = offsetCache();
+		final Map<Integer, CachedMatch>[] cache = offsetCache();
 		final Set<Integer> startOffsets = startOffsets(s, options, cache);
 		final Matcher m = rules.get(root).matcher(s, options.start, cache,
 				new DummyMatcher(s, options));
@@ -1049,8 +1055,7 @@ public class Grammar implements Serializable, Cloneable {
 	}
 
 	private Set<Integer> startOffsets(final CharSequence s,
-			final GlobalState options,
-			final Map<Label, Map<Integer, CachedMatch>> cache) {
+			final GlobalState options, final Map<Integer, CachedMatch>[] cache) {
 		final Set<Integer> startOffsets = new HashSet<Integer>();
 		if (options.study) {
 			Set<Rule> studiedRules = new HashSet<Rule>();

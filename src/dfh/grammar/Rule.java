@@ -243,7 +243,7 @@ public abstract class Rule implements Serializable {
 	 * @return set of start offsets of matches
 	 */
 	public abstract Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache,
+			Map<Integer, CachedMatch>[] cache,
 			Set<Rule> studiedRules, GlobalState options);
 
 	/**
