@@ -678,7 +678,7 @@ public class Compiler {
 		}
 		GroupFragment gf = (GroupFragment) rf;
 		Set<String> tags = gf.alternateTags;
-		// if we've gotten here then the !gf.rep.redundant(), because these
+		// if we've gotten here then !gf.rep.redundant(), because these
 		// cases are handled by the sequence parser or the initial rule body
 		// parser
 		if (gf.alternates.size() == 1) {
@@ -741,7 +741,7 @@ public class Compiler {
 			b.append(']');
 			Label l = new Label(Type.nonTerminal, b.toString());
 			Rule r = new AlternationRule(l, alternates.toArray(new Rule[alternates.size()]), tagMap);
-			if (gf.rep.redundant()) {
+			if (gf.rep.redundant()) { // TODO confirm that this won't be true
 				setCondition(condition, r);
 				return r;
 			}
