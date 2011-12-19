@@ -104,6 +104,11 @@ public class Match {
 	private String group;
 	private Set<String> labels;
 	/**
+	 * Indicates that all terminal modifications have been completed and all
+	 * methods are available.
+	 */
+	private boolean done = false;
+	/**
 	 * Used as a placeholder in offset cache.
 	 */
 	public static final Match DUMMY = new Match();
@@ -187,6 +192,7 @@ public class Match {
 	 * Recursively defines link from child to parent.
 	 */
 	void establishParentage() {
+		done = true;
 		if (children == null)
 			children = new Match[0];
 		else {
@@ -286,6 +292,9 @@ public class Match {
 	/**
 	 * Returns whether the {@link Rule} that generated this {@link Match} has
 	 * the given name or tag.
+	 * <p>
+	 * Cannot be used in {@link Condition}; {@link GrammarException} will be
+	 * thrown.
 	 * 
 	 * @param name
 	 *            a {@link Label#id}
@@ -300,20 +309,27 @@ public class Match {
 	 * Returns set of strings to which {@link #hasLabel(String)} will return
 	 * <code>true</code> for this {@link Match}. This method is useful for
 	 * debugging but not optimized for speed.
+	 * <p>
+	 * Cannot be used in {@link Condition}; {@link GrammarException} will be
+	 * thrown.
 	 * 
 	 * @return set of strings to which {@link #hasLabel(String)} will return
 	 *         <code>true</code> for this {@link Match}
 	 */
 	public synchronized Set<String> labels() {
-		if (labels == null) {
-			labels = new TreeSet<String>();
-			labels.add(r.label.id);
-			labels.add(r.uid());
-			r.addLabels(labels);
-			if (parent != null)
-				parent.r.addLabels(this, labels);
-		}
-		return labels;
+		if (done) {
+			if (labels == null) {
+				labels = new TreeSet<String>();
+				labels.add(r.label.id);
+				labels.add(r.uid());
+				r.addLabels(labels);
+				if (parent != null)
+					parent.r.addLabels(this, labels);
+			}
+			return labels;
+		} else
+			throw new GrammarException(
+					"labels() only available after grammar has completed match");
 	}
 
 	/**
