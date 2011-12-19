@@ -62,7 +62,7 @@ public class AlternationRule extends Rule {
 	}
 
 	protected final Rule[] alternates;
-	Map<String, Rule> tagMap;
+	Map<String, Set<String>> tagMap;
 	protected Condition c;
 
 	/**
@@ -70,10 +70,10 @@ public class AlternationRule extends Rule {
 	 * 
 	 * @param label
 	 * @param alternates
-	 * @param tagMap
+	 * @param tagMap2
 	 */
 	public AlternationRule(Label label, Rule[] alternates,
-			Map<String, Rule> tagMap) {
+			Map<String, Set<String>> tagMap) {
 		super(label);
 		this.alternates = alternates;
 		this.tagMap = tagMap;
@@ -145,7 +145,7 @@ public class AlternationRule extends Rule {
 	public Rule shallowClone() {
 		AlternationRule ar = new AlternationRule((Label) label.clone(),
 				Arrays.copyOf(alternates, alternates.length),
-				new HashMap<String, Rule>(tagMap));
+				new HashMap<String, Set<String>>(tagMap));
 		return ar;
 	}
 
@@ -175,7 +175,7 @@ public class AlternationRule extends Rule {
 
 	@Override
 	public void addLabels(Match match, Set<String> labels) {
-		// TODO remember tagMap
+		labels.addAll(tagMap.get(match.rule().uid()));
 	}
 
 	@Override

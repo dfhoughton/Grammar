@@ -1,10 +1,11 @@
 package dfh.grammar;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import dfh.grammar.util.Dotify;
 
 /**
  * Node in an match tree.
@@ -303,6 +304,16 @@ public class Match {
 	 */
 	public boolean hasLabel(String name) {
 		return labels().contains(name);
+	}
+
+	/**
+	 * Debugging method that calls {@link Dotify#dot(Match)}.
+	 * 
+	 * @return stringification of this notable suitable for graphing by
+	 *         GraphViz, etc.
+	 */
+	public String dot() {
+		return Dotify.dot(this);
 	}
 
 	/**
