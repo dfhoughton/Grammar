@@ -123,7 +123,7 @@ public class DeferredDefinitionRule extends Rule {
 	}
 
 	@Override
-	protected void fixAlternationCycles() {
-		r.fixAlternationCycles();
+	protected void fixAlternation() {
+		r.fixAlternation();
 	}
 }

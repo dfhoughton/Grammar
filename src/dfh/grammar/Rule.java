@@ -403,11 +403,11 @@ public abstract class Rule implements Serializable {
 
 	/**
 	 * find {@link AlternationRule} rules and fix {@link AlternationRule#tagMap}
-	 * so that there is mapping from {@link CyclicRule#r#uid()} to the proper
-	 * tag set.
+	 * so that there is mapping from {@link CyclicRule#r#uid()} or
+	 * {@link DeferredDefinitionRule#r#uid()}to the proper tag set.
 	 * <p>
 	 * This really need only be overridden in non-terminal rules.
 	 */
-	protected void fixAlternationCycles() {
+	protected void fixAlternation() {
 	}
 }

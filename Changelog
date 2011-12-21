@@ -1,6 +1,8 @@
 1.05
   * added lean memory cache option
   * added walk(MatchTest) method to Match
+  * fixed bug where an error was thrown when calling labels() on a match
+    produced by a deferred definition rule in an alternation
 
 1.04, 21 December 2011
   * fixed tagging bug in alternation rules such as foo = [{bar} 'a' | 'b' ]

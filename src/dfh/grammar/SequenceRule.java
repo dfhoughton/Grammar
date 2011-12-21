@@ -288,8 +288,8 @@ public class SequenceRule extends Rule {
 	}
 
 	@Override
-	protected void fixAlternationCycles() {
+	protected void fixAlternation() {
 		for (Rule r : sequence)
-			r.fixAlternationCycles();
+			r.fixAlternation();
 	}
 }

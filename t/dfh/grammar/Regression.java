@@ -54,4 +54,16 @@ public class Regression {
 		}
 	}
 
+	@Test
+	public void labelsAndDeferredRuleDefinition() {
+		try {
+			String[] rules = { "ROOT = <foo> | 'quux'" };
+			Grammar g = new Grammar(rules);
+			g.defineRule("foo", "bar");
+			Match m = g.matches("bar").match();
+			m.choose("foo");
+		} catch (Exception e) {
+			fail("threw exception: " + e);
+		}
+	}
 }

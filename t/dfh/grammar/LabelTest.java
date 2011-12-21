@@ -1,10 +1,8 @@
 package dfh.grammar;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -42,7 +40,6 @@ public class LabelTest {
 	public void testA() {
 		Match a = n.choose("\"a\"");
 		assertTrue("\"a\" has two labels", a.labels().size() == 2);
-		Match b = n.choose("f");
 	}
 
 	@Test

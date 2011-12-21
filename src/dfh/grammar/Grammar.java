@@ -871,7 +871,7 @@ public class Grammar implements Serializable, Cloneable {
 		// cache unique ids
 		getRoot().setUid();
 		// fix tag maps in alternations
-		getRoot().fixAlternationCycles();
+		getRoot().fixAlternation();
 		// create actual offset cache
 		getRoot().setCacheIndex(new HashMap<String, Integer>());
 		int max = getRoot().maxCacheIndex(-1, new HashSet<Rule>());

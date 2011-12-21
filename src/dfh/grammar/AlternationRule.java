@@ -221,7 +221,7 @@ public class AlternationRule extends Rule {
 	}
 
 	@Override
-	protected void fixAlternationCycles() {
+	protected void fixAlternation() {
 		for (Rule r : alternates) {
 			if (r instanceof CyclicRule) {
 				Set<String> set = tagMap.remove(r.uid());
@@ -229,8 +229,14 @@ public class AlternationRule extends Rule {
 					r = ((CyclicRule) r).r;
 					tagMap.put(r.uid(), set);
 				}
+			} else if (r instanceof DeferredDefinitionRule) {
+				Set<String> set = tagMap.remove(r.uid());
+				if (set != null) {
+					r = ((DeferredDefinitionRule) r).r;
+					tagMap.put(r.uid(), set);
+				}
 			}
-			r.fixAlternationCycles();
+			r.fixAlternation();
 		}
 	}
 }

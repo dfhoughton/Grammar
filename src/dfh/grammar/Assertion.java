@@ -257,7 +257,7 @@ public class Assertion extends Rule {
 	}
 
 	@Override
-	protected void fixAlternationCycles() {
-		r.fixAlternationCycles();
+	protected void fixAlternation() {
+		r.fixAlternation();
 	}
 }
