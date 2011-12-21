@@ -2,6 +2,7 @@
   * fixed tagging bug in alternation rules such as foo = [{bar} 'a' | 'b' ]
   * added dot() method to Match
   * added completion check on Match.labels()
+  * improved cache checking
   
 1.03 14 December 2011
   * fixed zero-width final leaf bug where studying was causing <rule> /\s*/,

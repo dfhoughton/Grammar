@@ -87,9 +87,10 @@ public abstract class NonterminalMatcher extends Matcher {
 
 	@Override
 	public boolean mightHaveNext() {
-		if (done) {
+		if (done)
 			return false;
-		}
+		if (CachedMatch.MISMATCH.equals(subCache.get(offset)))
+			return false;
 		if (next == null && !(options.containsCycles && cycleCheck()))
 			fetchNext();
 		return next != null;
