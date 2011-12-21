@@ -859,6 +859,8 @@ public class Grammar implements Serializable, Cloneable {
 
 	/**
 	 * Generates a cache to keep track of failing offsets for particular rules.
+	 * This method is also where other post-validation, pre-match preparations
+	 * take place.
 	 * 
 	 * @param options
 	 * 
@@ -870,6 +872,7 @@ public class Grammar implements Serializable, Cloneable {
 		getRoot().setUid();
 		// fix tag maps in alternations
 		getRoot().fixAlternationCycles();
+		// create actual offset cache
 		getRoot().setCacheIndex(new HashMap<String, Integer>());
 		int max = getRoot().maxCacheIndex(-1, new HashSet<Rule>());
 		@SuppressWarnings("unchecked")

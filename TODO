@@ -19,3 +19,4 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 * add labels() method to Match
 . make cyclic rules reversible
 . make use of root and rules field in Grammar more sane; perhaps eliminate latter altogether
+. clean up uid() uniqueId() business
