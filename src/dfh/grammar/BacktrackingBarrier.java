@@ -80,7 +80,7 @@ public class BacktrackingBarrier extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence s, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		return new BarrierMatcher(s, offset, master);
 	}
 
@@ -96,8 +96,8 @@ public class BacktrackingBarrier extends Rule {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, GlobalState options) {
+			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
+			GlobalState options) {
 		// one cannot study barriers
 		return new HashSet<Integer>(0);
 	}
@@ -111,5 +111,4 @@ public class BacktrackingBarrier extends Rule {
 	public Rule shallowClone() {
 		return new BacktrackingBarrier(isSingle);
 	}
-
 }

@@ -2,6 +2,10 @@ package dfh.grammar;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import dfh.grammar.util.Dotify;
 
 /**
  * Node in an match tree.
@@ -99,6 +103,12 @@ public class Match {
 	private Match parent;
 	private Match[] children;
 	private String group;
+	private Set<String> labels;
+	/**
+	 * Indicates that all terminal modifications have been completed and all
+	 * methods are available.
+	 */
+	private boolean done = false;
 	/**
 	 * Used as a placeholder in offset cache.
 	 */
@@ -183,6 +193,7 @@ public class Match {
 	 * Recursively defines link from child to parent.
 	 */
 	void establishParentage() {
+		done = true;
 		if (children == null)
 			children = new Match[0];
 		else {
@@ -282,6 +293,9 @@ public class Match {
 	/**
 	 * Returns whether the {@link Rule} that generated this {@link Match} has
 	 * the given name or tag.
+	 * <p>
+	 * Cannot be used in {@link Condition}; {@link GrammarException} will be
+	 * thrown.
 	 * 
 	 * @param name
 	 *            a {@link Label#id}
@@ -289,10 +303,44 @@ public class Match {
 	 *         the given id
 	 */
 	public boolean hasLabel(String name) {
-		if (parent != null && parent.r instanceof IdentifyChild) {
-			return ((IdentifyChild) parent.r).is(parent, this, name);
-		}
-		return r.label().id.equals(name);
+		return labels().contains(name);
+	}
+
+	/**
+	 * Debugging method that calls {@link Dotify#dot(Match)}.
+	 * 
+	 * @return stringification of this notable suitable for graphing by
+	 *         GraphViz, etc.
+	 */
+	public String dot() {
+		return Dotify.dot(this);
+	}
+
+	/**
+	 * Returns set of strings to which {@link #hasLabel(String)} will return
+	 * <code>true</code> for this {@link Match}. This method is useful for
+	 * debugging but not optimized for speed.
+	 * <p>
+	 * Cannot be used in {@link Condition}; {@link GrammarException} will be
+	 * thrown.
+	 * 
+	 * @return set of strings to which {@link #hasLabel(String)} will return
+	 *         <code>true</code> for this {@link Match}
+	 */
+	public synchronized Set<String> labels() {
+		if (done) {
+			if (labels == null) {
+				labels = new TreeSet<String>();
+				labels.add(r.label.id);
+				labels.add(r.uid());
+				r.addLabels(labels);
+				if (parent != null)
+					parent.r.addLabels(this, labels);
+			}
+			return labels;
+		} else
+			throw new GrammarException(
+					"labels() only available after grammar has completed match");
 	}
 
 	/**

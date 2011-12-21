@@ -29,7 +29,7 @@ public abstract class NonterminalMatcher extends Matcher {
 	/**
 	 * General matching cache.
 	 */
-	protected final Map<Label, Map<Integer, CachedMatch>> cache;
+	protected final Map<Integer, CachedMatch>[] cache;
 	/**
 	 * Matching cache appropriate to this {@link Matcher}'s {@link Rule}.
 	 */
@@ -49,12 +49,11 @@ public abstract class NonterminalMatcher extends Matcher {
 	 * @param master
 	 */
 	protected NonterminalMatcher(CharSequence cs2, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Rule rule,
-			Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Rule rule, Matcher master) {
 		super(cs2, offset, master);
 		this.cache = cache;
 		this.rule = rule;
-		this.subCache = cache.get(rule.label());
+		this.subCache = cache[rule.cacheIndex];
 	}
 
 	@Override
@@ -88,9 +87,10 @@ public abstract class NonterminalMatcher extends Matcher {
 
 	@Override
 	public boolean mightHaveNext() {
-		if (done) {
+		if (done)
 			return false;
-		}
+		if (CachedMatch.MISMATCH.equals(subCache.get(offset)))
+			return false;
 		if (next == null && !(options.containsCycles && cycleCheck()))
 			fetchNext();
 		return next != null;

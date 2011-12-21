@@ -37,7 +37,7 @@ public class DeferredDefinitionRule extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence cs, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		return r.matcher(cs, offset, cache, master);
 	}
 
@@ -66,8 +66,8 @@ public class DeferredDefinitionRule extends Rule {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, GlobalState options) {
+			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
+			GlobalState options) {
 		return r.study(s, cache, studiedRules, options);
 	}
 
@@ -82,5 +82,48 @@ public class DeferredDefinitionRule extends Rule {
 				(Label) label.clone());
 		ddr.r = r;
 		return ddr;
+	}
+
+	@Override
+	protected void setUid() {
+		if (uid == null) {
+			uid = uniqueId();
+			r.setUid();
+		}
+	}
+
+	@Override
+	protected void setCacheIndex(Map<String, Integer> uids) {
+		if (cacheIndex == -1) {
+			Integer i = uids.get(uid());
+			if (i == null) {
+				i = uids.size();
+				uids.put(uid(), i);
+			}
+			cacheIndex = i;
+			r.setCacheIndex(uids);
+		}
+	}
+
+	@Override
+	protected int maxCacheIndex(int currentMax, Set<Rule> visited) {
+		if (visited.contains(this))
+			return currentMax;
+		visited.add(this);
+		int max = Math.max(cacheIndex, currentMax);
+		return r.maxCacheIndex(max, visited);
+	}
+
+	@Override
+	protected void rules(Map<String, Rule> map) {
+		if (!map.containsKey(uid())) {
+			map.put(uid(), this);
+			r.rules(map);
+		}
+	}
+
+	@Override
+	protected void fixAlternationCycles() {
+		r.fixAlternationCycles();
 	}
 }

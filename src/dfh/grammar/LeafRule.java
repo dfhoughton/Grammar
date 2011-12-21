@@ -27,9 +27,9 @@ public class LeafRule extends Rule {
 		private boolean fresh = true;
 
 		public LeafMatcher(CharSequence s, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Matcher master) {
 			super(s, offset, master);
-			this.cache = cache.get(label);
+			this.cache = cache[rule().cacheIndex];
 		}
 
 		@Override
@@ -105,7 +105,7 @@ public class LeafRule extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence s, final Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		return new LeafMatcher(s, offset, cache, master);
 	}
 
@@ -167,9 +167,9 @@ public class LeafRule extends Rule {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, GlobalState options) {
-		Map<Integer, CachedMatch> subCache = cache.get(label);
+			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
+			GlobalState options) {
+		Map<Integer, CachedMatch> subCache = cache[cacheIndex];
 		Set<Integer> startOffsets = new HashSet<Integer>();
 		if (subCache.keySet().isEmpty()) {
 			if (studiedRules.contains(this))

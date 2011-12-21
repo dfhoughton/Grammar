@@ -19,7 +19,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class SequenceRule extends Rule implements IdentifyChild {
+public class SequenceRule extends Rule {
 	private static final long serialVersionUID = 1L;
 	final Rule[] sequence;
 	private Condition c;
@@ -30,7 +30,7 @@ public class SequenceRule extends Rule implements IdentifyChild {
 		LinkedList<Match> matched = new LinkedList<Match>();
 
 		public SequenceMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Matcher master) {
 			super(cs, offset, cache, SequenceRule.this, master);
 		}
 
@@ -125,7 +125,7 @@ public class SequenceRule extends Rule implements IdentifyChild {
 
 	@Override
 	public Matcher matcher(CharSequence cs, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		return new SequenceMatcher(cs, offset, cache, master);
 	}
 
@@ -173,8 +173,8 @@ public class SequenceRule extends Rule implements IdentifyChild {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, GlobalState options) {
+			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
+			GlobalState options) {
 		Set<Integer> startOffsets = null;
 		boolean foundStarts = false;
 		for (Rule r : sequence) {
@@ -235,16 +235,61 @@ public class SequenceRule extends Rule implements IdentifyChild {
 	}
 
 	@Override
-	public boolean is(Match parent, Match child, String label) {
-		int index = 0;
-		for (Match m : parent.children()) {
-			if (m == child)
+	public void addLabels(Match match, Set<String> labels) {
+		for (int i = 0; i < sequence.length; i++) {
+			if (match.rule() == sequence[i]) {
+				labels.addAll(tagList.get(i));
 				break;
-			index++;
+			}
 		}
-		if (index < sequence.length) {
-			return tagList.get(index).contains(label);
+	}
+
+	@Override
+	protected void setUid() {
+		if (uid == null) {
+			uid = uniqueId();
+			for (Rule r : sequence)
+				r.setUid();
 		}
-		return false;
+	}
+
+	@Override
+	protected void setCacheIndex(Map<String, Integer> uids) {
+		if (cacheIndex == -1) {
+			Integer i = uids.get(uid());
+			if (i == null) {
+				i = uids.size();
+				uids.put(uid(), i);
+			}
+			cacheIndex = i;
+			for (Rule r : sequence)
+				r.setCacheIndex(uids);
+		}
+	}
+
+	@Override
+	protected int maxCacheIndex(int currentMax, Set<Rule> visited) {
+		if (visited.contains(this))
+			return currentMax;
+		visited.add(this);
+		int max = Math.max(cacheIndex, currentMax);
+		for (Rule r : sequence)
+			max = Math.max(max, r.maxCacheIndex(max, visited));
+		return max;
+	}
+
+	@Override
+	protected void rules(Map<String, Rule> map) {
+		if (!map.containsKey(uid())) {
+			map.put(uid(), this);
+			for (Rule r : sequence)
+				r.rules(map);
+		}
+	}
+
+	@Override
+	protected void fixAlternationCycles() {
+		for (Rule r : sequence)
+			r.fixAlternationCycles();
 	}
 }

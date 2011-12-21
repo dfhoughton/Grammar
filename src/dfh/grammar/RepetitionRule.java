@@ -14,7 +14,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class RepetitionRule extends Rule implements IdentifyChild {
+public class RepetitionRule extends Rule {
 	private static final long serialVersionUID = 1L;
 	Rule r;
 	final Repetition repetition;
@@ -26,8 +26,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 		protected LinkedList<Matcher> matchers;
 
 		public RepetitionMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
-				Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Label label, Matcher master) {
 			super(cs, offset, cache, RepetitionRule.this, master);
 		}
 
@@ -56,7 +55,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 		private final boolean backtracks;
 
 		protected GreedyAndPossessive(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
+				Map<Integer, CachedMatch>[] cache, Label label,
 				boolean backtracks, Matcher master) {
 			super(cs, offset, cache, label, master);
 			this.backtracks = backtracks;
@@ -90,8 +89,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 	 */
 	private class GreedyMatcher extends GreedyAndPossessive {
 		protected GreedyMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
-				Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Label label, Matcher master) {
 			super(cs, offset, cache, label, true, master);
 		}
 
@@ -144,8 +142,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 		private int goal;
 
 		protected StingyMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
-				Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Label label, Matcher master) {
 			super(cs, offset, cache, label, master);
 			matchers = new LinkedList<Matcher>();
 			matched = new LinkedList<Match>();
@@ -224,8 +221,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 	private class PossessiveMatcher extends GreedyAndPossessive {
 
 		protected PossessiveMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Label label,
-				Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Label label, Matcher master) {
 			super(cs, offset, cache, label, false, master);
 		}
 
@@ -275,7 +271,7 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 
 	@Override
 	public Matcher matcher(CharSequence cs, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		switch (repetition.t) {
 		case possessive:
 			return new PossessiveMatcher(cs, offset, cache, label, master);
@@ -313,8 +309,8 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, GlobalState options) {
+			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
+			GlobalState options) {
 		return r.study(s, cache, studiedRules, options);
 	}
 
@@ -355,7 +351,50 @@ public class RepetitionRule extends Rule implements IdentifyChild {
 	}
 
 	@Override
-	public boolean is(Match parent, Match child, String label) {
-		return alternateTags.contains(label);
+	protected void addLabels(Match match, Set<String> labels) {
+		labels.addAll(alternateTags);
+	}
+
+	@Override
+	protected void setUid() {
+		if (uid == null) {
+			uid = uniqueId();
+			r.setUid();
+		}
+	}
+
+	@Override
+	protected void setCacheIndex(Map<String, Integer> uids) {
+		if (cacheIndex == -1) {
+			Integer i = uids.get(uid());
+			if (i == null) {
+				i = uids.size();
+				uids.put(uid(), i);
+			}
+			cacheIndex = i;
+			r.setCacheIndex(uids);
+		}
+	}
+
+	@Override
+	protected int maxCacheIndex(int currentMax, Set<Rule> visited) {
+		if (visited.contains(this))
+			return currentMax;
+		visited.add(this);
+		int max = Math.max(cacheIndex, currentMax);
+		return r.maxCacheIndex(max, visited);
+	}
+
+	@Override
+	protected void rules(Map<String, Rule> map) {
+		if (!map.containsKey(uid())) {
+			map.put(uid(), this);
+			r.rules(map);
+		}
+	}
+
+	@Override
+	protected void fixAlternationCycles() {
+		r.fixAlternationCycles();
 	}
 }

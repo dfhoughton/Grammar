@@ -29,6 +29,15 @@ public abstract class Rule implements Serializable {
 	 */
 	protected Label label;
 	/**
+	 * Cached unique id.
+	 */
+	protected String uid;
+	/**
+	 * The index of the offset cache for this rule. Set to -1 until it is set by
+	 * {@link #setCacheIndex(Map)}.
+	 */
+	protected int cacheIndex = -1;
+	/**
 	 * Used by {@link Grammar#describe()}.
 	 */
 	int generation = -1;
@@ -38,6 +47,19 @@ public abstract class Rule implements Serializable {
 	 * constructing unique ids. See {@link #uniqueId()}.
 	 */
 	protected String condition;
+
+	/**
+	 * A set of labels associated with this rule wherever it appears. Such
+	 * labels are assigned like so:
+	 * 
+	 * <pre>
+	 * foo = [{bar,quux} "the rule" ]
+	 * baz = "qux" [{twiddle} /in line regex/ ]
+	 * </pre>
+	 * 
+	 * That is, it is a pure "named capture".
+	 */
+	private Set<String> labels;
 
 	/**
 	 * Assigns given label to {@link Rule}.
@@ -75,11 +97,20 @@ public abstract class Rule implements Serializable {
 	 *         offset
 	 */
 	public abstract Matcher matcher(CharSequence s, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master);
+			Map<Integer, CachedMatch>[] cache, Matcher master);
 
 	@Override
 	public String toString() {
 		return label.id;
+	}
+
+	public String uid() {
+		return uid;
+	}
+
+	protected void setUid() {
+		if (uid == null)
+			uid = uniqueId();
 	}
 
 	/**
@@ -225,8 +256,8 @@ public abstract class Rule implements Serializable {
 	 * @return set of start offsets of matches
 	 */
 	public abstract Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, GlobalState options);
+			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
+			GlobalState options);
 
 	/**
 	 * Returns whether this rule can match the null string. This method is used
@@ -306,5 +337,77 @@ public abstract class Rule implements Serializable {
 	 */
 	public Rule reverse() {
 		throw new GrammarException(this.getClass() + " cannot be reversed");
+	}
+
+	/**
+	 * Sets index of cache for this rule in offset matching cache.
+	 * 
+	 * @param uids
+	 *            a map from unique ids to indices
+	 */
+	protected void setCacheIndex(Map<String, Integer> uids) {
+		if (cacheIndex == -1) {
+			Integer i = uids.get(uid());
+			if (i == null) {
+				i = uids.size();
+				uids.put(uid(), i);
+			}
+			cacheIndex = i;
+		}
+	}
+
+	protected int maxCacheIndex(int currentMax, Set<Rule> visited) {
+		if (visited.contains(this))
+			return currentMax;
+		visited.add(this);
+		return Math.max(cacheIndex, currentMax);
+	}
+
+	protected void rules(Map<String, Rule> map) {
+		if (!map.containsKey(uid()))
+			map.put(uid(), this);
+	}
+
+	/**
+	 * Add to the label set any additional tags associated with all instances of
+	 * this rule.
+	 * 
+	 * @param labels
+	 */
+	protected void addLabels(Set<String> labels) {
+		if (this.labels != null)
+			labels.addAll(this.labels);
+	}
+
+	/**
+	 * Add to the labels of the child match any tags associated with the child
+	 * rule only in this parent rule.
+	 * 
+	 * @param match
+	 *            the match of a child rule of this rule
+	 * @param labels
+	 */
+	protected void addLabels(Match match, Set<String> labels) {
+	}
+
+	/**
+	 * Assign a set of alternate labels to the rule. This is only used during
+	 * compilation.
+	 * 
+	 * @param labels
+	 *            tags assigned by a named capture expression
+	 */
+	void setLabels(Set<String> labels) {
+		this.labels = labels;
+	}
+
+	/**
+	 * find {@link AlternationRule} rules and fix {@link AlternationRule#tagMap}
+	 * so that there is mapping from {@link CyclicRule#r#uid()} to the proper
+	 * tag set.
+	 * <p>
+	 * This really need only be overridden in non-terminal rules.
+	 */
+	protected void fixAlternationCycles() {
 	}
 }

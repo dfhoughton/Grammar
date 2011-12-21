@@ -1,4 +1,12 @@
-1.03 14 December 2011
+1.04
+  * fixed tagging bug in alternation rules such as foo = [{bar} 'a' | 'b' ]
+  * added dot() method to Match
+  * added completion check on Match.labels()
+  * improved cache checking
+  * improved tagging consistency
+  * removed redundant rule faux optimization
+  
+1.03, 14 December 2011
   * fixed zero-width final leaf bug where studying was causing <rule> /\s*/,
     for example, to always fail to match
   * establish parentage and group of rightmost match in case of mismatch

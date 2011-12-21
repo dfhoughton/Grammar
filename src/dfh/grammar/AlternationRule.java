@@ -17,7 +17,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class AlternationRule extends Rule implements IdentifyChild {
+public class AlternationRule extends Rule {
 	private static final long serialVersionUID = 1L;
 
 	private class AlternationMatcher extends NonterminalMatcher {
@@ -25,7 +25,7 @@ public class AlternationRule extends Rule implements IdentifyChild {
 		Matcher mostRecent = null;
 
 		public AlternationMatcher(CharSequence cs, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Matcher master) {
 			super(cs, offset, cache, AlternationRule.this, master);
 		}
 
@@ -62,7 +62,7 @@ public class AlternationRule extends Rule implements IdentifyChild {
 	}
 
 	protected final Rule[] alternates;
-	Map<String, Rule> tagMap;
+	Map<String, Set<String>> tagMap;
 	protected Condition c;
 
 	/**
@@ -70,10 +70,10 @@ public class AlternationRule extends Rule implements IdentifyChild {
 	 * 
 	 * @param label
 	 * @param alternates
-	 * @param tagMap
+	 * @param tagMap2
 	 */
 	public AlternationRule(Label label, Rule[] alternates,
-			Map<String, Rule> tagMap) {
+			Map<String, Set<String>> tagMap) {
 		super(label);
 		this.alternates = alternates;
 		this.tagMap = tagMap;
@@ -81,7 +81,7 @@ public class AlternationRule extends Rule implements IdentifyChild {
 
 	@Override
 	public Matcher matcher(CharSequence cs, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		return new AlternationMatcher(cs, offset, cache, master);
 	}
 
@@ -124,8 +124,8 @@ public class AlternationRule extends Rule implements IdentifyChild {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, GlobalState options) {
+			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
+			GlobalState options) {
 		Set<Integer> startOffsets = new HashSet<Integer>();
 		for (Rule r : alternates)
 			startOffsets.addAll(r.study(s, cache, studiedRules, options));
@@ -145,7 +145,7 @@ public class AlternationRule extends Rule implements IdentifyChild {
 	public Rule shallowClone() {
 		AlternationRule ar = new AlternationRule((Label) label.clone(),
 				Arrays.copyOf(alternates, alternates.length),
-				new HashMap<String, Rule>(tagMap));
+				new HashMap<String, Set<String>>(tagMap));
 		return ar;
 	}
 
@@ -174,13 +174,63 @@ public class AlternationRule extends Rule implements IdentifyChild {
 	}
 
 	@Override
-	public boolean is(Match parent, Match child, String label) {
-		Rule r = tagMap.get(label);
-		if (r != null) {
-			if (r instanceof CyclicRule)
-				return ((CyclicRule) r).r == child.rule();
-			return r == child.rule();
+	public void addLabels(Match match, Set<String> labels) {
+		labels.addAll(tagMap.get(match.rule().uid()));
+	}
+
+	@Override
+	protected void setUid() {
+		uid = uniqueId();
+		for (Rule r : alternates)
+			r.setUid();
+	}
+
+	@Override
+	protected void setCacheIndex(Map<String, Integer> uids) {
+		if (cacheIndex == -1) {
+			Integer i = uids.get(uid());
+			if (i == null) {
+				i = uids.size();
+				uids.put(uid(), i);
+			}
+			cacheIndex = i;
+			for (Rule r : alternates)
+				r.setCacheIndex(uids);
 		}
-		return false;
+
+	}
+
+	@Override
+	protected int maxCacheIndex(int currentMax, Set<Rule> visited) {
+		if (visited.contains(this))
+			return currentMax;
+		visited.add(this);
+		int max = Math.max(cacheIndex, currentMax);
+		for (Rule r : alternates)
+			max = Math.max(max, r.maxCacheIndex(max, visited));
+		return max;
+	}
+
+	@Override
+	protected void rules(Map<String, Rule> map) {
+		if (!map.containsKey(uid())) {
+			map.put(uid(), this);
+			for (Rule r : alternates)
+				r.rules(map);
+		}
+	}
+
+	@Override
+	protected void fixAlternationCycles() {
+		for (Rule r : alternates) {
+			if (r instanceof CyclicRule) {
+				Set<String> set = tagMap.remove(r.uid());
+				if (set != null) {
+					r = ((CyclicRule) r).r;
+					tagMap.put(r.uid(), set);
+				}
+			}
+			r.fixAlternationCycles();
+		}
 	}
 }

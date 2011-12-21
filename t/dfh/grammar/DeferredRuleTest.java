@@ -42,9 +42,9 @@ public class DeferredRuleTest {
 			private boolean fresh = true;
 
 			public AMatcher(CharSequence s, Integer offset,
-					Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+					Map<Integer, CachedMatch>[] cache, Matcher master) {
 				super(s, offset, master);
-				this.cache = cache.get(label);
+				this.cache = cache[cacheIndex];
 			}
 
 			@Override
@@ -98,7 +98,7 @@ public class DeferredRuleTest {
 
 		@Override
 		public Matcher matcher(CharSequence s, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Matcher master) {
 			return new AMatcher(s, offset, cache, master);
 		}
 
@@ -109,8 +109,8 @@ public class DeferredRuleTest {
 
 		@Override
 		public Set<Integer> study(CharSequence s,
-				Map<Label, Map<Integer, CachedMatch>> cache,
-				Set<Rule> studiedRules, GlobalState options) {
+				Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
+				GlobalState options) {
 			// we won't study for this
 			return null;
 		}

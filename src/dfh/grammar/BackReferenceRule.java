@@ -33,7 +33,7 @@ public class BackReferenceRule extends Rule {
 		private boolean fresh = true;
 
 		public BackReferenceMatcher(CharSequence s, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Matcher master) {
 			super(s, offset, master);
 		}
 
@@ -95,7 +95,7 @@ public class BackReferenceRule extends Rule {
 
 	@Override
 	public Matcher matcher(CharSequence s, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		return new BackReferenceMatcher(s, offset, cache, master);
 	}
 
@@ -111,8 +111,8 @@ public class BackReferenceRule extends Rule {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Label, Map<Integer, CachedMatch>> cache,
-			Set<Rule> studiedRules, GlobalState options) {
+			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
+			GlobalState options) {
 		// one cannot study backreferences
 		return new HashSet<Integer>(0);
 	}
@@ -128,5 +128,4 @@ public class BackReferenceRule extends Rule {
 				index);
 		return brr;
 	}
-
 }

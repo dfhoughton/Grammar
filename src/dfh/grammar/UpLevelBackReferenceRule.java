@@ -33,7 +33,7 @@ public class UpLevelBackReferenceRule extends BackReferenceRule {
 		private boolean fresh = true;
 
 		public UpLevelBackReferenceMatcher(CharSequence s, Integer offset,
-				Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+				Map<Integer, CachedMatch>[] cache, Matcher master) {
 			super(s, offset, master);
 		}
 
@@ -99,7 +99,7 @@ public class UpLevelBackReferenceRule extends BackReferenceRule {
 
 	@Override
 	public Matcher matcher(CharSequence s, Integer offset,
-			Map<Label, Map<Integer, CachedMatch>> cache, Matcher master) {
+			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		return new UpLevelBackReferenceMatcher(s, offset, cache, master);
 	}
 
