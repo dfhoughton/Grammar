@@ -1,6 +1,8 @@
 package dfh.grammar;
 
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * A structure to hold matching options and define defaults.
@@ -78,10 +80,19 @@ public class Options {
 	 * matching.
 	 */
 	public static final boolean KEEP_RIGHTMOST = false;
+	/**
+	 * Whether to use a {@link HashMap} or {@link TreeMap} for the offset cache.
+	 * The keys in either case are of type {@link Integer}. The former is
+	 * slightly faster. The latter consumes less memory. You probably only want
+	 * lean memory when you are matching against an extremely large character
+	 * sequence in a memory constrained environment.
+	 */
+	public static final boolean LEAN_MEMORY = false;
 	boolean allowOverlap = ALLOW_OVERLAP;
 	boolean study = STUDY;
 	boolean longestMatch = LONGEST_MATCH;
 	boolean keepRightmost = KEEP_RIGHTMOST;
+	boolean leanMemory = LEAN_MEMORY;
 	int start = START_OFFSET;
 	int end = -1;
 	int maxRecursionDepth = MAX_RECURSION_DEPTH;
@@ -276,6 +287,29 @@ public class Options {
 	 */
 	public Options keepRightmost(boolean keepRightmost) {
 		this.keepRightmost = keepRightmost;
+		return this;
+	}
+
+	/**
+	 * Whether to use a slightly slower, leaner memory cache, or a slightly
+	 * faster, less wasteful one. See {@link #LEAN_MEMORY}.
+	 * 
+	 * @return whether to use a memory-efficient cache
+	 */
+	public boolean leanMemory() {
+		return leanMemory;
+	}
+
+	/**
+	 * Sets whether to use a slightly slower, leaner memory cache, or a slightly
+	 * faster, less wasteful one. See {@link #LEAN_MEMORY}.
+	 * 
+	 * @param keepRightmost
+	 *            whether to use a memory-efficient cache
+	 * @return self to allow chaining of methods
+	 */
+	public Options leanMemory(boolean leanMemory) {
+		this.leanMemory = leanMemory;
 		return this;
 	}
 }

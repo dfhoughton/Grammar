@@ -733,7 +733,7 @@ public class Grammar implements Serializable, Cloneable {
 		checkComplete();
 		final GlobalState co = verifyOptions(cs, opt);
 		final boolean ltm = containsAlternation && opt.longestMatch();
-		final Map<Integer, CachedMatch>[] cache = offsetCache();
+		final Map<Integer, CachedMatch>[] cache = offsetCache(opt);
 		final Set<Integer> startOffsets = startOffsets(cs, co, cache);
 		final Matcher m = rules.get(root).matcher(cs, co.start, cache,
 				new DummyMatcher(cs, co));
@@ -849,7 +849,7 @@ public class Grammar implements Serializable, Cloneable {
 		checkComplete();
 		final GlobalState options = verifyOptions(s, opt);
 		final boolean ltm = containsAlternation && opt.longestMatch();
-		final Map<Integer, CachedMatch>[] cache = offsetCache();
+		final Map<Integer, CachedMatch>[] cache = offsetCache(opt);
 		List<Integer> list = new ArrayList<Integer>(startOffsets(s, options,
 				cache));
 		Collections.sort(list);
@@ -860,10 +860,12 @@ public class Grammar implements Serializable, Cloneable {
 	/**
 	 * Generates a cache to keep track of failing offsets for particular rules.
 	 * 
+	 * @param options
+	 * 
 	 * @return map from labels to sets of offsets where the associated rules are
 	 *         known not to match
 	 */
-	private Map<Integer, CachedMatch>[] offsetCache() {
+	private Map<Integer, CachedMatch>[] offsetCache(Options options) {
 		// cache unique ids
 		getRoot().setUid();
 		// fix tag maps in alternations
@@ -873,7 +875,8 @@ public class Grammar implements Serializable, Cloneable {
 		@SuppressWarnings("unchecked")
 		Map<Integer, CachedMatch>[] offsetCache = new Map[max + 1];
 		for (int i = 0; i < offsetCache.length; i++)
-			offsetCache[i] = new TreeMap<Integer, CachedMatch>();
+			offsetCache[i] = options.leanMemory ? new TreeMap<Integer, CachedMatch>()
+					: new HashMap<Integer, CachedMatch>();
 		return offsetCache;
 	}
 
@@ -1006,7 +1009,7 @@ public class Grammar implements Serializable, Cloneable {
 			throws GrammarException {
 		checkComplete();
 		final GlobalState options = verifyOptions(s, opt);
-		final Map<Integer, CachedMatch>[] cache = offsetCache();
+		final Map<Integer, CachedMatch>[] cache = offsetCache(opt);
 		final Set<Integer> startOffsets = startOffsets(s, options, cache);
 		final Matcher m = rules.get(root).matcher(s, options.start, cache,
 				new DummyMatcher(s, options));
