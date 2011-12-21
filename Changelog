@@ -1,3 +1,5 @@
+1.05
+
 1.04, 21 December 2011
   * fixed tagging bug in alternation rules such as foo = [{bar} 'a' | 'b' ]
   * added dot() method to Match
