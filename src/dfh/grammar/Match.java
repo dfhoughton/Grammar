@@ -377,6 +377,31 @@ public class Match {
 	}
 
 	/**
+	 * Walk the match tree, applying the test to every node encountered. If the
+	 * test evaluates to true, any child nodes are skipped; otherwise the
+	 * children are walked as well.
+	 * <p>
+	 * You can only walk the match tree after matching has completed. Doing
+	 * otherwise will cause a runtime error to be thrown.
+	 * 
+	 * @param t
+	 *            the code to apply to each node encountered
+	 * @return whether the test ever evaluated to true
+	 */
+	public boolean walk(MatchTest t) {
+		if (done) {
+			if (t.test(this))
+				return true;
+			boolean matched = false;
+			for (Match c : children)
+				matched = c.walk(t) || matched;
+			return matched;
+		}
+		throw new GrammarException(
+				"dfh.grammar.Match.walk(dfh.grammar.MatchTest) can only be called after matching has completed");
+	}
+
+	/**
 	 * Returns list of matches dominated by this that pass the given test. The
 	 * search is depth first. Children are returned before parents.
 	 * 

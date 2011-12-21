@@ -43,6 +43,7 @@ import org.junit.runners.Suite;
 		UplevelBackreferenceTest.class,//
 		Regression.class,//
 		LabelTest.class,//
+		WalkTest.class,//
 })
 public class AllTests {
 }
