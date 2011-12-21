@@ -42,6 +42,7 @@ import org.junit.runners.Suite;
 		ComplexConditions.class,//
 		UplevelBackreferenceTest.class,//
 		Regression.class,//
+		LabelTest.class,//
 })
 public class AllTests {
 }

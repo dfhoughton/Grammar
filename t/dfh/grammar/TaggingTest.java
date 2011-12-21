@@ -141,7 +141,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  a";
 		Match m = g.matches(s).match();
-		assertNotNull(m.choose("a"));
+		assertNotNull(m.choose("\"a\""));
 		assertNotNull(m.choose("b"));
 		assertNotNull(m.choose("c"));
 	}

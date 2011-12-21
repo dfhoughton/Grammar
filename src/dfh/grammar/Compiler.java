@@ -681,39 +681,38 @@ public class Compiler {
 		// if we've gotten here then !gf.rep.redundant(), because these
 		// cases are handled by the sequence parser or the initial rule body
 		// parser
+		Rule r = null;
 		if (gf.alternates.size() == 1) {
+			// repeated rule with capture
 			if (gf.alternates.get(0).size() == 1) {
-				Rule r = makeSingle(gf.alternates.get(0).get(0), cycleMap, null);
-				// repeated rule with capture
-				Label l = new Label(Type.nonTerminal, subLabel(r) + gf.rep);
-				r = new RepetitionRule(l, r, gf.rep, tags);
-				setCondition(condition, r);
+				r = makeSingle(gf.alternates.get(0).get(0), cycleMap, null);
 			} else {
 				// repeated sequence
+				r = makeSequence(gf.alternates.get(0), cycleMap, null);
 			}
 		} else {
 			// repeated alternation
 			List<Rule> alternates = new ArrayList<Rule>(gf.alternates.size());
-			int index = 0;
 			StringBuilder b = new StringBuilder();
 			b.append('[');
 			boolean nonInitial = false;
 			Map<String, Set<String>> tagMap = new HashMap<String, Set<String>>(
 					gf.alternates.size());
 			for (List<RuleFragment> alternate : gf.alternates) {
-				Rule r;
-				Set<String> innerTags;
+				Set<String> innerTags = null;
 				if (alternate.size() == 1) {
 					RuleFragment rfInner = alternate.get(0);
-					
 					if (isNamedCapture(rfInner)) {
 						GroupFragment gfInner = (GroupFragment) rfInner;
 						innerTags = new HashSet<String>(gfInner.alternateTags);
 						if (gfInner.alternates.size() == 1) {
 							if (gfInner.alternates.get(0).size() == 1)
-							r = makeSingle(gfInner.alternates.get(0).get(0), cycleMap, null);
+								r = makeSingle(
+										gfInner.alternates.get(0).get(0),
+										cycleMap, null);
 							else
-								r = makeSequence(gfInner.alternates.get(0), cycleMap, null);
+								r = makeSequence(gfInner.alternates.get(0),
+										cycleMap, null);
 						} else
 							r = makeSingle(rfInner, cycleMap, null);
 					} else {
@@ -725,7 +724,8 @@ public class Compiler {
 							tagMap.get(id).addAll(innerTags);
 						continue;
 					} else {
-							tagMap.put(id, innerTags == null ? new HashSet<String>(0): innerTags);
+						tagMap.put(id, innerTags == null ? new HashSet<String>(
+								0) : innerTags);
 					}
 				} else {
 					r = makeSequence(alternate, cycleMap, null);
@@ -740,103 +740,16 @@ public class Compiler {
 			}
 			b.append(']');
 			Label l = new Label(Type.nonTerminal, b.toString());
-			Rule r = new AlternationRule(l, alternates.toArray(new Rule[alternates.size()]), tagMap);
+			r = new AlternationRule(l, alternates.toArray(new Rule[alternates
+					.size()]), tagMap);
 			if (gf.rep.redundant()) { // TODO confirm that this won't be true
 				setCondition(condition, r);
 				return r;
 			}
-			l = new Label(Type.nonTerminal, l.toString() + gf.rep);
-			r = new RepetitionRule(l, r, gf.rep, tags);
-			setCondition(condition, r);
 		}
-		if (gf.alternates.size() == 1) {
-			Set<String> tags;
-			if (gf.alternates.get(0).size() == 1) {
-				Rule r = makeSingle(gf.alternates.get(0).get(0), cycleMap, null);
-				if (r instanceof AlternationRule) {
-					// fix tags
-					AlternationRule ar = (AlternationRule) r;
-					Set<Rule> rs = new HashSet<Rule>(ar.tagMap.values());
-					for (String s : gf.alternateTags) {
-						for (Rule sr : rs)
-							ar.tagMap.put(s, sr);
-					}
-				}
-				if (gf.rep.redundant()) {
-					setCondition(condition, r);
-					return r;
-				} else {
-					// handle tags here
-					tags = new HashSet<String>(gf.alternateTags.size() + 1);
-					tags.addAll(gf.alternateTags);
-					Label l = new Label(Type.nonTerminal, subLabel(r) + gf.rep);
-					r = new RepetitionRule(l, r, gf.rep, tags);
-					setCondition(condition, r);
-					tags.add(r.uniqueId());
-					return r;
-				}
-			}
-			Rule r = makeSequence(gf.alternates.get(0), cycleMap, null);
-			if (gf.rep.redundant()) {
-				setCondition(condition, r);
-				return r;
-			}
-			Label l = new Label(Type.nonTerminal, subLabel(r) + gf.rep);
-			tags = new HashSet<String>(gf.alternateTags.size() + 1);
-			tags.addAll(gf.alternateTags);
-			r = new RepetitionRule(l, r, gf.rep, tags);
-			setCondition(condition, r);
-			tags.add(r.uniqueId());
-			return r;
-		}
-		// is necessarily alternation at this point
-		Rule[] alternates = new Rule[gf.alternates.size()];
-		int index = 0;
-		StringBuilder b = new StringBuilder();
-		b.append('[');
-		boolean nonInitial = false;
-		Map<String, Rule> tagMap = new HashMap<String, Rule>(
-				gf.alternates.size());
-		for (List<RuleFragment> alternate : gf.alternates) {
-			Rule r;
-			if (alternate.size() == 1) {
-				RuleFragment rfInner = alternate.get(0);
-				r = makeSingle(rfInner, cycleMap, null);
-				if (rfInner instanceof GroupFragment) {
-					// handle tags
-					GroupFragment gfInner = (GroupFragment) rfInner;
-					for (String tag : gfInner.alternateTags)
-						tagMap.put(tag, r);
-				}
-				tagMap.put(
-						rfInner instanceof Label ? ((Label) rfInner).id : r
-								.uniqueId(), r);
-			} else {
-				r = makeSequence(alternate, cycleMap, null);
-				tagMap.put(r.uniqueId(), r);
-			}
-			alternates[index++] = r;
-			if (nonInitial)
-				b.append('|');
-			else
-				nonInitial = true;
-			b.append(subLabel(r));
-			for (String s : gf.alternateTags) {
-				tagMap.put(s, r);
-			}
-		}
-		b.append(']');
-		Label l = new Label(Type.nonTerminal, b.toString());
-		Rule r = new AlternationRule(l, alternates, tagMap);
-		if (gf.rep.redundant()) {
-			setCondition(condition, r);
-			return r;
-		}
-		l = new Label(Type.nonTerminal, l.toString() + gf.rep);
-		Set<String> tags = new HashSet<String>(1);
+		Label l = new Label(Type.nonTerminal, subLabel(r) + gf.rep);
 		r = new RepetitionRule(l, r, gf.rep, tags);
 		setCondition(condition, r);
-		tags.add(r.uniqueId());
 		return r;
 	}
 
@@ -867,8 +780,13 @@ public class Compiler {
 		if (sr instanceof AlternationRule) {
 			AlternationRule ar = (AlternationRule) sr;
 			Rule[] children = new Rule[ar.alternates.length];
-			for (int i = 0; i < children.length; i++)
+			Map<String, Set<String>> tagMap = new HashMap<String, Set<String>>(
+					ar.tagMap.size());
+			for (int i = 0; i < children.length; i++) {
 				children[i] = reverse(ar.alternates[i]);
+				tagMap.put(children[i].uniqueId(),
+						ar.tagMap.get(ar.alternates[i].uniqueId()));
+			}
 			StringBuilder b = new StringBuilder();
 			b.append('[');
 			boolean nonInitial = false;
@@ -881,8 +799,7 @@ public class Compiler {
 			}
 			b.append(']');
 			Label l = new Label(Type.nonTerminal, b.toString());
-			ru = new AlternationRule(l, children, new HashMap<String, Rule>(
-					ar.tagMap));
+			ru = new AlternationRule(l, children, tagMap);
 		} else if (sr instanceof Assertion) {
 			Assertion as = (Assertion) sr;
 			Rule child = as.forward ? reverse(as.r) : as.r;
@@ -986,19 +903,31 @@ public class Compiler {
 		b.append('[');
 		for (RuleFragment rf : value) {
 			Set<String> tagSet = null;
+			Rule r = null;
 			if (rf instanceof GroupFragment) {
 				GroupFragment gf = (GroupFragment) rf;
-				tagSet = new HashSet<String>(gf.alternateTags.size() + 1);
-				for (String tag : gf.alternateTags)
-					tagSet.add(tag);
-			} else
-				tagSet = new HashSet<String>(1);
+				if (isNamedCapture(gf)) {
+					tagSet = gf.alternateTags;
+					if (gf.alternates.size() == 1) {
+						if (gf.alternates.get(0).size() == 1)
+							r = makeSingle(gf.alternates.get(0).get(0),
+									cycleMap, null);
+						else
+							r = makeSequence(gf.alternates.get(0), cycleMap,
+									null);
+					}
+				} else {
+					tagSet = new HashSet<String>(0);
+					r = makeSingle(rf, cycleMap, null);
+				}
+			} else {
+				tagSet = new HashSet<String>(0);
+				r = makeSingle(rf, cycleMap, null);
+			}
 			if (nonInitial)
 				b.append(' ');
 			else
 				nonInitial = true;
-			Rule r = makeSingle(rf, cycleMap, null);
-			tagSet.add(rf instanceof Label ? ((Label) rf).id : r.uniqueId());
 			tagList.add(tagSet);
 			sequence[index++] = r;
 			b.append(subLabel(r));

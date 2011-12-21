@@ -400,4 +400,14 @@ public abstract class Rule implements Serializable {
 	void setLabels(Set<String> labels) {
 		this.labels = labels;
 	}
+
+	/**
+	 * find {@link AlternationRule} rules and fix {@link AlternationRule#tagMap}
+	 * so that there is mapping from {@link CyclicRule#r#uid()} to the proper
+	 * tag set.
+	 * <p>
+	 * This really need only be overridden in non-terminal rules.
+	 */
+	protected void fixAlternationCycles() {
+	}
 }

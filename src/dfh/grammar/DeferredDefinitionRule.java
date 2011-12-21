@@ -121,4 +121,9 @@ public class DeferredDefinitionRule extends Rule {
 			r.rules(map);
 		}
 	}
+
+	@Override
+	protected void fixAlternationCycles() {
+		r.fixAlternationCycles();
+	}
 }

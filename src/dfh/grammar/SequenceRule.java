@@ -236,7 +236,12 @@ public class SequenceRule extends Rule {
 
 	@Override
 	public void addLabels(Match match, Set<String> labels) {
-		// TODO remember tagList
+		for (int i = 0; i < sequence.length; i++) {
+			if (match.rule() == sequence[i]) {
+				labels.addAll(tagList.get(i));
+				break;
+			}
+		}
 	}
 
 	@Override
@@ -280,5 +285,11 @@ public class SequenceRule extends Rule {
 			for (Rule r : sequence)
 				r.rules(map);
 		}
+	}
+
+	@Override
+	protected void fixAlternationCycles() {
+		for (Rule r : sequence)
+			r.fixAlternationCycles();
 	}
 }

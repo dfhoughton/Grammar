@@ -219,4 +219,18 @@ public class AlternationRule extends Rule {
 				r.rules(map);
 		}
 	}
+
+	@Override
+	protected void fixAlternationCycles() {
+		for (Rule r : alternates) {
+			if (r instanceof CyclicRule) {
+				Set<String> set = tagMap.remove(r.uid());
+				if (set != null) {
+					r = ((CyclicRule) r).r;
+					tagMap.put(r.uid(), set);
+				}
+			}
+			r.fixAlternationCycles();
+		}
+	}
 }
