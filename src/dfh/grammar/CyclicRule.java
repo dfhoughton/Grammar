@@ -21,7 +21,7 @@ import java.util.Set;
  * 
  */
 public class CyclicRule extends Rule {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	Rule r;
 
 	/**

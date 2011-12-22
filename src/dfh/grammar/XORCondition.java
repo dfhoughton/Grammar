@@ -3,7 +3,7 @@ package dfh.grammar;
 import java.util.List;
 
 public class XORCondition extends LogicalCondition {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	public XORCondition(List<Condition> conditions) {
 		super(conditions);

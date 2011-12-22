@@ -3,7 +3,7 @@ package dfh.grammar;
 import java.util.List;
 
 public class DisjunctionCondition extends LogicalCondition {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	public DisjunctionCondition(List<Condition> conditions) {
 		super(conditions);

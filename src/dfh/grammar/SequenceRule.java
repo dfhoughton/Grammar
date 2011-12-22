@@ -20,7 +20,7 @@ import java.util.Set;
  */
 @Reversible
 public class SequenceRule extends Rule {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	final Rule[] sequence;
 	private Condition c;
 	final List<Set<String>> tagList;

@@ -91,7 +91,7 @@ public class LiteralRule extends Rule {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	protected final String literal;
 	private Condition c;
 

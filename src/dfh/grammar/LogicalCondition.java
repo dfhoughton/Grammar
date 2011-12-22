@@ -15,7 +15,7 @@ import dfh.grammar.util.Dotify;
  * 
  */
 public abstract class LogicalCondition extends Condition {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	protected final Condition[] subconditions;
 	public static final MatchTest expOrGroupTest = new MatchTest() {
 		@Override

@@ -6,7 +6,7 @@ import java.util.Set;
 
 @Reversible
 public class ConditionalLeafRule extends LeafRule {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	private Condition c;
 
 	private class LeafMatcher extends Matcher {

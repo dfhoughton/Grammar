@@ -15,7 +15,7 @@ import java.util.Set;
  */
 @Reversible
 public class RepetitionRule extends Rule {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	Rule r;
 	final Repetition repetition;
 	protected Condition c;

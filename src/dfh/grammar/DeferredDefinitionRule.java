@@ -20,7 +20,7 @@ import java.util.Set;
  * 
  */
 public class DeferredDefinitionRule extends Rule {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	/**
 	 * Holds rule whose definition is deferred.
 	 */

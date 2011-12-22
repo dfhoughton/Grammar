@@ -85,7 +85,7 @@ public class LeafRule extends Rule {
 		}
 	}
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	protected final Pattern p;
 	protected final boolean reversible;
 	protected boolean matchesTrivially;

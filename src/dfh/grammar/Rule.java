@@ -21,7 +21,7 @@ import java.util.Set;
  * @author David Houghton
  */
 public abstract class Rule implements Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	/**
 	 * The rule's name. Though it is not <code>final</code>, it should be
