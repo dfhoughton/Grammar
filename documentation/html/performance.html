@@ -19,23 +19,23 @@
 string: qewrqewrqewraqwreqewr
 
 pattern: [ab]
-56 milliseconds
+21 milliseconds
 
 ROOT = "a" | "b"
 
 with studying
-170 milliseconds
+166 milliseconds
 without studying
-550 milliseconds
+667 milliseconds
 with studying using LTM
-110 milliseconds
+118 milliseconds
 
 =============
 
 string: foo bar
 
 pattern: foo\s++bar|quux\s++baz
-35 milliseconds
+45 milliseconds
 
 ROOT = &lt;a&gt; | &lt;b&gt;
 
@@ -48,18 +48,18 @@ quux = /quux/
    s = /\s++/
 
 with studying
-353 milliseconds
+366 milliseconds
 without studying
-340 milliseconds
+381 milliseconds
 with studying using LTM
-353 milliseconds
+389 milliseconds
 
 =============
 
 string: aabb
 
 pattern: (?:a{0,2}|a{0,2}b){2}b
-17 milliseconds
+48 milliseconds
 
 ROOT = [ &lt;c&gt; | &lt;d&gt; ]{2} &lt;d&gt;
 
@@ -69,18 +69,18 @@ ROOT = [ &lt;c&gt; | &lt;d&gt; ]{2} &lt;d&gt;
    b = /b/
 
 with studying
-524 milliseconds
+531 milliseconds
 without studying
-521 milliseconds
+476 milliseconds
 with studying using LTM
-837 milliseconds
+530 milliseconds
 
 =============
 
 string: qewrqewrqewraqwreqewr
 
 pattern: [ab]
-13 milliseconds
+24 milliseconds
 
 ROOT = &lt;c&gt; | &lt;d&gt;
 
@@ -88,18 +88,18 @@ ROOT = &lt;c&gt; | &lt;d&gt;
    d = /b/
 
 with studying
-173 milliseconds
+179 milliseconds
 without studying
-804 milliseconds
+780 milliseconds
 with studying using LTM
-181 milliseconds
+186 milliseconds
 
 =============
 
 string: aabb
 
 pattern: (?:a{0,2}|ab){2}ab
-24 milliseconds
+22 milliseconds
 
 ROOT = [ &lt;a&gt; | &lt;b&gt; ]{2} &lt;b&gt;
 
@@ -107,26 +107,26 @@ ROOT = [ &lt;a&gt; | &lt;b&gt; ]{2} &lt;b&gt;
    b = "ab"
 
 with studying
-379 milliseconds
+412 milliseconds
 without studying
-410 milliseconds
+415 milliseconds
 with studying using LTM
-567 milliseconds
+392 milliseconds
 
 =============
 
 string: __________cat__________dog__________monkey__________cat_____... (length 13999)
 
 pattern: cat|dog|monkey
-40899 milliseconds
+50387 milliseconds
 
 ROOT = "cat" | "dog" | "monkey"
 
 with studying
-68686 milliseconds
+68556 milliseconds
 without studying
-81711 milliseconds
+81284 milliseconds
 with studying using LTM
-81584 milliseconds</pre>
+81512 milliseconds</pre>
 </body>
 </html>
