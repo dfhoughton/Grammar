@@ -44,6 +44,7 @@ import org.junit.runners.Suite;
 		Regression.class,//
 		LabelTest.class,//
 		WalkTest.class,//
+		DescriptionTest.class,//
 })
 public class AllTests {
 }

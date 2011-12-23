@@ -983,14 +983,6 @@ public class Compiler {
 		return new HashMap<String, Set<Label>>(undefinedConditions);
 	}
 
-	private Set<String> namedCapture(List<RuleFragment> ruleBody) {
-		if (ruleBody.size() == 1) {
-			RuleFragment rf = ruleBody.get(0);
-			return namedCapture(rf);
-		}
-		return null;
-	}
-
 	private Set<String> namedCapture(RuleFragment rf) {
 		if (rf instanceof GroupFragment) {
 			GroupFragment gf = (GroupFragment) rf;

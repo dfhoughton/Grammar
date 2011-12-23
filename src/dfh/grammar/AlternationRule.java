@@ -108,16 +108,21 @@ public class AlternationRule extends Rule {
 		StringBuilder b = new StringBuilder();
 		boolean nonInitial = false;
 		for (Rule r : alternates) {
-			String id = r.uniqueId();
-			boolean hasTags = !tagMap.get(id).isEmpty();
+			Set<String> tags;
+			if (r instanceof CyclicRule)
+				tags = tagMap.get(((CyclicRule) r).r.uniqueId());
+			else if (r instanceof DeferredDefinitionRule)
+				tags = tagMap.get(((DeferredDefinitionRule) r).r.uniqueId());
+			else
+				tags = tagMap.get(r.uniqueId());
 			if (nonInitial)
 				b.append(" | ");
 			else
 				nonInitial = true;
-			if (hasTags) {
+			if (!tags.isEmpty()) {
 				b.append("[{");
 				boolean ni2 = false;
-				for (String label : tagMap.get(id)) {
+				for (String label : tags) {
 					if (ni2)
 						b.append(',');
 					else
@@ -130,7 +135,7 @@ public class AlternationRule extends Rule {
 				b.append(r.description());
 			} else
 				b.append(r.label());
-			if (hasTags)
+			if (!tags.isEmpty())
 				b.append(" ]");
 		}
 		if (condition != null)
@@ -240,13 +245,13 @@ public class AlternationRule extends Rule {
 	protected void fixAlternation() {
 		for (Rule r : alternates) {
 			if (r instanceof CyclicRule) {
-				Set<String> set = tagMap.get(r.uid());
+				Set<String> set = tagMap.remove(r.uid());
 				if (set != null) {
 					r = ((CyclicRule) r).r;
 					tagMap.put(r.uid(), set);
 				}
 			} else if (r instanceof DeferredDefinitionRule) {
-				Set<String> set = tagMap.get(r.uid());
+				Set<String> set = tagMap.remove(r.uid());
 				if (set != null) {
 					r = ((DeferredDefinitionRule) r).r;
 					tagMap.put(r.uid(), set);
