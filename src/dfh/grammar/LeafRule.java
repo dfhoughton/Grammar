@@ -140,7 +140,7 @@ public class LeafRule extends Rule {
 		StringBuilder b = descriptionWOCondition();
 		if (condition != null)
 			b.append(" (").append(condition).append(')');
-		return b.toString();
+		return wrap(b);
 	}
 
 	private StringBuilder descriptionWOCondition() {

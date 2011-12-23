@@ -174,7 +174,7 @@ public class Assertion extends Rule {
 			b.append(subDescription);
 		} else
 			subDescription(r, b);
-		return b.toString();
+		return wrap(b);
 	}
 
 	static void subDescription(Rule r, StringBuilder b) {

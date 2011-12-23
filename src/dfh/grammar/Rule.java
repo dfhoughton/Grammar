@@ -59,7 +59,25 @@ public abstract class Rule implements Serializable {
 	 * 
 	 * That is, it is a pure "named capture".
 	 */
-	private Set<String> labels;
+	protected Set<String> labels;
+
+	protected String wrap(StringBuilder b) {
+		if (!(labels == null || labels.isEmpty())) {
+			String s = b.toString();
+			b = new StringBuilder("[{");
+			boolean nonInitial = false;
+			for (String label : labels) {
+				if (nonInitial)
+					b.append(',');
+				else
+					nonInitial = true;
+				b.append(label);
+			}
+			b.append("} ");
+			b.append(s).append(" ]");
+		}
+		return b.toString();
+	}
 
 	/**
 	 * Assigns given label to {@link Rule}.

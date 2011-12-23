@@ -127,9 +127,9 @@ public class LiteralRule extends Rule {
 				s = '"' + s.replaceAll("([\\\\])", "\\\\$1") + '"';
 			if (condition != null)
 				s += " (" + condition + ')';
-			return s;
+			return wrap(new StringBuilder(s));
 		}
-		return uniqueId();
+		return wrap(new StringBuilder(uniqueId()));
 	}
 
 	@Override

@@ -168,7 +168,7 @@ public class SequenceRule extends Rule {
 		}
 		if (condition != null)
 			b.append(" (").append(condition).append(')');
-		return b.toString();
+		return wrap(b);
 	}
 
 	@Override

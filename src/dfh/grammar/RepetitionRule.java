@@ -304,7 +304,7 @@ public class RepetitionRule extends Rule {
 		} else
 			b.append(r.label());
 		b.append(repetition);
-		return b.toString();
+		return wrap(b);
 	}
 
 	@Override

@@ -57,7 +57,7 @@ public class CyclicRule extends Rule {
 
 	@Override
 	public String description() {
-		return label.toString();
+		return wrap(new StringBuilder(label.toString()));
 	}
 
 	@Override
