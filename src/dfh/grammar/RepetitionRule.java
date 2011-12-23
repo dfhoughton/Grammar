@@ -294,6 +294,19 @@ public class RepetitionRule extends Rule {
 	@Override
 	public String description() {
 		StringBuilder b = new StringBuilder();
+		boolean hasTags = !(alternateTags == null || alternateTags.isEmpty());
+		if (hasTags) {
+			b.append("[{");
+			boolean ni2 = false;
+			for (String label : alternateTags) {
+				if (ni2)
+					b.append(',');
+				else
+					ni2 = true;
+				b.append(label);
+			}
+			b.append("} ");
+		}
 		if (r.generation == -1) {
 			if (r instanceof SequenceRule || r instanceof AlternationRule) {
 				b.append("[ ");
@@ -303,6 +316,8 @@ public class RepetitionRule extends Rule {
 				b.append(r.description());
 		} else
 			b.append(r.label());
+		if (hasTags)
+			b.append(" ]");
 		b.append(repetition);
 		return wrap(b);
 	}

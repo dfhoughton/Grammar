@@ -59,4 +59,15 @@ public class DescriptionTest {
 						.matcher(g.describe()).matches());
 	}
 
+	@Test
+	public void repetition() {
+		String[] rules = {
+		//
+		"ROOT = [{bar} 'foo']+" };
+		Grammar g = new Grammar(rules);
+		assertTrue("basic description",
+				Pattern.compile("\\s*+ROOT = \\[\\{bar\\} \"foo\" ]\\+\\s*+")
+						.matcher(g.describe()).matches());
+	}
+
 }
