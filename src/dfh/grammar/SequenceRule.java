@@ -151,11 +151,26 @@ public class SequenceRule extends Rule {
 	public String description() {
 		StringBuilder b = new StringBuilder();
 		boolean nonInitial = false;
+		int index = -1;
 		for (Rule r : sequence) {
+			index++;
+			boolean hasTags = !tagList.get(index).isEmpty();
 			if (nonInitial)
 				b.append(' ');
 			else
 				nonInitial = true;
+			if (hasTags) {
+				b.append("[{");
+				boolean ni2 = false;
+				for (String label : tagList.get(index)) {
+					if (ni2)
+						b.append(',');
+					else
+						ni2 = true;
+					b.append(label);
+				}
+				b.append("} ");
+			}
 			if (r.generation == -1) {
 				boolean alternation = r instanceof AlternationRule;
 				if (alternation)
@@ -165,6 +180,8 @@ public class SequenceRule extends Rule {
 					b.append(" ]");
 			} else
 				b.append(r.label());
+			if (hasTags)
+				b.append(" ]");
 		}
 		if (condition != null)
 			b.append(" (").append(condition).append(')');

@@ -46,4 +46,17 @@ public class DescriptionTest {
 						.matcher(g.describe()).matches());
 	}
 
+	@Test
+	public void sequence() {
+		String[] rules = {
+		//
+		"ROOT = 'foo' [{bar} 'quux']" };
+		Grammar g = new Grammar(rules);
+		assertTrue(
+				"basic description",
+				Pattern.compile(
+						"\\s*+ROOT = \"foo\" \\[\\{bar\\} \"quux\" ]\\s*+")
+						.matcher(g.describe()).matches());
+	}
+
 }

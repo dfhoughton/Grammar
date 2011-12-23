@@ -109,11 +109,12 @@ public class AlternationRule extends Rule {
 		boolean nonInitial = false;
 		for (Rule r : alternates) {
 			String id = r.uniqueId();
+			boolean hasTags = !tagMap.get(id).isEmpty();
 			if (nonInitial)
 				b.append(" | ");
 			else
 				nonInitial = true;
-			if (!tagMap.get(id).isEmpty()) {
+			if (hasTags) {
 				b.append("[{");
 				boolean ni2 = false;
 				for (String label : tagMap.get(id)) {
@@ -129,7 +130,7 @@ public class AlternationRule extends Rule {
 				b.append(r.description());
 			} else
 				b.append(r.label());
-			if (!tagMap.get(id).isEmpty())
+			if (hasTags)
 				b.append(" ]");
 		}
 		if (condition != null)
