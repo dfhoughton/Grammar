@@ -108,14 +108,29 @@ public class AlternationRule extends Rule {
 		StringBuilder b = new StringBuilder();
 		boolean nonInitial = false;
 		for (Rule r : alternates) {
+			String id = r.uniqueId();
 			if (nonInitial)
 				b.append(" | ");
 			else
 				nonInitial = true;
+			if (!tagMap.get(id).isEmpty()) {
+				b.append("[{");
+				boolean ni2 = false;
+				for (String label : tagMap.get(id)) {
+					if (ni2)
+						b.append(',');
+					else
+						ni2 = true;
+					b.append(label);
+				}
+				b.append("} ");
+			}
 			if (r.generation == -1) {
 				b.append(r.description());
 			} else
 				b.append(r.label());
+			if (!tagMap.get(id).isEmpty())
+				b.append(" ]");
 		}
 		if (condition != null)
 			b.append(" (").append(condition).append(')');
@@ -224,13 +239,13 @@ public class AlternationRule extends Rule {
 	protected void fixAlternation() {
 		for (Rule r : alternates) {
 			if (r instanceof CyclicRule) {
-				Set<String> set = tagMap.remove(r.uid());
+				Set<String> set = tagMap.get(r.uid());
 				if (set != null) {
 					r = ((CyclicRule) r).r;
 					tagMap.put(r.uid(), set);
 				}
 			} else if (r instanceof DeferredDefinitionRule) {
-				Set<String> set = tagMap.remove(r.uid());
+				Set<String> set = tagMap.get(r.uid());
 				if (set != null) {
 					r = ((DeferredDefinitionRule) r).r;
 					tagMap.put(r.uid(), set);

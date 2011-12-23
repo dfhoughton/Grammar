@@ -32,4 +32,18 @@ public class DescriptionTest {
 						"\\s*+ROOT = \\[\\{bar\\}\\s*+\"foo\"\\s*+\\]\\s*+")
 						.matcher(g.describe()).matches());
 	}
+
+	@Test
+	public void alternation() {
+		String[] rules = {
+		//
+		"ROOT = 'foo' | [{bar} 'quux']" };
+		Grammar g = new Grammar(rules);
+		assertTrue(
+				"basic description",
+				Pattern.compile(
+						"\\s*+ROOT = \"foo\" \\| \\[\\{bar\\} \"quux\" ]\\s*+")
+						.matcher(g.describe()).matches());
+	}
+
 }
