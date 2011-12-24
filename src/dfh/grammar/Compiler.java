@@ -32,6 +32,7 @@ public class Compiler {
 	private Map<String, Label> terminalLabelMap;
 	private Collection<Label> undefinedRules = new HashSet<Label>();
 	private Map<Label, Set<Label>> dependencyMap = new HashMap<Label, Set<Label>>();
+	private Map<Label, Rule> reversedCyclicRuleMap = new HashMap<Label, Rule>();
 	private final Label root;
 	private boolean recursive;
 	private Map<String, Set<Label>> undefinedConditions = new HashMap<String, Set<Label>>();
@@ -867,6 +868,17 @@ public class Compiler {
 			List<Set<String>> tagList = new ArrayList<Set<String>>(sqr.tagList);
 			Collections.reverse(tagList);
 			ru = new SequenceRule(l, children, tagList);
+		} else if (sr instanceof CyclicRule) {
+			if (reversedCyclicRuleMap.containsKey(sr.label)) {
+				ru = reversedCyclicRuleMap.get(sr.label);
+			} else {
+				CyclicRule cr = (CyclicRule) sr;
+				Label l = new Label(sr.label.t, sr.label.id + ":reversed");
+				cr = new CyclicRule(l);
+				reversedCyclicRuleMap.put(sr.label, cr);
+				cr.setRule(reverse(((CyclicRule) sr).r));
+				ru = cr;
+			}
 		} else {
 			ru = sr.reverse();
 		}
@@ -981,17 +993,5 @@ public class Compiler {
 
 	public Map<String, Set<Label>> undefinedConditions() {
 		return new HashMap<String, Set<Label>>(undefinedConditions);
-	}
-
-	private Set<String> namedCapture(RuleFragment rf) {
-		if (rf instanceof GroupFragment) {
-			GroupFragment gf = (GroupFragment) rf;
-			if (!gf.alternateTags.isEmpty())
-				;
-			Set<String> namedCapture = new HashSet<String>(gf.alternateTags);
-			gf.alternateTags.clear();
-			return namedCapture;
-		} else
-			return null;
 	}
 }

@@ -45,6 +45,7 @@ import org.junit.runners.Suite;
 		LabelTest.class,//
 		WalkTest.class,//
 		DescriptionTest.class,//
+		ReversedCycle.class,//
 })
 public class AllTests {
 }
