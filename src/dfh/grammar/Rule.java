@@ -254,9 +254,21 @@ public abstract class Rule implements Serializable {
 	 * The rule description is invoked by {@link Grammar#describe()}. It is the
 	 * text that appears after the '=' in a rule definition.
 	 * 
+	 * @param b
+	 *            whether this description already resides in brackets
 	 * @return a String describing the rule
 	 */
-	public abstract String description();
+	public abstract String description(boolean b);
+
+	/**
+	 * The rule description is invoked by {@link Grammar#describe()}. It is the
+	 * text that appears after the '=' in a rule definition.
+	 * 
+	 * @return a String describing the rule
+	 */
+	public String description() {
+		return description(false);
+	}
 
 	/**
 	 * Prepare for matching against the given {@link CharSequence}. This is an

@@ -233,7 +233,7 @@ public class Match {
 		if (this == DUMMY)
 			return "[DUMMY]";
 		StringBuilder b = new StringBuilder();
-		b.append('(').append(r.description()).append(": ");
+		b.append('(').append(r.description(false)).append(": ");
 		b.append(start).append(", ").append(end);
 		if (children != null && children.length > 0) {
 			b.append(" [");

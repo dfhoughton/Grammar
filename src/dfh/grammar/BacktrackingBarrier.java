@@ -90,7 +90,7 @@ public class BacktrackingBarrier extends Rule {
 	}
 
 	@Override
-	public String description() {
+	public String description(boolean inBrackets) {
 		return label.id;
 	}
 

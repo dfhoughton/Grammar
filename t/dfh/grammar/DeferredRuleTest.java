@@ -103,7 +103,7 @@ public class DeferredRuleTest {
 		}
 
 		@Override
-		public String description() {
+		public String description(boolean inBrackets) {
 			return "foo bar";
 		}
 

@@ -292,11 +292,13 @@ public class RepetitionRule extends Rule {
 	}
 
 	@Override
-	public String description() {
+	public String description(boolean inBrackets) {
 		StringBuilder b = new StringBuilder();
 		boolean hasTags = !(alternateTags == null || alternateTags.isEmpty());
 		if (hasTags) {
-			b.append("[{");
+			if (!inBrackets)
+				b.append('[');
+			b.append('{');
 			boolean ni2 = false;
 			for (String label : alternateTags) {
 				if (ni2)
@@ -308,16 +310,21 @@ public class RepetitionRule extends Rule {
 			b.append("} ");
 		}
 		if (r.generation == -1) {
-			if (r instanceof SequenceRule || r instanceof AlternationRule) {
+			if ((r instanceof SequenceRule || r instanceof AlternationRule)
+					&& !(inBrackets && repetition.redundant())) {
 				b.append("[ ");
-				b.append(r.description());
+				// TODO fix issue with inner tags
+				b.append(r.description(true));
 				b.append(" ]");
 			} else
-				b.append(r.description());
+				b.append(r.description(false));
 		} else
 			b.append(r.label());
-		if (hasTags)
-			b.append(" ]");
+		if (hasTags) {
+			b.append(' ');
+			if (!inBrackets)
+				b.append(']');
+		}
 		b.append(repetition);
 		return wrap(b);
 	}

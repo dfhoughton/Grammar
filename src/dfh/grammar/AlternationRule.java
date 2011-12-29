@@ -104,7 +104,7 @@ public class AlternationRule extends Rule {
 	}
 
 	@Override
-	public String description() {
+	public String description(boolean inBrackets) {
 		StringBuilder b = new StringBuilder();
 		boolean nonInitial = false;
 		for (Rule r : alternates) {
@@ -120,7 +120,9 @@ public class AlternationRule extends Rule {
 			else
 				nonInitial = true;
 			if (!tags.isEmpty()) {
-				b.append("[{");
+				if (!inBrackets)
+					b.append('[');
+				b.append("{");
 				boolean ni2 = false;
 				for (String label : tags) {
 					if (ni2)
@@ -132,11 +134,14 @@ public class AlternationRule extends Rule {
 				b.append("} ");
 			}
 			if (r.generation == -1) {
-				b.append(r.description());
+				b.append(r.description(false));
 			} else
 				b.append(r.label());
-			if (!tags.isEmpty())
-				b.append(" ]");
+			if (!tags.isEmpty()) {
+				b.append(' ');
+				if (!inBrackets)
+					b.append(']');
+			}
 		}
 		if (condition != null)
 			b.append(" (").append(condition).append(')');

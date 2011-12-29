@@ -136,7 +136,7 @@ public class LeafRule extends Rule {
 	}
 
 	@Override
-	public String description() {
+	public String description(boolean inBrackets) {
 		StringBuilder b = descriptionWOCondition();
 		if (condition != null)
 			b.append(" (").append(condition).append(')');

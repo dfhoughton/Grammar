@@ -116,7 +116,7 @@ public class LiteralRule extends Rule {
 	}
 
 	@Override
-	public String description() {
+	public String description(boolean inBrackets) {
 		boolean b1 = literal.indexOf('\\') > -1;
 		boolean b2 = literal.indexOf('"') > -1;
 		if (b1 || b2) {

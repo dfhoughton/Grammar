@@ -105,7 +105,7 @@ public class BackReferenceRule extends Rule {
 	}
 
 	@Override
-	public String description() {
+	public String description(boolean inBrackets) {
 		return wrap(new StringBuilder(label.toString()));
 	}
 

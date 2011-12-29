@@ -166,7 +166,7 @@ public class Assertion extends Rule {
 	}
 
 	@Override
-	public String description() {
+	public String description(boolean inBrackets) {
 		StringBuilder b = new StringBuilder();
 		b.append(positive ? '~' : '!');
 		if (!forward) {
@@ -184,7 +184,7 @@ public class Assertion extends Rule {
 					|| r instanceof AlternationRule;
 			if (needsBrackets)
 				b.append("[ ");
-			b.append(r.description());
+			b.append(r.description(true));
 			if (needsBrackets)
 				b.append(" ]");
 		} else
@@ -211,7 +211,7 @@ public class Assertion extends Rule {
 		return new Assertion((Label) label.clone(), r, positive, forward);
 	}
 
-	public void setSubDescription(String subDescription) {
+	void setSubDescription(String subDescription) {
 		if (this.subDescription != null)
 			throw new GrammarException(
 					"one cannot reset an assertion sub-descriptoin");

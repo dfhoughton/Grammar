@@ -148,7 +148,7 @@ public class SequenceRule extends Rule {
 	}
 
 	@Override
-	public String description() {
+	public String description(boolean inBrackets) {
 		StringBuilder b = new StringBuilder();
 		boolean nonInitial = false;
 		int index = -1;
@@ -160,7 +160,9 @@ public class SequenceRule extends Rule {
 			else
 				nonInitial = true;
 			if (hasTags) {
-				b.append("[{");
+				if (!inBrackets)
+					b.append('[');
+				b.append('{');
 				boolean ni2 = false;
 				for (String label : tagList.get(index)) {
 					if (ni2)
@@ -175,13 +177,16 @@ public class SequenceRule extends Rule {
 				boolean alternation = r instanceof AlternationRule;
 				if (alternation)
 					b.append("[ ");
-				b.append(r.description());
+				b.append(r.description(true));
 				if (alternation)
 					b.append(" ]");
 			} else
 				b.append(r.label());
-			if (hasTags)
-				b.append(" ]");
+			if (hasTags) {
+				b.append(' ');
+				if (!inBrackets)
+					b.append(']');
+			}
 		}
 		if (condition != null)
 			b.append(" (").append(condition).append(')');
