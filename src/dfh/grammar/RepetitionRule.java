@@ -359,7 +359,7 @@ public class RepetitionRule extends Rule {
 		} else {
 			if (this.c instanceof LogicalCondition) {
 				if (!((LogicalCondition) this.c).replace(id, c))
-					throw new GrammarException("could not defined " + id
+					throw new GrammarException("could not define " + id
 							+ " in this condition");
 			} else if (this.c instanceof LeafCondition) {
 				LeafCondition lc = (LeafCondition) this.c;

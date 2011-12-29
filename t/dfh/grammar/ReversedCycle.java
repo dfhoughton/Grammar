@@ -32,7 +32,7 @@ public class ReversedCycle {
 		String[] rules = {
 				//
 				"ROOT = !- [ <foo> /\\s++/r ] <foo> /(?!\\w)/",//
-				"foo = '1' | <foo> '0' (lt100)",//
+				"foo = '1' | <foo> '0' (offset lt100)",//
 		};
 		try {
 			Grammar g = new Grammar(rules);
@@ -42,7 +42,13 @@ public class ReversedCycle {
 					return i < 100;
 				}
 			});
-			System.out.println(g.describe());
+			g.defineCondition("offset", new Condition() {
+				@Override
+				public boolean passes(Match n, CharSequence s) {
+					System.out.println(n.start());
+					return true;
+				}
+			});
 			String s = "100 10 1";
 			Matcher m = g.find(s);
 			int count = 0;
