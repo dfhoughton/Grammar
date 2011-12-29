@@ -312,9 +312,12 @@ public class RepetitionRule extends Rule {
 		if (r.generation == -1) {
 			if ((r instanceof SequenceRule || r instanceof AlternationRule)
 					&& !(inBrackets && repetition.redundant())) {
-				b.append("[ ");
-				// TODO fix issue with inner tags
-				b.append(r.description(true));
+				String d = r.description(true);
+				if (d.startsWith("{"))
+					b.append('[');
+				else
+					b.append("[ ");
+				b.append(d);
 				b.append(" ]");
 			} else
 				b.append(r.description(false));
