@@ -549,8 +549,10 @@ public class Compiler {
 		if (r.condition != null) {
 			Match m = cg.matches(r.condition).match();
 			conditionMap.put(label, m);
-			Set<Label> set = undefinedConditions().get(r.condition);
-			set.add(label);
+			for (Match n : m.get("cnd")) {
+				Set<Label> set = undefinedConditions().get(n.group());
+				set.add(label);
+			}
 		}
 	}
 
@@ -590,7 +592,7 @@ public class Compiler {
 					+ r.getClass().getName());
 		setCondition(match, ru);
 
-		if (match != null) {
+		if (match != null && r.condition == null) {
 			ru.conditionalize(LogicalCondition.manufacture(match),
 					match.group());
 		} else if (r.condition != null) {
