@@ -17,22 +17,6 @@ import org.junit.BeforeClass;
  */
 public class ReversedCharSequenceTest {
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
-
 	@Test
 	public void toStringTest() {
 		String s = "abc";
@@ -73,5 +57,20 @@ public class ReversedCharSequenceTest {
 		String s = "abcdefghijklmnopqrstuvwxyz";
 		ReversedCharSequence rcs = new ReversedCharSequence(s, 5, 1);
 		assertTrue("reversed string", rcs.toString().equals("edcb"));
+	}
+
+	@Test
+	public void oneArgConstructorTest() {
+		String s = "abc";
+		ReversedCharSequence rcs = new ReversedCharSequence(s);
+		assertTrue("one arg constructor worked", "cba".equals(rcs.toString()));
+	}
+
+	@Test
+	public void subsequenceTest() {
+		String s = "abc";
+		ReversedCharSequence rcs = new ReversedCharSequence(s);
+		assertTrue("returned correct subsequence", rcs.subSequence(0, 1)
+				.toString().equals("c"));
 	}
 }

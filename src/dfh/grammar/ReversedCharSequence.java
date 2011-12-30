@@ -19,6 +19,15 @@ public class ReversedCharSequence implements CharSequence {
 	private final CharSequence s;
 	private final boolean reversed;
 
+	private ReversedCharSequence(int zero, int end, int length, CharSequence s,
+			boolean reversed) {
+		this.zero = zero;
+		this.end = end;
+		this.length = length;
+		this.s = s;
+		this.reversed = reversed;
+	}
+
 	/**
 	 * @param s
 	 * @param offset
@@ -49,8 +58,28 @@ public class ReversedCharSequence implements CharSequence {
 		length = zero - this.end;
 	}
 
+	/**
+	 * Reverses input from character before offset to beginning.
+	 * 
+	 * @param s
+	 *            sequence to reverse
+	 * @param offset
+	 *            character immediately *before* first character appearing in
+	 *            reversed sequence, which means index after last character
+	 *            reversed
+	 */
 	public ReversedCharSequence(CharSequence s, int offset) {
 		this(s, offset, 0);
+	}
+
+	/**
+	 * Reverses input sequence.
+	 * 
+	 * @param s
+	 *            sequence to reverse
+	 */
+	public ReversedCharSequence(CharSequence s) {
+		this(s, s.length(), 0);
 	}
 
 	@Override
@@ -88,7 +117,8 @@ public class ReversedCharSequence implements CharSequence {
 
 	@Override
 	public CharSequence subSequence(int start, int end) {
-		return new ReversedCharSequence(s, start - zero, end - zero);
+		return new ReversedCharSequence(zero, zero - end, end - start, s,
+				reversed);
 	}
 
 	@Override
