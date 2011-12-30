@@ -73,4 +73,12 @@ public class ReversedCharSequenceTest {
 		assertTrue("returned correct subsequence", rcs.subSequence(0, 1)
 				.toString().equals("c"));
 	}
+
+	@Test
+	public void doubleReversalTest() {
+		String s = "abc";
+		ReversedCharSequence rcs = new ReversedCharSequence(s);
+		rcs = new ReversedCharSequence(rcs);
+		assertTrue("double reversal worked", rcs.toString().equals("abc"));
+	}
 }
