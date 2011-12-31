@@ -121,4 +121,16 @@ public abstract class Matcher {
 		}
 		return m;
 	}
+
+	/**
+	 * Called by matchers possibly involving conditions while matching to
+	 * enforce logging of condition testing when appropriate.
+	 * 
+	 * @param c
+	 * @param child
+	 * @return
+	 */
+	protected boolean testCondition(Condition c, Match child) {
+		return c == null || c.passes(child, this, s);
+	}
 }

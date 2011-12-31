@@ -54,7 +54,7 @@ public class LiteralRule extends Rule {
 					}
 					if (matched) {
 						Match m = new Match(LiteralRule.this, offset, end);
-						if (c == null || c.passes(m, this, s))
+						if (testCondition(c, m))
 							cm = new CachedMatch(m);
 						else
 							cm = CachedMatch.MISMATCH;

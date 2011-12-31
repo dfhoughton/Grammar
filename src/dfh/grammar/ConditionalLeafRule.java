@@ -45,7 +45,7 @@ public class ConditionalLeafRule extends LeafRule {
 				if (m.lookingAt()) {
 					Match n = new Match(ConditionalLeafRule.this, offset,
 							m.end());
-					if (c.passes(n, this, s))
+					if (testCondition(c, n))
 						cm = new CachedMatch(n);
 					else
 						cm = CachedMatch.MISMATCH;

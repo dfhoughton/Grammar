@@ -87,7 +87,7 @@ public class SequenceRule extends Rule {
 						Match[] children = matched
 								.toArray(new Match[sequence.length]);
 						next.setChildren(children);
-						if (c == null || c.passes(next, this, s))
+						if (testCondition(c, next))
 							break;
 					} else
 						break;

@@ -40,7 +40,7 @@ public class AlternationRule extends Rule {
 				while (mostRecent.mightHaveNext()) {
 					child = mostRecent.match();
 					if (child != null) {
-						if (c == null || c.passes(child, this, s))
+						if (testCondition(c, child))
 							break OUTER;
 						else
 							child = null;

@@ -130,7 +130,7 @@ public class RepetitionRule extends Rule {
 					next.setChildren(children);
 					next.setEnd(matched.isEmpty() ? offset : matched.peekLast()
 							.end());
-					if (c == null || c.passes(next, this, s))
+					if (testCondition(c, next))
 						break;
 				}
 			}
@@ -152,7 +152,7 @@ public class RepetitionRule extends Rule {
 				done = true;
 				matched = null;
 				matchers = null;
-			} else if (!(c == null || c.passes(next, this, cs)))
+			} else if (!testCondition(c, next))
 				fetchNext();
 		}
 
@@ -212,7 +212,7 @@ public class RepetitionRule extends Rule {
 					matchers = null;
 					matched = null;
 					break;
-				} else if (c == null || c.passes(next, this, s))
+				} else if (testCondition(c, next))
 					break;
 			}
 		}
@@ -237,7 +237,7 @@ public class RepetitionRule extends Rule {
 					next.setChildren(children);
 					next.setEnd(matched.isEmpty() ? offset : matched.peekLast()
 							.end());
-					if (!(c == null || c.passes(next, this, s))) {
+					if (!(testCondition(c, next))) {
 						next = null;
 						done = true;
 						matched = null;
