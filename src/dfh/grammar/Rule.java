@@ -222,7 +222,8 @@ public abstract class Rule implements Serializable {
 		b.append('_');
 		if (end > offset) {
 			b.append('"');
-			b.append(s.subSequence(offset, end));
+			CharSequence ss = s.subSequence(offset, end);
+			b.append(ss);
 			b.append('"');
 			if (end < s.length())
 				b.append("...");
