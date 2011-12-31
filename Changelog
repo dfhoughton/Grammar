@@ -1,5 +1,6 @@
 1.06
   * made cyclic rules reversible
+  * fixed various logical condition bugs
 
 1.05, 23 December 2011
   * added lean memory cache option
