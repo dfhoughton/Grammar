@@ -28,3 +28,5 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 . create more thorough unit tests for complex conditions
 . rename searching methods in Match to make them more intuitive
 . create xpath-like convention for searching matches
+. create single-line Grammar constructor and string LineReader
+. make tests for describe() to ensure descriptions are compilable
