@@ -26,3 +26,5 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 . modify lookbehinds to use a single reversed character sequence
 . make conditions log their activity
 . create more thorough unit tests for complex conditions
+. rename searching methods in Match to make them more intuitive
+. create xpath-like convention for searching matches
