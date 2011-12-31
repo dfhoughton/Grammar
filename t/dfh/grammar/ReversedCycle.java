@@ -2,6 +2,8 @@ package dfh.grammar;
 
 import static org.junit.Assert.*;
 
+import java.io.PrintStream;
+
 import org.junit.Test;
 
 public class ReversedCycle {
@@ -31,26 +33,25 @@ public class ReversedCycle {
 	public void conditionTest() {
 		String[] rules = {
 				//
-				"ROOT = !- [ <foo> /\\s++/r ] <foo> /(?!\\w)/",//
-				"foo = '1' | <foo> '0' (offset lt100)",//
+				"ROOT = !- [ <bar> /\\s++/r ] <bar>",//
+				"bar = /\\b/r <foo> /\\b/r (lt100)",//
+				"foo = '1' | <foo> '0'",//
 		};
 		try {
+			final PrintStream out = new PrintStream("/tmp/log.txt");
 			Grammar g = new Grammar(rules);
 			g.defineCondition("lt100", new IntegerCondition() {
 				@Override
 				public boolean passes(int i) {
+					out.printf("testing: %d; passes: %b%n", i, i < 100);
 					return i < 100;
 				}
 			});
-			g.defineCondition("offset", new Condition() {
-				@Override
-				public boolean passes(Match n, CharSequence s) {
-					System.out.println(n.start());
-					return true;
-				}
-			});
 			String s = "100 10 1";
-			Matcher m = g.find(s);
+			Matcher m = g.find(
+					s,
+					new Options().study(false).log(
+							out));
 			int count = 0;
 			Match n;
 			while ((n = m.match()) != null) {
