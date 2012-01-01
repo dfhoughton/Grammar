@@ -66,4 +66,11 @@ public class Regression {
 			fail("threw exception: " + e);
 		}
 	}
+
+	@Test
+	public void backwardAssertionWordBreak() {
+		Grammar g = new Grammar("ROOT = ~- /\\b/r 'a'");
+		assertNotNull("found initial word break in backwards assertion", g
+				.matches("a").match());
+	}
 }
