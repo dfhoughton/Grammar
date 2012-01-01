@@ -51,12 +51,12 @@ public abstract class LogicalCondition extends Condition {
 		if (m.hasLabel("cnd"))
 			return new LeafCondition(m.group());
 		if (m.hasLabel("group"))
-			return mfct(m.choose("exp").children()[0]);
+			return mfct(m.first("exp").children()[0]);
 		if (m.hasLabel("exp"))
 			return mfct(m.children()[0]);
 		try {
 			List<Condition> list = new ArrayList<Condition>();
-			List<Match> constituents = m.getClosestDescendants(expOrGroupTest);
+			List<Match> constituents = m.closest(expOrGroupTest);
 			for (Match sm : constituents)
 				list.add(mfct(sm));
 			if (m.hasLabel("conj"))

@@ -3,6 +3,7 @@
   * fixed various logical condition bugs
   * made conditions provide log output
   * created single-line grammar constructor
+  * renamed searching methods of Match to make them shorter and more intuitive
 
 1.05, 23 December 2011
   * added lean memory cache option

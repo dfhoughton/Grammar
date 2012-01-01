@@ -38,43 +38,43 @@ public class LabelTest {
 
 	@Test
 	public void testA() {
-		Match a = n.choose("\"a\"");
+		Match a = n.first("\"a\"");
 		assertTrue("\"a\" has two labels", a.labels().size() == 2);
 	}
 
 	@Test
 	public void testB() {
-		Match a = n.choose("\"b\"");
+		Match a = n.first("\"b\"");
 		assertTrue("\"b\" has three labels", a.labels().size() == 3);
 	}
 
 	@Test
 	public void testC() {
-		Match a = n.choose("\"c\"");
+		Match a = n.first("\"c\"");
 		assertTrue("\"c\" has two labels", a.labels().size() == 2);
 	}
 
 	@Test
 	public void testD() {
-		Match a = n.choose("d");
+		Match a = n.first("d");
 		assertTrue("d has two labels", a.labels().size() == 2);
 	}
 
 	@Test
 	public void testE() {
-		Match a = n.choose("e");
+		Match a = n.first("e");
 		assertTrue("e has three labels", a.labels().size() == 3);
 	}
 
 	@Test
 	public void testF() {
-		Match a = n.choose("f");
+		Match a = n.first("f");
 		assertTrue("f has two labels", a.labels().size() == 2);
 	}
 
 	@Test
 	public void testFoo() {
-		Match a = n.choose("foo");
+		Match a = n.first("foo");
 		assertTrue("foo has three labels", a.labels().size() == 3);
 	}
 }

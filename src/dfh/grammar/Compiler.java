@@ -93,7 +93,7 @@ public class Compiler {
 		private boolean found(Match c, Set<String> tagset) {
 			@SuppressWarnings("unused")
 			String debug = c.group(), debug2;
-			List<Match> exps = c.getClosestDescendants(expTest);
+			List<Match> exps = c.closest(expTest);
 			if (exps.isEmpty())
 				return false;
 			for (Match exp : exps) {

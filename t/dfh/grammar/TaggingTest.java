@@ -49,7 +49,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  ba\tbcd";
 		Match m = g.matches(s).match();
-		assertNotNull(m.choose("foo"));
+		assertNotNull(m.first("foo"));
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  ba\tbcd";
 		Match m = g.matches(s).match();
-		assertNotNull(m.choose("bar"));
+		assertNotNull(m.first("bar"));
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  ba\tbcd";
 		Match m = g.matches(s).match();
-		assertNotNull(m.choose("baz"));
+		assertNotNull(m.first("baz"));
 	}
 
 	@Test
@@ -85,7 +85,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  ba\tbcd";
 		Match m = g.matches(s).match();
-		assertNotNull(m.choose("quux"));
+		assertNotNull(m.first("quux"));
 	}
 
 	@Test
@@ -97,8 +97,8 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a";
 		Match m = g.matches(s).match();
-		assertNotNull(m.choose("ROOT"));
-		assertNotNull(m.choose("foo"));
+		assertNotNull(m.first("ROOT"));
+		assertNotNull(m.first("foo"));
 	}
 
 	@Test
@@ -112,7 +112,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  a";
 		Match m = g.matches(s).match();
-		assertNotNull(m.choose("a"));
+		assertNotNull(m.first("a"));
 	}
 
 	@Test
@@ -126,7 +126,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  a";
 		Match m = g.matches(s).match();
-		assertNotNull(m.choose("b"));
+		assertNotNull(m.first("b"));
 	}
 
 	@Test
@@ -141,9 +141,9 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  a";
 		Match m = g.matches(s).match();
-		assertNotNull(m.choose("\"a\""));
-		assertNotNull(m.choose("b"));
-		assertNotNull(m.choose("c"));
+		assertNotNull(m.first("\"a\""));
+		assertNotNull(m.first("b"));
+		assertNotNull(m.first("c"));
 	}
 
 	@Test
@@ -157,7 +157,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  a";
 		Match m = g.matches(s).match();
-		assertNotNull(m.choose("c"));
+		assertNotNull(m.first("c"));
 	}
 
 	@Test

@@ -61,7 +61,7 @@ public class Regression {
 			Grammar g = new Grammar(rules);
 			g.defineRule("foo", "bar");
 			Match m = g.matches("bar").match();
-			m.choose("foo");
+			m.first("foo");
 		} catch (Exception e) {
 			fail("threw exception: " + e);
 		}
