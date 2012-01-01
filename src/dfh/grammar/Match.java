@@ -737,6 +737,15 @@ public class Match {
 	}
 
 	/**
+	 * Length of sequence matched in characters.
+	 * 
+	 * @return length of sequence matched
+	 */
+	public int length() {
+		return end - start;
+	}
+
+	/**
 	 * Records subsequence this match corresponds to.
 	 * 
 	 * @param s
