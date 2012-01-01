@@ -441,4 +441,12 @@ public abstract class Rule implements Serializable {
 	 */
 	protected void fixAlternation() {
 	}
+
+	protected void logCondition(Matcher m, boolean passes) {
+		StringBuilder b = new StringBuilder();
+		b.append("\ncondition ").append(condition).append(' ');
+		b.append(passes ? "passes" : "does not pass");
+		b.append('\n');
+		m.options.trace.println(b);
+	}
 }

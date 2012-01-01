@@ -43,7 +43,6 @@ public class ReversedCycle {
 			g.defineCondition("lt100", new IntegerCondition() {
 				@Override
 				public boolean passes(int i) {
-					out.printf("testing: %d; passes: %b%n", i, i < 100);
 					return i < 100;
 				}
 			});

@@ -131,6 +131,11 @@ public abstract class Matcher {
 	 * @return
 	 */
 	protected boolean testCondition(Condition c, Match child) {
-		return c == null || c.passes(child, this, s);
+		if (c == null)
+			return true;
+		boolean passes = c.passes(child, this, s);
+		if (options.debug)
+			child.rule().logCondition(this, passes);
+		return passes;
 	}
 }
