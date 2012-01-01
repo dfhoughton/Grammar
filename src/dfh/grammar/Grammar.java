@@ -549,6 +549,36 @@ public class Grammar implements Serializable, Cloneable {
 	}
 
 	/**
+	 * For when the entire grammar is defined in a single string.
+	 * <p>
+	 * Delegates to {@link #Grammar(LineReader, Map)}.
+	 * 
+	 * @param multiline
+	 *            rule source
+	 * @param precompiledRules
+	 *            definitions for {@link Rule} symbols
+	 * @throws GrammarException
+	 * @throws IOException
+	 */
+	public Grammar(String multiline, Map<String, Rule> precompiledRules)
+			throws GrammarException {
+		this(new StringLineReader(multiline), precompiledRules);
+	}
+
+	/**
+	 * Delegates to {@link #Grammar(String, Map)}, setting the second parameter
+	 * to <code>null</code>.
+	 * 
+	 * @param multiline
+	 *            rule source
+	 * @throws GrammarException
+	 * @throws IOException
+	 */
+	public Grammar(String multiline) throws GrammarException {
+		this(multiline, null);
+	}
+
+	/**
 	 * For defining a terminal rule left undefined by the initial rule set. In
 	 * this case you are defining the rule to be a {@link LeafRule}. This is
 	 * useful when the regular expression is too unwieldy to fit in the grammar

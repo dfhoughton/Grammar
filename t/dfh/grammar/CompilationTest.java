@@ -1,5 +1,8 @@
 package dfh.grammar;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
 
 public class CompilationTest {
@@ -17,11 +20,10 @@ public class CompilationTest {
 				"<baz> = 'baz'",//
 		};
 		try {
-			@SuppressWarnings("unused")
-			Grammar g = new Grammar(rules);
+			new Grammar(rules);
 			org.junit.Assert.assertTrue("compiled simple rules", true);
 		} catch (Exception e) {
-			org.junit.Assert.fail("error thrown: " + e);
+			fail("error thrown: " + e);
 		}
 	}
 
@@ -33,11 +35,10 @@ public class CompilationTest {
 				"<a> = /\\b\\d{2}\\b/ (less_than_30)",//
 		};
 		try {
-			@SuppressWarnings("unused")
-			Grammar g = new Grammar(rules);
+			new Grammar(rules);
 			org.junit.Assert.assertTrue("compiled rules with condition", true);
 		} catch (Exception e) {
-			org.junit.Assert.fail("error thrown: " + e);
+			fail("error thrown: " + e);
 		}
 	}
 
@@ -53,7 +54,13 @@ public class CompilationTest {
 			Grammar g = new Grammar(rules);
 			org.junit.Assert.assertTrue("compiled rules with condition", true);
 		} catch (Exception e) {
-			org.junit.Assert.fail("error thrown: " + e);
+			fail("error thrown: " + e);
 		}
+	}
+
+	@Test
+	public void singleLineCompilation() {
+		Grammar g = new Grammar("ROOT = <foo>\nfoo= 'a'");
+		assertNotNull("correct grammar", g.matches("a").match());
 	}
 }

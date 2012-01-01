@@ -2,6 +2,7 @@
   * made cyclic rules reversible
   * fixed various logical condition bugs
   * made conditions provide log output
+  * created single-line grammar constructor
 
 1.05, 23 December 2011
   * added lean memory cache option
