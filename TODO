@@ -29,6 +29,5 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 * rename searching methods in Match to make them more intuitive
 . create xpath-like convention for searching matches
 * create single-line Grammar constructor and string LineReader
-. make tests for describe() to ensure descriptions are compilable
-. construct round trip tests for Grammar.description()
+* construct round trip tests for Grammar.description()
 . remove Serializable constraint on Rule
