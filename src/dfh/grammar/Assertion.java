@@ -21,18 +21,18 @@ public class Assertion extends Rule {
 		private final Map<Integer, CachedMatch> subCache;
 		private final boolean backward;
 
-		private AssertionMatcher(CharSequence cs, Integer offset,
+		private AssertionMatcher(Integer offset,
 				Map<Integer, CachedMatch>[] cache, Matcher master) {
-			super(cs, offset, master);
+			super(offset, master);
 			this.cache = cache;
 			this.subCache = cache[rule().cacheIndex];
 			backward = false;
 		}
 
-		public AssertionMatcher(CharSequence reversed, Integer offset,
+		public AssertionMatcher(Integer offset,
 				Map<Integer, CachedMatch>[] cache, Matcher master,
 				GlobalState gs) {
-			super(reversed, offset, master, gs);
+			super(offset, master, gs);
 			this.cache = gs.backwardsCache;
 			this.subCache = cache[rule().cacheIndex];
 			backward = true;
@@ -44,11 +44,13 @@ public class Assertion extends Rule {
 		public Match match() {
 			if (fresh) {
 				fresh = false;
-				CachedMatch cm = subCache.get(offset); // TODO: should we check
-														// cache here at all?
+				// TODO: should we check cache here at all?
+				CachedMatch cm = subCache.get(offset);
 				if (cm == null) {
-					Match n = r.matcher(s, backward ? 0 : offset, cache, this)
-							.match();
+					Match n = r.matcher(
+							s,
+							backward ? master.options.rcs.translate(offset) + 1
+									: offset, cache, this).match();
 					if (positive) {
 						if (n != null) {
 							Match next = new Match(Assertion.this, offset,
@@ -95,29 +97,29 @@ public class Assertion extends Rule {
 		 * @return
 		 */
 		private Match reverse(Match n) {
-			return reverse(n, offset);
-		}
-
-		private Match reverse(Match n, int base) {
-			Match reversed = new Match(n.rule(), base - n.end(), base
-					- n.start());
-			if (n.children() != null) {
-				Match[] children = new Match[n.children().length];
-				int half = children.length % 2 == 1 ? children.length / 2 : -1;
-				for (int i = 0, lim = children.length / 2; i <= lim; i++) {
-					Match m1 = reverse(n.children()[i], base);
-					if (i == half)
-						children[i] = m1;
-					else {
-						int j = children.length - i - 1;
-						Match m2 = reverse(n.children()[j], base);
-						children[i] = m2;
-						children[j] = m1;
+			if (options.isReversed) {
+				Match reversed = new Match(n.rule(), options.rcs.translate(n
+						.end()) + 1, options.rcs.translate(n.start()) + 1);
+				if (n.children() != null) {
+					Match[] children = new Match[n.children().length];
+					int half = children.length % 2 == 1 ? children.length / 2
+							: -1;
+					for (int i = 0, lim = children.length / 2; i <= lim; i++) {
+						Match m1 = reverse(n.children()[i]);
+						if (i == half)
+							children[i] = m1;
+						else {
+							int j = children.length - i - 1;
+							Match m2 = reverse(n.children()[j]);
+							children[i] = m2;
+							children[j] = m1;
+						}
 					}
+					reversed.setChildren(children);
 				}
-				reversed.setChildren(children);
+				return reversed;
 			}
-			return reversed;
+			return n;
 		}
 
 		@Override
@@ -148,12 +150,9 @@ public class Assertion extends Rule {
 	public Matcher matcher(CharSequence s, Integer offset,
 			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		if (forward)
-			return new AssertionMatcher(s, offset, cache, master);
-		CharSequence reversed = new ReversedCharSequence(s, offset,
-				master.options.start);
-		GlobalState gs = new GlobalState(master.options, reversed.length(),
-				cache);
-		return new AssertionMatcher(reversed, offset, cache, master, gs);
+			return new AssertionMatcher(offset, cache, master);
+		GlobalState gs = new GlobalState(master.options, cache);
+		return new AssertionMatcher(offset, cache, master, gs);
 	}
 
 	@Override

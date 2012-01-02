@@ -32,9 +32,9 @@ public class UpLevelBackReferenceRule extends BackReferenceRule {
 
 		private boolean fresh = true;
 
-		public UpLevelBackReferenceMatcher(CharSequence s, Integer offset,
+		public UpLevelBackReferenceMatcher(Integer offset,
 				Map<Integer, CachedMatch>[] cache, Matcher master) {
-			super(s, offset, master);
+			super(offset, master);
 		}
 
 		@Override
@@ -53,7 +53,7 @@ public class UpLevelBackReferenceRule extends BackReferenceRule {
 					n = new Match(UpLevelBackReferenceRule.this, offset, offset);
 				} else {
 					int end = offset + delta;
-					if (end <= options.end) {
+					if (end <= options.end()) {
 						boolean matched = true;
 						for (int i = offset, j = m.start(); i < end; i++, j++) {
 							if (s.charAt(i) != s.charAt(j)) {
@@ -100,7 +100,7 @@ public class UpLevelBackReferenceRule extends BackReferenceRule {
 	@Override
 	public Matcher matcher(CharSequence s, Integer offset,
 			Map<Integer, CachedMatch>[] cache, Matcher master) {
-		return new UpLevelBackReferenceMatcher(s, offset, cache, master);
+		return new UpLevelBackReferenceMatcher(offset, cache, master);
 	}
 
 	@Override

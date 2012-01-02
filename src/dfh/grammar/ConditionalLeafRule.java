@@ -13,9 +13,9 @@ public class ConditionalLeafRule extends LeafRule {
 		private Map<Integer, CachedMatch> cache;
 		private boolean fresh = true;
 
-		public LeafMatcher(CharSequence s, Integer offset,
-				Map<Integer, CachedMatch>[] cache, Matcher master) {
-			super(s, offset, master);
+		public LeafMatcher(Integer offset, Map<Integer, CachedMatch>[] cache,
+				Matcher master) {
+			super(offset, master);
 			this.cache = cache[rule().cacheIndex];
 		}
 
@@ -28,7 +28,7 @@ public class ConditionalLeafRule extends LeafRule {
 				CachedMatch cm = cache.get(offset);
 				if (cm == null) {
 					if (options.study
-							&& (!matchesTrivially || offset < options.end)) {
+							&& (!matchesTrivially || offset < options.end())) {
 						if (options.debug)
 							ConditionalLeafRule.this.matchTrace(this, null);
 						return null;
@@ -39,7 +39,7 @@ public class ConditionalLeafRule extends LeafRule {
 					return register(cm.m);
 				}
 				java.util.regex.Matcher m = p.matcher(s);
-				m.region(offset, options.end);
+				m.region(offset, options.end());
 				m.useTransparentBounds(true);
 				m.useAnchoringBounds(false);
 				if (m.lookingAt()) {
@@ -87,7 +87,7 @@ public class ConditionalLeafRule extends LeafRule {
 	@Override
 	public Matcher matcher(CharSequence s, final Integer offset,
 			Map<Integer, CachedMatch>[] cache, Matcher master) {
-		return new LeafMatcher(s, offset, cache, master);
+		return new LeafMatcher(offset, cache, master);
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class ConditionalLeafRule extends LeafRule {
 			java.util.regex.Matcher m = p.matcher(s);
 			m.useAnchoringBounds(false);
 			m.useTransparentBounds(true);
-			m.region(options.start, options.end);
+			m.region(options.start, options.end());
 			while (m.find()) {
 				Integer i = m.start();
 				startOffsets.add(i);
@@ -112,9 +112,9 @@ public class ConditionalLeafRule extends LeafRule {
 				if (c.passes(n, null, s))
 					subCache.put(i, new CachedMatch(n));
 				int newStart = m.start() + 1;
-				if (newStart == options.end)
+				if (newStart == options.end())
 					break;
-				m.region(newStart, options.end);
+				m.region(newStart, options.end());
 			}
 		} else {
 			startOffsets.addAll(subCache.keySet());

@@ -18,11 +18,14 @@ import java.util.Map;
 public class GlobalState {
 	public final boolean allowOverlap, study, containsCycles, reversed,
 			keepRightmost;
-	public final int start, end;
+	public final int start, end, rcsEnd;
 	public final PrintStream trace;
 	public final boolean debug;
 	public final Map<Integer, CachedMatch>[] backwardsCache;
 	public final int maxDepth;
+	public final CharSequence cs;
+	public final ReversedCharSequence rcs;
+	public final boolean isReversed;
 
 	/**
 	 * Constructor called in {@link Grammar} only.
@@ -30,9 +33,10 @@ public class GlobalState {
 	 * @param o
 	 * @param containsCycles
 	 */
-	GlobalState(Options o, boolean containsCycles) {
-		this(o.allowOverlap, o.start, o.end, o.maxRecursionDepth, o.trace,
-				o.study, containsCycles, o.keepRightmost, null);
+	GlobalState(CharSequence cs, Options o, boolean containsCycles) {
+		this(cs, new ReversedCharSequence(cs), false, o.allowOverlap, o.start,
+				o.end, o.maxRecursionDepth, o.trace, o.study, containsCycles,
+				o.keepRightmost, null);
 	}
 
 	/**
@@ -43,16 +47,21 @@ public class GlobalState {
 	 * @param o
 	 * @param backwardsCache
 	 */
-	GlobalState(GlobalState gs, int end,
-			Map<Integer, CachedMatch>[] backwardsCache) {
-		this(gs.allowOverlap, 0, end, gs.maxDepth, gs.trace, false, false,
-				gs.keepRightmost, backwardsCache);
+	GlobalState(GlobalState gs, Map<Integer, CachedMatch>[] backwardsCache) {
+		this(gs.cs, gs.rcs, !gs.isReversed, gs.allowOverlap, 0, gs.end,
+				gs.maxDepth, gs.trace, false, false, gs.keepRightmost,
+				backwardsCache);
 	}
 
 	@SuppressWarnings("unchecked")
-	private GlobalState(boolean allowOverlap, int start, int end, int maxDepth,
-			PrintStream trace, boolean study, boolean containsCycles,
-			boolean keepRightmost, Map<Integer, CachedMatch>[] backwardsCache) {
+	private GlobalState(CharSequence cs, ReversedCharSequence rcs,
+			boolean isReversed, boolean allowOverlap, int start, int end,
+			int maxDepth, PrintStream trace, boolean study,
+			boolean containsCycles, boolean keepRightmost,
+			Map<Integer, CachedMatch>[] backwardsCache) {
+		this.cs = cs;
+		this.rcs = rcs;
+		this.isReversed = isReversed;
 		this.allowOverlap = allowOverlap;
 		this.start = start;
 		this.end = end;
@@ -73,6 +82,27 @@ public class GlobalState {
 			this.reversed = false;
 			this.backwardsCache = null;
 		}
+		this.rcsEnd = rcs.translate(start) + 1;
+	}
+
+	/**
+	 * Returns character sequence appropriate to current match context:
+	 * {@link #cs} or {@link #rcs}.
+	 * 
+	 * @return character sequence appropriate to current match context
+	 */
+	public CharSequence seq() {
+		return isReversed ? rcs : cs;
+	}
+
+	/**
+	 * Returns end offset appropriate to current match context: {@link #end} or
+	 * {@link #rcsEnd}.
+	 * 
+	 * @return end offset appropriate to current match context
+	 */
+	public int end() {
+		return isReversed ? rcsEnd : end;
 	}
 
 	/*

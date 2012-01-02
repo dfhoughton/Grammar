@@ -40,23 +40,22 @@ public abstract class Matcher {
 	 * @param offset
 	 * @param master
 	 */
-	protected Matcher(CharSequence s, Integer offset, Matcher master) {
-		this.s = s;
+	protected Matcher(Integer offset, Matcher master) {
 		this.offset = offset;
 		this.master = master;
 		this.options = master.options;
+		this.s = options.seq();
 	}
 
 	/**
 	 * Constructor only to be used by {@link Grammar}.
 	 * 
-	 * @param s
 	 * @param offset
 	 * @param master
 	 * @param ruleStates
 	 */
-	Matcher(CharSequence s, Integer offset, Matcher master, GlobalState options) {
-		this.s = s;
+	Matcher(Integer offset, Matcher master, GlobalState options) {
+		this.s = options.isReversed ? options.rcs : options.cs;
 		this.offset = offset;
 		this.master = master;
 		this.options = options;

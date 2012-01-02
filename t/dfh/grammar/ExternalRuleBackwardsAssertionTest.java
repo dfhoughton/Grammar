@@ -59,7 +59,7 @@ public class ExternalRuleBackwardsAssertionTest {
 			Match m = g.find("foobar").match();
 			assertNotNull("positive backwards assertion works", m);
 		} catch (Exception e) {
-			fail("could not compile grammar with pre-compiled rule");
+			fail("threw error: " + e);
 		}
 	}
 
@@ -94,7 +94,7 @@ public class ExternalRuleBackwardsAssertionTest {
 			assertNotNull("positive backwards variable-width assertion works",
 					m);
 		} catch (Exception e) {
-			fail("could not compile grammar with pre-compiled rule");
+			fail("threw error: " + e);
 		}
 	}
 

@@ -23,10 +23,9 @@ public class UncachedRepetitionRule extends RepetitionRule {
 		protected LinkedList<Match> matched;
 		protected LinkedList<Matcher> matchers;
 
-		public UncachedRepetitionMatcher(CharSequence cs, Integer offset,
-				Map<Integer, CachedMatch>[] cache, Label label,
-				Matcher master) {
-			super(cs, offset, cache, UncachedRepetitionRule.this, master);
+		public UncachedRepetitionMatcher(Integer offset,
+				Map<Integer, CachedMatch>[] cache, Label label, Matcher master) {
+			super(offset, cache, UncachedRepetitionRule.this, master);
 		}
 
 		@Override
@@ -72,10 +71,10 @@ public class UncachedRepetitionRule extends RepetitionRule {
 
 		private final boolean backtracks;
 
-		protected GreedyAndPossessive(CharSequence cs, Integer offset,
+		protected GreedyAndPossessive(Integer offset,
 				Map<Integer, CachedMatch>[] cache, Label label,
 				boolean backtracks, Matcher master) {
-			super(cs, offset, cache, label, master);
+			super(offset, cache, label, master);
 			this.backtracks = backtracks;
 		}
 
@@ -106,10 +105,9 @@ public class UncachedRepetitionRule extends RepetitionRule {
 	 * 
 	 */
 	private class GreedyMatcher extends GreedyAndPossessive {
-		protected GreedyMatcher(CharSequence cs, Integer offset,
-				Map<Integer, CachedMatch>[] cache, Label label,
-				Matcher master) {
-			super(cs, offset, cache, label, true, master);
+		protected GreedyMatcher(Integer offset,
+				Map<Integer, CachedMatch>[] cache, Label label, Matcher master) {
+			super(offset, cache, label, true, master);
 		}
 
 		@Override
@@ -160,10 +158,9 @@ public class UncachedRepetitionRule extends RepetitionRule {
 	private class StingyMatcher extends UncachedRepetitionMatcher {
 		private int goal;
 
-		protected StingyMatcher(CharSequence cs, Integer offset,
-				Map<Integer, CachedMatch>[] cache, Label label,
-				Matcher master) {
-			super(cs, offset, cache, label, master);
+		protected StingyMatcher(Integer offset,
+				Map<Integer, CachedMatch>[] cache, Label label, Matcher master) {
+			super(offset, cache, label, master);
 			matchers = new LinkedList<Matcher>();
 			matched = new LinkedList<Match>();
 			goal = repetition.bottom;
@@ -172,7 +169,7 @@ public class UncachedRepetitionRule extends RepetitionRule {
 				done = true;
 				matched = null;
 				matchers = null;
-			} else if (!(c == null || c.passes(next, this, cs)))
+			} else if (!testCondition(c, next))
 				fetchNext();
 		}
 
@@ -240,10 +237,9 @@ public class UncachedRepetitionRule extends RepetitionRule {
 
 	private class PossessiveMatcher extends GreedyAndPossessive {
 
-		protected PossessiveMatcher(CharSequence cs, Integer offset,
-				Map<Integer, CachedMatch>[] cache, Label label,
-				Matcher master) {
-			super(cs, offset, cache, label, false, master);
+		protected PossessiveMatcher(Integer offset,
+				Map<Integer, CachedMatch>[] cache, Label label, Matcher master) {
+			super(offset, cache, label, false, master);
 		}
 
 		@Override
@@ -292,11 +288,11 @@ public class UncachedRepetitionRule extends RepetitionRule {
 			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		switch (repetition.t) {
 		case possessive:
-			return new PossessiveMatcher(cs, offset, cache, label, master);
+			return new PossessiveMatcher(offset, cache, label, master);
 		case stingy:
-			return new StingyMatcher(cs, offset, cache, label, master);
+			return new StingyMatcher(offset, cache, label, master);
 		default:
-			return new GreedyMatcher(cs, offset, cache, label, master);
+			return new GreedyMatcher(offset, cache, label, master);
 		}
 	}
 

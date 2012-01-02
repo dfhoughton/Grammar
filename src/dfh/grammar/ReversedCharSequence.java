@@ -101,7 +101,7 @@ public class ReversedCharSequence implements CharSequence {
 	 *         this sequence is in the same (0) or opposite (1) order to the
 	 *         base sequence
 	 */
-	public int[] translate(int index) {
+	public int[] deepTranslation(int index) {
 		ReversedCharSequence rcs = this;
 		int[] i = { index, 1 };
 		while (true) {
@@ -113,6 +113,19 @@ public class ReversedCharSequence implements CharSequence {
 				break;
 		}
 		return i;
+	}
+
+	/**
+	 * Returns index of the corresponding character in the sequence upon which
+	 * the reversed sequence is based.
+	 * 
+	 * @param index
+	 *            index of some character in the reversed sequence
+	 * @return index of the corresponding character in the sequence upon which
+	 *         the reversed sequence is based
+	 */
+	public int translate(int index) {
+		return zero - index;
 	}
 
 	@Override

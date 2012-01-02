@@ -18,9 +18,9 @@ public class LiteralRule extends Rule {
 		private final Map<Integer, CachedMatch> cache;
 		private boolean fresh = true;
 
-		public LiteralMatcher(CharSequence s, Integer offset,
+		public LiteralMatcher(Integer offset,
 				Map<Integer, CachedMatch>[] cache, Matcher master) {
-			super(s, offset, master);
+			super(offset, master);
 			this.cache = cache[rule().cacheIndex];
 		}
 
@@ -43,7 +43,7 @@ public class LiteralRule extends Rule {
 					return register(cm.m);
 				}
 				int end = offset + literal.length();
-				if (end <= options.end) {
+				if (end <= options.end()) {
 					boolean matched = true;
 					for (int i = offset, j = 0; i < end; i++, j++) {
 						char c1 = literal.charAt(j), c2 = s.charAt(i);
@@ -103,7 +103,7 @@ public class LiteralRule extends Rule {
 	@Override
 	public Matcher matcher(CharSequence s, Integer offset,
 			Map<Integer, CachedMatch>[] cache, Matcher master) {
-		return new LiteralMatcher(s, offset, cache, master);
+		return new LiteralMatcher(offset, cache, master);
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public class LiteralRule extends Rule {
 			else
 				studiedRules.add(this);
 			int index, o = 0;
-			String string = s.subSequence(options.start, options.end)
+			String string = s.subSequence(options.start, options.end())
 					.toString();
 			while (o <= string.length()
 					&& (index = string.indexOf(literal, o)) > -1) {

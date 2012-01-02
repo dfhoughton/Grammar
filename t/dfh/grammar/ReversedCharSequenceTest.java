@@ -1,11 +1,8 @@
 package dfh.grammar;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 
 /**
  * Just to make sure {@link ReversedCharSequence} class works as intended.
@@ -80,5 +77,13 @@ public class ReversedCharSequenceTest {
 		ReversedCharSequence rcs = new ReversedCharSequence(s);
 		rcs = new ReversedCharSequence(rcs);
 		assertTrue("double reversal worked", rcs.toString().equals("abc"));
+	}
+
+	@Test
+	public void translationTest() {
+		String s = "abcdefghijklmnopqrstuvwxyz";
+		ReversedCharSequence rcs = new ReversedCharSequence(s);
+		for (int i = 0; i < s.length(); i++)
+			assertTrue(s.charAt(i) == rcs.charAt(rcs.translate(i)));
 	}
 }

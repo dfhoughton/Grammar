@@ -41,8 +41,8 @@ public class BacktrackingBarrier extends Rule {
 
 		private boolean fresh = true;
 
-		protected BarrierMatcher(CharSequence s, Integer offset, Matcher master) {
-			super(s, offset, master);
+		protected BarrierMatcher(Integer offset, Matcher master) {
+			super(offset, master);
 		}
 
 		@Override
@@ -81,7 +81,7 @@ public class BacktrackingBarrier extends Rule {
 	@Override
 	public Matcher matcher(CharSequence s, Integer offset,
 			Map<Integer, CachedMatch>[] cache, Matcher master) {
-		return new BarrierMatcher(s, offset, master);
+		return new BarrierMatcher(offset, master);
 	}
 
 	@Override

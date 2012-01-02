@@ -32,9 +32,9 @@ public class BackReferenceRule extends Rule {
 
 		private boolean fresh = true;
 
-		public BackReferenceMatcher(CharSequence s, Integer offset,
+		public BackReferenceMatcher(Integer offset,
 				Map<Integer, CachedMatch>[] cache, Matcher master) {
-			super(s, offset, master);
+			super(offset, master);
 		}
 
 		@Override
@@ -50,7 +50,7 @@ public class BackReferenceRule extends Rule {
 					n = new Match(BackReferenceRule.this, offset, offset);
 				} else {
 					int end = offset + delta;
-					if (end <= options.end) {
+					if (end <= options.end()) {
 						boolean matched = true;
 						for (int i = offset, j = m.start(); i < end; i++, j++) {
 							if (s.charAt(i) != s.charAt(j)) {
@@ -96,7 +96,7 @@ public class BackReferenceRule extends Rule {
 	@Override
 	public Matcher matcher(CharSequence s, Integer offset,
 			Map<Integer, CachedMatch>[] cache, Matcher master) {
-		return new BackReferenceMatcher(s, offset, cache, master);
+		return new BackReferenceMatcher(offset, cache, master);
 	}
 
 	@Override

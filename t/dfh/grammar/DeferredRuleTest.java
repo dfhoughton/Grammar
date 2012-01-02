@@ -41,9 +41,9 @@ public class DeferredRuleTest {
 			private final Map<Integer, CachedMatch> cache;
 			private boolean fresh = true;
 
-			public AMatcher(CharSequence s, Integer offset,
-					Map<Integer, CachedMatch>[] cache, Matcher master) {
-				super(s, offset, master);
+			public AMatcher(Integer offset, Map<Integer, CachedMatch>[] cache,
+					Matcher master) {
+				super(offset, master);
 				this.cache = cache[cacheIndex];
 			}
 
@@ -55,7 +55,7 @@ public class DeferredRuleTest {
 					if (cm == null) {
 						boolean found = false;
 						int i = offset;
-						for (; i < options.end; i++) {
+						for (; i < options.end(); i++) {
 							if (Character.isLetterOrDigit(s.charAt(i)))
 								found = true;
 							else
@@ -99,7 +99,7 @@ public class DeferredRuleTest {
 		@Override
 		public Matcher matcher(CharSequence s, Integer offset,
 				Map<Integer, CachedMatch>[] cache, Matcher master) {
-			return new AMatcher(s, offset, cache, master);
+			return new AMatcher(offset, cache, master);
 		}
 
 		@Override

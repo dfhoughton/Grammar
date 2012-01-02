@@ -29,9 +29,9 @@ public class SequenceRule extends Rule {
 		LinkedList<Matcher> matchers = new LinkedList<Matcher>();
 		LinkedList<Match> matched = new LinkedList<Match>();
 
-		public SequenceMatcher(CharSequence cs, Integer offset,
+		public SequenceMatcher(Integer offset,
 				Map<Integer, CachedMatch>[] cache, Matcher master) {
-			super(cs, offset, cache, SequenceRule.this, master);
+			super(offset, cache, SequenceRule.this, master);
 		}
 
 		@Override
@@ -126,7 +126,7 @@ public class SequenceRule extends Rule {
 	@Override
 	public Matcher matcher(CharSequence cs, Integer offset,
 			Map<Integer, CachedMatch>[] cache, Matcher master) {
-		return new SequenceMatcher(cs, offset, cache, master);
+		return new SequenceMatcher(offset, cache, master);
 	}
 
 	@Override
