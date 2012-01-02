@@ -1,5 +1,7 @@
 package dfh.grammar;
 
+import java.io.Serializable;
+
 /**
  * Convenience base class for defining conditions on rules that match floating
  * point numbers.
@@ -9,7 +11,8 @@ package dfh.grammar;
  * @author David Houghton
  * 
  */
-public abstract class FloatingPointCondition extends Condition {
+public abstract class FloatingPointCondition extends Condition implements
+		Serializable {
 	private static final long serialVersionUID = 2L;
 
 	@Override

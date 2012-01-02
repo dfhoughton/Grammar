@@ -1,6 +1,5 @@
 package dfh.grammar;
 
-import java.io.Serializable;
 
 /**
  * For applying a post-match test to a {@link Match}.
@@ -10,8 +9,7 @@ import java.io.Serializable;
  * @author David Houghton
  * 
  */
-public abstract class Condition implements Serializable {
-	private static final long serialVersionUID = 2L;
+public abstract class Condition {
 
 	/**
 	 * Returns whether the {@link Match} meets the given condition.

@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,8 @@ import dfh.grammar.util.Dotify;
  * @author David Houghton
  * 
  */
-public abstract class LogicalCondition extends Condition {
+public abstract class LogicalCondition extends Condition implements
+		Serializable {
 	private static final long serialVersionUID = 2L;
 	protected final Condition[] subconditions;
 	public static final MatchTest expOrGroupTest = new MatchTest() {

@@ -1,6 +1,13 @@
 package dfh.grammar;
 
-class LeafCondition extends Condition {
+import java.io.Serializable;
+
+/**
+ * Place holder for undefined condition.
+ * 
+ * @author David F. Houghton
+ */
+class LeafCondition extends Condition implements Serializable {
 	private static final long serialVersionUID = 2L;
 	protected String cnd;
 
