@@ -780,6 +780,11 @@ public class Compiler {
 
 		// all's well, so we reverse the rule
 		Rule ru = null;
+		String id = sr.label.id;
+		if (id.endsWith(":r"))
+			id = id.substring(0, id.length() - 2);
+		else
+			id = id + ":r";
 		if (sr instanceof AlternationRule) {
 			AlternationRule ar = (AlternationRule) sr;
 			Rule[] children = new Rule[ar.alternates.length];
@@ -790,23 +795,12 @@ public class Compiler {
 				tagMap.put(children[i].uniqueId(),
 						ar.tagMap.get(ar.alternates[i].uniqueId()));
 			}
-			StringBuilder b = new StringBuilder();
-			b.append('[');
-			boolean nonInitial = false;
-			for (Rule child : children) {
-				if (nonInitial)
-					b.append('|');
-				else
-					nonInitial = true;
-				b.append(subLabel(child));
-			}
-			b.append(']');
-			Label l = new Label(Type.nonTerminal, b.toString());
+			Label l = new Label(Type.nonTerminal, id);
 			ru = new AlternationRule(l, children, tagMap);
 		} else if (sr instanceof Assertion) {
 			Assertion as = (Assertion) sr;
 			Rule child = as.forward ? reverse(as.r) : as.r;
-			String id = (as.positive ? '~' : '!') + (as.forward ? "-" : "+")
+			id = (as.positive ? '~' : '!') + (as.forward ? "-" : "+")
 					+ subLabel(child);
 			Label l = new Label(Type.nonTerminal, id);
 			ru = new Assertion(l, child, as.positive, !as.forward);
@@ -827,13 +821,12 @@ public class Compiler {
 			ReversedCharSequence rcs = new ReversedCharSequence(lr.literal,
 					lr.literal.length());
 			String s = rcs.toString();
-			Label l = new Label(Type.terminal, '"' + s + '"');
+			Label l = new Label(Type.terminal, id);
 			ru = new LiteralRule(l, s);
 		} else if (sr instanceof RepetitionRule) {
 			RepetitionRule rr = (RepetitionRule) sr;
 			Rule child = reverse(rr.r);
-			Label l = new Label(Type.nonTerminal, subLabel(child)
-					+ rr.repetition);
+			Label l = new Label(Type.nonTerminal, id);
 			ru = new RepetitionRule(l, child, rr.repetition,
 					new HashSet<String>(rr.alternateTags));
 		} else if (sr instanceof SequenceRule) {
@@ -855,18 +848,7 @@ public class Compiler {
 			for (int i = 0; i < children.length; i++) {
 				children[i] = reverse(sqr.sequence[children.length - i - 1]);
 			}
-			StringBuilder b = new StringBuilder();
-			b.append('[');
-			boolean nonInitial = false;
-			for (Rule r : children) {
-				if (nonInitial)
-					b.append(' ');
-				else
-					nonInitial = true;
-				b.append(subLabel(r));
-			}
-			b.append(']');
-			Label l = new Label(Type.nonTerminal, b.toString());
+			Label l = new Label(Type.nonTerminal, id);
 			List<Set<String>> tagList = new ArrayList<Set<String>>(sqr.tagList);
 			Collections.reverse(tagList);
 			ru = new SequenceRule(l, children, tagList);
@@ -875,13 +857,14 @@ public class Compiler {
 				ru = reversedCyclicRuleMap.get(sr.label);
 			} else {
 				CyclicRule cr = (CyclicRule) sr;
-				Label l = new Label(sr.label.t, sr.label.id + ":reversed");
+				Label l = new Label(sr.label.t, id);
 				cr = new CyclicRule(l);
 				reversedCyclicRuleMap.put(sr.label, cr);
 				cr.setRule(reverse(((CyclicRule) sr).r));
 				ru = cr;
 			}
 		} else {
+			// TODO fix label so it fits the general label:r pattern
 			ru = sr.reverse();
 		}
 		if (sr.condition != null)
