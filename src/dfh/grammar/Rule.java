@@ -1,6 +1,5 @@
 package dfh.grammar;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,8 +19,7 @@ import java.util.Set;
  * 
  * @author David Houghton
  */
-public abstract class Rule implements Serializable {
-	private static final long serialVersionUID = 2L;
+public abstract class Rule {
 
 	/**
 	 * The rule's name. Though it is not <code>final</code>, it should be

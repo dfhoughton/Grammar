@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +25,7 @@ import dfh.grammar.SequenceRule.SequenceMatcher;
  * 
  */
 @Reversible
-public class BackReferenceRule extends Rule {
+public class BackReferenceRule extends Rule implements Serializable {
 	private static final long serialVersionUID = 2L;
 	protected final int index;
 

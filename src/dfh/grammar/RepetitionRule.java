@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class RepetitionRule extends Rule {
+public class RepetitionRule extends Rule implements Serializable {
 	private static final long serialVersionUID = 2L;
 	Rule r;
 	final Repetition repetition;

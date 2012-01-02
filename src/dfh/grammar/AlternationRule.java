@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,7 +18,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class AlternationRule extends Rule {
+public class AlternationRule extends Rule implements Serializable {
 	private static final long serialVersionUID = 2L;
 
 	private class AlternationMatcher extends NonterminalMatcher {

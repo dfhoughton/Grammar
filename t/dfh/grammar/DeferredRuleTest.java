@@ -85,8 +85,6 @@ public class DeferredRuleTest {
 
 		}
 
-		private static final long serialVersionUID = 1L;
-
 		ARule(Label label) {
 			super(label);
 		}

@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -15,7 +16,7 @@ import dfh.grammar.Label.Type;
  * 
  */
 @Reversible
-public class BacktrackingBarrier extends Rule {
+public class BacktrackingBarrier extends Rule implements Serializable {
 	private static final long serialVersionUID = 2L;
 	/**
 	 * {@link Label} used by all : barriers.

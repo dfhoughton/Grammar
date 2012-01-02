@@ -30,4 +30,4 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 . create xpath-like convention for searching matches
 * create single-line Grammar constructor and string LineReader
 * construct round trip tests for Grammar.description()
-. remove Serializable constraint on Rule
+* remove Serializable constraint on Rule

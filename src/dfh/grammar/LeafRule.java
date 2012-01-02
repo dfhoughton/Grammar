@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -15,7 +16,7 @@ import java.util.regex.Pattern;
  * @author David Houghton
  */
 @Reversible
-public class LeafRule extends Rule {
+public class LeafRule extends Rule implements Serializable {
 	/**
 	 * For normalizing the unique ids of regexes that allow comments.
 	 */

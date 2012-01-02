@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +14,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class LiteralRule extends Rule {
+public class LiteralRule extends Rule implements Serializable {
 	private class LiteralMatcher extends Matcher {
 		private final Map<Integer, CachedMatch> cache;
 		private boolean fresh = true;

@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class CyclicRule extends Rule {
+public class CyclicRule extends Rule implements Serializable {
 	private static final long serialVersionUID = 2L;
 	Rule r;
 

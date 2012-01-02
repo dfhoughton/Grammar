@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +14,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class Assertion extends Rule {
+public class Assertion extends Rule implements Serializable {
 	private static final long serialVersionUID = 2L;
 
 	private class AssertionMatcher extends Matcher {

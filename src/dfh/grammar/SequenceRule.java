@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -19,7 +20,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class SequenceRule extends Rule {
+public class SequenceRule extends Rule implements Serializable {
 	private static final long serialVersionUID = 2L;
 	final Rule[] sequence;
 	private Condition c;

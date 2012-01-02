@@ -5,6 +5,8 @@
   * created single-line grammar constructor
   * renamed searching methods of Match to make them shorter and more intuitive
   * made all backwards assertions use a common reversed character sequence
+  * removed the requirement that rules and conditions be serializable (kept
+    actual serializability of all rules and conditions defined in dfh.grammar)
 
 1.05, 23 December 2011
   * added lean memory cache option

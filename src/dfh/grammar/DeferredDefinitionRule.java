@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,7 +20,7 @@ import java.util.Set;
  * @author David Houghton
  * 
  */
-public class DeferredDefinitionRule extends Rule {
+public class DeferredDefinitionRule extends Rule implements Serializable {
 	private static final long serialVersionUID = 2L;
 	/**
 	 * Holds rule whose definition is deferred.
