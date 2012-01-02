@@ -818,14 +818,14 @@ public class Compiler {
 			ru = lr;
 		} else if (sr instanceof LiteralRule) {
 			LiteralRule lr = (LiteralRule) sr;
-			ReversedCharSequence rcs = new ReversedCharSequence(lr.literal,
-					lr.literal.length());
+			ReversedCharSequence rcs = new ReversedCharSequence(lr.literal);
 			String s = rcs.toString();
 			Label l = new Label(Type.terminal, id);
 			ru = new LiteralRule(l, s);
 		} else if (sr instanceof RepetitionRule) {
 			RepetitionRule rr = (RepetitionRule) sr;
 			Rule child = reverse(rr.r);
+			// check for redundant repetition and eliminate
 			if (rr.repetition.redundant())
 				return child;
 			Label l = new Label(Type.nonTerminal, id);
