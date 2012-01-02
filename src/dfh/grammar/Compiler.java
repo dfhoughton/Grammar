@@ -622,6 +622,9 @@ public class Compiler {
 			}
 			String id = (af.positive ? '~' : '!') + (af.forward ? "+" : "-")
 					+ subLabel(sr);
+			if (!af.forward)
+				// strip off redundant ":r" to improve logging
+				id = id.substring(0, id.length() - 2);
 			Label l = new Label(Type.nonTerminal, id);
 			Assertion a = new Assertion(l, sr, af.positive, af.forward);
 			if (subDescription != null)
