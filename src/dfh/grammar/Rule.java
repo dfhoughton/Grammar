@@ -359,10 +359,13 @@ public abstract class Rule {
 	 * as the base implementation only throws a {@link GrammarException} when
 	 * called.
 	 * 
+	 * @param id
+	 *            label to be used by reversed version of rule
+	 * 
 	 * @return a {@link Rule} that duplicates this except that it won't return
 	 *         any {@link Match} that doesn't meet the given condition
 	 */
-	public Rule reverse() {
+	public Rule reverse(String id) {
 		throw new GrammarException(this.getClass() + " cannot be reversed");
 	}
 

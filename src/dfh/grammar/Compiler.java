@@ -864,11 +864,10 @@ public class Compiler {
 				ru = cr;
 			}
 		} else {
-			// TODO fix label so it fits the general label:r pattern
-			ru = sr.reverse();
+			ru = sr.reverse(id);
 		}
 		if (sr.condition != null)
-			ru.condition = "r:" + sr.condition;
+			ru.condition = sr.condition;
 		ru.generation = sr.generation;
 		return ru;
 	}
@@ -948,6 +947,9 @@ public class Compiler {
 		return new HashSet<Label>(undefinedRules);
 	}
 
+	/**
+	 * @return whether any cycles had to be dealt with during compilation
+	 */
 	boolean recursive() {
 		return recursive;
 	}
