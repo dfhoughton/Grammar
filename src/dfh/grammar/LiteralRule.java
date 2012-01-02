@@ -101,8 +101,8 @@ public class LiteralRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence s, Integer offset,
-			Map<Integer, CachedMatch>[] cache, Matcher master) {
+	public Matcher matcher(Integer offset, Map<Integer, CachedMatch>[] cache,
+			Matcher master) {
 		return new LiteralMatcher(offset, cache, master);
 	}
 

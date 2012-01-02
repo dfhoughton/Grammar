@@ -57,7 +57,7 @@ public class SequenceRule extends Rule {
 					while (matched.size() < sequence.length) {
 						Matcher m;
 						if (matchers.isEmpty()) {
-							m = sequence[0].matcher(s, offset, cache, this);
+							m = sequence[0].matcher(offset, cache, this);
 							matchers.add(m);
 						} else
 							m = matchers.peekLast();
@@ -75,8 +75,8 @@ public class SequenceRule extends Rule {
 						} else {
 							matched.add(n);
 							if (matched.size() < sequence.length) {
-								m = sequence[matched.size()].matcher(s,
-										n.end(), cache, this);
+								m = sequence[matched.size()].matcher(n.end(),
+										cache, this);
 								matchers.add(m);
 							}
 						}
@@ -124,8 +124,8 @@ public class SequenceRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence cs, Integer offset,
-			Map<Integer, CachedMatch>[] cache, Matcher master) {
+	public Matcher matcher(Integer offset, Map<Integer, CachedMatch>[] cache,
+			Matcher master) {
 		return new SequenceMatcher(offset, cache, master);
 	}
 

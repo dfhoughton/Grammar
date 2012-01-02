@@ -98,8 +98,8 @@ public class UpLevelBackReferenceRule extends BackReferenceRule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence s, Integer offset,
-			Map<Integer, CachedMatch>[] cache, Matcher master) {
+	public Matcher matcher(Integer offset, Map<Integer, CachedMatch>[] cache,
+			Matcher master) {
 		return new UpLevelBackReferenceMatcher(offset, cache, master);
 	}
 

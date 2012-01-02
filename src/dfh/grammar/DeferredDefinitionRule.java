@@ -36,9 +36,9 @@ public class DeferredDefinitionRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence cs, Integer offset,
-			Map<Integer, CachedMatch>[] cache, Matcher master) {
-		return r.matcher(cs, offset, cache, master);
+	public Matcher matcher(Integer offset, Map<Integer, CachedMatch>[] cache,
+			Matcher master) {
+		return r.matcher(offset, cache, master);
 	}
 
 	@Override

@@ -235,7 +235,7 @@ public class Grammar implements Serializable, Cloneable {
 			index = options.study && !startOffsets.isEmpty() ? startOffsets
 					.removeFirst() : options.start;
 			firstMatch = true;
-			m = rules.get(root).matcher(s, index, cache, this);
+			m = rules.get(root).matcher(index, cache, this);
 			if (ltm)
 				ltmm = new LTMMatcher(m);
 			next = fetchNext();
@@ -303,7 +303,7 @@ public class Grammar implements Serializable, Cloneable {
 				firstNull = false;
 				if (index >= options.end())
 					break;
-				m = rules.get(root).matcher(s, index, cache, this);
+				m = rules.get(root).matcher(index, cache, this);
 				if (ltm)
 					ltmm = new LTMMatcher(m);
 			}
@@ -765,7 +765,7 @@ public class Grammar implements Serializable, Cloneable {
 		final boolean ltm = containsAlternation && opt.longestMatch();
 		final Map<Integer, CachedMatch>[] cache = offsetCache(opt);
 		final Set<Integer> startOffsets = startOffsets(cs, co, cache);
-		final Matcher m = rules.get(root).matcher(cs, co.start, cache,
+		final Matcher m = rules.get(root).matcher(co.start, cache,
 				new DummyMatcher(co));
 		final LTMMatcher ltmm = ltm ? new LTMMatcher(m) : null;
 		abstract class LookingAtMatcher extends GrammarMatcher {
@@ -1044,7 +1044,7 @@ public class Grammar implements Serializable, Cloneable {
 		final GlobalState options = verifyOptions(s, opt);
 		final Map<Integer, CachedMatch>[] cache = offsetCache(opt);
 		final Set<Integer> startOffsets = startOffsets(s, options, cache);
-		final Matcher m = rules.get(root).matcher(s, options.start, cache,
+		final Matcher m = rules.get(root).matcher(options.start, cache,
 				new DummyMatcher(options));
 		return new GrammarMatcher(options) {
 			boolean matchedOnce = false;

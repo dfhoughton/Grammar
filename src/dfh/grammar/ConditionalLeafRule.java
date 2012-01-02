@@ -85,7 +85,7 @@ public class ConditionalLeafRule extends LeafRule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence s, final Integer offset,
+	public Matcher matcher(final Integer offset,
 			Map<Integer, CachedMatch>[] cache, Matcher master) {
 		return new LeafMatcher(offset, cache, master);
 	}

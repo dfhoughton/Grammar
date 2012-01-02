@@ -48,7 +48,6 @@ public class Assertion extends Rule {
 				CachedMatch cm = subCache.get(offset);
 				if (cm == null) {
 					Match n = r.matcher(
-							s,
 							backward ? master.options.rcs.translate(offset) + 1
 									: offset, cache, this).match();
 					if (positive) {
@@ -74,10 +73,10 @@ public class Assertion extends Rule {
 				else if (positive) {
 					Match n;
 					if (backward) {
-						n = r.matcher(s, 0, cache, this).match();
+						n = r.matcher(0, cache, this).match();
 						n = reverse(n);
 					} else {
-						n = r.matcher(s, offset, cache, this).match();
+						n = r.matcher(offset, cache, this).match();
 					}
 					Match next = new Match(Assertion.this, offset, offset);
 					next.setChildren(new Match[] { n });
@@ -147,8 +146,8 @@ public class Assertion extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence s, Integer offset,
-			Map<Integer, CachedMatch>[] cache, Matcher master) {
+	public Matcher matcher(Integer offset, Map<Integer, CachedMatch>[] cache,
+			Matcher master) {
 		if (forward)
 			return new AssertionMatcher(offset, cache, master);
 		GlobalState gs = new GlobalState(master.options, cache);

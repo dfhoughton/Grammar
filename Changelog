@@ -4,6 +4,7 @@
   * made conditions provide log output
   * created single-line grammar constructor
   * renamed searching methods of Match to make them shorter and more intuitive
+  * made all backwards assertions use a common reversed character sequence
 
 1.05, 23 December 2011
   * added lean memory cache option

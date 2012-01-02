@@ -94,8 +94,8 @@ public class BackReferenceRule extends Rule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence s, Integer offset,
-			Map<Integer, CachedMatch>[] cache, Matcher master) {
+	public Matcher matcher(Integer offset, Map<Integer, CachedMatch>[] cache,
+			Matcher master) {
 		return new BackReferenceMatcher(offset, cache, master);
 	}
 

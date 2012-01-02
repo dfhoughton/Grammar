@@ -52,7 +52,7 @@ public class UncachedRepetitionRule extends RepetitionRule {
 			if (matchers.size() > matched.size())
 				m = matchers.peekLast();
 			else {
-				m = r.matcher(s, start, cache, this);
+				m = r.matcher(start, cache, this);
 				matchers.add(m);
 			}
 			Match n = m.match();
@@ -284,8 +284,8 @@ public class UncachedRepetitionRule extends RepetitionRule {
 	}
 
 	@Override
-	public Matcher matcher(CharSequence cs, Integer offset,
-			Map<Integer, CachedMatch>[] cache, Matcher master) {
+	public Matcher matcher(Integer offset, Map<Integer, CachedMatch>[] cache,
+			Matcher master) {
 		switch (repetition.t) {
 		case possessive:
 			return new PossessiveMatcher(offset, cache, label, master);

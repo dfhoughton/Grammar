@@ -102,8 +102,6 @@ public abstract class Rule implements Serializable {
 	 * Creates a {@link Matcher} to keep track of backtracking and the matching
 	 * cache at this offset.
 	 * 
-	 * @param s
-	 *            sequence to match against
 	 * @param offset
 	 *            offset at which to begin the match
 	 * @param cache
@@ -114,7 +112,7 @@ public abstract class Rule implements Serializable {
 	 * @return {@link Matcher} initialized to manage matching state at this
 	 *         offset
 	 */
-	public abstract Matcher matcher(CharSequence s, Integer offset,
+	public abstract Matcher matcher(Integer offset,
 			Map<Integer, CachedMatch>[] cache, Matcher master);
 
 	@Override
