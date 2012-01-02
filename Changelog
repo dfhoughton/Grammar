@@ -1,4 +1,4 @@
-1.06
+1.06, 2 January 2012
   * made cyclic rules reversible
   * fixed various logical condition bugs
   * made conditions provide log output
