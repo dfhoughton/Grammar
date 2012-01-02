@@ -30,6 +30,10 @@ public abstract class LogicalCondition extends Condition implements
 	public LogicalCondition(List<Condition> conditions) {
 		subconditions = conditions.toArray(new Condition[conditions.size()]);
 	}
+	
+	protected LogicalCondition(int length) {
+		subconditions = new Condition[length];
+	}
 
 	@Override
 	public boolean passes(Match n, Matcher m, CharSequence s) {
@@ -103,6 +107,8 @@ public abstract class LogicalCondition extends Condition implements
 		}
 		return used;
 	}
+	
+	protected abstract LogicalCondition duplicate();
 
 	protected abstract boolean allPass(Match n, Matcher m, CharSequence s);
 }

@@ -23,7 +23,7 @@ import java.util.Set;
 public class SequenceRule extends Rule implements Serializable {
 	private static final long serialVersionUID = 2L;
 	final Rule[] sequence;
-	private Condition c;
+	protected Condition c;
 	final List<Set<String>> tagList;
 
 	class SequenceMatcher extends NonterminalMatcher {

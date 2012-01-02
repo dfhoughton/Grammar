@@ -9,9 +9,25 @@ public class NegationCondition extends LogicalCondition {
 		super(conditions);
 	}
 
+	private NegationCondition(int length) {
+		super(length);
+	}
+
 	@Override
 	protected boolean allPass(Match n, Matcher m, CharSequence s) {
 		return !subconditions[0].passes(n, m, s);
+	}
+
+	@Override
+	protected LogicalCondition duplicate() {
+		NegationCondition cj = new NegationCondition(subconditions.length);
+		for (int i = 0; i < subconditions.length; i++) {
+			Condition c = subconditions[i];
+			if (c instanceof LogicalCondition)
+				c = ((LogicalCondition) c).duplicate();
+			cj.subconditions[i] = c;
+		}
+		return cj;
 	}
 
 }

@@ -587,7 +587,7 @@ public class Compiler {
 		setCondition(match, ru);
 
 		if (match != null && r.condition == null) {
-			ru.conditionalize(LogicalCondition.manufacture(match),
+			ru = ru.conditionalize(LogicalCondition.manufacture(match),
 					match.group());
 		} else if (r.condition != null) {
 			ru.condition = r.condition;
@@ -866,10 +866,39 @@ public class Compiler {
 		} else {
 			ru = sr.reverse(id);
 		}
-		if (sr.condition != null)
+		if (sr.condition != null) {
 			ru.condition = sr.condition;
+			ru = adjustCondition(ru, sr);
+		}
 		ru.generation = sr.generation;
 		return ru;
+	}
+
+	private Rule adjustCondition(Rule nr, Rule r) {
+		if (r instanceof AlternationRule) {
+			AlternationRule ar = (AlternationRule) r, ar2 = (AlternationRule) nr;
+			ar2.c = duplicateCondition(ar.c);
+		} else if (r instanceof SequenceRule) {
+			SequenceRule sr = (SequenceRule) r, sr2 = (SequenceRule) nr;
+			sr2.c = duplicateCondition(sr.c);
+		} else if (r instanceof RepetitionRule) {
+			RepetitionRule rr = (RepetitionRule) r, rr2 = (RepetitionRule) nr;
+			rr2.c = duplicateCondition(rr.c);
+		} else if (r instanceof ConditionalLeafRule) {
+			ConditionalLeafRule clr = (ConditionalLeafRule) r;
+			LeafRule lr = (LeafRule) nr;
+			return lr.conditionalize(duplicateCondition(clr.c), clr.condition);
+		} else if (r instanceof LiteralRule) {
+			LiteralRule lr = (LiteralRule) r, lr2 = (LiteralRule) nr;
+			lr2.c = duplicateCondition(lr.c);
+		}
+		return nr;
+	}
+
+	private Condition duplicateCondition(Condition c) {
+		if (c instanceof LogicalCondition)
+			return ((LogicalCondition) c).duplicate();
+		return c;
 	}
 
 	private String subLabel(Rule r) {

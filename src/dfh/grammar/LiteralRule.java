@@ -94,7 +94,7 @@ public class LiteralRule extends Rule implements Serializable {
 	 */
 	private static final long serialVersionUID = 2L;
 	protected final String literal;
-	private Condition c;
+	protected Condition c;
 
 	public LiteralRule(Label label, String literal) {
 		super(label);

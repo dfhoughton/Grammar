@@ -323,7 +323,7 @@ public abstract class Rule {
 	 * 
 	 * @param c
 	 * @param id
-	 *            new label that may be assigned to conditionalized rule
+	 *            condition identifier
 	 * @return a {@link Rule} that duplicates this except that it won't return
 	 *         any {@link Match} that doesn't meet the given condition
 	 */

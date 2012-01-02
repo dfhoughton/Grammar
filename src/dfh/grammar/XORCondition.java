@@ -9,6 +9,10 @@ public class XORCondition extends LogicalCondition {
 		super(conditions);
 	}
 
+	private XORCondition(int length) {
+		super(length);
+	}
+
 	@Override
 	protected boolean allPass(Match n, Matcher m, CharSequence s) {
 		int count = 0;
@@ -17,6 +21,18 @@ public class XORCondition extends LogicalCondition {
 				count++;
 		}
 		return count % 2 == 1;
+	}
+
+	@Override
+	protected LogicalCondition duplicate() {
+		XORCondition cj = new XORCondition(subconditions.length);
+		for (int i = 0; i < subconditions.length; i++) {
+			Condition c = subconditions[i];
+			if (c instanceof LogicalCondition)
+				c = ((LogicalCondition) c).duplicate();
+			cj.subconditions[i] = c;
+		}
+		return cj;
 	}
 
 }

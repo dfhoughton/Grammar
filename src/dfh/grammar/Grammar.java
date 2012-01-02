@@ -1509,7 +1509,7 @@ public class Grammar implements Serializable, Cloneable {
 			rset.add(nr);
 			String reversedId = l.id + ":r";
 			for (Rule rr : findRulesById(reversedId)) {
-				Rule nrr = rr.conditionalize(c, reversedId);
+				Rule nrr = rr.conditionalize(c, label);
 				if (rr != nrr)
 					fix(this, rr, nrr);
 			}
