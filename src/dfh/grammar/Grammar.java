@@ -1344,40 +1344,63 @@ public class Grammar implements Serializable, Cloneable {
 	 * 
 	 * @param g
 	 * @param ru
+	 *            old rule
 	 * @param nru
+	 *            new rule
 	 */
 	private void fix(Grammar g, Rule ru, Rule nru) {
 		nru.generation = ru.generation;
 		for (Rule r : g.rules.values()) {
-			if (r instanceof AlternationRule) {
-				AlternationRule ar = (AlternationRule) r;
-				for (int i = 0; i < ar.alternates.length; i++) {
-					if (ar.alternates[i] == ru)
-						ar.alternates[i] = nru;
-				}
-			} else if (r instanceof SequenceRule) {
-				SequenceRule sr = (SequenceRule) r;
-				for (int i = 0; i < sr.sequence.length; i++) {
-					if (sr.sequence[i] == ru)
-						sr.sequence[i] = nru;
-				}
-			} else if (r instanceof RepetitionRule) {
-				RepetitionRule rr = (RepetitionRule) r;
-				if (rr.r == ru)
-					rr.r = nru;
-			} else if (r instanceof DeferredDefinitionRule) {
-				DeferredDefinitionRule ddr = (DeferredDefinitionRule) r;
-				if (ddr.r == ru)
-					ddr.r = nru;
-			} else if (r instanceof CyclicRule) {
-				CyclicRule cr = (CyclicRule) r;
-				if (cr.r == ru)
-					cr.r = nru;
-			} else if (r instanceof Assertion) {
-				Assertion a = (Assertion) r;
-				if (a.r == ru)
-					a.r = nru;
+			fix(ru, nru, r);
+		}
+	}
+
+	/**
+	 * Replace all instances of old {@link Rule} with new.
+	 * 
+	 * @param ru
+	 *            old rule
+	 * @param nru
+	 *            new rule
+	 * @param r
+	 */
+	private void fix(Rule ru, Rule nru, Rule r) {
+		if (r instanceof AlternationRule) {
+			AlternationRule ar = (AlternationRule) r;
+			for (int i = 0; i < ar.alternates.length; i++) {
+				if (ar.alternates[i] == ru)
+					ar.alternates[i] = nru;
+				else
+					fix(ru, nru, ar.alternates[i]);
 			}
+		} else if (r instanceof SequenceRule) {
+			SequenceRule sr = (SequenceRule) r;
+			for (int i = 0; i < sr.sequence.length; i++) {
+				if (sr.sequence[i] == ru)
+					sr.sequence[i] = nru;
+				else
+					fix(ru, nru, sr.sequence[i]);
+			}
+		} else if (r instanceof RepetitionRule) {
+			RepetitionRule rr = (RepetitionRule) r;
+			if (rr.r == ru)
+				rr.r = nru;
+			else
+				fix(ru, nru, rr.r);
+		} else if (r instanceof DeferredDefinitionRule) {
+			DeferredDefinitionRule ddr = (DeferredDefinitionRule) r;
+			if (ddr.r == ru)
+				ddr.r = nru;
+		} else if (r instanceof CyclicRule) {
+			CyclicRule cr = (CyclicRule) r;
+			if (cr.r == ru)
+				cr.r = nru;
+		} else if (r instanceof Assertion) {
+			Assertion a = (Assertion) r;
+			if (a.r == ru)
+				a.r = nru;
+			else
+				fix(ru, nru, a.r);
 		}
 	}
 
@@ -1484,6 +1507,51 @@ public class Grammar implements Serializable, Cloneable {
 				fix(this, r, nr);
 			rules.put(l, nr);
 			rset.add(nr);
+			String reversedId = l.id + ":r";
+			for (Rule rr : findRulesById(reversedId)) {
+				Rule nrr = rr.conditionalize(c, reversedId);
+				if (rr != nrr)
+					fix(this, rr, nrr);
+			}
+		}
+	}
+
+	/**
+	 * Find all the rules with the given label id.
+	 * 
+	 * @param reversedId
+	 * @return
+	 */
+	private Set<Rule> findRulesById(String reversedId) {
+		Set<Rule> set = new HashSet<Rule>(), cycleSet = new HashSet<Rule>();
+		for (Rule r : rules.values()) {
+			findRulesById(r, set, reversedId, cycleSet);
+		}
+		return set;
+	}
+
+	private void findRulesById(Rule r, Set<Rule> set, String reversedId,
+			Set<Rule> cycleSet) {
+		if (r.label.id.equals(reversedId))
+			set.add(r);
+		// recursively search non-terminal rules
+		if (r instanceof SequenceRule) {
+			SequenceRule sr = (SequenceRule) r;
+			for (Rule srr : sr.sequence)
+				findRulesById(srr, set, reversedId, cycleSet);
+		} else if (r instanceof AlternationRule) {
+			AlternationRule ar = (AlternationRule) r;
+			for (Rule sr : ar.alternates)
+				findRulesById(sr, set, reversedId, cycleSet);
+		} else if (r instanceof RepetitionRule) {
+			findRulesById(((RepetitionRule) r).r, set, reversedId, cycleSet);
+		} else if (r instanceof Assertion) {
+			findRulesById(((Assertion) r).r, set, reversedId, cycleSet);
+		} else if (r instanceof CyclicRule) {
+			if (!cycleSet.contains(r)) {
+				cycleSet.add(r);
+				findRulesById(((CyclicRule) r).r, set, reversedId, cycleSet);
+			}
 		}
 	}
 

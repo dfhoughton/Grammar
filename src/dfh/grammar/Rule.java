@@ -322,6 +322,8 @@ public abstract class Rule {
 	 * {@link GrammarException} when called.
 	 * 
 	 * @param c
+	 * @param id
+	 *            new label that may be assigned to conditionalized rule
 	 * @return a {@link Rule} that duplicates this except that it won't return
 	 *         any {@link Match} that doesn't meet the given condition
 	 */

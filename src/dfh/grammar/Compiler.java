@@ -314,12 +314,6 @@ public class Compiler {
 		terminalLabelMap = new HashMap<String, Label>(terminals.size());
 		for (Label l : terminals)
 			terminalLabelMap.put(l.id, l);
-
-		// TODO check to make sure this is unnecessary
-		// // now we add in all the synthetic rules
-		// redundancyMap.keySet().removeAll(redundantLabels);
-		// for (Rule ru : redundancyMap.values())
-		// rules.put(ru.label(), ru);
 	}
 
 	static Match parseCondition(String line, String cnd) {
