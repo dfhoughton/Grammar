@@ -677,7 +677,7 @@ public class Compiler {
 			return r;
 		} else if (rf instanceof Regex) {
 			Regex rx = (Regex) rf;
-			Label l = new Label(Type.terminal, rf.toString());
+			Label l = new Label(Type.terminal, '/' + rf.toString() + '/');
 			Rule r = new LeafRule(l, rx.re, rx.reversible);
 			setCondition(condition, r);
 			return r;
@@ -818,7 +818,8 @@ public class Compiler {
 						"terminal rule "
 								+ lr
 								+ " has not been marked as reversible; it cannot be used in a backwards assertion");
-			ru = lr;
+			Label l = new Label(Type.terminal, id);
+			ru = new LeafRule(l, lr.p, true);
 		} else if (sr instanceof LiteralRule) {
 			LiteralRule lr = (LiteralRule) sr;
 			ReversedCharSequence rcs = new ReversedCharSequence(lr.literal);
