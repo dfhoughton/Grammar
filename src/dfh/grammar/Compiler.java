@@ -826,6 +826,8 @@ public class Compiler {
 		} else if (sr instanceof RepetitionRule) {
 			RepetitionRule rr = (RepetitionRule) sr;
 			Rule child = reverse(rr.r);
+			if (rr.repetition.redundant())
+				return child;
 			Label l = new Label(Type.nonTerminal, id);
 			ru = new RepetitionRule(l, child, rr.repetition,
 					new HashSet<String>(rr.alternateTags));
