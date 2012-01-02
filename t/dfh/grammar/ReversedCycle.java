@@ -38,7 +38,6 @@ public class ReversedCycle {
 				"foo = '1' | <foo> '0'",//
 		};
 		try {
-			final PrintStream out = new PrintStream("/tmp/log.txt");
 			Grammar g = new Grammar(rules);
 			g.defineCondition("lt100", new IntegerCondition() {
 				@Override
@@ -47,16 +46,11 @@ public class ReversedCycle {
 				}
 			});
 			String s = "100 10 1";
-			Matcher m = g.find(
-					s,
-					new Options().study(false).log(
-							out));
+			Matcher m = g.find(s);
 			int count = 0;
 			Match n;
-			while ((n = m.match()) != null) {
+			while ((n = m.match()) != null)
 				count++;
-				System.out.printf("%s -- %s%n", n, n.group());
-			}
 			assertTrue("correct count using condition", count == 1);
 		} catch (Exception e) {
 			fail("threw exception: " + e);
