@@ -32,4 +32,4 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 * construct round trip tests for Grammar.description()
 * remove Serializable constraint on Rule
 . fix reversed rule logging bug
-. change stack separator in logging so it doesn't look like a backtracking barrier
+* change stack separator in logging so it doesn't look like a backtracking barrier

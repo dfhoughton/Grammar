@@ -195,7 +195,7 @@ public abstract class Rule {
 		boolean nonInitial = false;
 		for (String s : labels) {
 			if (nonInitial)
-				b.append(" :: ");
+				b.append(" => ");
 			else
 				nonInitial = true;
 			b.append(s);
