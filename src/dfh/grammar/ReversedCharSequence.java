@@ -130,8 +130,8 @@ public class ReversedCharSequence implements CharSequence {
 
 	@Override
 	public CharSequence subSequence(int start, int end) {
-		return new ReversedCharSequence(zero, zero - end, end - start, s,
-				reversed);
+		return new ReversedCharSequence(zero - start, zero - end, end - start,
+				s, reversed);
 	}
 
 	@Override

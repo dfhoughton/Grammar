@@ -86,4 +86,14 @@ public class ReversedCharSequenceTest {
 		for (int i = 0; i < s.length(); i++)
 			assertTrue(s.charAt(i) == rcs.charAt(rcs.translate(i)));
 	}
+
+	@Test
+	public void subsequenceRegression() {
+		String s = "1 01 001";
+		String ss1 = s.subSequence(3, 8).toString();
+		s = new ReversedCharSequence(s).toString();
+		ReversedCharSequence rcs = new ReversedCharSequence(s);
+		String ss2 = rcs.subSequence(3, 8).toString();
+		assertTrue(ss1.equals(ss2));
+	}
 }
