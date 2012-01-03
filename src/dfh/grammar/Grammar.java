@@ -117,8 +117,7 @@ public class Grammar implements Serializable, Cloneable {
 		protected Match maybeGood(Match n, Matcher m) {
 			if (n == null)
 				return bad(m);
-			n.establishParentage();
-			n.setGroup(s);
+			n.done(s);
 			return n;
 		}
 
@@ -131,10 +130,8 @@ public class Grammar implements Serializable, Cloneable {
 		 * @return null
 		 */
 		protected Match bad(Matcher m) {
-			if (options.keepRightmost && m.rightmost != null) {
-				m.rightmost.establishParentage();
-				m.rightmost.setGroup(s);
-			}
+			if (options.keepRightmost && m.rightmost != null)
+				m.rightmost.done(s);
 			return null;
 		}
 	}

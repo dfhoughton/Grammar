@@ -1,4 +1,7 @@
 1.08
+  * improved Match completion, replacing establishParentage() and
+    setGroup(CharSequence) with done(CharSequence) and eliminating a bug
+    thereby
 
 1.07, 3 January 2012
   * fixed ReversedCharSequence.subsequence(int,int)

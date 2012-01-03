@@ -190,25 +190,6 @@ public class Match {
 	}
 
 	/**
-	 * Recursively defines link from child to parent.
-	 */
-	void establishParentage() {
-		done = true;
-		if (children == null)
-			children = new Match[0];
-		else {
-			for (Match child : children) {
-				if (child.parent != null)
-					return;
-				else {
-					child.parent = this;
-					child.establishParentage();
-				}
-			}
-		}
-	}
-
-	/**
 	 * This method is to be called during matching. After the match children
 	 * have been set this will throw an error.
 	 * 
@@ -746,16 +727,20 @@ public class Match {
 	}
 
 	/**
-	 * Records subsequence this match corresponds to.
+	 * Marks entire match tree as completed.
 	 * 
 	 * @param s
-	 *            mother sequence of match
 	 */
-	void setGroup(CharSequence s) {
+	void done(CharSequence s) {
+		done = true;
 		group = s.subSequence(start, end).toString();
-		if (children != null) {
-			for (Match child : children)
-				child.setGroup(s);
+		if (children == null)
+			children = new Match[0];
+		else {
+			for (Match m : children) {
+				m.parent = this;
+				m.done(s);
+			}
 		}
 	}
 }
