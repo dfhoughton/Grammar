@@ -1,4 +1,4 @@
-1.07
+1.07, 3 January 2012
   * fixed ReversedCharSequence.subsequence(int,int)
   * fixed conditionalization of reversed rules
 
