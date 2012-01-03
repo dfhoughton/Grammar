@@ -21,7 +21,7 @@ import java.util.Set;
  * 
  */
 public class DeferredDefinitionRule extends Rule implements Serializable {
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 	/**
 	 * Holds rule whose definition is deferred.
 	 */

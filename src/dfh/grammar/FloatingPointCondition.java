@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 public abstract class FloatingPointCondition extends Condition implements
 		Serializable {
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 
 	@Override
 	public boolean passes(Match n, Matcher m, CharSequence s) {

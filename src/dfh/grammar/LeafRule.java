@@ -86,7 +86,7 @@ public class LeafRule extends Rule implements Serializable {
 		}
 	}
 
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 	protected final Pattern p;
 	protected final boolean reversible;
 	protected boolean matchesTrivially;

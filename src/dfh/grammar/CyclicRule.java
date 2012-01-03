@@ -23,7 +23,7 @@ import java.util.Set;
  */
 @Reversible
 public class CyclicRule extends Rule implements Serializable {
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 	Rule r;
 
 	/**

@@ -15,7 +15,7 @@ import java.util.Set;
  */
 @Reversible
 public class Assertion extends Rule implements Serializable {
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 
 	private class AssertionMatcher extends Matcher {
 		private final Map<Integer, CachedMatch>[] cache;

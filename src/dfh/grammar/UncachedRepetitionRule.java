@@ -17,7 +17,7 @@ import java.util.Set;
  */
 @Reversible
 public class UncachedRepetitionRule extends RepetitionRule {
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 
 	private abstract class UncachedRepetitionMatcher extends NonterminalMatcher {
 		protected LinkedList<Match> matched;
