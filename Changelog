@@ -1,4 +1,4 @@
-1.08
+1.08, 5 January 2012
   * improved Match completion, replacing establishParentage() and
     setGroup(CharSequence) with done(CharSequence) and eliminating a bug
     thereby
