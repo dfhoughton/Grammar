@@ -21,7 +21,7 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 . make use of root and rules field in Grammar more sane; perhaps eliminate latter altogether
 . clean up uid() uniqueId() business
 * makes description() include tags
-. add 'before', 'after', 'notbefore', 'notafter' as synonyms for ~/~+, ~-, !/!+, !- respectively
+* add 'before', 'after', 'notbefore', 'notafter' as synonyms for ~/~+, ~-, !/!+, !- respectively
 . make assertions studiable
 * modify lookbehinds to use a single reversed character sequence
 * make conditions log their activity
@@ -33,3 +33,4 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 * remove Serializable constraint on Rule
 * fix reversed rule logging bug
 * change stack separator in logging so it doesn't look like a backtracking barrier
+. make sure conditionalized terminals are being cached properly
