@@ -34,3 +34,4 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 * fix reversed rule logging bug
 * change stack separator in logging so it doesn't look like a backtracking barrier
 . make sure conditionalized terminals are being cached properly
+. profile some matching to figure out what could be optimized
