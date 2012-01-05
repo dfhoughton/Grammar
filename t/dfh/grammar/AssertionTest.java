@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -524,4 +525,33 @@ public class AssertionTest {
 			count++;
 		assertTrue("could not match due to barrier", count == 0);
 	}
+
+	@Test
+	public void beforeTest() {
+		Grammar g = new Grammar("ROOT = before /\\d/ /\\w/");
+		System.out.println(g.describe());
+		assertNotNull(g.matches("1").match());
+	}
+
+	@Test
+	public void notBeforeTest() {
+		Grammar g = new Grammar("ROOT = not before /\\d/ /\\w/");
+		System.out.println(g.describe());
+		assertNotNull(g.matches("a").match());
+	}
+
+	@Test
+	public void afterTest() {
+		Grammar g = new Grammar("ROOT = after /\\b/r /\\w/");
+		System.out.println(g.describe());
+		assertNotNull(g.matches("1").match());
+	}
+
+	@Test
+	public void notAfterTest() {
+		Grammar g = new Grammar("ROOT = not after /\\B/r /\\w/");
+		System.out.println(g.describe());
+		assertNotNull(g.matches("a").match());
+	}
+
 }

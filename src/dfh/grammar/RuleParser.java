@@ -22,29 +22,35 @@ public class RuleParser {
 	/**
 	 * Basic pattern of a labeled rule.
 	 */
-	public static final Pattern labelPattern = Pattern.compile("<(\\w++)>");
+	private static final Pattern labelPattern = Pattern.compile("<(\\w++)>");
 	/**
 	 * Pattern matching the rule identifier to the left of the equals sign in a
 	 * rule definition.
 	 */
-	public static final Pattern leftValuePattern = Pattern
+	private static final Pattern leftValuePattern = Pattern
 			.compile("(?:<(\\w++)>|(\\w++))");
 	/**
 	 * Pattern that defines a rule as "<"<name>">" "=" <remainder>
 	 */
-	public static final Pattern basePattern = Pattern.compile("\\s*+"
+	private static final Pattern basePattern = Pattern.compile("\\s*+"
 			+ leftValuePattern + "\\s*+=\\s*+(.*?)\\s*+");
 	/**
 	 * Pattern of repetition symbols such as <code>*</code>.
 	 */
-	public static final Pattern repetitionPattern = Pattern
+	private static final Pattern repetitionPattern = Pattern
 			.compile("(?:([?*+]|\\{\\d*+(?:,\\d*+)?\\})([+?]?+))?+");
 
 	/**
 	 * Pattern for comments and blank lines.
 	 */
-	public static final Pattern ignorePattern = Pattern
+	private static final Pattern ignorePattern = Pattern
 			.compile("^\\s*+(?:#.*)?$");
+
+	/**
+	 * For parsing out assertion adverbs.
+	 */
+	private static final Pattern beforeAfterPattern = Pattern
+			.compile("(not\\s++)?(before|after)\\b");
 
 	/**
 	 * Parses a line of the string representation of a grammar. Does
@@ -239,6 +245,9 @@ public class RuleParser {
 				}
 				add(parse, gf, bf);
 				break;
+			case 'a':
+			case 'b':
+			case 'n':
 			case '~':
 			case '!':
 				AssertionFragment as = getAssertion(body, offset);
@@ -433,22 +442,26 @@ public class RuleParser {
 
 	private static AssertionFragment getAssertion(String body, int[] offset) {
 		// TODO implement modifier for backwards assertions
-		boolean positive = body.charAt(offset[0]) == '~';
-		boolean forward = true;
-		offset[0]++;
+		Matcher m = beforeAfterPattern.matcher(body);
+		m.region(offset[0], body.length());
+		boolean positive = true, forward = true;
+		if (m.lookingAt()) {
+			positive = m.group(1) == null;
+			forward = m.group(2).equals("before");
+			offset[0] = m.end();
+		} else {
+			positive = body.charAt(offset[0]) == '~';
+			offset[0]++;
+			char c = body.charAt(offset[0]);
+			if (c == '+' || c == '-') {
+				forward = c == '+';
+				offset[0]++;
+			}
+		}
 		// TODO check to see whether this can ever be true
 		if (offset[0] == body.length())
 			throw new GrammarException("no rule after assertion marker: "
 					+ body);
-		char c = body.charAt(offset[0]);
-		if (c == '+' || c == '-') {
-			forward = c == '+';
-			offset[0]++;
-			// TODO see previous
-			if (offset[0] == body.length())
-				throw new GrammarException("no rule after assertion marker: "
-						+ body);
-		}
 		return new AssertionFragment(positive, forward);
 	}
 
