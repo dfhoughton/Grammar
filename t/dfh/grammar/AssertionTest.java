@@ -529,29 +529,42 @@ public class AssertionTest {
 	@Test
 	public void beforeTest() {
 		Grammar g = new Grammar("ROOT = before /\\d/ /\\w/");
-		System.out.println(g.describe());
 		assertNotNull(g.matches("1").match());
 	}
 
 	@Test
 	public void notBeforeTest() {
 		Grammar g = new Grammar("ROOT = not before /\\d/ /\\w/");
-		System.out.println(g.describe());
+		assertNotNull(g.matches("a").match());
+	}
+
+	@Test
+	public void bangBeforeTest1() {
+		Grammar g = new Grammar("ROOT = ! before /\\d/ /\\w/");
+		assertNotNull(g.matches("a").match());
+	}
+
+	@Test
+	public void bangBeforeTest2() {
+		Grammar g = new Grammar("ROOT = !before /\\d/ /\\w/");
 		assertNotNull(g.matches("a").match());
 	}
 
 	@Test
 	public void afterTest() {
 		Grammar g = new Grammar("ROOT = after /\\b/r /\\w/");
-		System.out.println(g.describe());
 		assertNotNull(g.matches("1").match());
 	}
 
 	@Test
 	public void notAfterTest() {
 		Grammar g = new Grammar("ROOT = not after /\\B/r /\\w/");
-		System.out.println(g.describe());
 		assertNotNull(g.matches("a").match());
 	}
 
+	@Test
+	public void bangAfterTest() {
+		Grammar g = new Grammar("ROOT = ! after /\\B/r /\\w/");
+		assertNotNull(g.matches("a").match());
+	}
 }

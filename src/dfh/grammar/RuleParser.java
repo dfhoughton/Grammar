@@ -50,7 +50,7 @@ public class RuleParser {
 	 * For parsing out assertion adverbs.
 	 */
 	private static final Pattern beforeAfterPattern = Pattern
-			.compile("(not\\s++)?(before|after)\\b");
+			.compile("((?:!|not)\\s*+)?(before|after)\\b");
 
 	/**
 	 * Parses a line of the string representation of a grammar. Does
