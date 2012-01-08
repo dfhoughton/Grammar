@@ -1,6 +1,12 @@
 1.09
   * added '!' as a synonym of 'not' and removed requirement for a space after,
     so '! before', '!before', 'notafter', etc. are all now acceptable
+  * preserving all redundant labels for a rule, so
+    ROOT = <a>
+       a = <b>
+       b = 'c'
+    will produce matches findable by the labels "a" and "b". I.e., it
+    normalizes to ROOT = [{a,b} 'c']
 
 1.08, 5 January 2012
   * improved Match completion, replacing establishParentage() and
