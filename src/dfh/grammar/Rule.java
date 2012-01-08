@@ -452,6 +452,13 @@ public abstract class Rule {
 		m.options.trace.println(b);
 	}
 
+	/**
+	 * Walks tree from this rule collecting all rules reachable from this. This
+	 * must be overridden by non-terminal rules.
+	 * 
+	 * @param set
+	 *            collector of rules
+	 */
 	protected void subRules(Set<Rule> set) {
 		set.add(this);
 	}
