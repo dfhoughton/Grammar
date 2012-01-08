@@ -89,7 +89,6 @@ public class LabelTest {
 		Grammar g = new Grammar(rules);
 		Match m = g.matches("c").match();
 		assertNotNull(m);
-		assertNotNull(m.first("ROOT"));
 		assertNotNull(m.first("a"));
 		assertNotNull(m.first("b"));
 	}

@@ -303,10 +303,16 @@ public class Compiler {
 			Collections.sort(sorters);
 			// now we make the rules
 			for (Sorter s : sorters) {
-				Entry<Label, List<RuleFragment>> e = s.e;
-				Rule ru = parseRule(e.getKey(), e.getValue(), null);
-				ru.generation = gen;
-				rules.put(e.getKey(), ru);
+				Label l = s.e.getKey();
+				List<RuleFragment> body = s.e.getValue();
+				Rule ru = parseRule(l, body, null);
+				if (redundancyTest(body)) {
+					Label l2 = (Label) body.get(0);
+					ru.addLabel(l2);
+				} else {
+					ru.generation = gen;
+				}
+				rules.put(l, ru);
 			}
 			gen++;
 		}
@@ -314,6 +320,12 @@ public class Compiler {
 		terminalLabelMap = new HashMap<String, Label>(terminals.size());
 		for (Label l : terminals)
 			terminalLabelMap.put(l.id, l);
+	}
+
+	private boolean redundancyTest(List<RuleFragment> body) {
+		if (body.size() == 1 && body.get(0) instanceof Label)
+			return ((Label) body.get(0)).rep.redundant();
+		return false;
 	}
 
 	static Match parseCondition(String line, String cnd) {
@@ -560,6 +572,7 @@ public class Compiler {
 	 */
 	static Rule fixLabel(Label label, Rule r, Match match) {
 		Rule ru = null;
+		Set<String> labels = r.labels;
 		if (r instanceof AlternationRule) {
 			ru = new AlternationRule(label, ((AlternationRule) r).alternates,
 					((AlternationRule) r).tagMap);
@@ -591,6 +604,12 @@ public class Compiler {
 					match.group());
 		} else if (r.condition != null) {
 			ru.condition = r.condition;
+		}
+		if (labels != null) {
+			if (ru.labels == null)
+				ru.labels = labels;
+			else
+				ru.addLabels(labels);
 		}
 		return ru;
 	}

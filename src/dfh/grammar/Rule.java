@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A {@link Matcher} generator. <code>Rules</code> generate
@@ -453,5 +454,17 @@ public abstract class Rule {
 
 	protected void subRules(Set<Rule> set) {
 		set.add(this);
+	}
+
+	/**
+	 * For recording redundant labels during compilation.
+	 * 
+	 * @param l2
+	 */
+	protected void addLabel(Label l2) {
+		if (labels == null) {
+			labels = new TreeSet<String>();
+		}
+		labels.add(l2.id);
 	}
 }
