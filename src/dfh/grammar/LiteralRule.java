@@ -168,7 +168,7 @@ public class LiteralRule extends Rule implements Serializable {
 	}
 
 	@Override
-	public Rule shallowClone() {
+	protected Rule sClone() {
 		LiteralRule lr = new LiteralRule((Label) label.clone(), literal);
 		return lr;
 	}

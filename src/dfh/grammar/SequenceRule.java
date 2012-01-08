@@ -226,10 +226,12 @@ public class SequenceRule extends Rule implements Serializable {
 	}
 
 	@Override
-	public Rule shallowClone() {
+	protected Rule sClone() {
+		List<Set<String>> tl = new ArrayList<Set<String>>(tagList.size());
+		for (int i = 0, lim = tagList.size(); i < lim; i++)
+			tl.add(new HashSet<String>(tagList.get(i)));
 		SequenceRule sr = new SequenceRule((Label) label.clone(),
-				Arrays.copyOf(sequence, sequence.length),
-				new ArrayList<Set<String>>(tagList));
+				Arrays.copyOf(sequence, sequence.length), tl);
 		return sr;
 	}
 

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -169,10 +170,13 @@ public class AlternationRule extends Rule implements Serializable {
 	}
 
 	@Override
-	public Rule shallowClone() {
+	protected Rule sClone() {
+		Map<String, Set<String>> tm = new HashMap<String, Set<String>>(
+				tagMap.size());
+		for (Entry<String, Set<String>> e : tagMap.entrySet())
+			tm.put(e.getKey(), new HashSet<String>(e.getValue()));
 		AlternationRule ar = new AlternationRule((Label) label.clone(),
-				Arrays.copyOf(alternates, alternates.length),
-				new HashMap<String, Set<String>>(tagMap));
+				Arrays.copyOf(alternates, alternates.length), tm);
 		return ar;
 	}
 

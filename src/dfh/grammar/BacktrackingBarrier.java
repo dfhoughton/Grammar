@@ -109,7 +109,7 @@ public class BacktrackingBarrier extends Rule implements Serializable {
 	}
 
 	@Override
-	public Rule shallowClone() {
+	protected Rule sClone() {
 		return new BacktrackingBarrier(isSingle);
 	}
 }

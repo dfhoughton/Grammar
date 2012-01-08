@@ -78,7 +78,7 @@ public class DeferredDefinitionRule extends Rule implements Serializable {
 	}
 
 	@Override
-	public Rule shallowClone() {
+	protected Rule sClone() {
 		DeferredDefinitionRule ddr = new DeferredDefinitionRule(
 				(Label) label.clone());
 		ddr.r = r;

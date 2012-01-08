@@ -306,7 +306,7 @@ public class UncachedRepetitionRule extends RepetitionRule {
 	}
 
 	@Override
-	public Rule shallowClone() {
+	protected Rule sClone() {
 		UncachedRepetitionRule rr = new UncachedRepetitionRule(
 				(Label) label.clone(), r, repetition, new HashSet<String>(
 						alternateTags));

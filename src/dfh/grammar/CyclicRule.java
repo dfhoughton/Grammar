@@ -75,7 +75,7 @@ public class CyclicRule extends Rule implements Serializable {
 	}
 
 	@Override
-	public Rule shallowClone() {
+	protected Rule sClone() {
 		CyclicRule cr = new CyclicRule((Label) label.clone());
 		cr.r = r;
 		return cr;

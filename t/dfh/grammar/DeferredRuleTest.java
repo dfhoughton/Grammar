@@ -119,7 +119,7 @@ public class DeferredRuleTest {
 		}
 
 		@Override
-		public Rule shallowClone() {
+		protected Rule sClone() {
 			return this;
 		}
 

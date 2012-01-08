@@ -206,7 +206,7 @@ public class Assertion extends Rule implements Serializable {
 	}
 
 	@Override
-	public Rule shallowClone() {
+	protected Rule sClone() {
 		return new Assertion((Label) label.clone(), r, positive, forward);
 	}
 

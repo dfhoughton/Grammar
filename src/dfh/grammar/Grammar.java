@@ -1115,6 +1115,8 @@ public class Grammar implements Serializable, Cloneable {
 
 	private synchronized Set<Rule> rules() {
 		if (ruleSet == null) {
+			Set<Rule> set = new HashSet<Rule>();
+
 			Map<String, Rule> map = new HashMap<String, Rule>();
 			getRoot().rules(map);
 			ruleSet = new HashSet<Rule>(map.values());

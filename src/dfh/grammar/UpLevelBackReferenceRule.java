@@ -109,7 +109,7 @@ public class UpLevelBackReferenceRule extends BackReferenceRule {
 	}
 
 	@Override
-	public Rule shallowClone() {
+	protected Rule sClone() {
 		UpLevelBackReferenceRule brr = new UpLevelBackReferenceRule(
 				(Label) label.clone(), index, level);
 		return brr;

@@ -346,7 +346,7 @@ public class RepetitionRule extends Rule implements Serializable {
 	}
 
 	@Override
-	public Rule shallowClone() {
+	protected Rule sClone() {
 		RepetitionRule rr = new RepetitionRule((Label) label.clone(), r,
 				repetition, new HashSet<String>(alternateTags));
 		return rr;

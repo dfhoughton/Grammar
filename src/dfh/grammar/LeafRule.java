@@ -205,7 +205,7 @@ public class LeafRule extends Rule implements Serializable {
 	}
 
 	@Override
-	public Rule shallowClone() {
+	protected Rule sClone() {
 		LeafRule lr = new LeafRule((Label) label.clone(), p, reversible);
 		return lr;
 	}

@@ -124,7 +124,7 @@ public class BackReferenceRule extends Rule implements Serializable {
 	}
 
 	@Override
-	public Rule shallowClone() {
+	protected Rule sClone() {
 		BackReferenceRule brr = new BackReferenceRule((Label) label.clone(),
 				index);
 		return brr;
