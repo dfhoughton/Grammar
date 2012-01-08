@@ -77,4 +77,20 @@ public class LabelTest {
 		Match a = n.first("foo");
 		assertTrue("foo has three labels", a.labels().size() == 3);
 	}
+
+	@Test
+	public void redundantRules() {
+		String[] rules = {
+				//
+				"ROOT = <a>",//
+				"a = <b>",//
+				"b = 'c'",//
+		};
+		Grammar g = new Grammar(rules);
+		Match m = g.matches("c").match();
+		assertNotNull(m);
+		assertNotNull(m.first("ROOT"));
+		assertNotNull(m.first("a"));
+		assertNotNull(m.first("b"));
+	}
 }

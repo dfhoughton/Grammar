@@ -259,4 +259,12 @@ public class Assertion extends Rule implements Serializable {
 	protected void fixAlternation() {
 		r.fixAlternation();
 	}
+
+	@Override
+	protected void subRules(Set<Rule> set) {
+		if (!set.contains(this)) {
+			set.add(this);
+			r.subRules(set);
+		}
+	}
 }

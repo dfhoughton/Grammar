@@ -118,4 +118,12 @@ public class CyclicRule extends Rule implements Serializable {
 			r.rules(map);
 		}
 	}
+
+	@Override
+	protected void subRules(Set<Rule> set) {
+		if (!set.contains(this)) {
+			set.add(this);
+			r.subRules(set);
+		}
+	}
 }

@@ -266,4 +266,13 @@ public class AlternationRule extends Rule implements Serializable {
 			r.fixAlternation();
 		}
 	}
+
+	@Override
+	protected void subRules(Set<Rule> set) {
+		if (!set.contains(this)) {
+			set.add(this);
+			for (Rule r : alternates)
+				r.subRules(set);
+		}
+	}
 }

@@ -315,4 +315,13 @@ public class SequenceRule extends Rule implements Serializable {
 		for (Rule r : sequence)
 			r.fixAlternation();
 	}
+
+	@Override
+	protected void subRules(Set<Rule> set) {
+		if (!set.contains(this)) {
+			set.add(this);
+			for (Rule r : sequence)
+				r.subRules(set);
+		}
+	}
 }

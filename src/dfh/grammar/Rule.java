@@ -450,4 +450,8 @@ public abstract class Rule {
 		b.append('\n');
 		m.options.trace.println(b);
 	}
+
+	protected void subRules(Set<Rule> set) {
+		set.add(this);
+	}
 }
