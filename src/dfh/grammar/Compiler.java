@@ -309,9 +309,8 @@ public class Compiler {
 				if (redundancyTest(body)) {
 					Label l2 = (Label) body.get(0);
 					ru.addLabel(l2);
-				} else {
-					ru.generation = gen;
 				}
+				ru.generation = gen;
 				rules.put(l, ru);
 			}
 			gen++;

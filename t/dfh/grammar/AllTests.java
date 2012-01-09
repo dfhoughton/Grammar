@@ -48,6 +48,7 @@ import org.junit.runners.Suite;
 		ReversedCycle.class,//
 		StringLineReaderTest.class,//
 		RoundTripTest.class,//
+		SubrulesTest.class,//
 })
 public class AllTests {
 }
