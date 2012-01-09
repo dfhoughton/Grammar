@@ -344,6 +344,14 @@ public class Grammar implements Serializable, Cloneable {
 	protected final Map<String, Set<Label>> undefinedConditions;
 	private final Map<String, Set<Rule>> knownConditions;
 	private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
+	/**
+	 * Whether the grammar's rules contain alternation. Secondarily used as an
+	 * indicator of whether the grammar has been validated: if this value is
+	 * defined, it has.
+	 * 
+	 * TODO: separate out this latter function into a boolean variable for the
+	 * sake of clarity and efficiency.
+	 */
 	private Boolean containsAlternation;
 	private Set<Rule> ruleSet;
 
@@ -725,7 +733,7 @@ public class Grammar implements Serializable, Cloneable {
 			throw new GrammarException(b.toString());
 		}
 		if (containsAlternation == null) {
-			for (Rule r : rules.values()) {
+			for (Rule r : rules()) {
 				if (r instanceof AlternationRule) {
 					containsAlternation = true;
 					return;
@@ -1115,9 +1123,25 @@ public class Grammar implements Serializable, Cloneable {
 		if (ruleSet == null) {
 			Set<Rule> set = new HashSet<Rule>();
 			root.subRules(set);
+			if (containsAlternation == null)
+				return set;
 			ruleSet = new HashSet<Rule>(set);
 		}
 		return ruleSet;
+	}
+
+	/**
+	 * Experimental method introduced to replace uses of {@link #rules}. TODO:
+	 * finish testing replacement, install proper caching
+	 * 
+	 * @return
+	 */
+	private Map<Label, Rule> ruleMap() {
+		Set<Rule> set = rules();
+		Map<Label, Rule> ruleMap = new HashMap<Label, Rule>(set.size());
+		for (Rule r : set)
+			ruleMap.put(r.label, r);
+		return ruleMap;
 	}
 
 	/**
@@ -1525,7 +1549,7 @@ public class Grammar implements Serializable, Cloneable {
 	 */
 	private Set<Rule> findRulesById(String reversedId) {
 		Set<Rule> set = new HashSet<Rule>(), cycleSet = new HashSet<Rule>();
-		for (Rule r : rules.values()) {
+		for (Rule r : rules()) {
 			findRulesById(r, set, reversedId, cycleSet);
 		}
 		return set;
