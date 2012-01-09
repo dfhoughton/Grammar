@@ -232,7 +232,7 @@ public class Grammar implements Serializable, Cloneable {
 			index = options.study && !startOffsets.isEmpty() ? startOffsets
 					.removeFirst() : options.start;
 			firstMatch = true;
-			m = rules.get(root).matcher(index, cache, this);
+			m = root.matcher(index, cache, this);
 			if (ltm)
 				ltmm = new LTMMatcher(m);
 			next = fetchNext();
@@ -300,7 +300,7 @@ public class Grammar implements Serializable, Cloneable {
 				firstNull = false;
 				if (index >= options.end())
 					break;
-				m = rules.get(root).matcher(index, cache, this);
+				m = root.matcher(index, cache, this);
 				if (ltm)
 					ltmm = new LTMMatcher(m);
 			}
@@ -322,7 +322,11 @@ public class Grammar implements Serializable, Cloneable {
 	/**
 	 * {@link Label} of root {@link Rule}.
 	 */
-	protected Label root;
+	protected Label rootLabel;
+	/**
+	 * The root {@link Rule}.
+	 */
+	protected Rule root;
 	/**
 	 * Collection of all {@link Rule rules}.
 	 */
@@ -377,7 +381,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @param root
 	 */
 	private Grammar(Label root) {
-		this.root = root;
+		this.rootLabel = root;
 		this.rules = new HashMap<Label, Rule>();
 		this.terminalLabelMap = new HashMap<String, Label>();
 		this.undefinedRules = new HashSet<Label>();
@@ -535,8 +539,9 @@ public class Grammar implements Serializable, Cloneable {
 	public Grammar(LineReader reader, Map<String, Rule> precompiledRules)
 			throws GrammarException {
 		Compiler c = new Compiler(reader, precompiledRules);
-		root = c.root();
+		rootLabel = c.root();
 		rules = c.rules();
+		root = rules.get(rootLabel);
 		terminalLabelMap = c.terminalLabelMap();
 		undefinedRules = c.undefinedTerminals();
 		recursive = c.recursive();
@@ -762,8 +767,7 @@ public class Grammar implements Serializable, Cloneable {
 		final boolean ltm = containsAlternation && opt.longestMatch();
 		final Map<Integer, CachedMatch>[] cache = offsetCache(opt);
 		final Set<Integer> startOffsets = startOffsets(cs, co, cache);
-		final Matcher m = rules.get(root).matcher(co.start, cache,
-				new DummyMatcher(co));
+		final Matcher m = root.matcher(co.start, cache, new DummyMatcher(co));
 		final LTMMatcher ltmm = ltm ? new LTMMatcher(m) : null;
 		abstract class LookingAtMatcher extends GrammarMatcher {
 			LookingAtMatcher() {
@@ -896,22 +900,18 @@ public class Grammar implements Serializable, Cloneable {
 	 */
 	private Map<Integer, CachedMatch>[] offsetCache(Options options) {
 		// cache unique ids
-		getRoot().setUid();
+		root.setUid();
 		// fix tag maps in alternations
-		getRoot().fixAlternation();
+		root.fixAlternation();
 		// create actual offset cache
-		getRoot().setCacheIndex(new HashMap<String, Integer>());
-		int max = getRoot().maxCacheIndex(-1, new HashSet<Rule>());
+		root.setCacheIndex(new HashMap<String, Integer>());
+		int max = root.maxCacheIndex(-1, new HashSet<Rule>());
 		@SuppressWarnings("unchecked")
 		Map<Integer, CachedMatch>[] offsetCache = new Map[max + 1];
 		for (int i = 0; i < offsetCache.length; i++)
 			offsetCache[i] = options.leanMemory ? new TreeMap<Integer, CachedMatch>()
 					: new HashMap<Integer, CachedMatch>();
 		return offsetCache;
-	}
-
-	private Rule getRoot() {
-		return rules.get(root);
 	}
 
 	/**
@@ -955,7 +955,7 @@ public class Grammar implements Serializable, Cloneable {
 			int l = r.label().id.length();
 			if (l > maxLabel)
 				maxLabel = l;
-			if (r == rules.get(root))
+			if (r == root)
 				i.remove();
 		}
 		String format = "%" + maxLabel + "s =";
@@ -973,9 +973,9 @@ public class Grammar implements Serializable, Cloneable {
 		});
 
 		StringBuilder b = new StringBuilder();
-		b.append(String.format(format, root.id));
+		b.append(String.format(format, rootLabel.id));
 		b.append(' ');
-		b.append(rules.get(root).description());
+		b.append(root.description());
 		b.append('\n');
 		if (!ruleList.isEmpty()) {
 			b.append('\n');
@@ -1041,8 +1041,8 @@ public class Grammar implements Serializable, Cloneable {
 		final GlobalState options = verifyOptions(s, opt);
 		final Map<Integer, CachedMatch>[] cache = offsetCache(opt);
 		final Set<Integer> startOffsets = startOffsets(s, options, cache);
-		final Matcher m = rules.get(root).matcher(options.start, cache,
-				new DummyMatcher(options));
+		final Matcher m = root.matcher(options.start, cache, new DummyMatcher(
+				options));
 		return new GrammarMatcher(options) {
 			boolean matchedOnce = false;
 			Match next = fetchNext();
@@ -1107,8 +1107,8 @@ public class Grammar implements Serializable, Cloneable {
 							.study(s, cache, studiedRules, options));
 				}
 			} else
-				startOffsets.addAll(rules.get(root).study(s, cache,
-						studiedRules, options));
+				startOffsets
+						.addAll(root.study(s, cache, studiedRules, options));
 		}
 		return startOffsets;
 	}
@@ -1118,7 +1118,7 @@ public class Grammar implements Serializable, Cloneable {
 			Set<Rule> set = new HashSet<Rule>();
 
 			Map<String, Rule> map = new HashMap<String, Rule>();
-			getRoot().rules(map);
+			root.rules(map);
 			ruleSet = new HashSet<Rule>(map.values());
 		}
 		return ruleSet;
@@ -1224,7 +1224,7 @@ public class Grammar implements Serializable, Cloneable {
 		// rename
 		for (Label l : labels) {
 			Rule ru = g.rules.remove(l);
-			boolean isRoot = l.equals(g.root);
+			boolean isRoot = l.equals(g.rootLabel);
 			String s = label + ':' + l.id;
 			l = new Label(l.t, s);
 			Rule nru = Compiler.fixLabel(l, ru,
@@ -1232,9 +1232,10 @@ public class Grammar implements Serializable, Cloneable {
 			fix(g, ru, nru);
 			g.rules.put(l, nru);
 			if (isRoot) {
-				g.root = l;
+				g.rootLabel = l;
 				// hide root
 				nru.generation = -1;
+				g.root = nru;
 			}
 		}
 		// and we check for any lingering redundancies
@@ -1256,7 +1257,7 @@ public class Grammar implements Serializable, Cloneable {
 			rules.put(e.getKey(), e.getValue());
 		}
 		// and we define the rule
-		Rule rr = g.rules.get(g.root);
+		Rule rr = g.root;
 		if (c != null)
 			rr = conditionCheck(label, c, rr);
 		if (redefinitionCheck(r, rr)) {
@@ -1269,7 +1270,7 @@ public class Grammar implements Serializable, Cloneable {
 			for (Rule ru : rules.values()) {
 				Set<Rule> dependents = dependents(ru);
 				dependentMap.put(ru, dependents);
-				if (!ru.label.equals(root) && ru.generation > -1) {
+				if (!ru.label.equals(rootLabel) && ru.generation > -1) {
 					requireAssignment.add(ru);
 				}
 			}
@@ -1405,7 +1406,7 @@ public class Grammar implements Serializable, Cloneable {
 
 	@Override
 	public Object clone() {
-		Grammar clone = new Grammar((Label) root.clone());
+		Grammar clone = new Grammar((Label) rootLabel.clone());
 		Map<Label, Label> labelMap = new HashMap<Label, Label>(rules.size());
 		Map<Rule, Rule> ruleMap = new HashMap<Rule, Rule>(rules.size());
 		for (Entry<Label, Rule> e : rules.entrySet()) {
@@ -1434,6 +1435,7 @@ public class Grammar implements Serializable, Cloneable {
 				newSet.add(ruleMap.get(r));
 			knownConditions.put(e.getKey(), newSet);
 		}
+		clone.root = clone.rules.get(clone.rootLabel);
 		return clone;
 	}
 
@@ -1484,6 +1486,8 @@ public class Grammar implements Serializable, Cloneable {
 			throw new GrammarException("unknown rule: " + labelId);
 		Rule r = rules.remove(l);
 		Rule nr = conditionCheck(conditionId, c, r);
+		if (l.equals(rootLabel))
+			root = nr;
 		fix(this, r, nr);
 		rules.put(l, nr);
 	}
@@ -1505,6 +1509,8 @@ public class Grammar implements Serializable, Cloneable {
 			if (r != nr)
 				fix(this, r, nr);
 			rules.put(l, nr);
+			if (l.equals(rootLabel))
+				root = nr;
 			rset.add(nr);
 			String reversedId = l.id + ":r";
 			for (Rule rr : findRulesById(reversedId)) {
