@@ -942,32 +942,30 @@ public class Grammar implements Serializable, Cloneable {
 	 * @return pretty-printed grammar definition
 	 */
 	public String describe(final boolean alphabetized) {
-		List<Entry<Label, Rule>> ruleList = new ArrayList<Map.Entry<Label, Rule>>(
-				rules.entrySet());
-		int maxLabel = -1;
-		for (Iterator<Entry<Label, Rule>> i = ruleList.iterator(); i.hasNext();) {
-			Entry<Label, Rule> e = i.next();
-			Rule r = e.getValue();
-			if (r.generation == -1) {
+		List<Rule> rules = new ArrayList<Rule>(rules());
+		for (Iterator<Rule> i = rules.iterator(); i.hasNext();) {
+			Rule r = i.next();
+			if (r.generation == -1)
 				i.remove();
-				continue;
-			}
+			else if (r == root)
+				i.remove();
+		}
+		int maxLabel = -1;
+		for (Rule r : rules) {
 			int l = r.label().id.length();
 			if (l > maxLabel)
 				maxLabel = l;
-			if (r == root)
-				i.remove();
 		}
 		String format = "%" + maxLabel + "s =";
 		// put rules in canonical order
-		Collections.sort(ruleList, new Comparator<Entry<Label, Rule>>() {
+		Collections.sort(rules, new Comparator<Rule>() {
 			@Override
-			public int compare(Entry<Label, Rule> o1, Entry<Label, Rule> o2) {
-				int comparison = alphabetized ? 0 : o2.getValue().generation
-						- o1.getValue().generation;
+			public int compare(Rule o1, Rule o2) {
+				int comparison = alphabetized ? 0 : o2.generation
+						- o1.generation;
 				if (comparison == 0)
-					comparison = o1.getKey().toString()
-							.compareTo(o2.getKey().toString());
+					comparison = o1.label().toString()
+							.compareTo(o2.label().toString());
 				return comparison;
 			}
 		});
@@ -977,12 +975,12 @@ public class Grammar implements Serializable, Cloneable {
 		b.append(' ');
 		b.append(root.description());
 		b.append('\n');
-		if (!ruleList.isEmpty()) {
+		if (!rules.isEmpty()) {
 			b.append('\n');
-			for (Entry<Label, Rule> e : ruleList) {
-				b.append(String.format(format, e.getKey().id));
+			for (Rule r : rules) {
+				b.append(String.format(format, r.label().id));
 				b.append(' ');
-				b.append(e.getValue().description());
+				b.append(r.description());
 				b.append("\n");
 			}
 		}
@@ -1116,10 +1114,8 @@ public class Grammar implements Serializable, Cloneable {
 	private synchronized Set<Rule> rules() {
 		if (ruleSet == null) {
 			Set<Rule> set = new HashSet<Rule>();
-
-			Map<String, Rule> map = new HashMap<String, Rule>();
-			root.rules(map);
-			ruleSet = new HashSet<Rule>(map.values());
+			root.subRules(set);
+			ruleSet = new HashSet<Rule>(set);
 		}
 		return ruleSet;
 	}
