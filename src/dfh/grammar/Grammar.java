@@ -345,14 +345,14 @@ public class Grammar implements Serializable, Cloneable {
 	private final Map<String, Set<Rule>> knownConditions;
 	private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
 	/**
-	 * Whether the grammar's rules contain alternation. Secondarily used as an
-	 * indicator of whether the grammar has been validated: if this value is
-	 * defined, it has.
-	 * 
-	 * TODO: separate out this latter function into a boolean variable for the
-	 * sake of clarity and efficiency.
+	 * Whether the grammar's rules contain alternation.
 	 */
-	private Boolean containsAlternation;
+	private boolean containsAlternation = false;
+	/**
+	 * Whether the grammar has been validated and may be matched against
+	 * character sequences.
+	 */
+	private boolean validated = false;
 	private Set<Rule> ruleSet;
 
 	/**
@@ -707,6 +707,8 @@ public class Grammar implements Serializable, Cloneable {
 	 * @throws GrammarException
 	 */
 	private void checkComplete() throws GrammarException {
+		if (validated)
+			return;
 		if (!undefinedRules.isEmpty()) {
 			LinkedList<Label> list = new LinkedList<Label>(undefinedRules);
 			Collections.sort(list);
@@ -732,15 +734,13 @@ public class Grammar implements Serializable, Cloneable {
 			}
 			throw new GrammarException(b.toString());
 		}
-		if (containsAlternation == null) {
-			for (Rule r : rules()) {
-				if (r instanceof AlternationRule) {
-					containsAlternation = true;
-					return;
-				}
+		for (Rule r : rules()) {
+			if (r instanceof AlternationRule) {
+				containsAlternation = true;
+				break;
 			}
-			containsAlternation = false;
 		}
+		validated = true;
 	}
 
 	/**
@@ -1123,7 +1123,7 @@ public class Grammar implements Serializable, Cloneable {
 		if (ruleSet == null) {
 			Set<Rule> set = new HashSet<Rule>();
 			root.subRules(set);
-			if (containsAlternation == null)
+			if (!validated)
 				return set;
 			ruleSet = new HashSet<Rule>(set);
 		}
