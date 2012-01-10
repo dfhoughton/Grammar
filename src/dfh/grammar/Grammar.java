@@ -1109,8 +1109,15 @@ public class Grammar implements Serializable, Cloneable {
 							|| r instanceof RepetitionRule
 							|| r instanceof CyclicRule)
 						continue;
-					startOffsets.addAll(r
-							.study(s, cache, studiedRules, options));
+					// TODO take care for reversed terminal rules here
+					if (r.uid().endsWith(":r"))
+						;// do thing appropriate for reversed rules
+					else {
+						startOffsets.addAll(r.study(s, cache, studiedRules,
+								options));
+						// TODO again; special care must be taken here for
+						// reversed rules
+					}
 				}
 			} else
 				startOffsets

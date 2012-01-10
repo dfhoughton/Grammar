@@ -389,7 +389,9 @@ public abstract class Rule {
 	}
 
 	/**
-	 * Sets index of cache for this rule in offset matching cache.
+	 * Sets index of cache for this rule in offset matching cache. This method
+	 * must be overridden in non-terminal rules to ensure all rules set their
+	 * cache index. See, for example {@link AlternationRule#setCacheIndex(Map)}.
 	 * 
 	 * @param uids
 	 *            a map from unique ids to indices
