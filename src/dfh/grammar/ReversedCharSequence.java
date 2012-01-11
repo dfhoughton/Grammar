@@ -6,7 +6,11 @@ package dfh.grammar;
  * behind assertions.
  * 
  * Note that this class merely tinkers with the index math to retrieve
- * characters from the underlying sequence.
+ * characters from the underlying sequence. There is no requirement that the
+ * underlying sequence be immutable, though you will not want to match against a
+ * mutating sequence, and if the sequence shrinks you may get
+ * {@link IndexOutOfBoundsException}. The reversed sequence assumes there will
+ * always be characters at the indices initially in its range.
  * 
  * <b>Creation date:</b> Apr 10, 2011
  * 
@@ -134,9 +138,19 @@ public class ReversedCharSequence implements CharSequence {
 				s, reversed);
 	}
 
+	/**
+	 * This method must construct the string to return. I.e., the constructed
+	 * string is not cached. This is necessary because there is no guarantee
+	 * that the sequence underlying this reversed sequence is immutable (though
+	 * errors may be thrown if it changes in length). If you are planning to
+	 * stringify your reversed sequence repeatedly, you might want to cache this
+	 * stringification yourself.
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
-		StringBuilder b = new StringBuilder();
+		StringBuilder b = new StringBuilder(length());
 		for (int i = zero; i > end; i--)
 			b.append(s.charAt(i));
 		return b.toString();

@@ -796,10 +796,11 @@ public class Compiler {
 		// all's well, so we reverse the rule
 		Rule ru = null;
 		String id = sr.label.id;
-		if (id.endsWith(":r"))
-			id = id.substring(0, id.length() - 2);
+		if (id.endsWith(Assertion.REVERSAL_SUFFIX))
+			id = id.substring(0,
+					id.length() - Assertion.REVERSAL_SUFFIX.length());
 		else
-			id = id + ":r";
+			id = id + Assertion.REVERSAL_SUFFIX;
 		if (sr instanceof AlternationRule) {
 			AlternationRule ar = (AlternationRule) sr;
 			Rule[] children = new Rule[ar.alternates.length];

@@ -501,4 +501,15 @@ public abstract class Rule {
 		}
 		labels.add(l2.id);
 	}
+
+	/**
+	 * Returns whether this {@link Rule} will be tested against a
+	 * {@link ReversedCharSequence}.
+	 * 
+	 * @return whether this {@link Rule} will be tested against a
+	 *         {@link ReversedCharSequence}
+	 */
+	public boolean isReversed() {
+		return uid().endsWith(Assertion.REVERSAL_SUFFIX);
+	}
 }

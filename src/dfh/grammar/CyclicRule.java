@@ -82,14 +82,6 @@ public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 	}
 
 	@Override
-	protected void setUid() {
-		if (uid == null) {
-			uid = uniqueId();
-			r.setUid();
-		}
-	}
-
-	@Override
 	protected void setCacheIndex(Map<String, Integer> uids) {
 		if (cacheIndex == -1) {
 			Integer i = uids.get(uid());

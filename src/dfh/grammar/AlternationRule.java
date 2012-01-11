@@ -211,13 +211,6 @@ public class AlternationRule extends Rule implements Serializable,
 	}
 
 	@Override
-	protected void setUid() {
-		uid = uniqueId();
-		for (Rule r : alternates)
-			r.setUid();
-	}
-
-	@Override
 	protected void setCacheIndex(Map<String, Integer> uids) {
 		if (cacheIndex == -1) {
 			Integer i = uids.get(uid());

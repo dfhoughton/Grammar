@@ -16,6 +16,11 @@ import java.util.Set;
 @Reversible
 public class Assertion extends Rule implements Serializable, NonterminalRule {
 	private static final long serialVersionUID = 3L;
+	/**
+	 * suffix added to {@link Rule#uid} of reversed rules to signal their
+	 * reversal.
+	 */
+	public static final String REVERSAL_SUFFIX = ":r";
 
 	private class AssertionMatcher extends Matcher {
 		private final Map<Integer, CachedMatch>[] cache;
@@ -227,14 +232,6 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 			}
 			cacheIndex = i;
 			r.setCacheIndex(uids);
-		}
-	}
-
-	@Override
-	protected void setUid() {
-		if (uid == null) {
-			uid = uniqueId();
-			r.setUid();
 		}
 	}
 
