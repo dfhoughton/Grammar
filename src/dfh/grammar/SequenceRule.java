@@ -20,7 +20,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class SequenceRule extends Rule implements Serializable {
+public class SequenceRule extends Rule implements Serializable, NonterminalRule {
 	private static final long serialVersionUID = 3L;
 	final Rule[] sequence;
 	protected Condition c;
@@ -324,6 +324,18 @@ public class SequenceRule extends Rule implements Serializable {
 			set.add(this);
 			for (Rule r : sequence)
 				r.subRules(set);
+		}
+	}
+
+	@Override
+	protected void initialRules(Set<String> initialRules) {
+		if (!initialRules.contains(uid())) {
+			initialRules.add(uid());
+			for (Rule r : sequence) {
+				r.initialRules(initialRules);
+				if (!(r instanceof Assertion || r instanceof BacktrackingBarrier))
+					break;
+			}
 		}
 	}
 }

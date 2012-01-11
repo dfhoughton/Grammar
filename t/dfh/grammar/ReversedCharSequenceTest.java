@@ -83,8 +83,30 @@ public class ReversedCharSequenceTest {
 	public void translationTest() {
 		String s = "abcdefghijklmnopqrstuvwxyz";
 		ReversedCharSequence rcs = new ReversedCharSequence(s);
-		for (int i = 0; i < s.length(); i++)
+		for (int i = 0; i < s.length(); i++) {
 			assertTrue(s.charAt(i) == rcs.charAt(rcs.translate(i)));
+			assertTrue(rcs.charAt(i) == s.charAt(rcs.translate(i)));
+		}
+	}
+
+	@Test
+	public void translationTest2() {
+		String s = "abcdefghijklmnopqrstuvwxyz";
+		ReversedCharSequence rcs = new ReversedCharSequence(s, 12);
+		for (int i = 0; i < rcs.length(); i++) {
+			assertTrue(s.charAt(i) == rcs.charAt(rcs.translate(i)));
+			assertTrue(rcs.charAt(i) == s.charAt(rcs.translate(i)));
+		}
+	}
+
+	@Test
+	public void translationTest3() {
+		String s = "abcdefghijklmnopqrstuvwxyz";
+		ReversedCharSequence rcs = new ReversedCharSequence(s, 12, 2);
+		for (int i = 0; i < rcs.length(); i++) {
+			char c1 = rcs.charAt(i), c2 = s.charAt(rcs.translate(i));
+			assertTrue(c1 == c2);
+		}
 	}
 
 	@Test

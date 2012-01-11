@@ -354,6 +354,10 @@ public class Grammar implements Serializable, Cloneable {
 	 */
 	private boolean validated = false;
 	private Set<Rule> ruleSet;
+	/**
+	 * The set of rules that can begin a match.
+	 */
+	private Set<String> initialRules;
 
 	/**
 	 * Delegates to {@link #Grammar(String[], Map)}, setting the second
@@ -1101,6 +1105,10 @@ public class Grammar implements Serializable, Cloneable {
 			final GlobalState options, final Map<Integer, CachedMatch>[] cache) {
 		final Set<Integer> startOffsets = new HashSet<Integer>();
 		if (options.study) {
+			Set<String> initialRules = initialRules();
+			// collect offsets from initial rules
+			// study terminal rules, skipping initials and reversed two-way
+			// reverse caches of reversed two-way rules
 			Set<Rule> studiedRules = new HashSet<Rule>();
 			if (options.containsCycles) {
 				for (Rule r : rules()) {
@@ -1124,6 +1132,23 @@ public class Grammar implements Serializable, Cloneable {
 						.addAll(root.study(s, cache, studiedRules, options));
 		}
 		return startOffsets;
+	}
+
+	/**
+	 * @return set of rules that can begin a match
+	 */
+	private synchronized Set<String> initialRules() {
+		if (initialRules == null) {
+			initialRules = new HashSet<String>(rules().size());
+			root.initialRules(initialRules);
+			for (Rule r : rules()) {
+				if (initialRules.contains(r.uid())) {
+					if (r instanceof NonterminalRule)
+						initialRules.remove(r.uid());
+				}
+			}
+		}
+		return new HashSet<String>(initialRules);
 	}
 
 	private synchronized Set<Rule> rules() {

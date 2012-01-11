@@ -15,7 +15,8 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class RepetitionRule extends Rule implements Serializable {
+public class RepetitionRule extends Rule implements Serializable,
+		NonterminalRule {
 	private static final long serialVersionUID = 3L;
 	Rule r;
 	final Repetition repetition;
@@ -429,6 +430,14 @@ public class RepetitionRule extends Rule implements Serializable {
 		if (!set.contains(this)) {
 			set.add(this);
 			r.subRules(set);
+		}
+	}
+
+	@Override
+	protected void initialRules(Set<String> initialRules) {
+		if (!initialRules.contains(uid())) {
+			initialRules.add(uid());
+			r.initialRules(initialRules);
 		}
 	}
 }

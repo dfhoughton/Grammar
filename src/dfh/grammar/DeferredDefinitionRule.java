@@ -20,7 +20,8 @@ import java.util.Set;
  * @author David Houghton
  * 
  */
-public class DeferredDefinitionRule extends Rule implements Serializable {
+public class DeferredDefinitionRule extends Rule implements Serializable,
+		NonterminalRule {
 	private static final long serialVersionUID = 3L;
 	/**
 	 * Holds rule whose definition is deferred.
@@ -133,6 +134,14 @@ public class DeferredDefinitionRule extends Rule implements Serializable {
 		if (!set.contains(this)) {
 			set.add(this);
 			r.subRules(set);
+		}
+	}
+
+	@Override
+	protected void initialRules(Set<String> initialRules) {
+		if (!initialRules.contains(uid())) {
+			initialRules.add(uid());
+			r.initialRules(initialRules);
 		}
 	}
 }

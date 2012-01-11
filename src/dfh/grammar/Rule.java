@@ -288,6 +288,15 @@ public abstract class Rule {
 			GlobalState options);
 
 	/**
+	 * For recursively searching the rules for ones that might begin a match.
+	 * 
+	 * @param initialRules
+	 */
+	protected void initialRules(Set<String> initialRules) {
+		initialRules.add(uid());
+	}
+
+	/**
 	 * Returns whether this rule can match the null string. This method is used
 	 * in {@link #study(CharSequence, Map, Set, GlobalState) studying} in
 	 * {@link CharSequence}. When in doubt, default to <code>true</code>. This

@@ -22,7 +22,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class CyclicRule extends Rule implements Serializable {
+public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 	private static final long serialVersionUID = 3L;
 	Rule r;
 
@@ -124,6 +124,14 @@ public class CyclicRule extends Rule implements Serializable {
 		if (!set.contains(this)) {
 			set.add(this);
 			r.subRules(set);
+		}
+	}
+
+	@Override
+	protected void initialRules(Set<String> initialRules) {
+		if (!initialRules.contains(uid())) {
+			initialRules.add(uid());
+			r.initialRules(initialRules);
 		}
 	}
 }

@@ -14,7 +14,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class Assertion extends Rule implements Serializable {
+public class Assertion extends Rule implements Serializable, NonterminalRule {
 	private static final long serialVersionUID = 3L;
 
 	private class AssertionMatcher extends Matcher {

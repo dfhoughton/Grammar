@@ -19,7 +19,8 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class AlternationRule extends Rule implements Serializable {
+public class AlternationRule extends Rule implements Serializable,
+		NonterminalRule {
 	private static final long serialVersionUID = 3L;
 
 	private class AlternationMatcher extends NonterminalMatcher {
@@ -277,6 +278,15 @@ public class AlternationRule extends Rule implements Serializable {
 			set.add(this);
 			for (Rule r : alternates)
 				r.subRules(set);
+		}
+	}
+
+	@Override
+	protected void initialRules(Set<String> initialRules) {
+		if (!initialRules.contains(uid())) {
+			initialRules.add(uid());
+			for (Rule r : alternates)
+				r.initialRules(initialRules);
 		}
 	}
 }
