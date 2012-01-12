@@ -136,4 +136,22 @@ public class DeferredDefinitionRule extends Rule implements Serializable,
 			r.initialRules(initialRules);
 		}
 	}
+
+	@Override
+	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+		if (cache.containsKey(uid())) {
+			Boolean b = cache.get(uid());
+			if (b == null) {
+				// recursion, we bail
+				b = true;
+				cache.put(uid(), b);
+			}
+			return b;
+		} else {
+			cache.put(uid(), null);
+			Boolean b = r.mightBeZeroWidth(cache);
+			cache.put(uid(), b);
+			return b;
+		}
+	}
 }

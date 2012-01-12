@@ -113,4 +113,10 @@ public class BacktrackingBarrier extends Rule implements Serializable,
 	protected Rule sClone() {
 		return new BacktrackingBarrier(isSingle);
 	}
+
+	@Override
+	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+		cache.put(uid(), true);
+		return true;
+	}
 }

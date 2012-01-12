@@ -59,6 +59,7 @@ public abstract class Rule {
 	 * That is, it is a pure "named capture".
 	 */
 	protected Set<String> labels;
+	protected boolean mayBeZeroWidth = true;
 
 	protected String wrap(StringBuilder b) {
 		if (!(labels == null || labels.isEmpty())) {
@@ -512,4 +513,12 @@ public abstract class Rule {
 	public boolean isReversed() {
 		return uid().endsWith(Assertion.REVERSAL_SUFFIX);
 	}
+
+	/**
+	 * Used to calculate start offsets when studying.
+	 * 
+	 * @param cache
+	 * @return whether the rule could ever return a zero-width match
+	 */
+	protected abstract Boolean mightBeZeroWidth(Map<String, Boolean> cache);
 }

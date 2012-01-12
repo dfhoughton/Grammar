@@ -14,8 +14,6 @@ import java.util.Set;
  * 
  * which will match <i>(*)</i>, <i>((*))</i>, <i>(((*)))</i>, etc.
  * 
- * TODO: make cyclic rules reversible
- * 
  * <b>Creation date:</b> Mar 25, 2011
  * 
  * @author David Houghton
@@ -124,6 +122,24 @@ public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 		if (!initialRules.contains(uid())) {
 			initialRules.add(uid());
 			r.initialRules(initialRules);
+		}
+	}
+
+	@Override
+	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+		if (cache.containsKey(uid())) {
+			Boolean b = cache.get(uid());
+			if (b == null) {
+				// recursion, we bail
+				b = true;
+				cache.put(uid(), b);
+			}
+			return b;
+		} else {
+			cache.put(uid(), null);
+			Boolean b = r.mightBeZeroWidth(cache);
+			cache.put(uid(), b);
+			return b;
 		}
 	}
 }

@@ -214,4 +214,13 @@ public class LeafRule extends Rule implements Serializable {
 	public Rule conditionalize(Condition c, String id) {
 		return new ConditionalLeafRule(this, c, id);
 	}
+
+	@Override
+	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+		// because you can have patterns like /(?<=\w)|./, it is quite difficult
+		// to determine analytically whether a pattern can ever have a
+		// zero-width match, so we bail
+		cache.put(uid(), true);
+		return true;
+	}
 }

@@ -264,4 +264,13 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 			r.subRules(set);
 		}
 	}
+
+	@Override
+	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+		if (!cache.containsKey(uid())) {
+			cache.put(uid(), true);
+			r.mightBeZeroWidth(cache);
+		}
+		return true;
+	}
 }

@@ -127,6 +127,11 @@ public class DeferredRuleTest {
 		public Object clone() {
 			return this;
 		}
+
+		@Override
+		protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+			return false;
+		}
 	}
 
 	@Test

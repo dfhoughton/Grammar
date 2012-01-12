@@ -282,4 +282,27 @@ public class AlternationRule extends Rule implements Serializable,
 				r.initialRules(initialRules);
 		}
 	}
+
+	@Override
+	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+		if (cache.containsKey(uid())) {
+			Boolean b = cache.get(uid());
+			if (b == null) {
+				// recursion; we bail
+				b = true;
+				cache.put(uid(), b);
+			}
+			return b;
+		} else {
+			cache.put(uid(), null);
+			boolean anyZero = false;
+			for (Rule r: alternates) {
+				anyZero |= r.mightBeZeroWidth(cache);
+				if (anyZero)
+					cache.put(uid(), true);
+			}
+			cache.put(uid(), anyZero);
+			return anyZero;
+		}
+	}
 }

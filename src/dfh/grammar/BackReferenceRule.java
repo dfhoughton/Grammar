@@ -130,4 +130,10 @@ public class BackReferenceRule extends Rule implements Serializable,
 				index);
 		return brr;
 	}
+
+	@Override
+	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+		cache.put(uid(), true);
+		return true;
+	}
 }

@@ -324,9 +324,32 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 			initialRules.add(uid());
 			for (Rule r : sequence) {
 				r.initialRules(initialRules);
-				if (!(r instanceof Assertion || r instanceof BacktrackingBarrier))
+				if (!r.mayBeZeroWidth)
 					break;
 			}
+		}
+	}
+
+	@Override
+	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+		if (cache.containsKey(uid())) {
+			Boolean b = cache.get(uid());
+			if (b == null) {
+				// recursion; we bail out
+				b = true;
+				cache.put(uid(), b);
+			}
+			return b;
+		} else {
+			cache.put(uid(), null);
+			boolean allZero = true;
+			for (Rule r : sequence) {
+				allZero &= r.mightBeZeroWidth(cache);
+				if (!allZero)
+					cache.put(uid(), false);
+			}
+			cache.put(uid(), allZero);
+			return allZero;
 		}
 	}
 }

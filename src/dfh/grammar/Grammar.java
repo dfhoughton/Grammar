@@ -1183,26 +1183,6 @@ public class Grammar implements Serializable, Cloneable {
 					}
 				}
 			}
-			if (options.containsCycles) {
-				for (Rule r : rules()) {
-					if (r instanceof AlternationRule
-							|| r instanceof SequenceRule
-							|| r instanceof RepetitionRule
-							|| r instanceof CyclicRule)
-						continue;
-					// TODO take care for reversed terminal rules here
-					if (r.isReversed())
-						;// do thing appropriate for reversed rules
-					else {
-						startOffsets.addAll(r.study(s, cache, studiedRules,
-								options));
-						// TODO again; special care must be taken here for
-						// reversed rules
-					}
-				}
-			} else
-				startOffsets
-						.addAll(root.study(s, cache, studiedRules, options));
 		}
 		return startOffsets;
 	}
@@ -1238,6 +1218,16 @@ public class Grammar implements Serializable, Cloneable {
 	 */
 	private synchronized void initialRules() {
 		if (initialRules == null) {
+			Map<String, Boolean> zeroMap = new HashMap<String, Boolean>(rules()
+					.size());
+			root.mightBeZeroWidth(zeroMap);
+			for (Rule r : rules()) {
+				Boolean b = zeroMap.get(r.uid());
+				if (b == null)
+					throw new GrammarException("logic error: rule " + r
+							+ " never evaluated by Rule.mightBeZeroWidth()");
+				r.mayBeZeroWidth = b;
+			}
 			initialRules = new HashSet<String>(rules().size());
 			terminalRules = new HashSet<String>(rules().size());
 			root.initialRules(initialRules);
