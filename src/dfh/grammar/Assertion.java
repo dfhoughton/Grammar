@@ -39,7 +39,7 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 				Map<Integer, CachedMatch>[] cache, Matcher master,
 				GlobalState gs) {
 			super(offset, master, gs);
-			this.cache = gs.backwardsCache;
+			this.cache = cache;
 			this.subCache = cache[rule().cacheIndex];
 			backward = true;
 		}
@@ -156,7 +156,7 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 			Matcher master) {
 		if (forward)
 			return new AssertionMatcher(offset, cache, master);
-		GlobalState gs = new GlobalState(master.options, cache);
+		GlobalState gs = master.options.reverse();
 		return new AssertionMatcher(offset, cache, master, gs);
 	}
 

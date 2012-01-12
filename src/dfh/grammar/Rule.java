@@ -125,8 +125,11 @@ public abstract class Rule {
 	}
 
 	protected void setUid() {
-		if (uid == null)
+		if (uid == null) {
 			uid = uniqueId();
+			if (label.id.endsWith(Assertion.REVERSAL_SUFFIX))
+				uid += Assertion.REVERSAL_SUFFIX;
+		}
 	}
 
 	/**

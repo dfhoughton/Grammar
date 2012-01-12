@@ -131,7 +131,7 @@ public class AssertionTest {
 	}
 
 	@Test
-	public void nativePostiveAssertionSimple() throws GrammarException,
+	public void nativePositiveAssertionSimple() throws GrammarException,
 			IOException {
 		String[] rules = {
 				//
@@ -163,7 +163,7 @@ public class AssertionTest {
 	}
 
 	@Test
-	public void nativePostiveAssertionComplex() throws GrammarException,
+	public void nativePositiveAssertionComplex() throws GrammarException,
 			IOException {
 		String[] rules = {
 				//
@@ -225,7 +225,7 @@ public class AssertionTest {
 	}
 
 	@Test
-	public void nativePostiveAssertionCompilationComplex2()
+	public void nativePositiveAssertionCompilationComplex2()
 			throws GrammarException, IOException {
 		try {
 			String[] rules = {
@@ -240,7 +240,7 @@ public class AssertionTest {
 	}
 
 	@Test
-	public void nativePostiveAssertionCompilationSimple2()
+	public void nativePositiveAssertionCompilationSimple2()
 			throws GrammarException, IOException {
 		try {
 			String[] rules = {
@@ -255,7 +255,7 @@ public class AssertionTest {
 	}
 
 	@Test
-	public void nativePostiveBackwardsAssertion() throws GrammarException,
+	public void nativePositiveBackwardsAssertion() throws GrammarException,
 			IOException {
 		String[] rules = {
 				//
@@ -353,7 +353,7 @@ public class AssertionTest {
 	}
 
 	@Test
-	public void nativePostiveBackwardsWithBackReference()
+	public void nativePositiveBackwardsWithBackReference()
 			throws GrammarException, IOException {
 		String[] rules = {
 		//
@@ -370,7 +370,7 @@ public class AssertionTest {
 	}
 
 	@Test
-	public void nativePostiveBackwardsWithDoubleBackReference()
+	public void nativePositiveBackwardsWithDoubleBackReference()
 			throws GrammarException, IOException {
 		String[] rules = {
 		//

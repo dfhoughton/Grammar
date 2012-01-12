@@ -1,8 +1,6 @@
 package dfh.grammar;
 
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Immutable* data structure holding match options.
@@ -16,12 +14,10 @@ import java.util.Map;
  * 
  */
 public class GlobalState {
-	public final boolean allowOverlap, study, containsCycles, reversed,
-			keepRightmost;
+	public final boolean allowOverlap, study, containsCycles, keepRightmost;
 	public final int start, end, rcsEnd;
 	public final PrintStream trace;
 	public final boolean debug;
-	public final Map<Integer, CachedMatch>[] backwardsCache;
 	public final int maxDepth;
 	public final CharSequence cs;
 	public final ReversedCharSequence rcs;
@@ -36,29 +32,36 @@ public class GlobalState {
 	GlobalState(CharSequence cs, Options o, boolean containsCycles) {
 		this(cs, new ReversedCharSequence(cs), false, o.allowOverlap, o.start,
 				o.end, o.maxRecursionDepth, o.trace, o.study, containsCycles,
-				o.keepRightmost, null);
+				o.keepRightmost);
 	}
-
+	
+	private GlobalState(GlobalState gs) {
+		this.cs = gs.cs;
+		this.rcs = gs.rcs;
+		this.isReversed = !gs.isReversed;
+		this.allowOverlap = gs.allowOverlap;
+		this.start = gs.start;
+		this.end = gs.end;
+		this.maxDepth = gs.maxDepth;
+		this.trace = gs.trace;
+		this.keepRightmost = gs.keepRightmost;
+		this.debug = gs.debug;
+		this.rcsEnd = gs.rcsEnd;
+		this.study = gs.study;
+		this.containsCycles = gs.containsCycles;
+	}
+	
 	/**
-	 * Constructor called in {@link Assertion} only.
-	 * 
-	 * @param end
-	 * 
-	 * @param o
-	 * @param backwardsCache
+	 * @return {@link GlobalState} for use in backwards {@link Assertion}
 	 */
-	GlobalState(GlobalState gs, Map<Integer, CachedMatch>[] backwardsCache) {
-		this(gs.cs, gs.rcs, !gs.isReversed, gs.allowOverlap, 0, gs.end,
-				gs.maxDepth, gs.trace, false, false, gs.keepRightmost,
-				backwardsCache);
+	GlobalState reverse() {
+		return new GlobalState(this);
 	}
 
-	@SuppressWarnings("unchecked")
 	private GlobalState(CharSequence cs, ReversedCharSequence rcs,
 			boolean isReversed, boolean allowOverlap, int start, int end,
 			int maxDepth, PrintStream trace, boolean study,
-			boolean containsCycles, boolean keepRightmost,
-			Map<Integer, CachedMatch>[] backwardsCache) {
+			boolean containsCycles, boolean keepRightmost) {
 		this.cs = cs;
 		this.rcs = rcs;
 		this.isReversed = isReversed;
@@ -70,19 +73,8 @@ public class GlobalState {
 		this.containsCycles = containsCycles;
 		this.keepRightmost = keepRightmost;
 		this.debug = trace != null;
-		if (backwardsCache != null) {
-			this.study = false;
-			this.reversed = true;
-			this.backwardsCache = new Map[backwardsCache.length];
-			for (int i = 0; i < backwardsCache.length; i++) {
-				this.backwardsCache[i] = new HashMap<Integer, CachedMatch>();
-			}
-		} else {
-			this.study = study;
-			this.reversed = false;
-			this.backwardsCache = null;
-		}
 		this.rcsEnd = rcs.translate(start) + 1;
+		this.study = study;
 	}
 
 	/**
@@ -114,6 +106,6 @@ public class GlobalState {
 	public String toString() {
 		return "[overlap: " + allowOverlap + "; study: " + study + "; start: "
 				+ start + "; end: " + end + "; debug: " + debug + "; cycles: "
-				+ containsCycles + "; reversed: " + reversed + "]";
+				+ containsCycles;
 	}
 }

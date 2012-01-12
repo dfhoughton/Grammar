@@ -924,10 +924,8 @@ public class Grammar implements Serializable, Cloneable {
 		// look for reversals
 		for (Rule r : rules()) {
 			r.setUid();
-			if (r.isReversed()) {
+			if (r.isReversed()) 
 				containsReversal = true;
-				break;
-			}
 		}
 		// fix tag maps in alternations
 		root.fixAlternation();

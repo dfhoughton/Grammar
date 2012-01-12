@@ -55,7 +55,7 @@ public abstract class Matcher {
 	 * @param ruleStates
 	 */
 	Matcher(Integer offset, Matcher master, GlobalState options) {
-		this.s = options.isReversed ? options.rcs : options.cs;
+		this.s = options.seq();
 		this.offset = offset;
 		this.master = master;
 		this.options = options;
