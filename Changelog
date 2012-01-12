@@ -1,5 +1,6 @@
 1.10
   * improved studying algorithm
+  * study now works for backwards assertions as well as forwards
 
 1.09, 8 January 2012
   * added '!' as a synonym of 'not' and removed requirement for a space after,

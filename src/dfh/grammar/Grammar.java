@@ -363,10 +363,6 @@ public class Grammar implements Serializable, Cloneable {
 	 */
 	private boolean containsReversal = false;
 	/**
-	 * Set of uids for reversed rules that are never used in non-reversed forms.
-	 */
-	private Set<String> onlyReversed = null;
-	/**
 	 * Collection of terminal rules to be used in studying.
 	 */
 	private HashSet<String> terminalRules = null;
@@ -921,16 +917,20 @@ public class Grammar implements Serializable, Cloneable {
 	 *         known not to match
 	 */
 	private Map<Integer, CachedMatch>[] offsetCache(Options options) {
-		// look for reversals
-		for (Rule r : rules()) {
-			r.setUid();
-			if (r.isReversed()) 
-				containsReversal = true;
+		if (initialRules == null) {
+			synchronized (this) {
+				// look for reversals
+				for (Rule r : rules()) {
+					r.setUid();
+					if (r.isReversed())
+						containsReversal = true;
+				}
+				// fix tag maps in alternations
+				root.fixAlternation();
+				// create actual offset cache
+				root.setCacheIndex(new HashMap<String, Integer>());
+			}
 		}
-		// fix tag maps in alternations
-		root.fixAlternation();
-		// create actual offset cache
-		root.setCacheIndex(new HashMap<String, Integer>());
 		int max = root.maxCacheIndex(-1, new HashSet<Rule>());
 		@SuppressWarnings("unchecked")
 		Map<Integer, CachedMatch>[] offsetCache = new Map[max + 1];
@@ -1140,8 +1140,8 @@ public class Grammar implements Serializable, Cloneable {
 							if (containsReversal && r.isReversed())
 								continue;
 							r.study(s, cache, studiedRules, options);
+							done.add(r.uid());
 						}
-						done.add(r.uid());
 					}
 				}
 				if (containsReversal) {
@@ -1175,8 +1175,8 @@ public class Grammar implements Serializable, Cloneable {
 								} else
 									r.study(options.rcs, cache, studiedRules,
 											options);
+								done.add(r.uid());
 							}
-							done.add(r.uid());
 						}
 					}
 				}
@@ -1201,10 +1201,11 @@ public class Grammar implements Serializable, Cloneable {
 		Map<Integer, CachedMatch> reverse = new HashMap<Integer, CachedMatch>(
 				countercache.size());
 		for (Entry<Integer, CachedMatch> e : countercache.entrySet()) {
-			int offset = rcs.translate(e.getKey());
 			CachedMatch cm = e.getValue();
-			Match m = new Match(r, rcs.translate(cm.m.end()),
-					rcs.translate(cm.m.start()));
+			int start = rcs.translate(cm.m.end() - 1), end = start
+					+ cm.m.length();
+			int offset = start;
+			Match m = new Match(r, start, end);
 			CachedMatch rcm = new CachedMatch(m);
 			reverse.put(offset, rcm);
 		}
@@ -1234,21 +1235,6 @@ public class Grammar implements Serializable, Cloneable {
 					initialRules.remove(r.uid());
 				else
 					terminalRules.add(r.uid());
-			}
-			if (containsReversal) {
-				onlyReversed = new HashSet<String>(terminalRules.size());
-				for (Rule r : rules()) {
-					String s = r.uid();
-					if (onlyReversed.contains(s))
-						continue;
-					if (s.endsWith(Assertion.REVERSAL_SUFFIX)) {
-						if (!terminalRules.contains(s.substring(0, s.length()
-								- Assertion.REVERSAL_SUFFIX.length())))
-							onlyReversed.add(s);
-					}
-				}
-			} else {
-				onlyReversed = new HashSet<String>(0);
 			}
 		}
 	}

@@ -22,7 +22,7 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 . clean up uid() uniqueId() business
 * makes description() include tags
 * add 'before', 'after', 'notbefore', 'notafter' as synonyms for ~/~+, ~-, !/!+, !- respectively
-. make assertions studiable
+* make assertions studiable
 * modify lookbehinds to use a single reversed character sequence
 * make conditions log their activity
 * create more thorough unit tests for complex conditions
