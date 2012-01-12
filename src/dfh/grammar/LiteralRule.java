@@ -198,7 +198,7 @@ public class LiteralRule extends Rule implements Serializable {
 	}
 
 	@Override
-	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+	protected Boolean mayBeZeroWidth(Map<String, Boolean> cache) {
 		Boolean b = literal.length() == 0;
 		cache.put(uid(), b);
 		return b;

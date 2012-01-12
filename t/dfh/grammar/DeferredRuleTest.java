@@ -129,7 +129,7 @@ public class DeferredRuleTest {
 		}
 
 		@Override
-		protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+		protected Boolean mayBeZeroWidth(Map<String, Boolean> cache) {
 			return false;
 		}
 	}

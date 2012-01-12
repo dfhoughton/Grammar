@@ -132,7 +132,7 @@ public class BackReferenceRule extends Rule implements Serializable,
 	}
 
 	@Override
-	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+	protected Boolean mayBeZeroWidth(Map<String, Boolean> cache) {
 		cache.put(uid(), true);
 		return true;
 	}

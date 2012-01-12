@@ -284,7 +284,7 @@ public class AlternationRule extends Rule implements Serializable,
 	}
 
 	@Override
-	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+	protected Boolean mayBeZeroWidth(Map<String, Boolean> cache) {
 		if (cache.containsKey(uid())) {
 			Boolean b = cache.get(uid());
 			if (b == null) {
@@ -297,7 +297,7 @@ public class AlternationRule extends Rule implements Serializable,
 			cache.put(uid(), null);
 			boolean anyZero = false;
 			for (Rule r: alternates) {
-				anyZero |= r.mightBeZeroWidth(cache);
+				anyZero |= r.mayBeZeroWidth(cache);
 				if (anyZero)
 					cache.put(uid(), true);
 			}

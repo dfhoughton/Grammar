@@ -515,10 +515,14 @@ public abstract class Rule {
 	}
 
 	/**
-	 * Used to calculate start offsets when studying.
+	 * Used to calculate start offsets when studying. Used to set
+	 * {@link #mayBeZeroWidth} required by
+	 * {@link SequenceRule#initialRules(Set)}.
 	 * 
 	 * @param cache
+	 *            for keeping track of visited rules and caching the results of
+	 *            the visits; prevents infinite recursive loops
 	 * @return whether the rule could ever return a zero-width match
 	 */
-	protected abstract Boolean mightBeZeroWidth(Map<String, Boolean> cache);
+	protected abstract Boolean mayBeZeroWidth(Map<String, Boolean> cache);
 }

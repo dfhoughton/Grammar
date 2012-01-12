@@ -126,7 +126,7 @@ public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 	}
 
 	@Override
-	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+	protected Boolean mayBeZeroWidth(Map<String, Boolean> cache) {
 		if (cache.containsKey(uid())) {
 			Boolean b = cache.get(uid());
 			if (b == null) {
@@ -137,7 +137,7 @@ public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 			return b;
 		} else {
 			cache.put(uid(), null);
-			Boolean b = r.mightBeZeroWidth(cache);
+			Boolean b = r.mayBeZeroWidth(cache);
 			cache.put(uid(), b);
 			return b;
 		}

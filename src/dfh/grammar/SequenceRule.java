@@ -331,7 +331,7 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 	}
 
 	@Override
-	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+	protected Boolean mayBeZeroWidth(Map<String, Boolean> cache) {
 		if (cache.containsKey(uid())) {
 			Boolean b = cache.get(uid());
 			if (b == null) {
@@ -344,7 +344,7 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 			cache.put(uid(), null);
 			boolean allZero = true;
 			for (Rule r : sequence) {
-				allZero &= r.mightBeZeroWidth(cache);
+				allZero &= r.mayBeZeroWidth(cache);
 				if (!allZero)
 					cache.put(uid(), false);
 			}

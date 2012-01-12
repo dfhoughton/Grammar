@@ -138,7 +138,7 @@ public class DeferredDefinitionRule extends Rule implements Serializable,
 	}
 
 	@Override
-	protected Boolean mightBeZeroWidth(Map<String, Boolean> cache) {
+	protected Boolean mayBeZeroWidth(Map<String, Boolean> cache) {
 		if (cache.containsKey(uid())) {
 			Boolean b = cache.get(uid());
 			if (b == null) {
@@ -149,7 +149,7 @@ public class DeferredDefinitionRule extends Rule implements Serializable,
 			return b;
 		} else {
 			cache.put(uid(), null);
-			Boolean b = r.mightBeZeroWidth(cache);
+			Boolean b = r.mayBeZeroWidth(cache);
 			cache.put(uid(), b);
 			return b;
 		}

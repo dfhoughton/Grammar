@@ -1220,7 +1220,7 @@ public class Grammar implements Serializable, Cloneable {
 		if (initialRules == null) {
 			Map<String, Boolean> zeroMap = new HashMap<String, Boolean>(rules()
 					.size());
-			root.mightBeZeroWidth(zeroMap);
+			root.mayBeZeroWidth(zeroMap);
 			for (Rule r : rules()) {
 				Boolean b = zeroMap.get(r.uid());
 				if (b == null)
