@@ -36,7 +36,4 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 . make sure conditionalized terminals are being cached properly
 . profile some matching to figure out what could be optimized
 * fix studying of cyclic grammars
-
-completed
-=========
 * simplify study method given improved studying algorithm
