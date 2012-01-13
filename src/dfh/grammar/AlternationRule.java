@@ -153,12 +153,9 @@ public class AlternationRule extends Rule implements Serializable,
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
-			GlobalState options) {
-		Set<Integer> startOffsets = new HashSet<Integer>();
-		for (Rule r : alternates)
-			startOffsets.addAll(r.study(s, cache, studiedRules, options));
-		return startOffsets;
+			Map<Integer, CachedMatch>[] cache, GlobalState options) {
+		// non-terminal rules don't study
+		return null;
 	}
 
 	@Override
@@ -296,7 +293,7 @@ public class AlternationRule extends Rule implements Serializable,
 		} else {
 			cache.put(uid(), null);
 			boolean anyZero = false;
-			for (Rule r: alternates) {
+			for (Rule r : alternates) {
 				anyZero |= r.mayBeZeroWidth(cache);
 				if (anyZero)
 					cache.put(uid(), true);

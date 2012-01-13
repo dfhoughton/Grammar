@@ -107,8 +107,7 @@ public class DeferredRuleTest {
 
 		@Override
 		public Set<Integer> study(CharSequence s,
-				Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
-				GlobalState options) {
+				Map<Integer, CachedMatch>[] cache, GlobalState options) {
 			// we won't study for this
 			return null;
 		}

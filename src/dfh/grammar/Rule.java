@@ -281,15 +281,12 @@ public abstract class Rule {
 	 *            {@link CharSequence} to be matched against
 	 * @param cache
 	 *            match cache that will be used
-	 * @param studiedRules
-	 *            cache to forestall the re-studying of a rule
 	 * @param options
 	 *            {@link GlobalState} in use in this match
 	 * @return set of start offsets of matches
 	 */
 	public abstract Set<Integer> study(CharSequence s,
-			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
-			GlobalState options);
+			Map<Integer, CachedMatch>[] cache, GlobalState options);
 
 	/**
 	 * For recursively searching the rules for ones that might begin a match.

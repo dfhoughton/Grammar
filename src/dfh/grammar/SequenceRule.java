@@ -196,24 +196,9 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
-			GlobalState options) {
-		Set<Integer> startOffsets = null;
-		boolean foundStarts = false;
-		for (Rule r : sequence) {
-			if (foundStarts) {
-				r.study(s, cache, studiedRules, options);
-				continue;
-			}
-			Set<Integer> set = r.study(s, cache, studiedRules, options);
-			if (startOffsets == null)
-				startOffsets = new HashSet<Integer>(set);
-			else
-				startOffsets.addAll(set);
-			if (!r.zeroWidth())
-				foundStarts = true;
-		}
-		return startOffsets;
+			Map<Integer, CachedMatch>[] cache, GlobalState options) {
+		// non-terminal rules don't study
+		return null;
 	}
 
 	@Override

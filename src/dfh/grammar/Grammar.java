@@ -1122,12 +1122,10 @@ public class Grammar implements Serializable, Cloneable {
 			Set<String> done = new HashSet<String>(rules.size());
 			// collect offsets from initial rules
 			initialRules();
-			Set<Rule> studiedRules = new HashSet<Rule>(rules().size());
 			for (Rule r : rules()) {
 				if (initialRules.contains(r.uid())) {
 					if (!done.contains(r.uid()))
-						startOffsets.addAll(r.study(s, cache, studiedRules,
-								options));
+						startOffsets.addAll(r.study(s, cache, options));
 					done.add(r.uid());
 				}
 			}
@@ -1139,7 +1137,7 @@ public class Grammar implements Serializable, Cloneable {
 						if (!done.contains(r.uid())) {
 							if (containsReversal && r.isReversed())
 								continue;
-							r.study(s, cache, studiedRules, options);
+							r.study(s, cache, options);
 							done.add(r.uid());
 						}
 					}
@@ -1170,11 +1168,9 @@ public class Grammar implements Serializable, Cloneable {
 										|| (r instanceof LiteralRule && ((LiteralRule) r).c == null)) {
 									if (reversed == null)
 										reversed = options.rcs.toString();
-									r.study(reversed, cache, studiedRules,
-											options);
+									r.study(reversed, cache, options);
 								} else
-									r.study(options.rcs, cache, studiedRules,
-											options);
+									r.study(options.rcs, cache, options);
 								done.add(r.uid());
 							}
 						}

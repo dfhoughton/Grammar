@@ -168,15 +168,10 @@ public class LeafRule extends Rule implements Serializable {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
-			GlobalState options) {
+			Map<Integer, CachedMatch>[] cache, GlobalState options) {
 		Map<Integer, CachedMatch> subCache = cache[cacheIndex];
 		Set<Integer> startOffsets = new HashSet<Integer>();
 		if (subCache.keySet().isEmpty()) {
-			if (studiedRules.contains(this))
-				return startOffsets;
-			else
-				studiedRules.add(this);
 			java.util.regex.Matcher m = p.matcher(s);
 			m.useAnchoringBounds(false);
 			m.useTransparentBounds(true);

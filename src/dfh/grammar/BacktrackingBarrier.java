@@ -1,7 +1,6 @@
 package dfh.grammar;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -98,10 +97,9 @@ public class BacktrackingBarrier extends Rule implements Serializable,
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
-			GlobalState options) {
-		// one cannot study barriers
-		return new HashSet<Integer>(0);
+			Map<Integer, CachedMatch>[] cache, GlobalState options) {
+		// non-terminal rules don't study
+		return null;
 	}
 
 	@Override

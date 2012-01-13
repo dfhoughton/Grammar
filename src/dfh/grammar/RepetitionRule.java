@@ -336,9 +336,9 @@ public class RepetitionRule extends Rule implements Serializable,
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
-			GlobalState options) {
-		return r.study(s, cache, studiedRules, options);
+			Map<Integer, CachedMatch>[] cache, GlobalState options) {
+		// non-terminal rules don't study
+		return null;
 	}
 
 	@Override

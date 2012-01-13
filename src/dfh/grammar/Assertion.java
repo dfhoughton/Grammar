@@ -1,7 +1,6 @@
 package dfh.grammar;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -197,12 +196,9 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 
 	@Override
 	public Set<Integer> study(CharSequence s,
-			Map<Integer, CachedMatch>[] cache, Set<Rule> studiedRules,
-			GlobalState options) {
-		// we don't keep assertion offsets; they would be redundant
-		if (forward)
-			r.study(s, cache, studiedRules, options);
-		return new HashSet<Integer>(0);
+			Map<Integer, CachedMatch>[] cache, GlobalState options) {
+		// non-terminal rules don't study
+		return null;
 	}
 
 	@Override
