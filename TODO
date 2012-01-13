@@ -1,5 +1,17 @@
 Desired items are preceded by a '.'; completed items, by a '*'; discarded items, by a '-'.
+From time to time I will move the set of completed or discarded items to the COMPLETED
+section at the end of the document.
 
+. add zero-width optimizations to conditionalized leaf rules
+. allow notation to selectively disable studying of certain expressions
+. clean up uid() uniqueId() business
+. create xpath-like convention for searching matches
+. make sure conditionalized terminals are being cached properly
+. make sure non-terminal matches are using their subcache
+. profile some matching to figure out what could be optimized
+
+COMPLETED
+=========
 * change parsing rules so that angle brackets are only required to the right of '='
 * parameterize describe() so it either alphabetizes of lists rules in order of dependence
 - implement regex reversal
@@ -12,14 +24,10 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 * preserve rightmost offset matched to to improve debugging
 * allow boolean combinations of conditions
 * allow special notation for non-reversible, non-same-rule backreferences
-. allow notation to selectively disable studying of certain expressions
 * call setGroup() on righmost match in event of failure
-. make sure non-terminal matches are using their subcache
-. add zero-width optimizations to conditionalized leaf rules
 * add labels() method to Match
 * make cyclic rules reversible
 * make use of root and rules field in Grammar more sane; perhaps eliminate latter altogether
-. clean up uid() uniqueId() business
 * makes description() include tags
 * add 'before', 'after', 'notbefore', 'notafter' as synonyms for ~/~+, ~-, !/!+, !- respectively
 * make assertions studiable
@@ -27,13 +35,10 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 * make conditions log their activity
 * create more thorough unit tests for complex conditions
 * rename searching methods in Match to make them more intuitive
-. create xpath-like convention for searching matches
 * create single-line Grammar constructor and string LineReader
 * construct round trip tests for Grammar.description()
 * remove Serializable constraint on Rule
 * fix reversed rule logging bug
 * change stack separator in logging so it doesn't look like a backtracking barrier
-. make sure conditionalized terminals are being cached properly
-. profile some matching to figure out what could be optimized
 * fix studying of cyclic grammars
 * simplify study method given improved studying algorithm
