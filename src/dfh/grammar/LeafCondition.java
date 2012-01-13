@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @author David F. Houghton
  */
 class LeafCondition extends Condition implements Serializable {
-	private static final long serialVersionUID = 3L;
+	private static final long serialVersionUID = 4L;
 	protected String cnd;
 
 	LeafCondition(String cnd) {

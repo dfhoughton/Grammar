@@ -92,7 +92,7 @@ public class LiteralRule extends Rule implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 3L;
+	private static final long serialVersionUID = 4L;
 	protected final String literal;
 	protected Condition c;
 

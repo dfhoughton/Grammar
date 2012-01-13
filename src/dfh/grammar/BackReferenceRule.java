@@ -27,7 +27,7 @@ import dfh.grammar.SequenceRule.SequenceMatcher;
 @Reversible
 public class BackReferenceRule extends Rule implements Serializable,
 		NonterminalRule {
-	private static final long serialVersionUID = 3L;
+	private static final long serialVersionUID = 4L;
 	protected final int index;
 
 	private class BackReferenceMatcher extends Matcher {

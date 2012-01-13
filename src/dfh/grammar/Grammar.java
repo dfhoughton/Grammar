@@ -318,7 +318,7 @@ public class Grammar implements Serializable, Cloneable {
 		}
 	}
 
-	private static final long serialVersionUID = 3L;
+	private static final long serialVersionUID = 4L;
 	/**
 	 * {@link Label} of root {@link Rule}.
 	 */

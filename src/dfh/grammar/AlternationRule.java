@@ -21,7 +21,7 @@ import java.util.Set;
 @Reversible
 public class AlternationRule extends Rule implements Serializable,
 		NonterminalRule {
-	private static final long serialVersionUID = 3L;
+	private static final long serialVersionUID = 4L;
 
 	private class AlternationMatcher extends NonterminalMatcher {
 		int index = 0;
