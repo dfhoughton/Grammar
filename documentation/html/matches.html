@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>dfh.grammar.Grammar</title>
+<link href="../css/dfh.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="headers.json"></script>
+<script type="text/javascript" src="../scripts/pageutils.js"></script>
+</head>
+<body onLoad="dfh.prepare('working with matches', 'dfh.grammar')">
+	<h1>Working with Matches</h1>
+	<p>
+		Regular expressions make it very easy to find whether a string matches
+		a pattern and where. For finding how it matches -- what parts of the
+		string match what parts of the pattern -- their facilities are much
+		more limited: you can enclose parts of the pattern in parentheses,
+		creating matching groups. This is one respect in which
+		<code>dfh.grammar.Match</code>
+		objects shine: they represent the entire match tree. The problem them
+		is how to extract this information from the object. This section
+		explores the techniques available.
+	</p>
+	<span id="toc"></span>
+	<h2>Stringification</h2>
+	<p>
+		The
+		<code>dfh.grammar.Match</code>
+		object provides a
+		<code>toString()</code>
+		method that succinctly represents the entire match tree in a human
+		readable form. For debugging output and such this may suffice.
+	</p>
+	<pre>		String[] rules;
+		Grammar g;
+		Match m;
+		rules = new String[] {
+				//
+				"ROOT = &lt;foo&gt;",//
+				"foo = 'f' 'oo'",//
+		};
+		g = new Grammar(rules);
+		m = g.find("foo barquux foofoofoo quuxbar").match();
+		<b>System.out.println(m);</b>
+	</pre>
+	<p>produces</p>
+	<pre class="results">("f" "oo": 0, 3 [("f": 0, 1), ("oo": 1, 3)])</pre>
+	<p>The entire stringification is enclosed in round brackets.</p>
+	<pre class="results"><b>(</b>"f" "oo": 0, 3 [("f": 0, 1), ("oo": 1, 3)]<b>)</b></pre>
+	<p>The first item inside these parentheses is a label for the rule
+		generating the match.</p>
+	<pre class="results">(<b>"f" "oo"</b>: 0, 3 [("f": 0, 1), ("oo": 1, 3)])</pre>
+	<p>The label is separated from the remainder by a colon.</p>
+	<pre class="results">("f" "oo"<b>:</b> 0, 3 [("f": 0, 1), ("oo": 1, 3)])</pre>
+	<p>Immediately after the colon is a pair of integers represented
+		the start and end offsets of the match.</p>
+	<pre class="results">("f" "oo": <b>0, 3</b> [("f": 0, 1), ("oo": 1, 3)])</pre>
+	<p>The last item within the parentheses, occurring only in
+		non-terminal matches, is a list in square brackets of child matches.</p>
+	<pre class="results">("f" "oo": 0, 3 <b>[("f": 0, 1), ("oo": 1, 3)]</b>)</pre>
+	<p>As you can see, even a simple match may have a complex
+		stringification. If you don't find this Lisp-esque stringification to
+		your taste, or you need to do more than admire your matches, read on.</p>
+	<h2>Getting the Corresponding Text</h2>
+	<p>If you want the string matched, use the start and end offsets.</p>
+	<pre>String matched = s.substring(match.start(), match.end());</pre>
+	<h2>Walking the Match Tree</h2>
+</body>
+</html>
