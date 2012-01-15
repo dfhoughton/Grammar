@@ -4,14 +4,14 @@ package dfh.grammar;
  * {@link CharSequence} that allows the iteration over another
  * {@link CharSequence} in reverse. This is required for variable-length look
  * behind assertions.
- * 
+ * <p>
  * Note that this class merely tinkers with the index math to retrieve
  * characters from the underlying sequence. There is no requirement that the
  * underlying sequence be immutable, though you will not want to match against a
  * mutating sequence, and if the sequence shrinks you may get
  * {@link IndexOutOfBoundsException}. The reversed sequence assumes there will
  * always be characters at the indices initially in its range.
- * 
+ * <p>
  * <b>Creation date:</b> Apr 10, 2011
  * 
  * @author David Houghton

@@ -22,20 +22,28 @@
 	but the syntactic sugar provide by
 	<a
 		href="http://search.cpan.org/search?query=Regexp%3A%3AGrammars&mode=module">Regexp::Grammar</a>
-	adds another order or magnitude of awesomeness, and
+	is another order of magnitude better still, and
 	<a href="http://dev.perl.org/perl6/doc/design/exe/E05.html">Perl 6</a>
-	adds another level beyond that. Java's character class syntax is
-	similarly awesome, but Java regular expressions of any size are
-	unreadable I wanted me some of that compositional syntax and recursion.
-	Being too lazy to find someone else's solution, I decided to write one
-	myself. This library, which is still evolving but certainly usable, is
-	the product of this labor of obsession.
+	adds another level beyond that. I have long loved these character
+	pattern matching facilities and craved the same for Java, the language
+	which is my bread and butter.
+	</p>
+	<p>
+		Java's character class syntax is fabulous. I love being able to
+		combine character classes like sets. But Java regular expressions of
+		any size are unreadable, and there's no way to make them recursive.
+		Compositionality may be achieved to some extent by adding patterns
+		together like strings, but I wanted more. Being too lazy or selfish to
+		find someone else's solution<span class="fn">I love writing
+			code. Learning someone else's API is less thrilling.</span>, I decided to
+		write one myself. This library, which is still evolving but certainly
+		usable, is the product of this labor of obsession.
+	</p>
 	<span id="toc"></span>
 	<h2>The Basic Idea</h2>
 	<div>
 		The image above was produced by taking the grammar
-		<pre>
-&lt;ROOT&gt; = ~&lt;b&gt; &lt;g&gt; &lt;r&gt;?+ &lt;a&gt; &lt;m&gt;{2} &lt;a&gt; &lt;r&gt; ~&lt;b&gt;
+		<pre>&lt;ROOT&gt; = ~&lt;b&gt; &lt;g&gt; &lt;r&gt;?+ &lt;a&gt; &lt;m&gt;{2} &lt;a&gt; &lt;r&gt; ~&lt;b&gt;
 
    &lt;a&gt; = "a"
    &lt;b&gt; = / $ | ^ /x
@@ -46,8 +54,8 @@
 			I combined the two using the <code>MatchToDot</code> application
 			included with the <code>dfh.grammar</code> distribution, passing that
 			through <a href="http://www.graphviz.org/">GraphViz</a> and rescaling
-			the image a bit with <a href="http://inkscape.org/">Inkscape</a>. </span> As
-		you can see, a grammar looks a lot like a <a
+			the image a bit with <a href="http://inkscape.org/">Inkscape</a>.
+		</span> As you can see, a grammar looks a lot like a <a
 			href="http://en.wikipedia.org/wiki/Backus%E2%80%93Naur_Form">BNF
 			grammar</a>. It consists of a list of named rules. Rule names are
 		sequences of characters in the
@@ -55,8 +63,9 @@
 		class enclosed in angle brackets. Each line in the grammar consists of
 		a rule name, an equals sign, and a rule definition.<span class="fn">Or
 			a blank line or a comment beginning with <code>#</code>. Rule
-			definitions may also end in a comment.</span> The rule definition consists
-		of one or more elements optionally modified in various ways. A leading
+			definitions may also end in a comment.
+		</span> The rule definition consists of one or more elements optionally
+		modified in various ways. A leading
 		<code>~</code>
 		or
 		<code>!</code>
@@ -69,8 +78,8 @@
 			See <a href="syntax.html">syntax</a>. Of course, one may define a
 			terminal rule that provides a <code>java.util.regex.Pattern</code>
 			zero-width assertion, though the grammar will not be able to
-			recognize it as such.</span> Trailing suffixes familiar from Perl-style
-		regular expressions --
+			recognize it as such.
+		</span> Trailing suffixes familiar from Perl-style regular expressions --
 		<code>*?</code>
 		,
 		<code>{1,2}</code>
@@ -83,9 +92,10 @@
 	</div>
 	<div>
 		The atomic constituents of rules are literals, marked with single or
-		double quotes, and regular expression.<span class="fn">Or
+		double quotes, and regular expressions.<span class="fn">Or
 			arbitrary extensions of the <code>dfh.grammar.Rule</code>, as is
-			explained elsewhere.</span>
+			explained elsewhere.
+		</span>
 	</div>
 	<div>
 		Among the rules is a special rule called
@@ -100,6 +110,16 @@
 		<pre>
   \b(?i:g)\br?+am{2}ar\b</pre>
 	</div>
+	<h2>How it works</h2>
+	<p>This is roughly the algorithm in a nutshell: The grammar
+		compiles into a nonderministic finite state automaton. This automaton
+		examines symbols in two streams: the character sequence you give it
+		and a reversed version of this sequence for lookbehinds. To accelerate
+		matching, terminal matches are cached. Also, all rules cache offsets
+		at which they fail to match so they never attempt to match at such
+		offsets twice. Functionally identical rules share caches, so, for
+		example, a literal sub-rule in one rule will not attempt to match
+		where an identical literal from another rule has already been tried.</p>
 	<h2>Why?</h2>
 	<div>
 		So if grammars are basically regexes, why not use regexes? Well, for
@@ -111,9 +131,14 @@
 		<ul>
 			<li>Because they are built up compositionally, they are easier
 				to read.
+			<li>You can iterate over all possible matches of a patter
+				against a sequence, not just non-overlapping matches.
+			<li>You can create your own arbitrary extensions to <code>dfh.grammar.Rule</code>,
+				allowing matches against character sequences conditioned on
+				arbitrary meta-data, such as part of speech tags inferred by a
+				separate POS tagger.
 			<li>They can handle recursive rules.
-			<li>They can take arbitrary post-match conditions such as <pre>
-  &lt;a&gt; = /\b\d++/ (less_than_500)</pre>
+			<li>They can take arbitrary post-match conditions such as <pre>&lt;a&gt; = /\b\d++/ (less_than_500)</pre>
 			<li>They allow finer control of backtracking, potentially making
 				excessively complex pattern matching tractable.
 			<li>They provide debugging facilities that record a trace of the
@@ -162,7 +187,7 @@
 		Matcher m = g.lookingAt(s);
 		Match n = m.match();
 		System.out.println(n);
-		System.out.println(s.substring(n.start(), n.end()));</pre>
+		System.out.println(n.group());</pre>
 		produces
 		<pre class="results">(&lt;c&gt; &lt;d&gt;: 0, 3 [(&lt;a&gt;+: 0, 1 [(/a/: 0, 1)]), (&lt;a&gt; &lt;b&gt;: 1, 3 [(/a/: 1, 2), (/b/: 2, 3)])])
 aab</pre>
@@ -257,7 +282,7 @@ aab</pre>
                 Matcher m = g.find(s, opt);
                 Match n;
                 while ((n = m.match()) != null)
-                        System.out.println(s.substring(n.start(), n.end()));</pre>
+                        System.out.println(n.group());</pre>
 		produces
 		<pre class="results">2001/1/1</pre>
 	</div>
@@ -266,11 +291,11 @@ aab</pre>
 		different from post-filtering the results without the condition, but
 		it does illustrate the process. Within the grammar rules you only name
 		the condition. After grammar compilation you assign to this name an
-		instantiation of the
+		extension of the abstract class
 		<code>dfh.grammar.Condition</code>
-		interface. In complex grammars conditions can cause spurious matches
-		to fail quickly, accelerating the discovery of real matches. Also,
-		they enforce a declarative style which makes the logic of the grammar
+		. In complex grammars conditions can cause spurious matches to fail
+		quickly, accelerating the discovery of real matches. Also, they
+		enforce a declarative style which makes the logic of the grammar
 		easier to follow.
 	</div>
 </body>

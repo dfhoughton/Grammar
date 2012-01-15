@@ -335,7 +335,7 @@ public abstract class Rule {
 	 * @return clone of this {@link Rule} but not of any {@link Rule Rules} on
 	 *         which it is dependent
 	 */
-	public Rule shallowClone() {
+	public final Rule shallowClone() {
 		Rule ru = sClone();
 		if (labels != null)
 			ru.labels = new TreeSet<String>(labels);
@@ -369,7 +369,7 @@ public abstract class Rule {
 		label = new Label(label.t, s);
 	}
 
-	public Rule reLabel(String s) {
+	public Rule reLabel(String s) { // TODO needs documentation
 		throw new GrammarException(this.getClass() + " ");
 	}
 
