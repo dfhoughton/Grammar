@@ -28,52 +28,52 @@
 		<code>dfh.grammar</code>
 		expressed in its own formalism:
 	</div>
-	<pre>                &lt;ROOT&gt; = &lt;grammar&gt;
+                <pre>                   ROOT = &lt;padding&gt;*+ &lt;root&gt; &lt;definitions&gt;?+
 
-             &lt;grammar&gt; = &lt;padding&gt;* &lt;root&gt; &lt;post_root&gt;*
-           &lt;post_root&gt; = [ &lt;non_rule&gt; | &lt;rule&gt; ] &lt;nl&gt;
-                &lt;root&gt; = "&lt;ROOT&gt;" &lt;right_part&gt;
-                &lt;rule&gt; = "&lt;" &lt;identifier&gt; "&gt;" &lt;right_part&gt;
-          &lt;right_part&gt; = &lt;equals&gt; &lt;rule_body&gt;
-           &lt;rule_body&gt; = &lt;main_part&gt; [ &lt;space&gt;? &lt;condition&gt; ]? [ &lt;space&gt;? &lt;comment&gt; ]?
-           &lt;main_part&gt; = &lt;regex&gt; | &lt;element&gt;
-                 &lt;alt&gt; = &lt;element&gt; [ &lt;space&gt;? "|" &lt;element&gt; &lt;space&gt;? ]++
-           &lt;assertion&gt; = &lt;backtracking_barrier&gt; | &lt;forward_assertion&gt; | &lt;backward_assertion&gt;
-  &lt;backward_assertion&gt; = &lt;assertion_marker&gt; "-" &lt;space&gt;? &lt;delimited_element&gt;
-     &lt;complex_element&gt; = &lt;alt&gt; | &lt;seq&gt;
-   &lt;delimited_element&gt; = &lt;simple_element&gt; | "[" &lt;complex_element&gt; "]"
-             &lt;element&gt; = "[" &lt;element&gt; "]" | &lt;modifiable_element&gt; | &lt;assertion&gt;
-   &lt;forward_assertion&gt; = &lt;assertion_marker&gt; "+"? &lt;space&gt;? &lt;delimited_element&gt;
-  &lt;modifiable_element&gt; = &lt;simple_element&gt; | &lt;complex_element&gt;
-                 &lt;rep&gt; = &lt;delimited_element&gt; &lt;repetition&gt;
-                 &lt;seq&gt; = &lt;element&gt; [ &lt;space&gt;? [ &lt;element&gt; | &lt;d&gt;++ ] ]++
-      &lt;simple_element&gt; = &lt;id&gt; | &lt;literal&gt; | &lt;rep&gt;
-             &lt;literal&gt; = &lt;single_quote&gt; | &lt;double_quote&gt;
-             &lt;padding&gt; = &lt;non_rule&gt; &lt;nl&gt;
-           &lt;condition&gt; = "(" &lt;identifier&gt; ")"
-        &lt;double_quote&gt; = '"' [ &lt;ndq&gt; | &lt;escaped&gt; ]++ '"'
-                  &lt;id&gt; = "&lt;" &lt;identifier&gt; "&gt;"
-            &lt;non_rule&gt; = &lt;space&gt;? &lt;comment&gt;?
-          &lt;repetition&gt; = [ &lt;simple_rep&gt; | &lt;delimited_rep&gt; ] [ "?" | "+" ]?
-        &lt;single_quote&gt; = "'" [ &lt;nsq&gt; | &lt;escaped&gt; ]++ "'"
-    &lt;assertion_marker&gt; = "~" | "!"
-       &lt;backreference&gt; = &lt;d&gt;++
-&lt;backtracking_barrier&gt; = ":"{1,2}
-             &lt;comment&gt; = "#" &lt;dot&gt;*
-       &lt;delimited_rep&gt; = "{" [ &lt;d&gt;++ | "," &lt;d&gt;++ | &lt;d&gt;++ "," | &lt;d&gt;++ "," &lt;d&gt;++ ] "}"
-              &lt;equals&gt; = &lt;space&gt;? "=" &lt;space&gt;?
-             &lt;escaped&gt; = "\\\\" &lt;dot&gt;
-          &lt;identifier&gt; = &lt;w&gt;++
-               &lt;regex&gt; = "/" &lt;dot&gt;++ "/" &lt;regex_suffix&gt;?
-          &lt;simple_rep&gt; = "*" | "?" | "+"
-                   &lt;d&gt; = /\d/
-                 &lt;dot&gt; = /./
-                 &lt;ndq&gt; = /[^"\\]/
-                  &lt;nl&gt; = /\n/
-                 &lt;nsq&gt; = /[^'\\]/
-        &lt;regex_suffix&gt; = /[rimsdux]++/
-               &lt;space&gt; = /[\s&amp;&amp;[^\n]]++/
-                   &lt;w&gt; = /\w/</pre>
+            definitions = [ &lt;rule&gt; | &lt;padding&gt; ]++
+                   root = "&lt;"?+ "ROOT" 1 &lt;rule_body&gt;
+                   rule = &lt;rule_name&gt; &lt;rule_body&gt; &lt;nl&gt;
+              rule_body = &lt;s&gt; "=" &lt;s&gt; [ &lt;unbracketed_sequence&gt; | &lt;unbracketed_alternation&gt; ] &lt;condition&gt;?+ &lt;non_rule&gt;
+              condition = &lt;s&gt; &lt;cnd_group&gt;
+unbracketed_alternation = &lt;element&gt; [ &lt;s&gt; "|" &lt;s&gt; &lt;element&gt; ]++
+   unbracketed_sequence = ![ &lt;backref&gt; | &lt;ul_backref&gt; ] &lt;element&gt; [ &lt;s&gt; &lt;element&gt; ]*+
+            alternation = "[" &lt;tags&gt;?+ &lt;s&gt; &lt;element&gt; [ &lt;s&gt; "|" &lt;s&gt; &lt;element&gt; ]++ &lt;s&gt; "]"
+              assertion = &lt;assertion_type&gt; &lt;s&gt; &lt;element&gt;
+            cnd_element = &lt;identifier&gt; | &lt;cnd_group&gt;
+              cnd_group = "(" &lt;s&gt; &lt;cnd_element&gt; [ &lt;cnd_separator&gt; &lt;cnd_element&gt; ]*+ &lt;s&gt; ")"
+                element = &lt;sequence&gt; | &lt;alternation&gt; | &lt;repetition&gt; | &lt;zero_width&gt; | &lt;label&gt; | &lt;regex&gt; | &lt;literal&gt;
+             repetition = &lt;element&gt; &lt;repetition_suffix&gt;
+               sequence = "[" &lt;tags&gt;?+ &lt;s&gt; !&lt;backref&gt; &lt;element&gt; [ &lt;s&gt; &lt;element&gt; ]*+ &lt;s&gt; "]"
+             zero_width = &lt;barrier&gt; | &lt;assertion&gt;
+         assertion_type = &lt;short_at&gt; | &lt;long_at&gt;
+                padding = &lt;non_rule&gt; &lt;nl&gt;
+          cnd_separator = &lt;space&gt; | &lt;s&gt; /[&amp;|^]/ &lt;s&gt;
+                long_at = [ &lt;not&gt; &lt;s&gt; ]?+ &lt;preposition&gt;
+               non_rule = &lt;s&gt; &lt;comment&gt;?+
+      repetition_suffix = [ &lt;repetition_symbol&gt; | &lt;limits&gt; ] &lt;repetition_modifier&gt;?+
+                barrier = ":"{1,2}
+                  label = "&lt;" &lt;identifier&gt; "&gt;"
+                 limits = "{" / \d++ | \d++,\d*+ | ,\d++ /x "}"
+                literal = &lt;single_quoted&gt; | &lt;double_quoted&gt;
+                    not = "not" | "!"
+            preposition = "before" | "after"
+                  regex = /\/ (?: \\ [^\n\r\f] | [^\n\r\f\/] )++ \//x &lt;regex_modifiers&gt;
+    repetition_modifier = "+" | "?"
+      repetition_symbol = "*" | "+" | "?"
+              rule_name = "&lt;"?+ &lt;identifier&gt; 1
+                      s = &lt;space&gt;?+
+                   tags = "{" &lt;identifier&gt; [ "," &lt;identifier&gt; ]*+ "}"
+             ul_backref = &lt;backref&gt; "^"
+                backref = /\d++/
+                comment = /#.*/
+          double_quoted = /" (?: \\ [^\n\r\f] | [^\n\r\f"] )++ "/x
+             identifier = /\w++/
+                        # newline according to http://en.wikipedia.org/wiki/Newline, omitting QNX pre-POSIX
+                     nl = /\r\f|\f\r|\r|\f/
+        regex_modifiers = /[rimsdux]++/
+               short_at = /~[+-]?+|![+-]/
+          single_quoted = /' (?: \\ [^\n\r\f] | [^\n\r\f'] )++ '/x
+                  space = /[\s&amp;&amp;[^\n\r\f]]++/</pre>
 	<p>Basically, a grammar expects a set of rules, each of which may
 		define a terminal character pattern or a set of constituent rules. The
 		matching is top-down: the grammar attempts to match a master rule,
@@ -172,11 +172,23 @@ rule2 = <b>[</b> 'a'* 'b' <b>]{1}+</b>   # a non-backtracking group</pre>
 	<pre>rule = /["'"]/ /\w++/ <b>1</b> </pre>
 	<p>
 		Note: no group construct is required but the index is relative to the
-		elements <em>of the same rule</em>. This is due to the complexity of
-		interpreting backreferences in recursive patterns. If you need
-		something more powerful than this you can do it with conditions,
-		though this will cost you efficiency.
+		elements <em>of the same sequence</em>. Backreferences of this sort
+		are reversible, so you can have, for instance
 	</p>
+	<pre>foo = [ "'" | '"' ] &lt;bar&gt; 1
+bar = <b>not after &lt;foo&gt;</b> &lt;quux&gt;</pre>
+	<p>
+		This presents the limitation that you can't use branching
+		constructions such as
+		<code>foo = /['"]/ [ 'a' | 1 ]</code>
+		. If this is something you need and you're not worried about
+		lookbehinds -- reversible rules -- then you can use the up-level form:
+	</p>
+	<pre>foo = [ "'" | '"' ] &lt;bar&gt; [ 1<b>^</b> | 'shmoo' ]</pre>
+	<p>Now the reference necessarily refers to the main sequence of the
+		rule. If this still isn't enough -- you need to refer to a
+		sub-sequence or you need to refer a match in another rule -- you will
+		need to resort to a condition, though this will cost you efficiency.</p>
 	<h2>Terminal Rules</h2>
 	<p>
 		Terminals rules have no constituent rules. They match against a
@@ -413,38 +425,65 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 	<pre>String[] rules = {
         //
         "ROOT = &lt;a&gt; /\\s++/ &lt;b&gt; /\\s++/ &lt;c&gt; /\\s++/ &lt;d&gt;",//
-        "   a = ~  '1' /\\b\\d++/",// <b>the number must begin with 1</b>
-        "   b = ~+ '2' /\\b\\d++/",// <b>long form: the '+' here simply means "forward"</b>
-        "   c = !  '3' /\\b\\d++/",// <b>the number must not begin with 3</b>
-        "   d = !+ '4' /\\b\\d++/",//
+        "   a = <b>~</b>          '1' /\\b\\d++/",//     <b>the number must begin with 1</b>
+        "   b = <b>~+</b>         '2' /\\b\\d++/",//     <b>synonym; the '+' here simply means "forward"</b>
+        " b_2 = <b>before</b>     '2' /\\b\\d++/",//     <b>or you can use plain English</b>
+        "   c = <b>!</b>          '3'     /\\b\\d++/",// <b>the number must not begin with 3</b>
+        "   d = <b>!+</b>         '4'     /\\b\\d++/",//
+        " d_2 = <b>not before</b> '4' /\\b\\d++/",//     <b>plain English negation</b>
+        " d_3 = <b>notbefore</b>  '4' /\\b\\d++/",//
+        " d_4 = <b>!before</b>    '4' /\\b\\d++/",//
+        " d_5 = <b>! before</b>   '4' /\\b\\d++/",//
 };</pre>
 	<p>
 		The examples above are silly but they serve to illustrate the syntax.
-		A positive assertion has the prefix
+		If you prefer concision there are the single character variant:
 		<code>~</code>
-		; a negative,
+		and
 		<code>!</code>
-		. You may append the suffix
+		. To these you may a directional suffix,
 		<code>+</code>
-		to this to make clear that this is a forward assertion: the following
-		rule must match at the offset and preceding to the right. And the rule
-		marked as an assertion is that immediately after the lookahead symbol.
+		, which means &ldquo;before&rdquo;. This is provided to make the
+		forward assertion syntax fully parallel to the backwards assertion
+		syntax (see below), but may be omitted.
 	</p>
+	<p>
+		If you prefer clarity, you can use a variety of natural language, or
+		abbreviated natural language, expressions:
+		<code>before</code>
+		,
+		<code>not before</code>
+		, and the variants substituting
+		<code>!</code>
+		for
+		<code>not</code>
+		and/or omitting the space.
+	</p>
+	<p>The rule immediately to the right of the assertion expression is
+		that which must either match or fail to match.</p>
 	<h4>Lookbehinds</h4>
 	<pre>String[] rules = {
         //
         "ROOT = &lt;a&gt; /\\s++/ &lt;b&gt;",//
-        "   a = /\\b\\d++/ ~- '1'",// <b>the number must end in 1</b>
-        "   b = /\\b\\d++/ !- '2'",// <b>the number must not end in 2</b>
+        "   a = /\\b\\d++/ <b>~-</b>        '1'",// <b>the number must end in 1</b>
+        " a_2 = /\\b\\d++/ <b>after</b>     '1'",// <b>plain English version</b>
+        "   b = /\\b\\d++/ <b>!-</b>        '2'",// <b>the number must not end in 2</b>
+        " b_2 = /\\b\\d++/ <b>not after</b> '2'",// <b>plain English version</b>
+        " b_3 = /\\b\\d++/ <b>notafter</b>  '2'",// <b>and other variants</b>
+        " b_4 = /\\b\\d++/ <b>! after</b>   '2'",//
+        " b_5 = /\\b\\d++/ <b>!after</b>    '2'",//
 };</pre>
 	<p>
-		There is no short form to lookbehinds; they must always carry the
-		suffix
+		Lookbehinds are parallel in syntax to lookaheads except that, for
+		obvious reasons, there is no single-character variant. The
+		single-character directional suffix is
 		<code>-</code>
-		indicating they match backwards from the current offset. Note that you
-		do not write the rule backwards that they modify. The grammar compiler
-		will do this for you. So for example
+		and the natural language variant of this is
+		<code>after</code>
+		.
 	</p>
+	<p>Note that you do not write the rule backwards that they modify.
+		The grammar compiler will do this for you. So for example</p>
 	<pre>		String[] rules = {
 				//
 				"ROOT = !- [ &lt;fred&gt; /\\s++/r ] &lt;fred&gt;",//
@@ -471,19 +510,20 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 		those which only match palindromes. In this case, a block of all the
 		same character class will be a palindrome, so it's reversible. This
 		powerful restriction on the regular expressions usable in backwards
-		assertions actually limits their power very little inasmuch as the
-		rest of the machinery of matching can be provided by
+		assertions doesn't reduce the power of backwards assertions at all
+		inasmuch as the rest of the machinery of matching can be provided by
 		<code>dfh.grammar</code>
 		itself.
 	</p>
 	<b>how it works</b>
 	<p>
-		Backwards assertions work by wrapping the relevant portion of the
-		character sequence in a class that in effect reverses it, so character
-		indexes count back from the end and index 0 refers to the last
-		character. To this reversed character sequence it applies a rule
-		identical to the one defined in your grammar but with all sequences
-		reversed, so
+		Backwards assertions work by matching against a
+		<code>dfh.grammar.ReversedCharSequence</code>
+		, a wrapper class that translates character indices between the base
+		and reversed sequences. So character indices count back from the end
+		and index 0 refers to the last character. To this reversed character
+		sequence it applies a rule identical to the one defined in your
+		grammar but with all sequences reversed, so
 		<code>'cat'</code>
 		covertly becomes
 		<code>'tac'</code>
@@ -570,7 +610,7 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 		example above, you may provide more than one name inside the curly
 		brackets -- names have the same restrictions as rule labels; the name
 		separator inside the brackets is the comma. This allows you to
-		multiply categorize matches, both dates and numbers, say.
+		multiply categorize matches -- both dates and numbers, say.
 	</p>
 	<h2>Options</h2>
 	<pre>Matcher m = g.find(s);                                               // <b>use all defaults</b>
@@ -593,37 +633,163 @@ m = g.find(s3, opt);</pre>
 		matches over which it is iterating. The parameter collection is an
 		instance of
 		<code>dfh.grammar.Options</code>
-		. Among other things is specifies which should be regarded as the
+		. Among other things it specifies which should be regarded as the
 		first and last characters in the sub-sequence to match against,
 		whether overlapping matches should be considered, and whether
 		debugging output should be produced.
 	</p>
 	<h3>start</h3>
-	<pre>Options opt = new Options().start(10);
+	<pre>Options opt = new Options().start(10); // <b>default: 0</b>
 System.out.println(opt.start());       // 10</pre>
+	<p>If you wish the match to begin at some offset other than 0 in
+		the character sequence, set the start. As with regular expressions,
+		this will not affect such things as word boundary matching. If the
+		string is "abc", there is no word boundary at offset 1 even if this is
+		where you start matching.</p>
 	<h3>end</h3>
-	<pre>Options opt = new Options().end(10);
+	<pre>Options opt = new Options().end(10); // <b>default: length of sequence</b>
 System.out.println(opt.end());       // 10</pre>
+	<p>
+		<code>end</code>
+		is the counterpart of
+		<code>start</code>
+		: if you do not wish any matches to include indices beyond a
+		particular offset, you must send the
+		<code>end</code>
+		.
+	</p>
 	<h3>allow overlap</h3>
-	<pre>Options opt = new Options().allowOverlap(true);
+	<pre>Options opt = new Options().allowOverlap(true); // <b>default: false</b>
 System.out.println(opt.allowOverlap());         // true</pre>
+	<p>
+		By default a grammar will only return one match per offset tested
+		against and no two matches returned will contain the same character.
+		Suppose, however, that you wish to see all ways a grammar can match a
+		string (possibly a very large number!). In this case, you set
+		<code>allowOverlap</code>
+		to
+		<code>true</code>
+		.
+	</p>
 	<h3>keep rightmost match</h3>
-	<pre>Options opt = new Options().keepRightmost(true);
+	<pre>Options opt = new Options().keepRightmost(true); // <b>default: false</b>
 System.out.println(opt.keepRightmost());         // true</pre>
+	<p>
+		If a match fails you might still want to know, for the sake of
+		debugging or error message generation, how far it got before it
+		failed. This is what
+		<code>keepRightmost</code>
+		does for you. Since recording rightmost matches incurs some overhead,
+		the default value of this option is
+		<code>false</code>
+		.
+	</p>
 	<h3>longest match</h3>
-	<pre>Options opt = new Options().longestMatch(true);
+	<pre>Options opt = new Options().longestMatch(true); // <b>default: true</b>
 System.out.println(opt.longestMatch());         // true</pre>
+<p>
+Suppose your grammar contains the alternation 
+</p>
+<pre>foo = 'cat' | 'cat dog'</pre>
+	<p>
+		Because <i>cat</i> is listed first, the first match returned when a
+		find is done against the string <i>camel cat dog fish</i> will be <i>cat</i>
+		even though <i>cat dog</i> will also match at the same offset. If you
+		are not allowing overlapping matches (see above), you will never see
+		the <i>cat dog</i> match. If this is not what you want, set
+		<code>longestMatch</code>
+		to
+		<code>true</code>
+		. This will cause the matcher to iterate over all possible matches at
+		a given offset, retaining only those of maximum length. If you allow
+		overlapping matches, the matcher will return the matches in the order
+		of discovery. Otherwise, it will return the first maximum length match
+		found.
+	</p>
+	<p>
+		In fact, in my experience I find that I usually want only the longest
+		matches and receiving just the first match produces unexpected
+		results. The default value of
+		<code>longestMatch</code>
+		is
+		<code>true</code>
+		. You have to turn longest matching <em>off</em>, not on.
+	</p>
 	<h3>match all</h3>
-	<pre>Options opt = new Options().matchAll(true);
+	<pre>Options opt = new Options().matchAll(true); // <b>no default</b>
 System.out.println(opt.matchAll());         // true</pre>
+	<p>
+		The
+		<code>matchAll</code>
+		option is just a shortcut for setting
+		<code>longestMatch</code>
+		to
+		<code>false</code>
+		and
+		<code>allowOverlap</code>
+		to
+		<code>true</code>
+		with just one boolean.
+	</p>
 	<h3>maximum recursion depth</h3>
-	<pre>Options opt = new Options().maxRecursionDepth(10);
+	<pre>Options opt = new Options().maxRecursionDepth(10); // <b>default: 3</b>
 System.out.println(opt.maxRecursionDepth());       // 10</pre>
+	<p>
+		Recursion and
+		<code>dfh.grammar</code>
+		's top-down matching are an uneasy mix. Instead of looking at a
+		character and figuring out what rules it could match, the grammar
+		constructs hypothetical match trees and sees whether they fit the
+		underlying sequence. Or rather, it constructs the left branches of
+		trees. If it can match the leftmost leaf of the tree, it tries adding
+		the next branch. This works fine until you have a recursive grammar that allows the possibility of infinite left-branching, something like
+	</p>
+	<pre>foo = &lt;foo&gt; '0' | '1'</pre>
+	<p>
+		This grammar is a silly recursive equivalent of
+		<code>/10++/</code>
+		. Because of the way
+		<code>dfh.grammar</code>
+		tests alternates -- first alternate first -- it will attempt first to
+		construct an infinitely deep left-branching tree, never actually
+		trying the
+		<code>'1'</code>
+		alternate and beginning matching. In this case the solution would be
+		to write a less silly grammar, but sometimes you simply have to write
+		a left-branching rule. To cope with this situation
+		<code>dfh.grammar</code>
+		has a maximum branching depth. When the grammar is compiled, it checks
+		to see whether there are any cycles, any recursion. If it finds
+		recursion, every time it picks an alternate
+		<span class="fn">This problem can arise even if the recursive
+			alternate isn't first. Suppose, for example, that the first <code>n</code>
+			alternates never match and the <code>n + 1</code> alternate is
+			recursive.
+		</span> it first checks to see whether it's in a repeating loop. If it
+		finds that it is, it increments the recursion count. If it finds that
+		it cannot proceed without incrementing the count past the maximum
+		recursion depth limit, it abandons the alternate and tries the next.
+	</p>
 	<h3>study</h3>
-	<pre>Options opt = new Options().study(false);
+	<pre>Options opt = new Options().study(false); // <b>default: true</b>
 System.out.println(opt.study());          // false</pre>
-	<h3>trace</h3>
-	<pre>Options opt = new Options().trace(System.err);
+	<h3>log</h3>
+	<pre>Options opt = new Options().log(System.err); // <b>default: null</b>
 opt.trace().println(10);                       // 10</pre>
+	<p>
+		The
+		<code>log</code>
+		option is a
+		<code>java.io.PrintStream</code>
+		to which log messages will be printed if it isset to a non-null value.
+		In fact, setting the
+		<code>log</code>
+		to some print stream causes a boolean debug option to be set to
+		<code>true</code>
+		, which causes a number of debuggign code blocks to be called in the
+		course of matching. Logging a match thus incurs a good bit of
+		overhead, but due to the exponential complexity of matching it is
+		often the best way to debug a grammar.
+	</p>
 </body>
 </html>
