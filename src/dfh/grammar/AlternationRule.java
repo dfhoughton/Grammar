@@ -122,7 +122,7 @@ public class AlternationRule extends Rule implements Serializable,
 				b.append(" | ");
 			else
 				nonInitial = true;
-			if (!tags.isEmpty()) {
+			if (!(tags == null || tags.isEmpty())) {
 				if (!inBrackets)
 					b.append('[');
 				b.append("{");
@@ -140,7 +140,7 @@ public class AlternationRule extends Rule implements Serializable,
 				b.append(r.description(false));
 			} else
 				b.append(r.label());
-			if (!tags.isEmpty()) {
+			if (!(tags == null || tags.isEmpty())) {
 				b.append(' ');
 				if (!inBrackets)
 					b.append(']');

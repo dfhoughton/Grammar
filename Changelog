@@ -1,4 +1,5 @@
 1.11
+  * fixed some bugs in Grammar.describe()
 
 1.10, 13 January 2012
   * improved studying algorithm

@@ -125,7 +125,8 @@ public class DeferredDefinitionRule extends Rule implements Serializable,
 	protected void subRules(Set<Rule> set) {
 		if (!set.contains(this)) {
 			set.add(this);
-			r.subRules(set);
+			if (r != null)
+				r.subRules(set);
 		}
 	}
 
