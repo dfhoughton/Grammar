@@ -27,7 +27,7 @@ public abstract class Matcher {
 	/**
 	 * Reference to the matching parameters in use in this context.
 	 */
-	protected final GlobalState options;
+	public final GlobalState options;
 	/**
 	 * Rightmost match found by this {@link Matcher} or any of its descendants.
 	 */

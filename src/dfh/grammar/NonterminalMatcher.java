@@ -67,7 +67,7 @@ public abstract class NonterminalMatcher extends Matcher {
 		}
 		CachedMatch cm = subCache.get(offset);
 		boolean alreadyMatched = cm != null;
-		if (alreadyMatched && cm.m == null) {
+		if (alreadyMatched && cm == CachedMatch.MISMATCH) {
 			if (options.debug)
 				rule.matchTrace(this, null);
 			return null;
