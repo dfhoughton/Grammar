@@ -10,6 +10,10 @@ section at the end of the document.
 . make sure non-terminal matches are using their subcache
 . profile some matching to figure out what could be optimized
 . stop caching success
+. document logically complex conditions
+. document new assertion syntax
+. modify grammar grammar
+. document up-level back references
 
 COMPLETED
 =========
