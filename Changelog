@@ -1,4 +1,4 @@
-1.11
+1.11, 18 January 2012
   * fixed some bugs in Grammar.describe()
   * added a good bit of HTML documentation
   * added more tests for match completion to the Match tree walking methods
