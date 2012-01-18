@@ -186,7 +186,10 @@ public class Match {
 	 * @return parent {@link Match}, if any
 	 */
 	public Match parent() {
-		return parent;
+		if (done)
+			return parent;
+		throw new GrammarException(
+				"dfh.grammar.Match.parent() can only be called after matching has completed");
 	}
 
 	/**
@@ -241,16 +244,21 @@ public class Match {
 	 * @return index of {@link Match} among its parent's children
 	 */
 	public int index() {
-		if (parent == null)
-			return -1;
-		int index = 0;
-		for (Match m : parent.children) {
-			if (m == this)
-				return index;
-			index++;
+		if (done) {
+			if (parent == null)
+				return -1;
+			int index = 0;
+			for (Match m : parent.children) {
+				if (m == this)
+					return index;
+				index++;
+			}
+			throw new GrammarException(
+					"impossible state: match not among its parent's children");
 		}
 		throw new GrammarException(
-				"impossible state: match not among its parent's children");
+				"Match.done() not yet called; method unavailable");
+
 	}
 
 	/*
@@ -333,11 +341,15 @@ public class Match {
 	 * @return whether this object has the given object as an ancestor
 	 */
 	public boolean hasAncestor(Match m) {
-		if (m == null || parent == null)
-			return false;
-		if (parent == m)
-			return true;
-		return parent.hasAncestor(m);
+		if (done) {
+			if (m == null || parent == null)
+				return false;
+			if (parent == m)
+				return true;
+			return parent.hasAncestor(m);
+		}
+		throw new GrammarException(
+				"dfh.grammar.Math.hasAncestor(dfh.grammar.MatchTest) can only be called after matching has completed");
 	}
 
 	/**
@@ -361,25 +373,20 @@ public class Match {
 	 * Walk the match tree, applying the test to every node encountered. If the
 	 * test evaluates to true, any child nodes are skipped; otherwise the
 	 * children are walked as well.
-	 * <p>
-	 * You can only walk the match tree after matching has completed. Doing
-	 * otherwise will cause a runtime error to be thrown.
 	 * 
 	 * @param t
 	 *            the code to apply to each node encountered
 	 * @return whether the test ever evaluated to true
 	 */
 	public boolean walk(MatchTest t) {
-		if (done) {
-			if (t.test(this))
-				return true;
-			boolean matched = false;
+		if (t.test(this))
+			return true;
+		boolean matched = false;
+		if (children != null) {
 			for (Match c : children)
 				matched = c.walk(t) || matched;
-			return matched;
 		}
-		throw new GrammarException(
-				"dfh.grammar.Match.walk(dfh.grammar.MatchTest) can only be called after matching has completed");
+		return matched;
 	}
 
 	/**
@@ -457,11 +464,16 @@ public class Match {
 	 * @return closest ancestor {@link Match} passing given test
 	 */
 	public Match ancestor(MatchTest t) {
-		if (parent == null)
-			return null;
-		if (t.test(parent))
-			return parent;
-		return parent.ancestor(t);
+		if (done) {
+			if (parent == null)
+				return null;
+			if (t.test(parent))
+				return parent;
+			return parent.ancestor(t);
+		}
+		throw new GrammarException(
+				"Match.done() not yet called; method unavailable");
+
 	}
 
 	/**
@@ -474,11 +486,16 @@ public class Match {
 	}
 
 	private List<Match> passingAncestors(MatchTest t, List<Match> accumulator) {
-		if (parent == null)
-			return accumulator;
-		if (t.test(parent))
-			accumulator.add(parent);
-		return parent.passingAncestors(t, accumulator);
+		if (done) {
+			if (parent == null)
+				return accumulator;
+			if (t.test(parent))
+				accumulator.add(parent);
+			return parent.passingAncestors(t, accumulator);
+		}
+		throw new GrammarException(
+				"Match.done() not yet called; method unavailable");
+
 	}
 
 	/**
@@ -671,11 +688,16 @@ public class Match {
 	 *         passes the given test
 	 */
 	public boolean ancestorPasses(MatchTest t) {
-		if (parent == null)
-			return false;
-		if (t.test(parent))
-			return true;
-		return parent.ancestorPasses(t);
+		if (done) {
+			if (parent == null)
+				return false;
+			if (t.test(parent))
+				return true;
+			return parent.ancestorPasses(t);
+		}
+		throw new GrammarException(
+				"Match.done() not yet called; method unavailable");
+
 	}
 
 	/**
@@ -714,7 +736,11 @@ public class Match {
 	 * @return a string corresponding to the subsequence matched
 	 */
 	public String group() {
-		return group;
+		if (done)
+			return group;
+		throw new GrammarException(
+				"Match.done() not yet called; method unavailable");
+
 	}
 
 	/**

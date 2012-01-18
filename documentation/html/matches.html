@@ -45,7 +45,9 @@
 	<p>produces</p>
 	<pre class="results">("f" "oo": 0, 3 [("f": 0, 1), ("oo": 1, 3)])</pre>
 	<p>The entire stringification is enclosed in round brackets.</p>
-	<pre class="results"><b>(</b>"f" "oo": 0, 3 [("f": 0, 1), ("oo": 1, 3)]<b>)</b></pre>
+	<pre class="results">
+		<b>(</b>"f" "oo": 0, 3 [("f": 0, 1), ("oo": 1, 3)]<b>)</b>
+	</pre>
 	<p>The first item inside these parentheses is a label for the rule
 		generating the match.</p>
 	<pre class="results">(<b>"f" "oo"</b>: 0, 3 [("f": 0, 1), ("oo": 1, 3)])</pre>
@@ -61,8 +63,99 @@
 		stringification. If you don't find this Lisp-esque stringification to
 		your taste, or you need to do more than admire your matches, read on.</p>
 	<h2>Getting the Corresponding Text</h2>
-	<p>If you want the string matched, use the start and end offsets.</p>
-	<pre>String matched = s.substring(match.start(), match.end());</pre>
+	<p>If you want the string matched, there are two ways to go about
+		it.</p>
+	<ol>
+		<li>use the <code>start()</code> and <code>end()</code> offsets <pre>String matched = s.substring(match.start(), match.end());</pre>
+		<li>use the <code>group()</code> method <pre>String matched = match.group();</pre>
+	</ol>
+	<p>
+		Given the simplicity of the latter, why ever use the former? Well, for
+		the sake of efficiency,
+		<code>group()</code>
+		is only available after matching has completed for the entire grammar.
+		This means that in conditions and debugging if you call
+		<code>group()</code>
+		a runtime error will be thrown.
+	</p>
 	<h2>Walking the Match Tree</h2>
+	<p>If you wish to study the structure of the match, if you are
+		using a grammar for parsing rather than simple validation or text
+		extraction, you have to walk match tree. The match object provides
+		numerous methods to facilitate this. Here are the principle ones.</p>
+	<h3>match tree walking methods</h3>
+	<h4>
+		<code>walk(MatchTest)</code>
+	</h4>
+	<p>
+		This generic method allows you walk the match tree, performing some
+		action at every node. The
+		<code>MatchTest.test(Match)</code>
+		method is the action performed. If this method returns
+		<code>true</code>
+		, no children of the node tested will be walked (If you wish to walk
+		the entire tree, simply construct a method that always returns
+		<code>false</code>
+		). Because of this, a node is necessarily tested before its children.
+	</p>
+	<h4>
+		<code>get(String)</code>
+	</h4>
+	<p>This method walks the match tree rooted at the current node,
+		returning a list of nodes having the given label. For example, a node
+		matched by</p>
+	<pre>foo = [{bar} "baz"]</pre>
+	<p>
+		will have the labels <i>foo</i>, <i>bar</i>, and <i>"baz"</i>. A match
+		can always be retrieved by the
+		<code>uid()</code>
+		of the rule that generated it, in this case, "baz", but except in the
+		case of literals like this it may not be obvious what the appropriate
+		<code>uid()</code>
+		is, so one should use rule labels or named captures as illustrated
+		here.
+	</p>
+	<p>
+		This method in fact delegates to
+		<code>get(MatchTest)</code>
+		after generating an appropriate match test. You can achieve some
+		efficiency in this and the other tree walking methods by constructing
+		the appropriate tests once and reusing them.
+	</p>
+	<h4>
+		<code>get(MatchTest)</code>
+	</h4>
+		<p>This method returns a list of all nodes matching the given
+			test. Children are returned before parents.</p>
+	<h4>
+		<code>first(String)</code>
+		,
+		<code>first(MatchTest)</code>
+	</h4>
+	<h4>
+		<code>closest(String)</code>
+		,
+		<code>closest(MatchTest)</code>
+	</h4>
+	<h4>
+		<code>children()</code>
+	</h4>
+	<h4>
+		<code>parent()</code>
+	</h4>
+	<h4>
+		<code>ancestor(String)</code>
+		,
+		<code>ancestor(MatchTest)</code>
+	</h4>
+	<h4>
+		<code>ancestors(String)</code>
+		,
+		<code>ancestors(MatchTest)</code>
+	</h4>
+	<h3>
+		<code>MatchTest</code>
+		objects
+	</h3>
 </body>
 </html>
