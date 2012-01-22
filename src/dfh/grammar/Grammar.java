@@ -934,9 +934,10 @@ public class Grammar implements Serializable, Cloneable {
 		int max = root.maxCacheIndex(-1, new HashSet<Rule>());
 		@SuppressWarnings("unchecked")
 		Map<Integer, CachedMatch>[] offsetCache = new Map[max + 1];
-		for (int i = 0; i < offsetCache.length; i++)
+		for (int i = 0; i < offsetCache.length; i++) {
 			offsetCache[i] = options.leanMemory ? new TreeMap<Integer, CachedMatch>()
-					: new HashMap<Integer, CachedMatch>();
+					: new MatchCache(options.end - options.start);
+		}
 		return offsetCache;
 	}
 

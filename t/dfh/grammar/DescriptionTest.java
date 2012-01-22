@@ -95,4 +95,20 @@ public class DescriptionTest {
 			assertTrue("contains rule " + s, pattern.matcher(d).find());
 		}
 	}
+
+	@Test
+	public void benchmarkRegression() {
+		String[] rules = {
+				//
+				"<ROOT> = [ <a> | <b> ]{2} <b>",//
+				"<a> = 'a'{,2}",//
+				"<b> = 'ab'",//
+		};
+		Grammar g = new Grammar(rules);
+		String d = g.describe();
+		for (String s : new String[] { "ROOT", "a", "b" }) {
+			Pattern pattern = Pattern.compile("^\\s*+" + s, Pattern.MULTILINE);
+			assertTrue("contains rule " + s, pattern.matcher(d).find());
+		}
+	}
 }

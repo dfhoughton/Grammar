@@ -296,19 +296,16 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 
 	@Override
 	protected void subRules(Set<Rule> set, boolean explicit) {
-		if (explicit) {
-			if (generation > -1) {
-				if (!set.contains(this)) {
+		if (!set.contains(this)) {
+			if (explicit) {
+				if (generation > -1)
 					set.add(this);
-					for (Rule r : sequence)
-						r.subRules(set, true);
-				}
-			} else if (unreversed != null)
-				unreversed.subRules(set, true);
-		} else if (!set.contains(this)) {
-			set.add(this);
+				if (unreversed != null)
+					unreversed.subRules(set, explicit);
+			} else
+				set.add(this);
 			for (Rule r : sequence)
-				r.subRules(set, false);
+				r.subRules(set, explicit);
 		}
 	}
 

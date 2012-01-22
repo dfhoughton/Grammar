@@ -1,5 +1,7 @@
 1.12
   * fixed issues with description containing cyclic and reversed rules
+  * created array-based offset cache for faster puts and gets
+  * fixed description regression
 
 1.11, 18 January 2012
   * fixed some bugs in Grammar.describe()

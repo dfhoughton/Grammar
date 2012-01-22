@@ -111,16 +111,15 @@ public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 
 	@Override
 	protected void subRules(Set<Rule> set, boolean explicit) {
-		if (explicit) {
-			if (r.generation > -1) {
-				if (!set.contains(this))
+		if (!set.contains(this)) {
+			if (explicit) {
+				if (r.generation > -1)
 					set.add(this);
-			} else if (unreversed != null)
-				unreversed.subRules(set, true);
-			r.subRules(set, true);
-		} else if (!set.contains(this)) {
-			set.add(this);
-			r.subRules(set, false);
+				if (unreversed != null)
+					unreversed.subRules(set, explicit);
+			} else
+				set.add(this);
+			r.subRules(set, explicit);
 		}
 	}
 

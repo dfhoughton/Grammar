@@ -9,7 +9,7 @@ import dfh.grammar.Options;
 public class Benchmarks {
 
 	private static final int DEFAULT_ITERATIONS = 50000;
-	private static final int DEFAULT_WARMUP = 20000;
+	private static final int DEFAULT_WARMUP = 50000;
 	private static int iterations;
 	private static int warmup;
 

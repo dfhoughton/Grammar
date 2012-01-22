@@ -499,7 +499,7 @@ public abstract class Rule {
 		if (explicit) {
 			if (generation > -1)
 				set.add(this);
-			else if (unreversed != null)
+			if (unreversed != null)
 				unreversed.subRules(set, explicit);
 		} else
 			set.add(this);
