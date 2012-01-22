@@ -132,30 +132,169 @@
 		,
 		<code>first(MatchTest)</code>
 	</h4>
+	<p>
+		This method returns the first node under the current node (including
+		the current node) that matches the given test or has the given label.
+		This method necessarily tests parents before children. Because it
+		returns upon the first match and doesn't construct any list, it is
+		more efficient than
+		<code>get(MatchTest).get(0)</code>
+		(which also, given the varying test order, might not return the same
+		node).
+	</p>
 	<h4>
 		<code>closest(String)</code>
 		,
 		<code>closest(MatchTest)</code>
 	</h4>
+	<p>
+		This method tests the nodes under the current node. If a node passes
+		the test -- having the correct label or satisfying the
+		<code>MatchTest</code>
+		object -- it is added to the return list and no further tests are
+		performed on the passing node's children. So, for example, in the tree
+		below, if
+		<code>a</code>
+		is the root node,
+		<code>a.closest("a")</code>
+		will return the highlighted nodes.
+	</p>
+	<pre>
+	  a
+	 / \
+	<b>a</b>   b
+	   / \
+	  <b>a</b>   <b>a</b>
+	  |
+	  a
+	</pre>
 	<h4>
 		<code>children()</code>
 	</h4>
+	<p>
+	The children of the match.
+	</p>
 	<h4>
 		<code>parent()</code>
 	</h4>
+	<p>
+		The parent node of the match in the match tree.
+		<span class="fn">Nodes are not linked to their parents during the
+			matching process. This step is performed immediately before a match
+			is returned by a <code>find()</code>, <code>lookingAt()</code>, or <code>matches()</code>.
+			In the event that a match fails and rightmost matching is on (see
+			options in <a href="syntax.html">syntax</a>), the match tree of the
+			rightmost node will have its child-to-parent links completed.
+		</span>
+	</p>
 	<h4>
 		<code>ancestor(String)</code>
 		,
 		<code>ancestor(MatchTest)</code>
 	</h4>
+	<p>
+		This method is somewhat similar to
+		<code>closest</code>
+		: it returns the nearest single node to the current node matching the
+		test, but
+		<em>ascending</em> the match tree rather than descending, moving
+		towards the root rather than the leaves.
+	</p>
 	<h4>
 		<code>ancestors(String)</code>
 		,
 		<code>ancestors(MatchTest)</code>
 	</h4>
+	<p>This method climbs the match tree from the current node returning a
+		list of nodes matching the test in the order of their discovery.</p>
+	<h4>
+		<code>leaves()</code>
+	</h4>
+	<p>This method returns the leaf nodes under the current node.</p>
 	<h3>
 		<code>MatchTest</code>
 		objects
 	</h3>
+	<p>
+	<code>MatchTest</code> is a simple, one method interface:
+	</p>
+	<pre>public interface MatchTest {
+	boolean test(Match m);
+}</pre>
+	<p>
+		This interface is used by almost all the methods above. Here, for
+		example, is the implementation of
+		<code>get(String)</code>
+	</p>
+	<pre>	public List<Match> get(final String rule) {
+		return get(new MatchTest() {
+			@Override
+			public boolean test(Match m) {
+				return m.hasLabel(rule);
+			}
+		});
+	}</pre>
+	<p>
+		You can gain some efficiency by pre-compiling all the
+		<code>MatchTests</code>
+		you need. The
+		<code>dfh.grammar.Match</code>
+		test itself provides a number of useful tests precompiled.
+	</p>
+	<h4>
+		<code>Match.ALL</code>
+	</h4>
+	<p>Use this test to obtain a list of all the nodes in the match
+		tree.</p>
+	<h4>
+		<code>Match.ANONYMOUS</code>
+	</h4>
+	<p>Use this test to obtain a list of all the nodes in the match
+		tree that are defined in the course of defining another rule. In</p>
+	<pre>ROOT = "a" | "b"</pre>
+	,
+	<code>&lt;ROOT&gt;</code>
+	is named and
+	<code>"a"</code>
+	and
+	<code>"b"</code>
+	are anonymous.
+	<h4>
+		<code>Match.NAMED</code>
+	</h4>
+	<p>Use this test to obtain a list of all the nodes in the match
+		tree that are defined by their own line in the grammar.</p>
+	<h4>
+		<code>Match.NON_TERMINAL</code>
+	</h4>
+	<p>Use this test to obtain a list of all the non-leaf nodes in the
+		match tree.</p>
+	<h4>
+		<code>Match.TERMINAL</code>
+	</h4>
+	<p>Use this test to obtain a list of all the leaf nodes in the
+		match tree.</p>
+	<h4>
+		<code>Match.WIDE</code>
+	</h4>
+	<p>Use this test to obtain a list of all the nodes in the match
+		tree whose matching advanced the matching offset. This will exclude
+		things such as assertions, trivially matching regexes, and
+		backtracking barriers.</p>
+	<h4>
+		<code>Match.WIDE_LEAF</code>
+	</h4>
+	<p>
+		This is like the
+		<code>WIDE</code>
+		test but it only returns leaves.
+	</p>
+	<h4>
+		<code>Match.ZERO_WIDTH</code>
+	</h4>
+	<p>Use this test to obtain these matches whose matching did not
+		advance the match offset at all. These are such things as empty string
+		literals, trivially matching regexes, assertions, and backtracking
+		barriers.</p>
 </body>
 </html>

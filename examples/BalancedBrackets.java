@@ -4,7 +4,11 @@ import dfh.grammar.Match;
 import dfh.grammar.Matcher;
 import dfh.grammar.Options;
 
-
+/**
+ * Illustrates how to match balanced brackets.
+ * 
+ * @author David Houghton
+ */
 public class BalancedBrackets {
 
 	/**
@@ -16,11 +20,14 @@ public class BalancedBrackets {
 		medleyExample();
 	}
 
+	/**
+	 * Simple example.
+	 */
 	private static void parenthesisExample() {
-		Grammar g = new Grammar("ROOT = '(' [ /(?:\\\\.|[^()])++/ | <ROOT> ]*+ ')'");
+		Grammar g = new Grammar("ROOT = '(' [ /[^()]++/ | <ROOT> ]*+ ')'");
 		System.out.println("balanced parentheses:\n");
 		System.out.println(g.describe());
-		String s = "this (is (an example\\)))  isn't (it)";
+		String s = "this (is (an example))  isn't (it)";
 		System.out.println("string: " + s);
 		System.out.println("\nmatches:\n");
 		Matcher m = g.find(s, new Options().study(true).allowOverlap(true));
@@ -28,16 +35,21 @@ public class BalancedBrackets {
 		while ((n = m.match()) != null)
 			System.out.println(n.group());
 	}
+
+	/**
+	 * More thorough example with escaping.
+	 */
 	private static void medleyExample() {
-		Grammar g = new Grammar(new String[] {
-				//
-				"ROOT = <parens> | <square> | <curly> | <angled>",//
-				"parens = not after <escape> '(' [ /(?:\\\\.|[^()\\[\\]{}<>])++/ | <ROOT> ]*+ ')'",//
-				"square = not after <escape> '[' [ /(?:\\\\.|[^()\\[\\]{}<>])++/ | <ROOT> ]*+ ']'",//
-				"curly = not after <escape> '{' [ /(?:\\\\.|[^()\\[\\]{}<>])++/ | <ROOT> ]*+ '}'",//
-				"angled = not after <escape> '<' [ /(?:\\\\.|[^()\\[\\]{}<>])++/ | <ROOT> ]*+ '>'",//
-				"escape = /(?<!\\\\)(?:\\\\)++/r (odd)",//
-		});
+		Grammar g = new Grammar(
+				new String[] {
+						//
+						"ROOT = <parens> | <square> | <curly> | <angled>",//
+						"parens = not after <escape> '(' [ /(?:\\\\.|[^()\\[\\]{}<>])++/ | <ROOT> ]*+ ')'",//
+						"square = not after <escape> '[' [ /(?:\\\\.|[^()\\[\\]{}<>])++/ | <ROOT> ]*+ ']'",//
+						"curly = not after <escape> '{' [ /(?:\\\\.|[^()\\[\\]{}<>])++/ | <ROOT> ]*+ '}'",//
+						"angled = not after <escape> '<' [ /(?:\\\\.|[^()\\[\\]{}<>])++/ | <ROOT> ]*+ '>'",//
+						"escape = /(?<!\\\\)(?:\\\\)++/r (odd)",//
+				});
 		g.defineCondition("odd", new Condition() {
 			@Override
 			public boolean passes(CharSequence subsequence) {
@@ -46,7 +58,7 @@ public class BalancedBrackets {
 		});
 		System.out.println("balanced brackets of various sorts:\n");
 		System.out.println(g.describe());
-		String s = "this \\\\(is \\{ <an example\\>>)  { [ isn't ( \\) [{it}])";
+		String s = "this \\\\(is \\{ <an example\\>>)  { [ isn't ( \\) [{it}]) \\( testing escapes)";
 		System.out.println("string: " + s);
 		System.out.println("\nmatches:\n");
 		Matcher m = g.find(s, new Options().study(true).allowOverlap(true));
