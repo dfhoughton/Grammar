@@ -49,6 +49,7 @@ import org.junit.runners.Suite;
 		StringLineReaderTest.class,//
 		RoundTripTest.class,//
 		SubrulesTest.class,//
+		ExplicitRuleTest.class,//
 })
 public class AllTests {
 }
