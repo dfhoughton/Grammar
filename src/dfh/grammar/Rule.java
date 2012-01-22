@@ -60,6 +60,11 @@ public abstract class Rule {
 	 */
 	protected Set<String> labels;
 	protected boolean mayBeZeroWidth = true;
+	/**
+	 * A reference to the rule from which this rule was generated if the rule is
+	 * reversed.
+	 */
+	Rule unreversed;
 
 	protected String wrap(StringBuilder b) {
 		if (!(labels == null || labels.isEmpty())) {
@@ -486,9 +491,18 @@ public abstract class Rule {
 	 * 
 	 * @param set
 	 *            collector of rules
+	 * @param explicit
+	 *            whether to list only rules that were explicitly labeled, as
+	 *            opposed to those implicit in a larger rule definition
 	 */
-	protected void subRules(Set<Rule> set) {
-		set.add(this);
+	protected void subRules(Set<Rule> set, boolean explicit) {
+		if (explicit) {
+			if (generation > -1)
+				set.add(this);
+			else if (unreversed != null)
+				unreversed.subRules(set, explicit);
+		} else
+			set.add(this);
 	}
 
 	/**

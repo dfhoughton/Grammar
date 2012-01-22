@@ -1,4 +1,5 @@
 1.12
+  * fixed issues with description containing cyclic and reversed rules
 
 1.11, 18 January 2012
   * fixed some bugs in Grammar.describe()

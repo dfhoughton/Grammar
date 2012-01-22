@@ -56,6 +56,8 @@ public class DeferredDefinitionRule extends Rule implements Serializable,
 	public void setRule(Rule r) {
 		if (this.r != null)
 			throw new GrammarException("rule " + label + "already defined");
+		// TODO improve this so that the generation is set correctly
+		r.generation = 1;
 		this.r = r;
 	}
 
@@ -122,11 +124,19 @@ public class DeferredDefinitionRule extends Rule implements Serializable,
 	}
 
 	@Override
-	protected void subRules(Set<Rule> set) {
-		if (!set.contains(this)) {
+	protected void subRules(Set<Rule> set, boolean explicit) {
+		if (explicit) {
+			if (generation > -1) {
+				if (!set.contains(this))
+					set.add(this);
+			} else if (unreversed != null)
+				unreversed.subRules(set, true);
+			if (r != null)
+				r.subRules(set, true);
+		} else if (!set.contains(this)) {
 			set.add(this);
 			if (r != null)
-				r.subRules(set);
+				r.subRules(set, false);
 		}
 	}
 

@@ -968,7 +968,9 @@ public class Grammar implements Serializable, Cloneable {
 	 * @return pretty-printed grammar definition
 	 */
 	public String describe(final boolean alphabetized) {
-		List<Rule> rules = new ArrayList<Rule>(rules());
+		Set<Rule> set = new HashSet<Rule>(rules().size());
+		root.subRules(set, true);
+		List<Rule> rules = new ArrayList<Rule>(set);
 		for (Iterator<Rule> i = rules.iterator(); i.hasNext();) {
 			Rule r = i.next();
 			if (r.generation == -1)
@@ -1238,7 +1240,7 @@ public class Grammar implements Serializable, Cloneable {
 	private synchronized Set<Rule> rules() {
 		if (ruleSet == null) {
 			Set<Rule> set = new HashSet<Rule>();
-			root.subRules(set);
+			root.subRules(set, false);
 			if (!validated)
 				return set;
 			ruleSet = new HashSet<Rule>(set);

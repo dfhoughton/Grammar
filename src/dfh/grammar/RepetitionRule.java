@@ -418,10 +418,21 @@ public class RepetitionRule extends Rule implements Serializable,
 	}
 
 	@Override
-	protected void subRules(Set<Rule> set) {
-		if (!set.contains(this)) {
+	protected void subRules(Set<Rule> set, boolean explicit) {
+		if (explicit) {
+			if (generation > -1) {
+				if (!set.contains(this)) {
+					set.add(this);
+					r.subRules(set, true);
+				}
+			} else if (unreversed != null) {
+				if (!set.contains(unreversed)) {
+					unreversed.subRules(set, true);
+				}
+			}
+		} else if (!set.contains(this)) {
 			set.add(this);
-			r.subRules(set);
+			r.subRules(set, false);
 		}
 	}
 

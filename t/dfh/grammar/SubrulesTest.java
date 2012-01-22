@@ -15,7 +15,7 @@ public class SubrulesTest {
 		String[] rules = { "ROOT = /[ab]/ 'foo' 1^{2}" };
 		Grammar g = new Grammar(rules);
 		Set<Rule> set = new HashSet<Rule>();
-		g.root.subRules(set);
+		g.root.subRules(set, false);
 		for (Iterator<Rule> i = set.iterator(); i.hasNext();) {
 			Rule r = i.next();
 			if (r.generation == -1)
@@ -33,7 +33,7 @@ public class SubrulesTest {
 		};
 		Grammar g = new Grammar(rules);
 		Set<Rule> set = new HashSet<Rule>();
-		g.root.subRules(set);
+		g.root.subRules(set, false);
 		for (Iterator<Rule> i = set.iterator(); i.hasNext();) {
 			Rule r = i.next();
 			if (r.generation == -1)
@@ -52,7 +52,7 @@ public class SubrulesTest {
 		};
 		Grammar g = new Grammar(rules);
 		Set<Rule> set = new HashSet<Rule>();
-		g.root.subRules(set);
+		g.root.subRules(set, false);
 		for (Iterator<Rule> i = set.iterator(); i.hasNext();) {
 			Rule r = i.next();
 			if (r.generation == -1)
@@ -71,7 +71,7 @@ public class SubrulesTest {
 		};
 		Grammar g = new Grammar(rules);
 		Set<Rule> set = new HashSet<Rule>();
-		g.root.subRules(set);
+		g.root.subRules(set, false);
 		for (Iterator<Rule> i = set.iterator(); i.hasNext();) {
 			Rule r = i.next();
 			if (r.generation == -1)
@@ -88,7 +88,7 @@ public class SubrulesTest {
 		};
 		Grammar g = new Grammar(rules);
 		Set<Rule> set = new HashSet<Rule>();
-		g.root.subRules(set);
+		g.root.subRules(set, false);
 		for (Iterator<Rule> i = set.iterator(); i.hasNext();) {
 			Rule r = i.next();
 			if (r.generation == -1)
@@ -114,7 +114,7 @@ public class SubrulesTest {
 		};
 		Grammar g = new Grammar(rules);
 		Set<Rule> set = new HashSet<Rule>();
-		g.root.subRules(set);
+		g.root.subRules(set, false);
 		for (Iterator<Rule> i = set.iterator(); i.hasNext();) {
 			Rule r = i.next();
 			if (r.generation == -1)
@@ -138,7 +138,7 @@ public class SubrulesTest {
 		};
 		Grammar g = new Grammar(rules);
 		Set<Rule> set = new HashSet<Rule>();
-		g.root.subRules(set);
+		g.root.subRules(set, false);
 		for (Iterator<Rule> i = set.iterator(); i.hasNext();) {
 			Rule r = i.next();
 			if (r.generation == -1)

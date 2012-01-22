@@ -70,4 +70,29 @@ public class DescriptionTest {
 						.matcher(g.describe()).matches());
 	}
 
+	@Test
+	public void cyclesAndReversedRule() {
+		Grammar g = new Grammar(
+				new String[] {
+						//
+						"ROOT = <parens> | <square> | <curly> | <angled>",//
+						"parens = not after <escape> '(' [ /(?:\\\\.|[^()\\[\\]{}<>])++/ | <ROOT> ]*+ ')'",//
+						"square = not after <escape> '[' [ /(?:\\\\.|[^()\\[\\]{}<>])++/ | <ROOT> ]*+ ']'",//
+						"curly = not after <escape> '{' [ /(?:\\\\.|[^()\\[\\]{}<>])++/ | <ROOT> ]*+ '}'",//
+						"angled = not after <escape> '<' [ /(?:\\\\.|[^()\\[\\]{}<>])++/ | <ROOT> ]*+ '>'",//
+						"escape = /(?<!\\\\)(?:\\\\)++/r (odd)",//
+				});
+		g.defineCondition("odd", new Condition() {
+			@Override
+			public boolean passes(CharSequence subsequence) {
+				return subsequence.length() % 2 == 1;
+			}
+		});
+		String d = g.describe();
+		for (String s : new String[] { "ROOT", "parens", "square", "curly",
+				"angled", "escape" }) {
+			Pattern pattern = Pattern.compile("^\\s*+" + s, Pattern.MULTILINE);
+			assertTrue("contains rule " + s, pattern.matcher(d).find());
+		}
+	}
 }

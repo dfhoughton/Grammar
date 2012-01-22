@@ -889,7 +889,7 @@ public class Compiler {
 			ru.condition = sr.condition;
 			ru = adjustCondition(ru, sr);
 		}
-		ru.generation = sr.generation;
+		ru.unreversed = sr;
 		return ru;
 	}
 
