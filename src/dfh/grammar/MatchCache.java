@@ -3,15 +3,24 @@ package dfh.grammar;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- * A {@link Map} interface wrapped around an array. This implementation of a map
- * is optimized for getting and putting. It has a fixed size and will throw an
- * error if any integer is put into it outside its range of possible indices.
+ * The {@link Map} interface wrapped around an array. This implementation of a
+ * map is optimized for getting and putting. It has a fixed size and will throw
+ * an error if any integer is put into it outside its range of possible indices.
+ * It is great as a cache for grammars but isn't all that flexible. If you want
+ * flexibility, try <a href="http://trove.starlight-systems.com/">Trove</a>.
+ * Methods in {@link MatchCache} other than {@link #get(Object)},
+ * {@link #put(Integer, CachedMatch)}, and {@link #putAll(Map)} are *not*
+ * optimized. In particular, {@link #size()}, {@link #keySet()}, and
+ * {@link #values()} will all take considerably longer than their equivalent in
+ * {@link HashMap}, say, or {@link TreeMap}.
  * 
  * @author David Houghton
  */
