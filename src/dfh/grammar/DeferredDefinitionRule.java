@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public class DeferredDefinitionRule extends Rule implements Serializable,
 		NonterminalRule {
-	private static final long serialVersionUID = 4L;
+	private static final long serialVersionUID = 5L;
 	/**
 	 * Holds rule whose definition is deferred.
 	 */

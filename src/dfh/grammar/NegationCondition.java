@@ -3,7 +3,7 @@ package dfh.grammar;
 import java.util.List;
 
 public class NegationCondition extends LogicalCondition {
-	private static final long serialVersionUID = 4L;
+	private static final long serialVersionUID = 5L;
 
 	public NegationCondition(List<Condition> conditions) {
 		super(conditions);

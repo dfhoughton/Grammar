@@ -11,7 +11,7 @@ package dfh.grammar;
  * 
  */
 public abstract class BarrierException extends GrammarException {
-	private static final long serialVersionUID = 4L;
+	private static final long serialVersionUID = 5L;
 
 	/**
 	 * Generates error message appropriate to the barrier breached.

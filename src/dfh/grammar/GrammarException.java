@@ -15,7 +15,7 @@ import java.io.IOException;
  * 
  */
 public class GrammarException extends RuntimeException {
-	private static final long serialVersionUID = 4L;
+	private static final long serialVersionUID = 5L;
 
 	public GrammarException(String message) {
 		super(message);

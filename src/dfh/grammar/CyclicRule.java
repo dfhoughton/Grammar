@@ -21,7 +21,7 @@ import java.util.Set;
  */
 @Reversible
 public class CyclicRule extends Rule implements Serializable, NonterminalRule {
-	private static final long serialVersionUID = 4L;
+	private static final long serialVersionUID = 5L;
 	Rule r;
 
 	/**

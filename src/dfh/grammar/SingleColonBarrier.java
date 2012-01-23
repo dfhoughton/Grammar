@@ -11,7 +11,7 @@ package dfh.grammar;
  * 
  */
 public class SingleColonBarrier extends BarrierException {
-	private static final long serialVersionUID = 4L;
+	private static final long serialVersionUID = 5L;
 
 	/**
 	 * @param m
