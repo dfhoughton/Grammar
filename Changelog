@@ -1,4 +1,4 @@
-1.12
+1.12, 22 January 2012
   * fixed issues with description containing cyclic and reversed rules
   * created array-based offset cache for faster puts and gets
   * fixed description regression
