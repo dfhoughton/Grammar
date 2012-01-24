@@ -117,17 +117,18 @@
 			href="http://en.wikipedia.org/wiki/Recursive_descent_parser">recursive
 			descent parser</a>.<span class="fn">I am a linguist, not a
 			computer scientist. I hit upon this design by making the grammar work
-			in what I thought was the obvious way, not studying parsing theory. A
-			computer scientist could probably better fit my algorithm into a
-			standard taxonomy.</span> Basically this is a finite state automaton that
-		consumes symbols as it moves over a symbol sequence. This automaton
-		examines symbols in two streams: the character sequence you give it
-		and a reversed version of this sequence for lookbehinds. To accelerate
-		matching, terminal matches are cached. Also, all rules cache offsets
-		at which they fail to match so they never attempt to match at such
-		offsets twice. Functionally identical rules share caches, so, for
-		example, a literal sub-rule in one rule will not attempt to match
-		where an identical literal from another rule has already been tried.
+			in what I thought was the obvious way, not by studying parsing
+			theory. A computer scientist could probably better fit my algorithm
+			into a standard taxonomy.</span> Basically this is a finite state automaton
+		that consumes symbols as it moves over a symbol sequence. This
+		automaton examines symbols in two streams: the character sequence you
+		give it and a reversed version of this sequence for lookbehinds. To
+		accelerate matching, terminal matches are cached. Also, all rules
+		cache offsets at which they fail to match so they never attempt to
+		match at such offsets twice. Functionally identical rules share
+		caches, so, for example, a literal sub-rule in one rule will not
+		attempt to match where an identical literal from another rule has
+		already been tried.
 	</p>
 	<h2>Why?</h2>
 	<div>
