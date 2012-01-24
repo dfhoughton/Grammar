@@ -15,7 +15,8 @@ section at the end of the document.
 * modify grammar grammar
 * document up-level back references
 . clean up javadoc warnings
-. add fat option to Options
+* add fat option to Options
+. add document for new fat and longStringLength to Options documentation
 
 COMPLETED
 =========

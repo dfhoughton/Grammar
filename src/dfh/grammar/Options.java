@@ -81,20 +81,39 @@ public class Options {
 	 */
 	public static final boolean KEEP_RIGHTMOST = false;
 	/**
-	 * Whether to use a {@link HashMap} or {@link TreeMap} for the offset cache.
-	 * The keys in either case are of type {@link Integer}. The former is
-	 * slightly faster. The latter consumes less memory. You probably only want
-	 * lean memory when you are matching against an extremely large character
-	 * sequence in a memory constrained environment.
+	 * The default value of {@link #leanMemory()}: whether or not to use an
+	 * offset matching cache optimized for minimal memory usage. There are three
+	 * options: {@link MatchCache}, {@link HashMap}, and {@link TreeMap}. The
+	 * last uses the least memory; the first, the most. If you are matching
+	 * against very long character sequences and are in a memory constrained
+	 * environment, setting {@link #leanMemory()} to true enforces the use of a
+	 * {@link TreeMap}.
 	 */
 	public static final boolean LEAN_MEMORY = false;
+	/**
+	 * The default value of {@link #fatMemory()}: whether or not to always use
+	 * the fastest, least memory-efficient offset cache. See
+	 * {@link #LEAN_MEMORY}.
+	 */
+	public static final boolean FAT_MEMORY = false;
+	/**
+	 * If both {@link #leanMemory()} and {@link #fatMemory()} are false, the
+	 * grammar will choose whether to use a fast, fat cache --
+	 * {@link MatchCache} -- or a slower, leaner one -- {@link HashMap} --
+	 * depending on how long the sequence is it's matching against. This is the
+	 * default length threshold. If the sequence is longer than this, a
+	 * {@link HashMap} is used, otherwise, a {@link MatchCache}.
+	 */
+	public static final int LONG_STRING_LENGTH = 100000;
 	boolean allowOverlap = ALLOW_OVERLAP;
 	boolean study = STUDY;
 	boolean longestMatch = LONGEST_MATCH;
 	boolean keepRightmost = KEEP_RIGHTMOST;
 	boolean leanMemory = LEAN_MEMORY;
+	boolean fatMemory = FAT_MEMORY;
 	int start = START_OFFSET;
 	int end = -1;
+	int longStringLength = LONG_STRING_LENGTH;
 	int maxRecursionDepth = MAX_RECURSION_DEPTH;
 
 	/**
@@ -291,8 +310,9 @@ public class Options {
 	}
 
 	/**
-	 * Whether to use a slightly slower, leaner memory cache, or a slightly
-	 * faster, less wasteful one. See {@link #LEAN_MEMORY}.
+	 * Whether to use a slightly slower, leaner memory cache, or one of the
+	 * faster ones that consumes more memory. See {@link #LEAN_MEMORY},
+	 * {@link #FAT_MEMORY}, and {@value #LONG_STRING_LENGTH}.
 	 * 
 	 * @return whether to use a memory-efficient cache
 	 */
@@ -301,15 +321,68 @@ public class Options {
 	}
 
 	/**
-	 * Sets whether to use a slightly slower, leaner memory cache, or a slightly
-	 * faster, less wasteful one. See {@link #LEAN_MEMORY}.
+	 * Sets whether to use a slightly slower, leaner memory cache, or one of the
+	 * faster ones that consumes more memory. See {@link #LEAN_MEMORY},
+	 * {@link #FAT_MEMORY}, and {@value #LONG_STRING_LENGTH}.
 	 * 
-	 * @param keepRightmost
+	 * @param leanMemory
 	 *            whether to use a memory-efficient cache
 	 * @return self to allow chaining of methods
 	 */
 	public Options leanMemory(boolean leanMemory) {
 		this.leanMemory = leanMemory;
+		if (leanMemory)
+			fatMemory = false;
+		return this;
+	}
+
+	/**
+	 * Whether to always use the fastest, least memory-inefficient cache. See
+	 * {@link #FAT_MEMORY},{@link #LEAN_MEMORY}, and {@link #LONG_STRING_LENGTH}
+	 * .
+	 * 
+	 * @return whether to always use the fastest, least memory-efficient cache
+	 */
+	public boolean fatMemory() {
+		return fatMemory;
+	}
+
+	/**
+	 * Sets whether to always use the fastest, least memory-inefficient cache.
+	 * See {@link #FAT_MEMORY},{@link #LEAN_MEMORY}, and
+	 * {@link #LONG_STRING_LENGTH}.
+	 * 
+	 * @param fatMemory
+	 *            whether to use the fastest, least memory-efficient cache
+	 * @return self to allow chaining of methods
+	 */
+	public Options fatMemory(boolean fatMemory) {
+		this.fatMemory = fatMemory;
+		if (fatMemory)
+			leanMemory = false;
+		return this;
+	}
+
+	/**
+	 * @return end of region to match; returns -1 if the end is the end of the
+	 *         sequence to match
+	 */
+	public int longStringLength() {
+		return longStringLength;
+	}
+
+	/**
+	 * See {@link #LONG_STRING_LENGTH}.
+	 * 
+	 * @param longStringLength
+	 *            threshold length for switching from {@link MatchCache} to
+	 *            {@link HashMap}
+	 * @return self to allow chaining of methods
+	 */
+	public Options longStringLength(int longStringLength) {
+		if (longStringLength < 1)
+			throw new GrammarException("longStringLength must be positive");
+		this.longStringLength = longStringLength;
 		return this;
 	}
 }

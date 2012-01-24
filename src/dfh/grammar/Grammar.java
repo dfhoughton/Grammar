@@ -318,7 +318,7 @@ public class Grammar implements Serializable, Cloneable {
 		}
 	}
 
-	private static final long serialVersionUID = 5L;
+	private static final long serialVersionUID = 6L;
 	/**
 	 * {@link Label} of root {@link Rule}.
 	 */
@@ -934,9 +934,18 @@ public class Grammar implements Serializable, Cloneable {
 		int max = root.maxCacheIndex(-1, new HashSet<Rule>());
 		@SuppressWarnings("unchecked")
 		Map<Integer, CachedMatch>[] offsetCache = new Map[max + 1];
+		boolean lean = options.leanMemory, fat = options.fatMemory;
+		if (!(lean || fat))
+			fat = options.end - options.start < options.longStringLength;
 		for (int i = 0; i < offsetCache.length; i++) {
-			offsetCache[i] = options.leanMemory ? new TreeMap<Integer, CachedMatch>()
-					: new MatchCache(options.end - options.start);
+			Map<Integer, CachedMatch> m;
+			if (lean)
+				m = new TreeMap<Integer, CachedMatch>();
+			else if (fat)
+				m = new MatchCache(options.end - options.start);
+			else
+				m = new HashMap<Integer, CachedMatch>();
+			offsetCache[i] = m;
 		}
 		return offsetCache;
 	}

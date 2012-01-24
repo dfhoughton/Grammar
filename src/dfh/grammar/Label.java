@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		Serializable, Cloneable {
-	private static final long serialVersionUID = 5L;
+	private static final long serialVersionUID = 6L;
 	/**
 	 * label reserved for root rule label
 	 */
