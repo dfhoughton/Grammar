@@ -55,7 +55,7 @@
 	</target>
 
 	<target name="tar" description="bundle up the source and documentation">
-		<tar destfile="${build.dir}/grammar.tgz" compression="gzip">
+		<tar destfile="${build.dir}/grammar-${version}.tgz" compression="gzip">
 			<tarfileset dir="${basedir}">
 				<include name="README" />
 				<include name="VERSION" />
