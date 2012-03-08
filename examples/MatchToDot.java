@@ -13,7 +13,6 @@ import java.io.IOException;
 
 import dfh.cli.Cli;
 import dfh.cli.Cli.Opt;
-import dfh.cli.Modifiers;
 import dfh.grammar.Grammar;
 import dfh.grammar.GrammarException;
 import dfh.grammar.Match;
@@ -51,7 +50,8 @@ public class MatchToDot {
 				{ { Opt.NAME, MatchToDot.class.getName() } },//
 				{ { Opt.ARGS, "file", Opt.STAR } },//
 				{ { "grammar", 'g', String.class },
-						{ "grammar file; required", "file" }, { Cli.REQUIRED } },//
+						{ "grammar file; required", "file" },
+						{ Cli.Res.REQUIRED } },//
 				{ { "out", 'o', String.class },
 						{ "file to receive output", "file" } },//
 				{ {
@@ -62,7 +62,7 @@ public class MatchToDot {
 								+ "or any other utility that can read this format. If no file arguments are provided , it will expect input from STDIN.\n"
 								+ "If no output file is provided, it will write its output to STDOUT." } },//
 		};
-		Cli cli = new Cli(spec, Modifiers.HELP);
+		Cli cli = new Cli(spec, Cli.Mod.HELP);
 		cli.parse(args);
 		Grammar g = null;
 		File gf = new File(cli.string("grammar"));

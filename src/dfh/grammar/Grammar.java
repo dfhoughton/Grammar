@@ -978,6 +978,7 @@ public class Grammar implements Serializable, Cloneable {
 	 * @return pretty-printed grammar definition
 	 */
 	public String describe(final boolean alphabetized) {
+		checkComplete();
 		Set<Rule> set = new HashSet<Rule>(rules().size());
 		root.subRules(set, true);
 		List<Rule> rules = new ArrayList<Rule>(set);
