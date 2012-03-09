@@ -3,6 +3,8 @@
   * added fat and longStringLength options to allow finer control over offset
     caching
   * added Match.leftLeaf() and Match.rightLeaf()
+  * added some convenience methods to Match: hasLabel(Pattern),
+    hasLabelStartingWith(String), hasLabelEndingWith(String)
 
 1.12, 22 January 2012
   * fixed issues with description containing cyclic and reversed rules

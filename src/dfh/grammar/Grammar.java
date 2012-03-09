@@ -971,6 +971,11 @@ public class Grammar implements Serializable, Cloneable {
 	 * case, terminal rules are listed last, preceded by rules that depend only
 	 * on terminal rules, and so forth up the to the root rule. Rules of equal
 	 * independence are listed in alphabetical order.
+	 * <p>
+	 * This method is particularly useful if you produce a grammar by composing
+	 * other grammars. Grammar composition may necessitate rule name
+	 * readjustment to prevent conflicts and this method will facilitated
+	 * discovering these adjustments.
 	 * 
 	 * @param alphabetized
 	 *            whether non-root rules should be listed in alphabetical order
