@@ -1,6 +1,7 @@
 package dfh.grammar;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -92,5 +93,29 @@ public class TerminalGrammarTest {
 		String s = "aab";
 		Matcher m = g1.find(s);
 		assertNotNull("found joe", m.match());
+	}
+
+	@Test
+	public void conditionTest() {
+		Grammar ga = new Grammar("ROOT = <b>");
+		Grammar gb = new Grammar("ROOT = /\\b\\d++\\b/ (lt100)");
+		gb.defineCondition("lt100", new Condition() {
+			@Override
+			public boolean passes(CharSequence subsequence) {
+				return Integer.parseInt(subsequence.toString()) < 100;
+			}
+		});
+		int count = 0;
+		Matcher m = gb.find("1 10 100");
+		while (m.match() != null)
+			count++;
+		assertTrue("found only first two", count == 2);
+		ga.defineRule("b", gb);
+		count = 0;
+		m = gb.find("1 10 100");
+		while (m.match() != null) {
+			count++;
+		}
+		assertTrue("found only first two", count == 2);
 	}
 }
