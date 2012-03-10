@@ -118,4 +118,16 @@ public class TerminalGrammarTest {
 		}
 		assertTrue("found only first two", count == 2);
 	}
+
+	@Test
+	public void conditionDescriptionTest() {
+		Grammar ga = new Grammar("ROOT = <b>");
+		Grammar gb = new Grammar("ROOT = /\\b\\d++\\b/ (lt100)");
+		gb.defineCondition("lt100", new Condition() {
+		});
+		ga.defineRule("b", gb);
+		assertTrue("condition name appears in description", ga.describe()
+				.indexOf("lt100") > -1);
+	}
+
 }

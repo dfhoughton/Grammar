@@ -1,5 +1,4 @@
-
-1.13
+1.13, 10 March 2012
   * added fat and longStringLength options to allow finer control over offset
     caching
   * added Match.leftLeaf() and Match.rightLeaf()
