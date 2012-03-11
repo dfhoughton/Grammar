@@ -7,9 +7,8 @@ section at the end of the document.
 . clean up uid() uniqueId() business
 . create xpath-like convention for searching matches
 . make sure conditionalized terminals are being cached properly
-. make sure non-terminal matches are using their subcache
+* make sure non-terminal matches are using their subcache
 . profile some matching to figure out what could be optimized
-. stop caching success
 . document logically complex conditions
 * document new assertion syntax
 * modify grammar grammar
@@ -53,3 +52,4 @@ COMPLETED
 * change stack separator in logging so it doesn't look like a backtracking barrier
 * fix studying of cyclic grammars
 * simplify study method given improved studying algorithm
+- stop caching success
