@@ -1369,6 +1369,7 @@ public class Grammar implements Serializable, Cloneable {
 		DeferredDefinitionRule r = checkRuleDefinition(label);
 		g.checkComplete();
 		g = (Grammar) g.clone();
+		System.out.print(g.describe());
 		// now we fix labels
 		List<Label> labels = new ArrayList<Label>(g.rules.size());
 		for (Label l : g.rules.keySet()) {

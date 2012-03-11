@@ -66,15 +66,14 @@ public abstract class NonterminalMatcher extends Matcher {
 			return null;
 		}
 		CachedMatch cm = subCache.get(offset);
-		boolean alreadyMatched = cm != null;
-		if (alreadyMatched && cm == CachedMatch.MISMATCH) {
+		if (cm == CachedMatch.MISMATCH) {
 			if (options.debug)
 				rule.matchTrace(this, null);
 			return null;
 		}
 		if (next == null && !(options.containsCycles && cycleCheck()))
 			fetchNext();
-		if (!alreadyMatched) {
+		if (cm == null) {
 			cm = next == null ? CachedMatch.MISMATCH : CachedMatch.MATCH;
 			subCache.put(offset, cm);
 		}

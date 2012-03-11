@@ -70,8 +70,13 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 						else
 							n = new Match(Assertion.this, offset, offset);
 					}
-					cm = n == null ? CachedMatch.MISMATCH : CachedMatch.MATCH;
-					subCache.put(offset, cm);
+					if (n == null) {
+						subCache.put(offset, CachedMatch.MISMATCH);
+						return null;
+					}
+					// cm = n == null ? CachedMatch.MISMATCH :
+					// CachedMatch.MATCH;
+					// subCache.put(offset, cm);
 					return register(n);
 				} else if (cm == CachedMatch.MISMATCH)
 					return null;
