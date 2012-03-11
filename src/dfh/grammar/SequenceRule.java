@@ -189,9 +189,10 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 					b.append(']');
 			}
 		}
-		if (condition != null)
-			b.append(" (").append(condition).append(')');
-		return wrap(b);
+		b = new StringBuilder(wrap(b));
+		if (c != null)
+			b.append(" (").append(c.describe()).append(')');
+		return b.toString();
 	}
 
 	@Override
@@ -342,5 +343,42 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 			cache.put(uid(), allZero);
 			return allZero;
 		}
+	}
+
+	@Override
+	public Set<String> conditionNames() {
+		if (c instanceof LogicalCondition)
+			return ((LogicalCondition) c).conditionNames();
+		Set<String> set = new HashSet<String>(1);
+		set.add(c.getName());
+		return set;
+	}
+
+	@Override
+	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
+		String id = generation == -1 ? label().id : nameBase + ':' + label().id;
+		Label l = new Label(label().t, id);
+		Rule[] copies = new Rule[sequence.length];
+		List<Set<String>> tlCopy = new ArrayList<Set<String>>(tagList.size());
+		SequenceRule r = new SequenceRule(l, copies, tlCopy);
+		for (int i = 0; i < copies.length; i++) {
+			Set<String> copySet = new HashSet<String>(tagList.get(i));
+			tlCopy.add(copySet);
+			Rule or = sequence[i];
+			copySet.remove(or.uid());
+			Rule copy = cycleMap.get(or.label().id);
+			if (copy == null)
+				copy = or.deepCopy(nameBase, cycleMap);
+			copies[i] = copy;
+			copySet.add(copy.uid());
+		}
+		if (c != null) {
+			r.condition = nameBase + ':' + condition;
+			r.c = c.copy(nameBase);
+		}
+		r.setUid();
+		cycleMap.put(label().id, r);
+		r.generation = generation;
+		return r;
 	}
 }

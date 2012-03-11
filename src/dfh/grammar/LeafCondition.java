@@ -12,6 +12,6 @@ class LeafCondition extends Condition implements Serializable {
 	protected String cnd;
 
 	LeafCondition(String cnd) {
-		this.cnd = cnd;
+		name = this.cnd = cnd;
 	}
 }

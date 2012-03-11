@@ -2,7 +2,9 @@ package dfh.grammar;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import dfh.grammar.util.Dotify;
 
@@ -30,7 +32,7 @@ public abstract class LogicalCondition extends Condition implements
 	public LogicalCondition(List<Condition> conditions) {
 		subconditions = conditions.toArray(new Condition[conditions.size()]);
 	}
-	
+
 	protected LogicalCondition(int length) {
 		subconditions = new Condition[length];
 	}
@@ -107,8 +109,78 @@ public abstract class LogicalCondition extends Condition implements
 		}
 		return used;
 	}
-	
+
+	/**
+	 * Returns set of names for {@link LeafCondition conditions} that must be
+	 * defined to specify this logical condition.
+	 * 
+	 * @return set of names for {@link LeafCondition conditions} that must be
+	 *         defined to specify this logical condition
+	 */
+	public Set<String> conditionNames() {
+		Set<String> set = new HashSet<String>();
+		conditionNames(set);
+		return set;
+	}
+
+	protected void conditionNames(Set<String> set) {
+		for (Condition c : subconditions) {
+			String name = c.getName();
+			if (name != null)
+				set.add(name);
+			if (c instanceof LogicalCondition)
+				((LogicalCondition) c).conditionNames(set);
+		}
+	}
+
 	protected abstract LogicalCondition duplicate();
 
 	protected abstract boolean allPass(Match n, Matcher m, CharSequence s);
+
+	@Override
+	protected abstract String describe();
+
+	/**
+	 * Used to implement {@link #describe()} for various logical condition
+	 * subtypes.
+	 * 
+	 * @param c
+	 *            character representing a logical operation
+	 * @return
+	 */
+	protected String describe(char c) {
+		StringBuilder b = new StringBuilder();
+		boolean initial = true;
+		for (Condition cnd : subconditions) {
+			if (initial)
+				initial = false;
+			else
+				b.append(c);
+			if (cnd instanceof LogicalCondition)
+				b.append('(').append(cnd.describe()).append(')');
+			else
+				b.append(cnd.describe());
+		}
+		return b.toString();
+	}
+
+	@Override
+	Condition copy(String namebase) {
+		List<Condition> copies = new ArrayList<Condition>(subconditions.length);
+		for (int i = 0; i < subconditions.length; i++)
+			copies.add(subconditions[i].copy(namebase));
+		LogicalCondition lc = null;
+		if (this instanceof ConjunctionCondition)
+			lc = new ConjunctionCondition(copies);
+		else if (this instanceof DisjunctionCondition)
+			lc = new DisjunctionCondition(copies);
+		else if (this instanceof XORCondition)
+			lc = new XORCondition(copies);
+		else if (this instanceof NegationCondition)
+			lc = new NegationCondition(copies);
+		if (name != null) {
+			lc.setName(namebase + ':' + name);
+		}
+		return lc;
+	}
 }

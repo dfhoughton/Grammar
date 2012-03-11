@@ -34,4 +34,9 @@ public class DisjunctionCondition extends LogicalCondition {
 		return cj;
 	}
 
+	@Override
+	protected String describe() {
+		return describe('|');
+	}
+
 }

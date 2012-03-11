@@ -131,6 +131,11 @@ public class DeferredRuleTest {
 		protected Boolean mayBeZeroWidth(Map<String, Boolean> cache) {
 			return false;
 		}
+
+		@Override
+		public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
+			return null;
+		}
 	}
 
 	@Test

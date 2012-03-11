@@ -2,6 +2,7 @@ package dfh.grammar;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -506,6 +507,20 @@ public abstract class Rule {
 	}
 
 	/**
+	 * Returns whether this rule depends on the given for its matching. This
+	 * method is not optimized. It is meant to be used during grammar
+	 * composition, not matching.
+	 * 
+	 * @param r
+	 * @return whether this rule depends on r for its matching
+	 */
+	public boolean dependsOn(Rule r) {
+		Set<Rule> set = new HashSet<Rule>();
+		subRules(set, false);
+		return set.contains(r);
+	}
+
+	/**
 	 * For recording redundant labels during compilation.
 	 * 
 	 * @param l2
@@ -539,4 +554,16 @@ public abstract class Rule {
 	 * @return whether the rule could ever return a zero-width match
 	 */
 	protected abstract Boolean mayBeZeroWidth(Map<String, Boolean> cache);
+
+	public abstract Rule deepCopy(String nameBase, Map<String, Rule> cycleMap);
+
+	/**
+	 * Returns the names of conditions associated with this rule. This base
+	 * implementation should be overridden in rules that may carry conditions.
+	 * 
+	 * @return the names of conditions associated with this rule
+	 */
+	public Set<String> conditionNames() {
+		return new HashSet<String>(0);
+	}
 }

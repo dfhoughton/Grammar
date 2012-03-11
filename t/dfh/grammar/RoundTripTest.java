@@ -42,7 +42,10 @@ public class RoundTripTest {
 	public void cycle() {
 		String[] rules = { "ROOT = 'a' | <ROOT> 'b'",//
 		};
-		Grammar g = new Grammar(new Grammar(rules).describe());
+		Grammar g = new Grammar(rules);
+		assertNotNull(g.matches("ab").match());
+		String s = g.describe();
+		g = new Grammar(s);
 		assertNotNull(g.matches("ab").match());
 	}
 

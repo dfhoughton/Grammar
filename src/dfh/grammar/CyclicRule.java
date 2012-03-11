@@ -113,7 +113,7 @@ public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 	protected void subRules(Set<Rule> set, boolean explicit) {
 		if (!set.contains(this)) {
 			if (explicit) {
-				if (r.generation > -1)
+				if (generation > -1)
 					set.add(this);
 				if (unreversed != null)
 					unreversed.subRules(set, explicit);
@@ -147,5 +147,20 @@ public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 			cache.put(uid(), b);
 			return b;
 		}
+	}
+
+	@Override
+	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
+		String id = generation == -1 ? label().id : nameBase + ':' + label().id;
+		Label l = new Label(label().t, id);
+		Rule copy = cycleMap.get(r.label().id);
+		cycleMap.put(label().id, r);
+		if (copy == null)
+			copy = r.deepCopy(nameBase, cycleMap);
+		CyclicRule r = new CyclicRule(l);
+		r.r = copy;
+		r.setUid();
+		r.generation = generation;
+		return r;
 	}
 }

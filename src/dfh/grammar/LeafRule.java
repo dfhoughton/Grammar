@@ -131,20 +131,16 @@ public class LeafRule extends Rule implements Serializable {
 			s = s.replaceAll("\\s++", "");
 			return '/' + s + suffix;
 		}
-		if (condition != null)
-			s += '(' + condition + ')';
 		return s;
 	}
 
 	@Override
 	public String description(boolean inBrackets) {
 		StringBuilder b = descriptionWOCondition();
-		if (condition != null)
-			b.append(" (").append(condition).append(')');
 		return wrap(b);
 	}
 
-	private StringBuilder descriptionWOCondition() {
+	protected StringBuilder descriptionWOCondition() {
 		StringBuilder b = new StringBuilder();
 		b.append('/');
 		b.append(p.toString());
@@ -217,5 +213,20 @@ public class LeafRule extends Rule implements Serializable {
 		// zero-width match, so we bail
 		cache.put(uid(), true);
 		return true;
+	}
+
+	@Override
+	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
+		LeafRule lr = (LeafRule) cycleMap.get(label().id);
+		if (lr == null) {
+			String id = generation == -1 ? label().id : nameBase + ':'
+					+ label().id;
+			Label l = new Label(label().t, id);
+			lr = new LeafRule(l, p, reversible);
+			lr.setUid();
+			cycleMap.put(label().id, lr);
+			lr.generation = generation;
+		}
+		return lr;
 	}
 }

@@ -1,6 +1,5 @@
 package dfh.grammar;
 
-
 /**
  * For applying a post-match test to a {@link Match}.
  * <p>
@@ -10,6 +9,8 @@ package dfh.grammar;
  * 
  */
 public abstract class Condition {
+
+	public String name;
 
 	/**
 	 * Returns whether the {@link Match} meets the given condition.
@@ -99,5 +100,49 @@ public abstract class Condition {
 			return b;
 		}
 		return s.subSequence(n.start(), n.end());
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * To be called during compilation, not by user.
+	 * 
+	 * @param name
+	 *            the name the condition is identified by in the grammar
+	 */
+	protected void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * Adjusts the condition name to move it into the specified namespace.
+	 * 
+	 * @param base
+	 */
+	protected void addNameBase(String base) {
+		if (name != null)
+			name = base + ':' + name;
+	}
+
+	/**
+	 * Required by {@link Grammar#describe()}.
+	 * 
+	 * @return string representing condition
+	 */
+	protected String describe() {
+		return name;
+	}
+
+	/**
+	 * Facilitates the renaming of conditions for
+	 * {@link Grammar#defineRule(String, Grammar, String, Condition)}.
+	 * 
+	 * @param namebase
+	 * @return renamed copy of current condition
+	 */
+	Condition copy(String namebase) {
+		return new WrappedCondition(namebase, this);
 	}
 }

@@ -133,7 +133,8 @@ public class DeferredDefinitionRule extends Rule implements Serializable,
 					unreversed.subRules(set, explicit);
 			} else
 				set.add(this);
-			r.subRules(set, explicit);
+			if (r != null)
+				r.subRules(set, explicit);
 		}
 	}
 
@@ -161,5 +162,25 @@ public class DeferredDefinitionRule extends Rule implements Serializable,
 			cache.put(uid(), b);
 			return b;
 		}
+	}
+
+	@Override
+	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
+		DeferredDefinitionRule ddr = (DeferredDefinitionRule) cycleMap
+				.get(label().id);
+		if (ddr == null) {
+			String id = generation == -1 ? label().id : nameBase + ':'
+					+ label().id;
+			Label l = new Label(label().t, id);
+			Rule copy = cycleMap.get(r.label().id);
+			if (copy == null)
+				copy = r.deepCopy(nameBase, cycleMap);
+			ddr = new DeferredDefinitionRule(l);
+			ddr.r = copy;
+			ddr.setUid();
+			cycleMap.put(label().id, ddr);
+			ddr.generation = generation;
+		}
+		return ddr;
 	}
 }

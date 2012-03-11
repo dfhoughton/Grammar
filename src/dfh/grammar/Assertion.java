@@ -281,4 +281,20 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 		}
 		return true;
 	}
+
+	@Override
+	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
+		Assertion ass = (Assertion) cycleMap.get(label().id);
+		if (ass == null) {
+			Label l = new Label(label().t, nameBase + ':' + label().id);
+			Rule copy = cycleMap.get(r.label().id);
+			if (copy == null)
+				copy = r.deepCopy(nameBase, cycleMap);
+			ass = new Assertion(l, copy, positive, forward);
+			ass.setUid();
+			cycleMap.put(label().id, ass);
+			ass.generation = generation;
+		}
+		return ass;
+	}
 }

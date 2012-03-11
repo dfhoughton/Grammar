@@ -84,6 +84,14 @@ public class ConditionalLeafRule extends LeafRule {
 		this.c = c;
 	}
 
+	private ConditionalLeafRule(ConditionalLeafRule clr, String nameBase) {
+		super(new Label(clr.label().t, nameBase + ':' + clr.label().id), clr.p,
+				clr.reversible);
+		this.condition = nameBase + ':' + clr.condition;
+		this.generation = clr.generation;
+		this.c = clr.c.copy(nameBase);
+	}
+
 	@Override
 	public Matcher matcher(final Integer offset,
 			Map<Integer, CachedMatch>[] cache, Matcher master) {
@@ -141,4 +149,37 @@ public class ConditionalLeafRule extends LeafRule {
 		return this;
 	}
 
+	@Override
+	public Set<String> conditionNames() {
+		if (c instanceof LogicalCondition)
+			return ((LogicalCondition) c).conditionNames();
+		Set<String> set = new HashSet<String>(1);
+		set.add(c.getName());
+		return set;
+	}
+
+	@Override
+	public String description(boolean inBrackets) {
+		StringBuilder b = descriptionWOCondition();
+		b = new StringBuilder(wrap(b));
+		b.append(" (").append(c.describe()).append(')');
+		return b.toString();
+	}
+
+	@Override
+	protected String uniqueId() {
+		return super.uniqueId() + '(' + c.describe() + ')';
+	}
+
+	@Override
+	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
+		ConditionalLeafRule clr = (ConditionalLeafRule) cycleMap
+				.get(label().id);
+		if (clr == null) {
+			clr = new ConditionalLeafRule(this, nameBase);
+			clr.setUid();
+			cycleMap.put(label().id, clr);
+		}
+		return clr;
+	}
 }

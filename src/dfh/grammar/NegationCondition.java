@@ -30,4 +30,12 @@ public class NegationCondition extends LogicalCondition {
 		return cj;
 	}
 
+	@Override
+	protected String describe() {
+		Condition cnd = subconditions[0];
+		if (cnd instanceof LogicalCondition)
+			return "!(" + cnd.describe() + ')';
+		return '!' + cnd.describe();
+	}
+
 }

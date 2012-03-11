@@ -112,7 +112,7 @@ public class LiteralRule extends Rule implements Serializable {
 		StringBuilder b = new StringBuilder();
 		b.append('"').append(literal).append('"');
 		if (condition != null)
-			b.append('(').append(condition).append(')');
+			b.append('(').append(c.describe()).append(')');
 		return b.toString();
 	}
 
@@ -120,17 +120,20 @@ public class LiteralRule extends Rule implements Serializable {
 	public String description(boolean inBrackets) {
 		boolean b1 = literal.indexOf('\\') > -1;
 		boolean b2 = literal.indexOf('"') > -1;
+		StringBuilder b;
 		if (b1 || b2) {
 			String s = literal;
 			if (b2)
 				s = '\'' + s.replaceAll("([\\\\'])", "\\\\$1") + '\'';
 			else
 				s = '"' + s.replaceAll("([\\\\])", "\\\\$1") + '"';
-			if (condition != null)
-				s += " (" + condition + ')';
-			return wrap(new StringBuilder(s));
-		}
-		return wrap(new StringBuilder(uniqueId()));
+			b = new StringBuilder(s);
+		} else
+			b = new StringBuilder(uniqueId());
+		b = new StringBuilder(wrap(b));
+		if (c != null)
+			b.append(" (").append(c.describe()).append(')');
+		return b.toString();
 	}
 
 	@Override
@@ -197,5 +200,33 @@ public class LiteralRule extends Rule implements Serializable {
 		Boolean b = literal.length() == 0;
 		cache.put(uid(), b);
 		return b;
+	}
+
+	@Override
+	public Set<String> conditionNames() {
+		if (c instanceof LogicalCondition)
+			return ((LogicalCondition) c).conditionNames();
+		Set<String> set = new HashSet<String>(1);
+		set.add(c.getName());
+		return set;
+	}
+
+	@Override
+	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
+		LiteralRule lr = (LiteralRule) cycleMap.get(label().id);
+		if (lr == null) {
+			String id = generation == -1 ? label().id : nameBase + ':'
+					+ label().id;
+			Label l = new Label(label().t, id);
+			lr = new LiteralRule(l,literal);
+			if (c != null) {
+				lr.condition = nameBase + ':' + condition;
+				lr.c = c.copy(nameBase);
+			}
+			lr.setUid();
+			cycleMap.put(label().id, lr);
+			lr.generation = generation;
+		}
+		return lr;
 	}
 }

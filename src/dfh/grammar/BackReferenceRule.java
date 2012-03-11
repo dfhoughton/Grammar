@@ -134,4 +134,9 @@ public class BackReferenceRule extends Rule implements Serializable,
 		cache.put(uid(), true);
 		return true;
 	}
+
+	@Override
+	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
+		return this;
+	}
 }

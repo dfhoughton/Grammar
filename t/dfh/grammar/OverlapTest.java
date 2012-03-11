@@ -36,7 +36,6 @@ public class OverlapTest {
 		int count = 0;
 		while ((n = m.match()) != null) {
 			count++;
-			// System.out.println(s.substring(n.start(), n.end()));
 		}
 		assertTrue(count == 3);
 	}

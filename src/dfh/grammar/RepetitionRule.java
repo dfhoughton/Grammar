@@ -331,7 +331,10 @@ public class RepetitionRule extends Rule implements Serializable,
 				b.append(']');
 		}
 		b.append(repetition);
-		return wrap(b);
+		b = new StringBuilder(wrap(b));
+		if (c != null)
+			b.append(" (").append(c.describe()).append(')');
+		return b.toString();
 	}
 
 	@Override
@@ -464,5 +467,39 @@ public class RepetitionRule extends Rule implements Serializable,
 				return b;
 			}
 		}
+	}
+
+	@Override
+	public Set<String> conditionNames() {
+		if (c instanceof LogicalCondition)
+			return ((LogicalCondition) c).conditionNames();
+		Set<String> set = new HashSet<String>(1);
+		set.add(c.getName());
+		return set;
+	}
+
+	@Override
+	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
+		RepetitionRule rr = (RepetitionRule) cycleMap.get(label().id);
+		if (rr == null) {
+			Set<String> atCopy = new HashSet<String>(alternateTags);
+			atCopy.remove(r.uid());
+			Rule copy = cycleMap.get(r.label().id);
+			if (copy == null)
+				copy = r.deepCopy(nameBase, cycleMap);
+			atCopy.add(copy.uid());
+			String id = generation == -1 ? label().id : nameBase + ':'
+					+ label().id;
+			Label l = new Label(label().t, id);
+			rr = new RepetitionRule(l, copy, repetition, atCopy);
+			if (c != null) {
+				rr.condition = nameBase + ':' + condition;
+				rr.c = c.copy(nameBase);
+			}
+			rr.setUid();
+			cycleMap.put(label().id, rr);
+			rr.generation = generation;
+		}
+		return rr;
 	}
 }

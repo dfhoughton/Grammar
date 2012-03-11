@@ -983,18 +983,17 @@ public class Grammar implements Serializable, Cloneable {
 	 * @return pretty-printed grammar definition
 	 */
 	public String describe(final boolean alphabetized) {
-		checkComplete();
-		Set<Rule> set = new HashSet<Rule>(rules().size());
+		// checkComplete();
+		Set<Rule> set = new HashSet<Rule>();
 		root.subRules(set, true);
 		List<Rule> rules = new ArrayList<Rule>(set);
 		for (Iterator<Rule> i = rules.iterator(); i.hasNext();) {
-			Rule r = i.next();
-			if (r.generation == -1)
+			if (i.next() == root) {
 				i.remove();
-			else if (r == root)
-				i.remove();
+				break;
+			}
 		}
-		int maxLabel = -1;
+		int maxLabel = root.label().id.length();
 		for (Rule r : rules) {
 			int l = r.label().id.length();
 			if (l > maxLabel)
@@ -1294,204 +1293,32 @@ public class Grammar implements Serializable, Cloneable {
 		return new GlobalState(s, opt, recursive);
 	}
 
-	/**
-	 * Assign a complete grammar to an undefined symbol.
-	 * <p>
-	 * Defining a {@link Rule} as a {@link Grammar} presents namespace
-	 * difficulties because the two grammars are compiled independently, so up
-	 * to the point of assignment there is no way to ensure there won't be
-	 * namespace collisions. To solve this problem, the label that is being
-	 * redefined becomes a namespace prefix should there be collisions.
-	 * <p>
-	 * Furthermore, during compilation redundant rules are consolidated. This
-	 * same process is replicated when a symbol is redefined as a grammar.
-	 * Putting this together with namespace changes may produce
-	 * counter-intuitive results. For example, consider the following
-	 * composition of three grammars.
-	 * <h2>Root Grammar</h2>
-	 * 
-	 * <pre>
-	 * &lt;ROOT&gt; = &lt;bar&gt; | &lt;quux&gt;
-	 * 
-	 *  &lt;foo&gt; = &lt;bar&gt; | &lt;quux&gt;
-	 * &lt;quux&gt; = &lt;b&gt; &lt;foo&gt; 1
-	 *  &lt;bar&gt; = &lt;a&gt;
-	 *    &lt;a&gt; = UNDEFINED
-	 *    &lt;b&gt; = UNDEFINED
-	 * </pre>
-	 * 
-	 * <h2>Grammar for <code>&lt;a&gt;</code></h2>
-	 * 
-	 * <pre>
-	 * &lt;ROOT&gt; = &lt;a&gt;{2} &lt;b&gt;
-	 * 
-	 *    &lt;a&gt; = "a"
-	 *    &lt;b&gt; = "b"
-	 * </pre>
-	 * 
-	 * <h2>Grammar for <code>&lt;b&gt;</code></h2>
-	 * 
-	 * <pre>
-	 * &lt;ROOT&gt; = &lt;a&gt; &lt;b&gt;{1,2}
-	 * 
-	 *    &lt;a&gt; = "a"
-	 *    &lt;b&gt; = "b"
-	 * </pre>
-	 * 
-	 * <h2>Result</h2>
-	 * 
-	 * <pre>
-	 * &lt;ROOT&gt; = &lt;bar&gt; | &lt;quux&gt;
-	 * 
-	 * &lt;quux&gt; = &lt;b&gt; &lt;foo&gt; 1
-	 *  &lt;foo&gt; = &lt;bar&gt; | &lt;quux&gt;
-	 *  &lt;bar&gt; = &lt;a&gt;
-	 *  &lt;a:a&gt; = "a"
-	 *  &lt;a:b&gt; = "b"
-	 *    &lt;a&gt; = &lt;a:a&gt;{2} &lt;a:b&gt;
-	 *    &lt;b&gt; = &lt;a:a&gt; &lt;a:b&gt;{1,2}
-	 * </pre>
-	 * 
-	 * The matching pattern is what you would expect but you will see that the
-	 * <code>b</code> namespace goes entirely unused because all of the named
-	 * elements of the <code>&lt;b&gt;</code> grammar have been reconstituted
-	 * from components of <code>&lt;a&gt;</code>.
-	 * 
-	 * @param label
-	 * @param g
-	 * @param id
-	 *            unique identifier for condition, if any
-	 * @param c
-	 *            optional {@link Condition}
-	 */
 	public synchronized void defineRule(String label, Grammar g, String id,
 			Condition c) {
 		DeferredDefinitionRule r = checkRuleDefinition(label);
 		g.checkComplete();
-		g = (Grammar) g.clone();
-		System.out.print(g.describe());
-		// now we fix labels
-		List<Label> labels = new ArrayList<Label>(g.rules.size());
-		for (Label l : g.rules.keySet()) {
-			if (rules.containsKey(l) && g.rules.get(l).generation > -1)
-				labels.add(l);
+		// figure out how to adjust the generation numbers so describe()
+		// reflects the dependencies among rules
+		int greatestGeneration = -1;
+		for (Rule sr : g.rules()) {
+			if (sr.generation > greatestGeneration)
+				greatestGeneration = sr.generation;
 		}
-		// rename
-		for (Label l : labels) {
-			Rule ru = g.rules.remove(l);
-			boolean isRoot = l.equals(g.rootLabel);
-			String s = label + ':' + l.id;
-			l = new Label(l.t, s);
-			Rule nru = Compiler.fixLabel(l, ru,
-					Compiler.parseCondition(null, ru.condition));
-			fix(g, ru, nru);
-			g.rules.put(l, nru);
-			if (isRoot) {
-				g.rootLabel = l;
-				// hide root
-				nru.generation = -1;
-				g.root = nru;
+		// increment once more for the root rule
+		greatestGeneration++;
+		// now copy the rule tree
+		Rule rc = g.root.deepCopy(label, new HashMap<String, Rule>(g.rules()
+				.size()));
+		rc.generation = greatestGeneration++;
+		if (redefinitionCheck(r, rc)) {
+			r.generation = greatestGeneration;
+			for (Rule sr : rules()) {
+				if (sr.dependsOn(r))
+					sr.generation += greatestGeneration;
 			}
+			if (c != null)
+				rc = conditionCheck(label, c, rc);
 		}
-		// and we check for any lingering redundancies
-		Map<String, Label> oldMap = new HashMap<String, Label>(rules.size()), newMap = new HashMap<String, Label>(
-				g.rules.size());
-		for (Entry<Label, Rule> e : rules.entrySet())
-			oldMap.put(e.getValue().uniqueId(), e.getKey());
-		for (Entry<Label, Rule> e : g.rules.entrySet())
-			newMap.put(e.getValue().uniqueId(), e.getKey());
-		for (String uid : newMap.keySet()) {
-			if (oldMap.containsKey(uid)) {
-				Rule oru = g.rules.remove(newMap.get(uid));
-				Rule nru = rules.get(oldMap.get(uid));
-				fix(g, oru, nru);
-			}
-		}
-		// we augment the original rule set
-		for (Entry<Label, Rule> e : g.rules.entrySet()) {
-			rules.put(e.getKey(), e.getValue());
-		}
-		// and we define the rule
-		Rule rr = g.root;
-		if (c != null)
-			rr = conditionCheck(label, c, rr);
-		if (redefinitionCheck(r, rr)) {
-
-			// finally, we reassign generation numbers to better indicate
-			// dependency
-			Map<Rule, Set<Rule>> dependentMap = new HashMap<Rule, Set<Rule>>(
-					rules.size());
-			Set<Rule> requireAssignment = new HashSet<Rule>(rules.size());
-			for (Rule ru : rules.values()) {
-				Set<Rule> dependents = dependents(ru);
-				dependentMap.put(ru, dependents);
-				if (!ru.label.equals(rootLabel) && ru.generation > -1) {
-					requireAssignment.add(ru);
-				}
-			}
-			int generation = 0;
-			while (!requireAssignment.isEmpty()) {
-				generation++;
-				List<Rule> reassigned = new ArrayList<Rule>(
-						requireAssignment.size());
-				OUTER: for (Rule ru : requireAssignment) {
-					Set<Rule> dependents = dependentMap.get(ru);
-					for (Rule dr : dependents) {
-						if (requireAssignment.contains(dr))
-							continue OUTER;
-					}
-					reassigned.add(ru);
-				}
-				if (reassigned.isEmpty()) {
-					// looping, break out
-					for (Rule ru : requireAssignment)
-						ru.generation = generation;
-					break;
-				} else {
-					for (Rule ru : reassigned)
-						ru.generation = generation;
-					requireAssignment.removeAll(reassigned);
-				}
-			}
-		}
-	}
-
-	private Set<Rule> dependents(Rule ru) {
-		if (ru instanceof LeafRule || ru instanceof LiteralRule)
-			return new HashSet<Rule>(0);
-		if (ru instanceof AlternationRule) {
-			AlternationRule ar = (AlternationRule) ru;
-			Set<Rule> set = new HashSet<Rule>(ar.alternates.length);
-			for (Rule r : ar.alternates)
-				set.add(r);
-			return set;
-		}
-		if (ru instanceof SequenceRule) {
-			SequenceRule sr = (SequenceRule) ru;
-			Set<Rule> set = new HashSet<Rule>(sr.sequence.length);
-			for (Rule r : sr.sequence)
-				set.add(r);
-			return set;
-		}
-		if (ru instanceof RepetitionRule) {
-			RepetitionRule rr = (RepetitionRule) ru;
-			Set<Rule> set = new HashSet<Rule>(1);
-			set.add(rr.r);
-			return set;
-		}
-		if (ru instanceof DeferredDefinitionRule) {
-			DeferredDefinitionRule ddr = (DeferredDefinitionRule) ru;
-			Set<Rule> set = new HashSet<Rule>(1);
-			set.add(ddr.r);
-			return set;
-		}
-		if (ru instanceof CyclicRule) {
-			CyclicRule cr = (CyclicRule) ru;
-			Set<Rule> set = new HashSet<Rule>(1);
-			set.add(cr.r);
-			return set;
-		}
-		return new HashSet<Rule>(0);
 	}
 
 	/**
@@ -1678,6 +1505,7 @@ public class Grammar implements Serializable, Cloneable {
 					fix(this, rr, nrr);
 			}
 		}
+		c.setName(label);
 	}
 
 	/**
