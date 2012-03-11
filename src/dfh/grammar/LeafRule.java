@@ -196,12 +196,6 @@ public class LeafRule extends Rule implements Serializable {
 	}
 
 	@Override
-	protected Rule sClone() {
-		LeafRule lr = new LeafRule((Label) label.clone(), p, reversible);
-		return lr;
-	}
-
-	@Override
 	public Rule conditionalize(Condition c, String id) {
 		return new ConditionalLeafRule(this, c, id);
 	}

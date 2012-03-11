@@ -108,11 +108,4 @@ public class UpLevelBackReferenceRule extends BackReferenceRule {
 		return Integer.toString(index + 1) + '^';
 	}
 
-	@Override
-	protected Rule sClone() {
-		UpLevelBackReferenceRule brr = new UpLevelBackReferenceRule(
-				(Label) label.clone(), index, level);
-		return brr;
-	}
-
 }

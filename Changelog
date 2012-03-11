@@ -1,4 +1,6 @@
 1.14
+  * improved rule description
+  * removed shallow cloning and the Grammar.clone() method
 
 1.13, 10 March 2012
   * added fat and longStringLength options to allow finer control over offset

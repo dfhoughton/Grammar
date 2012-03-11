@@ -166,12 +166,6 @@ public class LiteralRule extends Rule implements Serializable {
 	}
 
 	@Override
-	protected Rule sClone() {
-		LiteralRule lr = new LiteralRule((Label) label.clone(), literal);
-		return lr;
-	}
-
-	@Override
 	public Rule conditionalize(Condition c, String id) {
 		if (this.c == null) {
 			this.c = c;

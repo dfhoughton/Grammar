@@ -323,32 +323,6 @@ public abstract class Rule {
 	public abstract boolean zeroWidth();
 
 	/**
-	 * Returns clone of this {@link Rule} but not of any {@link Rule Rules} on
-	 * which it is dependent. This method is required by {@link Grammar#clone()}
-	 * . It is wrapped by {@link #shallowClone()}, which adds handling of
-	 * {@link #labels}.
-	 * 
-	 * @return clone of this {@link Rule} but not of any {@link Rule Rules} on
-	 *         which it is dependent
-	 */
-	protected abstract Rule sClone();
-
-	/**
-	 * Returns clone of this {@link Rule} but not of any {@link Rule Rules} on
-	 * which it is dependent. This method is required by {@link Grammar#clone()}
-	 * .
-	 * 
-	 * @return clone of this {@link Rule} but not of any {@link Rule Rules} on
-	 *         which it is dependent
-	 */
-	public final Rule shallowClone() {
-		Rule ru = sClone();
-		if (labels != null)
-			ru.labels = new TreeSet<String>(labels);
-		return ru;
-	}
-
-	/**
 	 * Returns a {@link Rule} that duplicates this except that it won't return
 	 * any {@link Match} that doesn't meet the given condition. This method must
 	 * be overridden by child classes as the base implementation only throws a

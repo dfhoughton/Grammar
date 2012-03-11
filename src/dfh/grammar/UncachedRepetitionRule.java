@@ -1,6 +1,5 @@
 package dfh.grammar;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -303,13 +302,5 @@ public class UncachedRepetitionRule extends RepetitionRule {
 		if (condition != null)
 			b.append('(').append(condition).append(')');
 		return b.toString();
-	}
-
-	@Override
-	protected Rule sClone() {
-		UncachedRepetitionRule rr = new UncachedRepetitionRule(
-				(Label) label.clone(), r, repetition, new HashSet<String>(
-						alternateTags));
-		return rr;
 	}
 }

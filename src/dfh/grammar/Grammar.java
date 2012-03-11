@@ -83,7 +83,7 @@ import dfh.grammar.Label.Type;
  * 
  * @author David Houghton
  */
-public class Grammar implements Serializable, Cloneable {
+public class Grammar implements Serializable {
 	/**
 	 * Special debugging API.
 	 * <p>
@@ -393,20 +393,6 @@ public class Grammar implements Serializable, Cloneable {
 	public Grammar(String[] lines, Map<String, Rule> precompiledRules)
 			throws GrammarException {
 		this(new ArrayLineReader(lines), precompiledRules);
-	}
-
-	/**
-	 * Required for cloning.
-	 * 
-	 * @param root
-	 */
-	private Grammar(Label root) {
-		this.rootLabel = root;
-		this.rules = new HashMap<Label, Rule>();
-		this.terminalLabelMap = new HashMap<String, Label>();
-		this.undefinedRules = new HashSet<Label>();
-		this.undefinedConditions = new HashMap<String, Set<Label>>();
-		this.knownConditions = new HashMap<String, Set<Rule>>();
 	}
 
 	/**
@@ -1384,41 +1370,6 @@ public class Grammar implements Serializable, Cloneable {
 			else
 				fix(ru, nru, a.r);
 		}
-	}
-
-	@Override
-	public Object clone() {
-		Grammar clone = new Grammar((Label) rootLabel.clone());
-		Map<Label, Label> labelMap = new HashMap<Label, Label>(rules.size());
-		Map<Rule, Rule> ruleMap = new HashMap<Rule, Rule>(rules.size());
-		for (Entry<Label, Rule> e : rules.entrySet()) {
-			Label labelClone = (Label) e.getKey().clone();
-			Rule ruleClone = e.getValue().shallowClone();
-			ruleClone.generation = e.getValue().generation;
-			labelMap.put(e.getKey(), labelClone);
-			ruleMap.put(e.getValue(), ruleClone);
-			clone.rules.put(labelClone, ruleClone);
-		}
-		for (Entry<String, Label> e : terminalLabelMap.entrySet())
-			clone.terminalLabelMap.put(e.getKey(), labelMap.get(e.getValue()));
-		for (Label l : undefinedRules)
-			clone.undefinedRules.add(labelMap.get(l));
-		for (Entry<Rule, Rule> e : ruleMap.entrySet())
-			fix(clone, e.getKey(), e.getValue());
-		for (Entry<String, Set<Label>> e : undefinedConditions.entrySet()) {
-			Set<Label> set = new HashSet<Label>(e.getValue().size());
-			for (Label l : e.getValue())
-				set.add(labelMap.get(l));
-			clone.undefinedConditions.put(e.getKey(), set);
-		}
-		for (Entry<String, Set<Rule>> e : knownConditions.entrySet()) {
-			Set<Rule> newSet = new HashSet<Rule>(e.getValue().size());
-			for (Rule r : e.getValue())
-				newSet.add(ruleMap.get(r));
-			knownConditions.put(e.getKey(), newSet);
-		}
-		clone.root = clone.rules.get(clone.rootLabel);
-		return clone;
 	}
 
 	/**

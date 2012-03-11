@@ -73,13 +73,6 @@ public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 	}
 
 	@Override
-	protected Rule sClone() {
-		CyclicRule cr = new CyclicRule((Label) label.clone());
-		cr.r = r;
-		return cr;
-	}
-
-	@Override
 	protected void setCacheIndex(Map<String, Integer> uids) {
 		if (cacheIndex == -1) {
 			Integer i = uids.get(uid());

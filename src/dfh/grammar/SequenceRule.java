@@ -2,7 +2,6 @@ package dfh.grammar;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -209,16 +208,6 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 				return false;
 		}
 		return true;
-	}
-
-	@Override
-	protected Rule sClone() {
-		List<Set<String>> tl = new ArrayList<Set<String>>(tagList.size());
-		for (int i = 0, lim = tagList.size(); i < lim; i++)
-			tl.add(new HashSet<String>(tagList.get(i)));
-		SequenceRule sr = new SequenceRule((Label) label.clone(),
-				Arrays.copyOf(sequence, sequence.length), tl);
-		return sr;
 	}
 
 	@Override

@@ -123,13 +123,6 @@ public class BackReferenceRule extends Rule implements Serializable,
 	}
 
 	@Override
-	protected Rule sClone() {
-		BackReferenceRule brr = new BackReferenceRule((Label) label.clone(),
-				index);
-		return brr;
-	}
-
-	@Override
 	protected Boolean mayBeZeroWidth(Map<String, Boolean> cache) {
 		cache.put(uid(), true);
 		return true;

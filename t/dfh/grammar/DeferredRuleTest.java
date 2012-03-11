@@ -118,11 +118,6 @@ public class DeferredRuleTest {
 		}
 
 		@Override
-		protected Rule sClone() {
-			return this;
-		}
-
-		@Override
 		public Object clone() {
 			return this;
 		}

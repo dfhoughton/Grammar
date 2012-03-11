@@ -81,14 +81,6 @@ public class DeferredDefinitionRule extends Rule implements Serializable,
 	}
 
 	@Override
-	protected Rule sClone() {
-		DeferredDefinitionRule ddr = new DeferredDefinitionRule(
-				(Label) label.clone());
-		ddr.r = r;
-		return ddr;
-	}
-
-	@Override
 	protected void setCacheIndex(Map<String, Integer> uids) {
 		if (cacheIndex == -1) {
 			Integer i = uids.get(uid());

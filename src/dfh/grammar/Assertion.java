@@ -211,11 +211,6 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 		return true;
 	}
 
-	@Override
-	protected Rule sClone() {
-		return new Assertion((Label) label.clone(), r, positive, forward);
-	}
-
 	void setSubDescription(String subDescription) {
 		if (this.subDescription != null)
 			throw new GrammarException(

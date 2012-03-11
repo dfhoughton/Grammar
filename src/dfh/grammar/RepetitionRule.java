@@ -350,13 +350,6 @@ public class RepetitionRule extends Rule implements Serializable,
 	}
 
 	@Override
-	protected Rule sClone() {
-		RepetitionRule rr = new RepetitionRule((Label) label.clone(), r,
-				repetition, new HashSet<String>(alternateTags));
-		return rr;
-	}
-
-	@Override
 	public Rule conditionalize(Condition c, String id) {
 		if (this.c == null) {
 			this.c = c;
