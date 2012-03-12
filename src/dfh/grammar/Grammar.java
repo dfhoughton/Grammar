@@ -711,7 +711,7 @@ public class Grammar implements Serializable {
 	 * 
 	 * @throws GrammarException
 	 */
-	private void checkComplete() throws GrammarException {
+	private synchronized void checkComplete() throws GrammarException {
 		if (validated)
 			return;
 		if (!undefinedRules.isEmpty()) {
@@ -740,9 +740,17 @@ public class Grammar implements Serializable {
 			throw new GrammarException(b.toString());
 		}
 		for (Rule r : rules()) {
+			r.setUid();
+			if (r.isReversed())
+				containsReversal = true;
 			if (r instanceof AlternationRule)
 				containsAlternation = true;
 		}
+		// fix tag maps in alternations
+		root.fixAlternation();
+		// create actual offset cache
+		root.setCacheIndex(new HashMap<String, Integer>());
+
 		validated = true;
 	}
 
