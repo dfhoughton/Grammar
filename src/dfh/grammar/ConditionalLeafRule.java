@@ -3,6 +3,7 @@ package dfh.grammar;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Reversible
 public class ConditionalLeafRule extends LeafRule {
@@ -90,6 +91,8 @@ public class ConditionalLeafRule extends LeafRule {
 		this.condition = nameBase + ':' + clr.condition;
 		this.generation = clr.generation;
 		this.c = clr.c.copy(nameBase);
+		if (clr.labels != null)
+			labels = new TreeSet<String>(clr.labels);
 	}
 
 	@Override

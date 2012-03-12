@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 /**
@@ -197,7 +198,10 @@ public class LeafRule extends Rule implements Serializable {
 
 	@Override
 	public Rule conditionalize(Condition c, String id) {
-		return new ConditionalLeafRule(this, c, id);
+		ConditionalLeafRule clr = new ConditionalLeafRule(this, c, id);
+		if (labels != null)
+			clr.labels = new TreeSet<String>(labels);
+		return clr;
 	}
 
 	@Override
@@ -217,6 +221,8 @@ public class LeafRule extends Rule implements Serializable {
 					+ label().id;
 			Label l = new Label(label().t, id);
 			lr = new LeafRule(l, p, reversible);
+			if (labels != null)
+				lr.labels = new TreeSet<String>(labels);
 			lr.setUid();
 			cycleMap.put(label().id, lr);
 			lr.generation = generation;

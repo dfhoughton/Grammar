@@ -3,6 +3,7 @@ package dfh.grammar;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Implements zero-width assertions. See {@link AssertionFragment}.
@@ -289,6 +290,8 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 			if (copy == null)
 				copy = r.deepCopy(nameBase, cycleMap);
 			ass = new Assertion(l, copy, positive, forward);
+			if (labels != null)
+				ass.labels = new TreeSet<String>(labels);
 			ass.setUid();
 			cycleMap.put(label().id, ass);
 			ass.generation = generation;

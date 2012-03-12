@@ -3,6 +3,7 @@ package dfh.grammar;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A rule that depends on some other or others in a cycle of dependence. These
@@ -155,6 +156,8 @@ public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 			copy = r.deepCopy(nameBase, cycleMap);
 		CyclicRule r = new CyclicRule(l);
 		r.r = copy;
+		if (labels != null)
+			r.labels = new TreeSet<String>(labels);
 		r.setUid();
 		r.generation = generation;
 		return r;

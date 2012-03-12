@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * For matching a rule literal. E.g., <fred> = "Fred".
@@ -217,6 +218,8 @@ public class LiteralRule extends Rule implements Serializable {
 				lr.condition = nameBase + ':' + condition;
 				lr.c = c.copy(nameBase);
 			}
+			if (labels != null)
+				lr.labels = new TreeSet<String>(labels);
 			lr.setUid();
 			cycleMap.put(label().id, lr);
 			lr.generation = generation;

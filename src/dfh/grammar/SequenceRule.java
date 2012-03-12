@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Matches a sequence of sub-rules. E.g.,
@@ -366,6 +367,8 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 			r.condition = nameBase + ':' + condition;
 			r.c = c.copy(nameBase);
 		}
+		if (labels != null)
+			r.labels = new TreeSet<String>(labels);
 		r.setUid();
 		cycleMap.put(label().id, r);
 		r.generation = generation;

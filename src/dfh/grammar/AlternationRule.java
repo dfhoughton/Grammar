@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * The object implementing rules such as
@@ -331,6 +332,8 @@ public class AlternationRule extends Rule implements Serializable,
 			r.condition = nameBase + ':' + condition;
 			r.c = c.copy(nameBase);
 		}
+		if (labels != null)
+			r.labels = new TreeSet<String>(labels);
 		r.setUid();
 		cycleMap.put(label().id, r);
 		r.generation = generation;

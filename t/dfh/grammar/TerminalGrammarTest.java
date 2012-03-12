@@ -154,4 +154,92 @@ public class TerminalGrammarTest {
 			count++;
 		assertTrue("logical condition worked after copying", count == 2);
 	}
+
+	@Test
+	public void tagTest1() {
+		Grammar ga = new Grammar("ROOT = <b>");
+		Grammar gb = new Grammar("ROOT = [{foo} /\\b\\d++\\b/ ]");
+		ga.defineRule("b", gb);
+		String s = ga.describe();
+		assertTrue("tag copied", s.indexOf("foo") > -1);
+	}
+
+	@Test
+	public void tagTest2() {
+		Grammar ga = new Grammar("ROOT = <b>");
+		Grammar gb = new Grammar("ROOT = [{foo} 'bar' ]");
+		ga.defineRule("b", gb);
+		String s = ga.describe();
+		assertTrue("tag copied", s.indexOf("foo") > -1);
+	}
+
+	@Test
+	public void tagTest3() {
+		Grammar ga = new Grammar("ROOT = <b>");
+		Grammar gb = new Grammar("ROOT = [{foo} 'bar' | 'quux' ]");
+		ga.defineRule("b", gb);
+		String s = ga.describe();
+		assertTrue("tag copied", s.indexOf("foo") > -1);
+	}
+
+	@Test
+	public void tagTest4() {
+		Grammar ga = new Grammar("ROOT = <b>");
+		Grammar gb = new Grammar("ROOT = [{foo} [ 'bar' | 'quux' ] ]");
+		ga.defineRule("b", gb);
+		String s = ga.describe();
+		assertTrue("tag copied", s.indexOf("foo") > -1);
+	}
+
+	@Test
+	public void tagTest5() {
+		Grammar ga = new Grammar("ROOT = <b>");
+		Grammar gb = new Grammar("ROOT = [{foo} 'bar' ]+");
+		ga.defineRule("b", gb);
+		String s = ga.describe();
+		assertTrue("tag copied", s.indexOf("foo") > -1);
+	}
+
+	@Test
+	public void tagTest6() {
+		Grammar ga = new Grammar("ROOT = <b>");
+		Grammar gb = new Grammar("ROOT = [{foo} 'bar'+ ]");
+		ga.defineRule("b", gb);
+		String s = ga.describe();
+		assertTrue("tag copied", s.indexOf("foo") > -1);
+	}
+
+	@Test
+	public void tagTest7() {
+		Grammar ga = new Grammar("ROOT = <b>");
+		Grammar gb = new Grammar("ROOT = [{foo} 'bar' 'quux' ]");
+		ga.defineRule("b", gb);
+		String s = ga.describe();
+		assertTrue("tag copied", s.indexOf("foo") > -1);
+	}
+
+	@Test
+	public void tagTest8() {
+		Grammar ga = new Grammar("ROOT = <b>");
+		Grammar gb = new Grammar("ROOT = [{foo} 'bar' ] 'quux'");
+		ga.defineRule("b", gb);
+		String s = ga.describe();
+		assertTrue("tag copied", s.indexOf("foo") > -1);
+	}
+
+	@SuppressWarnings("serial")
+	@Test
+	public void tagTest9() {
+		Grammar ga = new Grammar("ROOT = <b>");
+		Grammar gb = new Grammar("ROOT = [{foo} /\\b\\d++\\b/ ] (gt10)");
+		gb.defineCondition("gt10", new IntegerCondition() {
+			@Override
+			public boolean passes(int i) {
+				return i > 10;
+			}
+		});
+		ga.defineRule("b", gb);
+		String s = ga.describe();
+		assertTrue("tag copied", s.indexOf("foo") > -1);
+	}
 }

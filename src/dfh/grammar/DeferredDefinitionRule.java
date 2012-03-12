@@ -3,6 +3,7 @@ package dfh.grammar;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A rule undefined at the time of grammar compilation. It will always
@@ -172,6 +173,8 @@ public class DeferredDefinitionRule extends Rule implements Serializable,
 				copy = r.deepCopy(nameBase, cycleMap);
 			ddr = new DeferredDefinitionRule(l);
 			ddr.r = copy;
+			if (labels != null)
+				ddr.labels = new TreeSet<String>(labels);
 			ddr.setUid();
 			cycleMap.put(label().id, ddr);
 			ddr.generation = generation;

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Rule to handle all the various repetition options.
@@ -490,6 +491,8 @@ public class RepetitionRule extends Rule implements Serializable,
 				rr.condition = nameBase + ':' + condition;
 				rr.c = c.copy(nameBase);
 			}
+			if (labels != null)
+				rr.labels = new TreeSet<String>(labels);
 			rr.setUid();
 			cycleMap.put(label().id, rr);
 			rr.generation = generation;
