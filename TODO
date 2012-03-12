@@ -16,7 +16,7 @@ section at the end of the document.
 . clean up javadoc warnings
 * add fat option to Options
 . add document for new fat and longStringLength to Options documentation
-. fix isTerminal() so it checks on the generating rule
+* fix isTerminal() so it checks on the generating rule
 * make sure conditions are copied during grammar composition
 . make sure labels propagate properly during grammar composition
 

@@ -271,7 +271,7 @@ public class Match {
 	 * @return whether this {@link Match} has no children
 	 */
 	public boolean isTerminal() {
-		return children == null || children.length == 0;
+		return r.isTerminal();
 	}
 
 	/**

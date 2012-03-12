@@ -540,4 +540,15 @@ public abstract class Rule {
 	public Set<String> conditionNames() {
 		return new HashSet<String>(0);
 	}
+
+	/**
+	 * Returns whether this rule necessarily produces terminal matches. This
+	 * method should be overridden by classes such as {@link LiteralRule}. It is
+	 * required by {@link Match#isTerminal()}.
+	 * 
+	 * @return whether this rule necessarily produces terminal matches
+	 */
+	protected boolean isTerminal() {
+		return false;
+	}
 }

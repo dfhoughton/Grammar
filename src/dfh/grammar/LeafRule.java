@@ -223,4 +223,9 @@ public class LeafRule extends Rule implements Serializable {
 		}
 		return lr;
 	}
+
+	@Override
+	public boolean isTerminal() {
+		return true;
+	}
 }

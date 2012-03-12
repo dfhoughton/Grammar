@@ -212,7 +212,7 @@ public class LiteralRule extends Rule implements Serializable {
 			String id = generation == -1 ? label().id : nameBase + ':'
 					+ label().id;
 			Label l = new Label(label().t, id);
-			lr = new LiteralRule(l,literal);
+			lr = new LiteralRule(l, literal);
 			if (c != null) {
 				lr.condition = nameBase + ':' + condition;
 				lr.c = c.copy(nameBase);
@@ -222,5 +222,10 @@ public class LiteralRule extends Rule implements Serializable {
 			lr.generation = generation;
 		}
 		return lr;
+	}
+
+	@Override
+	public boolean isTerminal() {
+		return true;
 	}
 }
