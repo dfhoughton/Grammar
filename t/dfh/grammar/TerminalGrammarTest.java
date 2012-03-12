@@ -130,4 +130,29 @@ public class TerminalGrammarTest {
 				.indexOf("lt100") > -1);
 	}
 
+	@SuppressWarnings("serial")
+	@Test
+	public void logicalConditionTest() {
+		Grammar ga = new Grammar("ROOT = <b>");
+		Grammar gb = new Grammar("ROOT = /\\b\\d++\\b/ (lt100 gt10)");
+		gb.defineCondition("lt100", new IntegerCondition() {
+			@Override
+			public boolean passes(int i) {
+				return i < 100;
+			}
+		});
+		gb.defineCondition("gt10", new IntegerCondition() {
+			@Override
+			public boolean passes(int i) {
+				return i > 10;
+			}
+		});
+		ga.defineRule("b", gb);
+		System.out.print(ga.describe());
+		Matcher m = ga.find("1 10 12 24 100 1000");
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertTrue("logical condition worked after copying", count == 2);
+	}
 }
