@@ -242,4 +242,15 @@ public class TerminalGrammarTest {
 		String s = ga.describe();
 		assertTrue("tag copied", s.indexOf("foo") > -1);
 	}
+
+	@SuppressWarnings("serial")
+	@Test
+	public void tagTest10() {
+		Grammar ga = new Grammar("ROOT = 'quux' <b>");
+		Grammar gb = new Grammar("ROOT = 'quux' !-/.?::/r");
+		ga.defineRule("b", gb);
+		String s = ga.describe();
+		assertTrue("tag copied", s.indexOf("null") == -1);
+	}
+
 }

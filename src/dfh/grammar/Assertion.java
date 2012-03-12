@@ -186,6 +186,13 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 		return wrap(b);
 	}
 
+	/**
+	 * Used in construction of text used by {@link #description()} in backwards
+	 * assertions.
+	 * 
+	 * @param r
+	 * @param b
+	 */
 	static void subDescription(Rule r, StringBuilder b) {
 		if (r.generation == -1) {
 			boolean needsBrackets = r instanceof SequenceRule
@@ -285,7 +292,9 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
 		Assertion ass = (Assertion) cycleMap.get(label().id);
 		if (ass == null) {
-			Label l = new Label(label().t, nameBase + ':' + label().id);
+			String id = generation == -1 ? label().id : nameBase + ':'
+					+ label().id;
+			Label l = new Label(label().t, id);
 			Rule copy = cycleMap.get(r.label().id);
 			if (copy == null)
 				copy = r.deepCopy(nameBase, cycleMap);
