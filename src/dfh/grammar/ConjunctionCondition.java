@@ -36,7 +36,7 @@ public class ConjunctionCondition extends LogicalCondition {
 
 	@Override
 	protected String describe() {
-		return describe('&');
+		return describe(" ");
 	}
 
 }

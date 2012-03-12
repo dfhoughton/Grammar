@@ -37,7 +37,7 @@ public class XORCondition extends LogicalCondition {
 
 	@Override
 	protected String describe() {
-		return describe('^');
+		return describe(" ^ ");
 	}
 
 }

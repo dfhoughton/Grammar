@@ -144,18 +144,18 @@ public abstract class LogicalCondition extends Condition implements
 	 * Used to implement {@link #describe()} for various logical condition
 	 * subtypes.
 	 * 
-	 * @param c
-	 *            character representing a logical operation
+	 * @param operator
+	 *            string representing the logical operator at work in this condition
 	 * @return
 	 */
-	protected String describe(char c) {
+	protected String describe(String operator) {
 		StringBuilder b = new StringBuilder();
 		boolean initial = true;
 		for (Condition cnd : subconditions) {
 			if (initial)
 				initial = false;
 			else
-				b.append(c);
+				b.append(operator);
 			if (cnd instanceof LogicalCondition)
 				b.append('(').append(cnd.describe()).append(')');
 			else
