@@ -320,11 +320,9 @@ public class AlternationRule extends Rule implements Serializable,
 		for (int i = 0; i < copies.length; i++) {
 			Rule r = alternates[i];
 			Set<String> copySet = new HashSet<String>(tagMap.get(r.uid()));
-			copySet.remove(r.uid());
 			Rule copy = cycleMap.get(r.label().id);
 			if (copy == null)
 				copy = r.deepCopy(nameBase, cycleMap);
-			copySet.add(copy.uid());
 			tmCopy.put(copy.uid(), copySet);
 			copies[i] = copy;
 		}

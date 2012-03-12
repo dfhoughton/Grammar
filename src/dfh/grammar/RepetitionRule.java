@@ -479,11 +479,9 @@ public class RepetitionRule extends Rule implements Serializable,
 		RepetitionRule rr = (RepetitionRule) cycleMap.get(label().id);
 		if (rr == null) {
 			Set<String> atCopy = new HashSet<String>(alternateTags);
-			atCopy.remove(r.uid());
 			Rule copy = cycleMap.get(r.label().id);
 			if (copy == null)
 				copy = r.deepCopy(nameBase, cycleMap);
-			atCopy.add(copy.uid());
 			String id = generation == -1 ? label().id : nameBase + ':'
 					+ label().id;
 			Label l = new Label(label().t, id);

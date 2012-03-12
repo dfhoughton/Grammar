@@ -357,12 +357,10 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 			Set<String> copySet = new HashSet<String>(tagList.get(i));
 			tlCopy.add(copySet);
 			Rule or = sequence[i];
-			copySet.remove(or.uid());
 			Rule copy = cycleMap.get(or.label().id);
 			if (copy == null)
 				copy = or.deepCopy(nameBase, cycleMap);
 			copies[i] = copy;
-			copySet.add(copy.uid());
 		}
 		if (c != null) {
 			r.condition = nameBase + ':' + condition;
