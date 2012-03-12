@@ -7,17 +7,10 @@ section at the end of the document.
 . clean up uid() uniqueId() business
 . create xpath-like convention for searching matches
 . make sure conditionalized terminals are being cached properly
-* make sure non-terminal matches are using their subcache
 . profile some matching to figure out what could be optimized
 . document logically complex conditions
-* document new assertion syntax
-* modify grammar grammar
-* document up-level back references
 . clean up javadoc warnings
-* add fat option to Options
 . add document for new fat and longStringLength to Options documentation
-* fix isTerminal() so it checks on the generating rule
-* make sure conditions are copied during grammar composition
 . make sure labels propagate properly during grammar composition
 . refactor Rule.subRules to reduce repetition
 . fix deepCopy so that the field reversed is properly handled everywhere
@@ -55,3 +48,10 @@ COMPLETED
 * fix studying of cyclic grammars
 * simplify study method given improved studying algorithm
 - stop caching success
+* document new assertion syntax
+* modify grammar grammar
+* document up-level back references
+* make sure non-terminal matches are using their subcache
+* add fat option to Options
+* fix isTerminal() so it checks on the generating rule
+* make sure conditions are copied during grammar composition
