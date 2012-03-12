@@ -148,7 +148,6 @@ public class TerminalGrammarTest {
 			}
 		});
 		ga.defineRule("b", gb);
-		System.out.print(ga.describe());
 		Matcher m = ga.find("1 10 12 24 100 1000");
 		int count = 0;
 		while (m.match() != null)

@@ -1295,15 +1295,21 @@ public class Grammar implements Serializable {
 		// now copy the rule tree
 		Rule rc = g.root.deepCopy(label, new HashMap<String, Rule>(g.rules()
 				.size()));
-		rc.generation = greatestGeneration++;
+		if (c != null)
+			rc = conditionCheck(label, c, rc);
 		if (redefinitionCheck(r, rc)) {
+			if (ruleSet != null) {
+				ruleSet.clear();
+				ruleSet = null;
+			}
 			r.generation = greatestGeneration;
-			for (Rule sr : rules()) {
-				if (sr.dependsOn(r))
+			Set<Rule> set = new HashSet<Rule>();
+			root.subRules(set, false);
+			for (Rule sr : set) {
+				if (sr.generation > 0 && sr.dependsOn(r))
 					sr.generation += greatestGeneration;
 			}
-			if (c != null)
-				rc = conditionCheck(label, c, rc);
+			 rc.generation = -1;
 		}
 	}
 

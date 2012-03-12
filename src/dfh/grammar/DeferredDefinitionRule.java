@@ -119,7 +119,7 @@ public class DeferredDefinitionRule extends Rule implements Serializable,
 	protected void subRules(Set<Rule> set, boolean explicit) {
 		if (!set.contains(this)) {
 			if (explicit) {
-				if (r.generation > -1)
+				if (generation > -1)
 					set.add(this);
 				if (unreversed != null)
 					unreversed.subRules(set, explicit);
