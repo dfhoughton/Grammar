@@ -470,14 +470,17 @@ public abstract class Rule {
 	 *            whether to list only rules that were explicitly labeled, as
 	 *            opposed to those implicit in a larger rule definition
 	 */
-	protected void subRules(Set<Rule> set, boolean explicit) {
-		if (explicit) {
-			if (generation > -1)
+	protected void subRules(Set<Rule> set, Set<Rule> all, boolean explicit) {
+		if (!all.contains(this)) {
+			all.add(this);
+			if (explicit) {
+				if (generation > -1)
+					set.add(this);
+				if (unreversed != null)
+					unreversed.subRules(set, all, explicit);
+			} else
 				set.add(this);
-			if (unreversed != null)
-				unreversed.subRules(set, explicit);
-		} else
-			set.add(this);
+		}
 	}
 
 	/**
@@ -490,7 +493,7 @@ public abstract class Rule {
 	 */
 	public boolean dependsOn(Rule r) {
 		Set<Rule> set = new HashSet<Rule>();
-		subRules(set, false);
+		subRules(set, new HashSet<Rule>(), false);
 		return set.contains(r);
 	}
 

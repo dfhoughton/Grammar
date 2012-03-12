@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -362,7 +363,7 @@ public class ConditionTest {
 		int count = 0;
 		while (m.match() != null)
 			count++;
-		assertTrue("found match", count == 1);
+		assertEquals("found match", 1, count);
 	}
 
 	@Test

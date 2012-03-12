@@ -254,18 +254,21 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 	}
 
 	@Override
-	protected void subRules(Set<Rule> set, boolean explicit) {
-		if (!set.contains(this)) {
-			if (explicit) {
-				if (generation > -1) {
+	protected void subRules(Set<Rule> set, Set<Rule> all, boolean explicit) {
+		if (!all.contains(this)) {
+			all.add(this);
+			if (!set.contains(this)) {
+				if (explicit) {
+					if (generation > -1) {
+						set.add(this);
+					}
+					if (unreversed != null)
+						unreversed.subRules(set, all, explicit);
+				} else
 					set.add(this);
-				}
-				if (unreversed != null)
-					unreversed.subRules(set, explicit);
-			} else
-				set.add(this);
+			}
+			r.subRules(set, all, explicit);
 		}
-		r.subRules(set, explicit);
 	}
 
 	@Override

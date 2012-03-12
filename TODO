@@ -19,6 +19,7 @@ section at the end of the document.
 * fix isTerminal() so it checks on the generating rule
 * make sure conditions are copied during grammar composition
 . make sure labels propagate properly during grammar composition
+. refactor Rule.subRules to reduce repetition
 
 COMPLETED
 =========
