@@ -306,7 +306,7 @@ public class AlternationRule extends Rule implements Serializable,
 	public Set<String> conditionNames() {
 		if (c instanceof LogicalCondition)
 			return ((LogicalCondition) c).conditionNames();
-		Set<String> set = new HashSet<String>(1);
+		Set<String> set = new HashSet<String>(2);
 		set.add(c.getName());
 		return set;
 	}
@@ -314,7 +314,7 @@ public class AlternationRule extends Rule implements Serializable,
 	@Override
 	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
 		Map<String, Set<String>> tmCopy = new HashMap<String, Set<String>>(
-				tagMap.size());
+				tagMap.size() * 2);
 		Rule[] copies = new Rule[alternates.length];
 		String id = generation == -1 ? label().id : nameBase + ':' + label().id;
 		Label l = new Label(label().t, id);

@@ -84,7 +84,7 @@ public class Compiler {
 		}
 
 		private boolean found(Match c, String... tags) {
-			Set<String> tagset = new HashSet<String>(tags.length);
+			Set<String> tagset = new HashSet<String>(tags.length * 2);
 			for (String s : tags)
 				tagset.add(s);
 			return found(c, tagset);
@@ -170,7 +170,7 @@ public class Compiler {
 
 		// make space for anonymous rules
 		rules = new HashMap<Label, Rule>(map.size() * 2);
-		Set<Label> terminals = new HashSet<Label>(map.size());
+		Set<Label> terminals = new HashSet<Label>(map.size() * 2);
 		int gen = 1;
 		// first we extract all the terminals we can
 		for (Iterator<Entry<Label, List<RuleFragment>>> i = map.entrySet()
@@ -316,7 +316,7 @@ public class Compiler {
 			gen++;
 		}
 
-		terminalLabelMap = new HashMap<String, Label>(terminals.size());
+		terminalLabelMap = new HashMap<String, Label>(terminals.size() * 2);
 		for (Label l : terminals)
 			terminalLabelMap.put(l.id, l);
 	}
@@ -390,7 +390,7 @@ public class Compiler {
 			int generation) {
 		testCycle(cycle);
 		Map<Label, CyclicRule> cycleMap = new HashMap<Label, CyclicRule>(
-				cycle.size());
+				cycle.size() * 2);
 		for (Entry<Label, List<RuleFragment>> e : cycle) {
 			CyclicRule ddr = new CyclicRule(e.getKey());
 			cycleMap.put(e.getKey(), ddr);
@@ -409,7 +409,7 @@ public class Compiler {
 	 * @param cycle
 	 */
 	private void testCycle(List<Entry<Label, List<RuleFragment>>> cycle) {
-		Set<Label> set = new HashSet<Label>(cycle.size());
+		Set<Label> set = new HashSet<Label>(cycle.size() * 2);
 		for (Entry<Label, List<RuleFragment>> e : cycle)
 			set.add(e.getKey());
 		for (Entry<Label, List<RuleFragment>> e : cycle) {
@@ -501,7 +501,7 @@ public class Compiler {
 	 */
 	private void removeStrictlyDominating(Map<Label, List<RuleFragment>> copy) {
 		while (true) {
-			Set<Label> required = new HashSet<Label>(copy.size());
+			Set<Label> required = new HashSet<Label>(copy.size() * 2);
 			for (List<RuleFragment> list : copy.values())
 				required.addAll(allLabels(list));
 			boolean changed = false;
@@ -683,7 +683,7 @@ public class Compiler {
 			if (ubf.rep.redundant())
 				return r;
 			l = new Label(Type.nonTerminal, ubf.toString());
-			Set<String> tags = new HashSet<String>(1);
+			Set<String> tags = new HashSet<String>(2);
 			r = new UncachedRepetitionRule(l, r, ubf.rep, tags);
 			tags.add(r.uniqueId());
 			return r;
@@ -715,7 +715,7 @@ public class Compiler {
 			b.append('[');
 			boolean nonInitial = false;
 			Map<String, Set<String>> tagMap = new HashMap<String, Set<String>>(
-					gf.alternates.size());
+					gf.alternates.size() * 2);
 			for (List<RuleFragment> alternate : gf.alternates) {
 				Set<String> innerTags = null;
 				if (alternate.size() == 1) {
@@ -805,7 +805,7 @@ public class Compiler {
 			AlternationRule ar = (AlternationRule) sr;
 			Rule[] children = new Rule[ar.alternates.length];
 			Map<String, Set<String>> tagMap = new HashMap<String, Set<String>>(
-					ar.tagMap.size());
+					ar.tagMap.size() * 2);
 			for (int i = 0; i < children.length; i++) {
 				children[i] = reverse(ar.alternates[i]);
 				tagMap.put(children[i].uniqueId(),
@@ -852,7 +852,7 @@ public class Compiler {
 			SequenceRule sqr = (SequenceRule) sr;
 			// reverse order of last backreference in sequence and submatch
 			// referred to before reversing order of entire sequence
-			Set<Integer> swapped = new HashSet<Integer>(sqr.sequence.length);
+			Set<Integer> swapped = new HashSet<Integer>(sqr.sequence.length * 2);
 			for (int i = sqr.sequence.length - 1; i >= 0; i--) {
 				if (sqr.sequence[i] instanceof BackReferenceRule) {
 					BackReferenceRule temp = (BackReferenceRule) sqr.sequence[i];

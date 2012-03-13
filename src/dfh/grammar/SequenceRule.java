@@ -342,7 +342,7 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 	public Set<String> conditionNames() {
 		if (c instanceof LogicalCondition)
 			return ((LogicalCondition) c).conditionNames();
-		Set<String> set = new HashSet<String>(1);
+		Set<String> set = new HashSet<String>(2);
 		set.add(c.getName());
 		return set;
 	}

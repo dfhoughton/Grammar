@@ -548,7 +548,7 @@ public class Grammar implements Serializable {
 		recursive = c.recursive();
 		undefinedConditions = c.undefinedConditions();
 		knownConditions = new HashMap<String, Set<Rule>>(
-				undefinedConditions.size());
+				undefinedConditions.size() * 2);
 	}
 
 	/**
@@ -655,7 +655,7 @@ public class Grammar implements Serializable {
 	private boolean redefinitionCheck(DeferredDefinitionRule r, Rule lr) {
 		Label l;
 		Map<Label, Rule> erules = explicitRules();
-		Map<String, Label> idMap = new HashMap<String, Label>(erules.size());
+		Map<String, Label> idMap = new HashMap<String, Label>(erules.size() * 2);
 		for (Entry<Label, Rule> e : erules.entrySet())
 			idMap.put(e.getValue().uniqueId(), e.getKey());
 		String id = lr.uniqueId();
@@ -671,7 +671,8 @@ public class Grammar implements Serializable {
 	private Map<Label, Rule> explicitRules() {
 		Set<Rule> set = new HashSet<Rule>();
 		root.subRules(set, new HashSet<Rule>(), false);
-		Map<Label, Rule> explicitRules = new HashMap<Label, Rule>(set.size());
+		Map<Label, Rule> explicitRules = new HashMap<Label, Rule>(
+				set.size() * 2);
 		for (Rule r : set) {
 			if (r.generation > 0 || r instanceof DeferredDefinitionRule)
 				explicitRules.put(r.label(), r);
@@ -1054,7 +1055,7 @@ public class Grammar implements Serializable {
 		rule.setLabel(label);
 		DeferredDefinitionRule r = checkRuleDefinition(label);
 		Map<Label, Rule> erules = explicitRules();
-		Map<String, Label> idMap = new HashMap<String, Label>(erules.size());
+		Map<String, Label> idMap = new HashMap<String, Label>(erules.size() * 2);
 		for (Entry<Label, Rule> e : erules.entrySet())
 			idMap.put(e.getValue().uniqueId(), e.getKey());
 		String id = rule.uniqueId();
@@ -1138,7 +1139,7 @@ public class Grammar implements Serializable {
 			final GlobalState options, final Map<Integer, CachedMatch>[] cache) {
 		final Set<Integer> startOffsets = new HashSet<Integer>();
 		if (options.study) {
-			Set<String> done = new HashSet<String>(rules().size());
+			Set<String> done = new HashSet<String>(rules().size() * 2);
 			// collect offsets from initial rules
 			initialRules();
 			for (Rule r : rules()) {
@@ -1214,7 +1215,7 @@ public class Grammar implements Serializable {
 	private Map<Integer, CachedMatch> reverse(Rule r,
 			Map<Integer, CachedMatch> countercache, ReversedCharSequence rcs) {
 		Map<Integer, CachedMatch> reverse = new HashMap<Integer, CachedMatch>(
-				countercache.size());
+				countercache.size() * 2);
 		for (Entry<Integer, CachedMatch> e : countercache.entrySet()) {
 			CachedMatch cm = e.getValue();
 			int start = rcs.translate(cm.m.end() - 1), end = start
@@ -1233,7 +1234,7 @@ public class Grammar implements Serializable {
 	private synchronized void initialRules() {
 		if (initialRules == null) {
 			Map<String, Boolean> zeroMap = new HashMap<String, Boolean>(rules()
-					.size());
+					.size() * 2);
 			root.mayBeZeroWidth(zeroMap);
 			for (Rule r : rules()) {
 				Boolean b = zeroMap.get(r.uid());
@@ -1242,8 +1243,8 @@ public class Grammar implements Serializable {
 							+ " never evaluated by Rule.mightBeZeroWidth()");
 				r.mayBeZeroWidth = b;
 			}
-			initialRules = new HashSet<String>(rules().size());
-			terminalRules = new HashSet<String>(rules().size());
+			initialRules = new HashSet<String>(rules().size() * 2);
+			terminalRules = new HashSet<String>(rules().size() * 2);
 			root.initialRules(initialRules);
 			for (Rule r : rules()) {
 				if (r instanceof NonterminalRule)
@@ -1296,7 +1297,7 @@ public class Grammar implements Serializable {
 		greatestGeneration++;
 		// now copy the rule tree
 		Rule rc = g.root.deepCopy(label, new HashMap<String, Rule>(g.rules()
-				.size()));
+				.size() * 2));
 		if (c != null)
 			rc = conditionCheck(label, c, rc);
 		if (redefinitionCheck(r, rc)) {
@@ -1449,12 +1450,12 @@ public class Grammar implements Serializable {
 		Set<Label> set = undefinedConditions.remove(label);
 		if (set == null)
 			throw new GrammarException("no undefined condition " + label);
-		Set<Rule> rset = new HashSet<Rule>(set.size());
+		Set<Rule> rset = new HashSet<Rule>(set.size() * 2);
 		knownConditions.put(label, rset);
 		Set<Rule> allRules = new HashSet<Rule>();
 		root.subRules(allRules, new HashSet<Rule>(), true);
 		root.subRules(allRules, new HashSet<Rule>(), false);
-		Map<Label, Rule> ruleMap = new HashMap<Label, Rule>(allRules.size());
+		Map<Label, Rule> ruleMap = new HashMap<Label, Rule>(allRules.size() * 2);
 		for (Rule r : allRules)
 			ruleMap.put(r.label, r);
 		for (Label l : set) {
