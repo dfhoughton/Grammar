@@ -41,7 +41,10 @@
 
 	<target name="jar" depends="compile" description="packages code into jar">
 		<mkdir dir="${jar.dir}" />
-		<jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}" />
+		<mkdir dir="${classes.dir}/META-INF" />
+		<copy file="lgpl.txt" tofile="${classes.dir}/META-INF/LICENSE" />
+		<copy file="NOTICE" tofile="${classes.dir}/META-INF/NOTICE" />
+		<jar destfile="${jar.dir}/${ant.project.name}-${version}.jar" basedir="${classes.dir}" />
 	</target>
 
 	<target name="javadoc" description="API for public and protected methods">
