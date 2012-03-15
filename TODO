@@ -14,6 +14,7 @@ section at the end of the document.
 . make sure labels propagate properly during grammar composition
 . refactor Rule.subRules to reduce repetition
 . fix deepCopy so that the field reversed is properly handled everywhere
+. add license file to jar
 
 COMPLETED
 =========
