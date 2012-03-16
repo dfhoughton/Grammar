@@ -490,6 +490,21 @@ public abstract class Rule {
 				set.add(this);
 		}
 	}
+	
+	/**
+	 * Returns rules upon which this rule is dependent.
+	 * 
+	 * @param explicit
+	 *            whether only "named" rules -- rules in the grammar with a name
+	 *            to the left of the equals sign -- are to be returned
+	 * @return rules upon which this rule is dependent
+	 */
+	public final Set<Rule> subRules(boolean explicit) {
+		Set<Rule> all = new HashSet<Rule>(), some = new HashSet<Rule>();
+		subRules(some, all, explicit);
+		return explicit ? some : all;
+	}
+
 
 	/**
 	 * Returns whether this rule depends on the given for its matching. This

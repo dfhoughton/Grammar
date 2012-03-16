@@ -12,3 +12,5 @@ var hdrs = {
 	"API" : "api/index.html",
 	"download" : "download.html"
 };
+
+var version = "2.0";
