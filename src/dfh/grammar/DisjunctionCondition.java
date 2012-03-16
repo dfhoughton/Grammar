@@ -1,7 +1,20 @@
+/*
+ * dfh.grammar -- a recursive descent parser library for Java
+ * 
+ * Copyright (C) 2012 David F. Houghton
+ * 
+ * This software is licensed under the LGPL. Please see accompanying NOTICE file
+ * and lgpl.txt.
+ */
 package dfh.grammar;
 
 import java.util.List;
 
+/**
+ * <p>
+ * @author David F. Houghton - Mar 15, 2012
+ *
+ */
 public class DisjunctionCondition extends LogicalCondition {
 	private static final long serialVersionUID = 6L;
 
