@@ -59,7 +59,7 @@ import dfh.grammar.Label.Type;
  * <h3>Advantages</h3>
  * <ul>
  * <li>Ease of composition, reading, maintenance, and debugging. See
- * {@link Options#trace(java.io.PrintStream))},
+ * {@link Options#log(java.io.PrintStream)},
  * {@link Options#keepRightmost(boolean)}, and {@link #describe()}.
  * <li>One can compose grammars from component {@link Rule rules}, regular
  * expressions, and other grammars. See {@link #defineRule(String, Pattern)},

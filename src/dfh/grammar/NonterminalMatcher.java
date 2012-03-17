@@ -50,7 +50,6 @@ public abstract class NonterminalMatcher extends Matcher {
 	/**
 	 * Constructs non-terminal matcher with given state.
 	 * 
-	 * @param cs2
 	 * @param offset
 	 * @param cache
 	 * @param rule

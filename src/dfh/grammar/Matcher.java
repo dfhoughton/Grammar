@@ -44,7 +44,6 @@ public abstract class Matcher {
 	/**
 	 * Generate a {@link Matcher} with the given state.
 	 * 
-	 * @param s
 	 * @param offset
 	 * @param master
 	 */
@@ -135,7 +134,7 @@ public abstract class Matcher {
 	 * 
 	 * @param c
 	 * @param child
-	 * @return
+	 * @return whether the child match passes the condition
 	 */
 	protected boolean testCondition(Condition c, Match child) {
 		if (c == null)

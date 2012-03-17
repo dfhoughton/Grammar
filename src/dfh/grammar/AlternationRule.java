@@ -79,7 +79,7 @@ public class AlternationRule extends Rule implements Serializable,
 	 * 
 	 * @param label
 	 * @param alternates
-	 * @param tagMap2
+	 * @param tagMap
 	 */
 	public AlternationRule(Label label, Rule[] alternates,
 			Map<String, Set<String>> tagMap) {
@@ -328,13 +328,15 @@ public class AlternationRule extends Rule implements Serializable,
 			Set<String> copySet = new HashSet<String>(tagMap.get(r.uid()));
 			Rule copy = cycleMap.get(r.label().id);
 			if (copy == null)
-				copy = r.deepCopy(nameBase, cycleMap, knownLabels, knownConditions);
+				copy = r.deepCopy(nameBase, cycleMap, knownLabels,
+						knownConditions);
 			tmCopy.put(copy.uid(), copySet);
 			copies[i] = copy;
 		}
 		AlternationRule r = new AlternationRule(l, copies, tmCopy);
 		if (c != null) {
-			r.condition = knownConditions.contains(condition)? nameBase + ':' + condition : condition;
+			r.condition = knownConditions.contains(condition) ? nameBase + ':'
+					+ condition : condition;
 			r.c = c.copy(nameBase, knownConditions);
 		}
 		return r;

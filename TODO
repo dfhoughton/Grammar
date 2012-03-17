@@ -9,7 +9,7 @@ section at the end of the document.
 . make sure conditionalized terminals are being cached properly
 . profile some matching to figure out what could be optimized
 . document logically complex conditions
-. clean up javadoc warnings
+* clean up javadoc warnings
 . add document for new fat and longStringLength to Options documentation
 * make sure labels propagate properly during grammar composition
 * refactor Rule.subRules to reduce repetition

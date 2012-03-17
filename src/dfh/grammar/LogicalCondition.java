@@ -156,7 +156,7 @@ public abstract class LogicalCondition extends Condition implements
 	 * @param operator
 	 *            string representing the logical operator at work in this
 	 *            condition
-	 * @return
+	 * @return string representing this logical condition
 	 */
 	protected String describe(String operator) {
 		StringBuilder b = new StringBuilder();

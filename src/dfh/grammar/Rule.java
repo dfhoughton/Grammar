@@ -313,7 +313,7 @@ public abstract class Rule {
 
 	/**
 	 * Returns whether this rule can match the null string. This method is used
-	 * in {@link #study(CharSequence, Map, Set, GlobalState) studying} in
+	 * in {@link #study(CharSequence, Map[], GlobalState) studying} in
 	 * {@link CharSequence}. When in doubt, default to <code>true</code>. This
 	 * may make the matching less efficient but is less likely to cause the
 	 * {@link Grammar} to miss a match.

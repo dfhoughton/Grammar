@@ -76,7 +76,7 @@ public abstract class Condition {
 	 *            {@link CharSequence} being matched against
 	 * @return whether the subsequence matched meets the condition
 	 */
-	public boolean passes(CharSequence subsequence) {
+	public boolean passes(CharSequence s) {
 		return true;
 	}
 
