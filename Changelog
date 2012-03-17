@@ -2,6 +2,7 @@
   * improved rule description
   * removed shallow cloning and the Grammar.clone() method
   * bumped major version number to reflect significant changes in API
+  * fixed grammar composition
 
 1.13, 10 March 2012
   * added fat and longStringLength options to allow finer control over offset
