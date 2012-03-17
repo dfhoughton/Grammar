@@ -222,19 +222,9 @@ public class LeafRule extends Rule implements Serializable {
 	}
 
 	@Override
-	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
-		LeafRule lr = (LeafRule) cycleMap.get(label().id);
-		if (lr == null) {
-			String id = generation == -1 ? label().id : nameBase + ':'
-					+ label().id;
-			Label l = new Label(label().t, id);
-			lr = new LeafRule(l, p, reversible);
-			if (labels != null)
-				lr.labels = new TreeSet<String>(labels);
-			lr.setUid();
-			cycleMap.put(label().id, lr);
-			lr.generation = generation;
-		}
+	public Rule deepCopy(Label l, String nameBase, Map<String, Rule> cycleMap,
+			Set<String> knownLabels, Set<String> knownConditions) {
+		LeafRule lr = new LeafRule(l, p, reversible);
 		return lr;
 	}
 

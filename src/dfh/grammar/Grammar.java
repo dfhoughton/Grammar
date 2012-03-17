@@ -1304,8 +1304,15 @@ public class Grammar implements Serializable {
 		// increment once more for the root rule
 		greatestGeneration++;
 		// now copy the rule tree
+		Set<Rule> explicitRules = root.subRules(true);
+		Set<String> knownLabels = new HashSet<String>(explicitRules.size() * 2), knownConditions = new HashSet<String>(
+				explicitRules.size() * 2);
+		for (Rule er : explicitRules) {
+			knownLabels.add(er.label().id);
+			knownLabels.addAll(er.conditionNames());
+		}
 		Rule rc = g.root.deepCopy(label, new HashMap<String, Rule>(g.rules()
-				.size() * 2));
+				.size() * 2), knownLabels, knownConditions);
 		if (c != null)
 			rc = conditionCheck(label, c, rc);
 		if (redefinitionCheck(r, rc)) {

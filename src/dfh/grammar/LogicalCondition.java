@@ -125,6 +125,7 @@ public abstract class LogicalCondition extends Condition implements
 	 * @return set of names for {@link LeafCondition conditions} that must be
 	 *         defined to specify this logical condition
 	 */
+	@Override
 	public Set<String> conditionNames() {
 		Set<String> set = new HashSet<String>();
 		conditionNames(set);
@@ -153,7 +154,8 @@ public abstract class LogicalCondition extends Condition implements
 	 * subtypes.
 	 * 
 	 * @param operator
-	 *            string representing the logical operator at work in this condition
+	 *            string representing the logical operator at work in this
+	 *            condition
 	 * @return
 	 */
 	protected String describe(String operator) {
@@ -173,10 +175,10 @@ public abstract class LogicalCondition extends Condition implements
 	}
 
 	@Override
-	Condition copy(String namebase) {
+	Condition copy(String namebase, Set<String> knownConditions) {
 		List<Condition> copies = new ArrayList<Condition>(subconditions.length);
 		for (int i = 0; i < subconditions.length; i++)
-			copies.add(subconditions[i].copy(namebase));
+			copies.add(subconditions[i].copy(namebase, knownConditions));
 		LogicalCondition lc = null;
 		if (this instanceof ConjunctionCondition)
 			lc = new ConjunctionCondition(copies);
@@ -186,9 +188,7 @@ public abstract class LogicalCondition extends Condition implements
 			lc = new XORCondition(copies);
 		else if (this instanceof NegationCondition)
 			lc = new NegationCondition(copies);
-		if (name != null) {
-			lc.setName(namebase + ':' + name);
-		}
+		lc.setName(lc.describe());
 		return lc;
 	}
 }

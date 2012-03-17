@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * For matching a rule literal. E.g., <fred> = "Fred".
@@ -207,30 +206,19 @@ public class LiteralRule extends Rule implements Serializable {
 
 	@Override
 	public Set<String> conditionNames() {
-		if (c instanceof LogicalCondition)
-			return ((LogicalCondition) c).conditionNames();
-		Set<String> set = new HashSet<String>(2);
-		set.add(c.getName());
-		return set;
+		if (c != null)
+			return c.conditionNames();
+		return super.conditionNames();
 	}
 
 	@Override
-	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
-		LiteralRule lr = (LiteralRule) cycleMap.get(label().id);
-		if (lr == null) {
-			String id = generation == -1 ? label().id : nameBase + ':'
-					+ label().id;
-			Label l = new Label(label().t, id);
-			lr = new LiteralRule(l, literal);
-			if (c != null) {
-				lr.condition = nameBase + ':' + condition;
-				lr.c = c.copy(nameBase);
-			}
-			if (labels != null)
-				lr.labels = new TreeSet<String>(labels);
-			lr.setUid();
-			cycleMap.put(label().id, lr);
-			lr.generation = generation;
+	public Rule deepCopy(Label l, String nameBase, Map<String, Rule> cycleMap,
+			Set<String> knownLabels, Set<String> knownConditions) {
+		LiteralRule lr = new LiteralRule(l, literal);
+		if (c != null) {
+			lr.condition = knownConditions.contains(condition) ? nameBase + ':'
+					+ condition : condition;
+			lr.c = c.copy(nameBase, knownConditions);
 		}
 		return lr;
 	}

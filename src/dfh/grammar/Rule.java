@@ -490,7 +490,7 @@ public abstract class Rule {
 				set.add(this);
 		}
 	}
-	
+
 	/**
 	 * Returns rules upon which this rule is dependent.
 	 * 
@@ -504,7 +504,6 @@ public abstract class Rule {
 		subRules(some, all, explicit);
 		return explicit ? some : all;
 	}
-
 
 	/**
 	 * Returns whether this rule depends on the given for its matching. This
@@ -555,7 +554,70 @@ public abstract class Rule {
 	 */
 	protected abstract Boolean mayBeZeroWidth(Map<String, Boolean> cache);
 
-	public abstract Rule deepCopy(String nameBase, Map<String, Rule> cycleMap);
+	/**
+	 * This method is required for grammar composition. It should be overwritten
+	 * by any rule that can serve as an explicit rule; that is, everything
+	 * except rules such as {@link BackReferenceRule} and
+	 * {@link BacktrackingBarrier}.
+	 * 
+	 * @param l
+	 *            the label to be used by the copy of this rule
+	 * @param nameBase
+	 *            name space prefix for disambiguation where necessary
+	 * @param cycleMap
+	 *            rules already copied -- this prevents infinite cycles and
+	 *            stack overflow during copying
+	 * @param knownLabels
+	 *            rule labels already used in the grammar being copied into
+	 * @param knownConditions
+	 *            condition labels already used in the grammar being copied into
+	 * @return a name-disambiguated copy of this rule
+	 */
+	protected Rule deepCopy(Label l, String nameBase,
+			Map<String, Rule> cycleMap, Set<String> knownLabels,
+			Set<String> knownConditions) {
+		return this;
+	}
+
+	/**
+	 * Performs most of generic bookkeeping required when composing one grammar
+	 * into another.
+	 * 
+	 * @param nameBase
+	 * @param cycleMap
+	 * @param knownLabels
+	 * @param knownConditions
+	 * @return copy of this rule preserving all naming distinctions
+	 */
+	final Rule deepCopy(String nameBase, Map<String, Rule> cycleMap,
+			Set<String> knownLabels, Set<String> knownConditions) {
+		Rule rr = cycleMap.get(label().id);
+		if (rr == null) {
+			String id = label().id;
+			if (generation > -1 && knownLabels.contains(id))
+				id = nameBase + ':' + id;
+			Label l = new Label(label().t, id);
+			rr = deepCopy(l, nameBase, cycleMap, knownLabels, knownConditions);
+			if (labels != null)
+				rr.labels = new TreeSet<String>(labels);
+			rr.setUid();
+			cycleMap.put(label().id, rr);
+			rr.generation = generation;
+			if (unreversed != null)
+				rr.unreversed = unreversed.deepCopy(nameBase, cycleMap,
+						knownLabels, knownConditions);
+			rr.postCopy();
+		}
+		return rr;
+	}
+
+	/**
+	 * A hook for any processing that must occur after
+	 * {@link #deepCopy(String, Map, Set, Set)} has finished its work.
+	 */
+	protected void postCopy() {
+
+	}
 
 	/**
 	 * Returns the names of conditions associated with this rule. This base

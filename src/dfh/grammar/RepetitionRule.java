@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Rule to handle all the various repetition options.
@@ -476,34 +475,22 @@ public class RepetitionRule extends Rule implements Serializable,
 
 	@Override
 	public Set<String> conditionNames() {
-		if (c instanceof LogicalCondition)
-			return ((LogicalCondition) c).conditionNames();
-		Set<String> set = new HashSet<String>(2);
-		set.add(c.getName());
-		return set;
+		if (c != null)
+			return c.conditionNames();
+		return super.conditionNames();
 	}
 
 	@Override
-	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
-		RepetitionRule rr = (RepetitionRule) cycleMap.get(label().id);
-		if (rr == null) {
-			Set<String> atCopy = new HashSet<String>(alternateTags);
-			Rule copy = cycleMap.get(r.label().id);
-			if (copy == null)
-				copy = r.deepCopy(nameBase, cycleMap);
-			String id = generation == -1 ? label().id : nameBase + ':'
-					+ label().id;
-			Label l = new Label(label().t, id);
-			rr = new RepetitionRule(l, copy, repetition, atCopy);
-			if (c != null) {
-				rr.condition = nameBase + ':' + condition;
-				rr.c = c.copy(nameBase);
-			}
-			if (labels != null)
-				rr.labels = new TreeSet<String>(labels);
-			rr.setUid();
-			cycleMap.put(label().id, rr);
-			rr.generation = generation;
+	public Rule deepCopy(Label l, String nameBase, Map<String, Rule> cycleMap,
+			Set<String> knownLabels, Set<String> knownConditions) {
+		Set<String> atCopy = new HashSet<String>(alternateTags);
+		Rule copy = r
+				.deepCopy(nameBase, cycleMap, knownLabels, knownConditions);
+		RepetitionRule rr = new RepetitionRule(l, copy, repetition, atCopy);
+		if (c != null) {
+			rr.condition = knownConditions.contains(condition) ? nameBase + ':'
+					+ condition : condition;
+			rr.c = c.copy(nameBase, knownConditions);
 		}
 		return rr;
 	}

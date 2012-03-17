@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * The object implementing rules such as
@@ -312,39 +311,32 @@ public class AlternationRule extends Rule implements Serializable,
 
 	@Override
 	public Set<String> conditionNames() {
-		if (c instanceof LogicalCondition)
-			return ((LogicalCondition) c).conditionNames();
-		Set<String> set = new HashSet<String>(2);
-		set.add(c.getName());
-		return set;
+		if (c != null)
+			return c.conditionNames();
+		return super.conditionNames();
 	}
 
 	@Override
-	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
+	protected Rule deepCopy(Label l, String nameBase,
+			Map<String, Rule> cycleMap, Set<String> knownLabels,
+			Set<String> knownConditions) {
 		Map<String, Set<String>> tmCopy = new HashMap<String, Set<String>>(
 				tagMap.size() * 2);
 		Rule[] copies = new Rule[alternates.length];
-		String id = generation == -1 ? label().id : nameBase + ':' + label().id;
-		Label l = new Label(label().t, id);
 		for (int i = 0; i < copies.length; i++) {
 			Rule r = alternates[i];
 			Set<String> copySet = new HashSet<String>(tagMap.get(r.uid()));
 			Rule copy = cycleMap.get(r.label().id);
 			if (copy == null)
-				copy = r.deepCopy(nameBase, cycleMap);
+				copy = r.deepCopy(nameBase, cycleMap, knownLabels, knownConditions);
 			tmCopy.put(copy.uid(), copySet);
 			copies[i] = copy;
 		}
 		AlternationRule r = new AlternationRule(l, copies, tmCopy);
 		if (c != null) {
-			r.condition = nameBase + ':' + condition;
-			r.c = c.copy(nameBase);
+			r.condition = knownConditions.contains(condition)? nameBase + ':' + condition : condition;
+			r.c = c.copy(nameBase, knownConditions);
 		}
-		if (labels != null)
-			r.labels = new TreeSet<String>(labels);
-		r.setUid();
-		cycleMap.put(label().id, r);
-		r.generation = generation;
 		return r;
 	}
 }

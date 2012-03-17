@@ -11,7 +11,6 @@ package dfh.grammar;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * A rule undefined at the time of grammar compilation. It will always
@@ -169,24 +168,12 @@ public class DeferredDefinitionRule extends Rule implements Serializable,
 	}
 
 	@Override
-	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
-		DeferredDefinitionRule ddr = (DeferredDefinitionRule) cycleMap
-				.get(label().id);
-		if (ddr == null) {
-			String id = generation == -1 ? label().id : nameBase + ':'
-					+ label().id;
-			Label l = new Label(label().t, id);
-			Rule copy = cycleMap.get(r.label().id);
-			if (copy == null)
-				copy = r.deepCopy(nameBase, cycleMap);
-			ddr = new DeferredDefinitionRule(l);
-			ddr.r = copy;
-			if (labels != null)
-				ddr.labels = new TreeSet<String>(labels);
-			ddr.setUid();
-			cycleMap.put(label().id, ddr);
-			ddr.generation = generation;
-		}
+	public Rule deepCopy(Label l, String nameBase, Map<String, Rule> cycleMap,
+			Set<String> knownLabels, Set<String> knownConditions) {
+		Rule copy = r
+				.deepCopy(nameBase, cycleMap, knownLabels, knownConditions);
+		DeferredDefinitionRule ddr = new DeferredDefinitionRule(l);
+		ddr.r = copy;
 		return ddr;
 	}
 }

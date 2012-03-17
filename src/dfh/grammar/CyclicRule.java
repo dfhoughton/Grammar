@@ -11,7 +11,6 @@ package dfh.grammar;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * A rule that depends on some other or others in a cycle of dependence. These
@@ -155,19 +154,12 @@ public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 	}
 
 	@Override
-	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
-		String id = generation == -1 ? label().id : nameBase + ':' + label().id;
-		Label l = new Label(label().t, id);
-		Rule copy = cycleMap.get(r.label().id);
-		cycleMap.put(label().id, r);
-		if (copy == null)
-			copy = r.deepCopy(nameBase, cycleMap);
+	public Rule deepCopy(Label l, String nameBase, Map<String, Rule> cycleMap,
+			Set<String> knownLabels, Set<String> knownConditions) {
+		Rule copy = r
+				.deepCopy(nameBase, cycleMap, knownLabels, knownConditions);
 		CyclicRule r = new CyclicRule(l);
 		r.r = copy;
-		if (labels != null)
-			r.labels = new TreeSet<String>(labels);
-		r.setUid();
-		r.generation = generation;
 		return r;
 	}
 }

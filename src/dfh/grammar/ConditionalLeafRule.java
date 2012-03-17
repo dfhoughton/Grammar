@@ -11,7 +11,6 @@ package dfh.grammar;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 @Reversible
 public class ConditionalLeafRule extends LeafRule {
@@ -93,14 +92,12 @@ public class ConditionalLeafRule extends LeafRule {
 		this.c = c;
 	}
 
-	private ConditionalLeafRule(ConditionalLeafRule clr, String nameBase) {
-		super(new Label(clr.label().t, nameBase + ':' + clr.label().id), clr.p,
-				clr.reversible);
-		this.condition = nameBase + ':' + clr.condition;
-		this.generation = clr.generation;
-		this.c = clr.c.copy(nameBase);
-		if (clr.labels != null)
-			labels = new TreeSet<String>(clr.labels);
+	private ConditionalLeafRule(ConditionalLeafRule clr, Label l,
+			String nameBase, Set<String> knownConditions) {
+		super(l, clr.p, clr.reversible);
+		condition = knownConditions.contains(clr.condition) ? nameBase + ':'
+				+ clr.condition : clr.condition;
+		c = clr.c.copy(nameBase, knownConditions);
 	}
 
 	@Override
@@ -162,11 +159,7 @@ public class ConditionalLeafRule extends LeafRule {
 
 	@Override
 	public Set<String> conditionNames() {
-		if (c instanceof LogicalCondition)
-			return ((LogicalCondition) c).conditionNames();
-		Set<String> set = new HashSet<String>(2);
-		set.add(c.getName());
-		return set;
+		return c.conditionNames();
 	}
 
 	@Override
@@ -183,14 +176,8 @@ public class ConditionalLeafRule extends LeafRule {
 	}
 
 	@Override
-	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
-		ConditionalLeafRule clr = (ConditionalLeafRule) cycleMap
-				.get(label().id);
-		if (clr == null) {
-			clr = new ConditionalLeafRule(this, nameBase);
-			clr.setUid();
-			cycleMap.put(label().id, clr);
-		}
-		return clr;
+	public Rule deepCopy(Label l, String nameBase, Map<String, Rule> cycleMap,
+			Set<String> knownLabels, Set<String> knownConditions) {
+		return new ConditionalLeafRule(this, l, nameBase, knownConditions);
 	}
 }

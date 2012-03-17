@@ -11,9 +11,9 @@ section at the end of the document.
 . document logically complex conditions
 . clean up javadoc warnings
 . add document for new fat and longStringLength to Options documentation
-. make sure labels propagate properly during grammar composition
-. refactor Rule.subRules to reduce repetition
-. fix deepCopy so that the field reversed is properly handled everywhere
+* make sure labels propagate properly during grammar composition
+* refactor Rule.subRules to reduce repetition
+* fix deepCopy so that the field reversed is properly handled everywhere
 * add license file to jar
 
 COMPLETED

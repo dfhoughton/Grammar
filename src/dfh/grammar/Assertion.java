@@ -11,7 +11,6 @@ package dfh.grammar;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Implements zero-width assertions. See {@link AssertionFragment}.
@@ -194,6 +193,15 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 		return wrap(b);
 	}
 
+	@Override
+	protected void postCopy() {
+		if (!forward) {
+			StringBuilder b = new StringBuilder();
+			Assertion.subDescription(r.unreversed, b);
+			subDescription = b.toString();
+		}
+	}
+
 	/**
 	 * Used in construction of text used by {@link #description()} in backwards
 	 * assertions.
@@ -297,22 +305,12 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 	}
 
 	@Override
-	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
-		Assertion ass = (Assertion) cycleMap.get(label().id);
-		if (ass == null) {
-			String id = generation == -1 ? label().id : nameBase + ':'
-					+ label().id;
-			Label l = new Label(label().t, id);
-			Rule copy = cycleMap.get(r.label().id);
-			if (copy == null)
-				copy = r.deepCopy(nameBase, cycleMap);
-			ass = new Assertion(l, copy, positive, forward);
-			if (labels != null)
-				ass.labels = new TreeSet<String>(labels);
-			ass.setUid();
-			cycleMap.put(label().id, ass);
-			ass.generation = generation;
-		}
+	public Rule deepCopy(Label l, String nameBase, Map<String, Rule> cycleMap,
+			Set<String> knownLabels, Set<String> knownConditions) {
+		Rule copy = r
+				.deepCopy(nameBase, cycleMap, knownLabels, knownConditions);
+		Assertion ass = new Assertion(l, copy, positive, forward);
+		ass.r = copy;
 		return ass;
 	}
 }

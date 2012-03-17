@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Matches a sequence of sub-rules. E.g.,
@@ -348,17 +347,14 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 
 	@Override
 	public Set<String> conditionNames() {
-		if (c instanceof LogicalCondition)
-			return ((LogicalCondition) c).conditionNames();
-		Set<String> set = new HashSet<String>(2);
-		set.add(c.getName());
-		return set;
+		if (c != null)
+			return c.conditionNames();
+		return super.conditionNames();
 	}
 
 	@Override
-	public Rule deepCopy(String nameBase, Map<String, Rule> cycleMap) {
-		String id = generation == -1 ? label().id : nameBase + ':' + label().id;
-		Label l = new Label(label().t, id);
+	public Rule deepCopy(Label l, String nameBase, Map<String, Rule> cycleMap,
+			Set<String> knownLabels, Set<String> knownConditions) {
 		Rule[] copies = new Rule[sequence.length];
 		List<Set<String>> tlCopy = new ArrayList<Set<String>>(tagList.size());
 		SequenceRule r = new SequenceRule(l, copies, tlCopy);
@@ -368,18 +364,15 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 			Rule or = sequence[i];
 			Rule copy = cycleMap.get(or.label().id);
 			if (copy == null)
-				copy = or.deepCopy(nameBase, cycleMap);
+				copy = or.deepCopy(nameBase, cycleMap, knownLabels,
+						knownConditions);
 			copies[i] = copy;
 		}
 		if (c != null) {
-			r.condition = nameBase + ':' + condition;
-			r.c = c.copy(nameBase);
+			r.condition = knownConditions.contains(condition) ? nameBase + ':'
+					+ condition : condition;
+			r.c = c.copy(nameBase, knownConditions);
 		}
-		if (labels != null)
-			r.labels = new TreeSet<String>(labels);
-		r.setUid();
-		cycleMap.put(label().id, r);
-		r.generation = generation;
 		return r;
 	}
 }

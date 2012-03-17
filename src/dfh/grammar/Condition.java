@@ -8,6 +8,9 @@
  */
 package dfh.grammar;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * For applying a post-match test to a {@link Match}.
  * <p>
@@ -148,9 +151,24 @@ public abstract class Condition {
 	 * {@link Grammar#defineRule(String, Grammar, String, Condition)}.
 	 * 
 	 * @param namebase
+	 * @param knownConditions
 	 * @return renamed copy of current condition
 	 */
-	Condition copy(String namebase) {
-		return new WrappedCondition(namebase, this);
+	Condition copy(String namebase, Set<String> knownConditions) {
+		return knownConditions.contains(name) ? new WrappedCondition(namebase,
+				this) : this;
+	}
+
+	/**
+	 * Returns all condition labels required to be defined in defining this
+	 * condition. This method is required for grammar composition.
+	 * 
+	 * @return all condition labels required to be defined in defining this
+	 *         condition
+	 */
+	public Set<String> conditionNames() {
+		Set<String> set = new TreeSet<String>();
+		set.add(name);
+		return set;
 	}
 }
