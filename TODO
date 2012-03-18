@@ -15,6 +15,8 @@ section at the end of the document.
 * refactor Rule.subRules to reduce repetition
 * fix deepCopy so that the field reversed is properly handled everywhere
 * add license file to jar
+. optimize cycleCheck so it only occurs in cyclic rule matchers
+. optimize cycleCheck so it is only done for left-headed cycles
 
 COMPLETED
 =========
