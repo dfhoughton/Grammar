@@ -164,9 +164,13 @@ public class Compiler {
 				if (map.containsKey(l))
 					throw new GrammarException("rule " + l
 							+ " redefined at line " + reader.lineNumber());
-				map.put(l, list);
-				if (l.t == Type.root)
+				if (r == null) {
+					if (l.t != Type.root) {
+						l = new Label(Type.root, l.id);
+					}
 					r = l;
+				}
+				map.put(l, list);
 			}
 		} catch (IOException e1) {
 			throw new GrammarException(e1);

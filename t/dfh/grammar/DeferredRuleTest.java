@@ -36,7 +36,7 @@ public class DeferredRuleTest {
 		assertNotNull("found ned", n);
 	}
 
-	class ARule extends Rule implements Cloneable {
+	public static class ARule extends Rule implements Cloneable {
 		class AMatcher extends Matcher {
 			private final Map<Integer, CachedMatch> cache;
 			private boolean fresh = true;

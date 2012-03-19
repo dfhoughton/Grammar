@@ -17,7 +17,7 @@ section at the end of the document.
 * add license file to jar
 * optimize cycleCheck so it only occurs in cyclic rule matchers
 * optimize cycleCheck so it is only done for left-headed cycles
-. remove requirement that root rule be called ROOT
+* remove requirement that root rule be called ROOT
 . renamed composed in rules only when functionally distinct
 . make Condition.copy() clone when possible
 * eliminated cycle parameter in global state

@@ -39,28 +39,6 @@ public class MisCompilationTest {
 	}
 
 	@Test
-	public void noRootError() {
-		String[] rules = {
-				//
-				"<a> = <foo> <s> <bar>",//
-				"<b> = <quux> <s> <baz>",//
-				"<s> = /\\s++/",//
-				"<foo> = /foo/",//
-				"<bar> = /bar/",//
-				"<quux> = /quux/",//
-				"<baz> = /baz/",//
-		};
-		try {
-			@SuppressWarnings("unused")
-			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover the lack of a root rule");
-		} catch (Exception e) {
-			org.junit.Assert.assertTrue("no root rule found", e.getMessage()
-					.indexOf("no root rule found") > -1);
-		}
-	}
-
-	@Test
 	public void doubleAssignmentError() {
 		String[] rules = {
 				//

@@ -29,7 +29,10 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 	/**
 	 * Type of {@link Rule} associated with {@link Label}.
 	 * <p>
-	 * <b>Creation date:</b> Apr 1, 2011
+	 * Note: this enum is a relic of an earlier conception of how grammar
+	 * compilation and description was going to proceed. I believe it serves no
+	 * purpose at this point but I have not yet removed it. It would probably be
+	 * wise to do so at some point. Compilation has gotten complex enough.
 	 * 
 	 * @author David Houghton
 	 * 

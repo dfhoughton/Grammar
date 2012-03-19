@@ -663,6 +663,9 @@ public abstract class Rule {
 	 * where the match graph can potentially branch leftward forever without
 	 * ever advancing the match offset. These are the problematic cycles sought
 	 * by {@link NonterminalMatcher#cycleCheck()}.
+	 * <p>
+	 * Note: this must be called towards the end of rule initialization, after
+	 * {@link #mayBeZeroWidth} has been set.
 	 * 
 	 * @param sought
 	 *            the rule whose left-headed-cyclicity is being tested

@@ -50,6 +50,7 @@ import org.junit.runners.Suite;
 		RoundTripTest.class,//
 		SubrulesTest.class,//
 		ExplicitRuleTest.class,//
+		RootlessGrammarTest.class,//
 })
 public class AllTests {
 }

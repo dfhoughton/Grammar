@@ -3,6 +3,7 @@
     mightHaveNext() test
   * optimized cycle checking to occur only on cyclic rules
   * eliminated cyclic field in GlobalState
+  * removed requirement that the root rule be named ROOT
 
 2.0, 17 March 2012
   * improved rule description
