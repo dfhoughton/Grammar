@@ -145,6 +145,12 @@ public class Compiler {
 				if (list == null)
 					continue; // blank line or comment
 				Label l = (Label) list.removeFirst();
+				if (r == null) {
+					if (l.t != Type.root) {
+						l = new Label(Type.root, l.id);
+					}
+					r = l;
+				}
 				if (list.peekLast() instanceof ConditionFragment) {
 					ConditionFragment cf = (ConditionFragment) list
 							.removeLast();
@@ -164,12 +170,6 @@ public class Compiler {
 				if (map.containsKey(l))
 					throw new GrammarException("rule " + l
 							+ " redefined at line " + reader.lineNumber());
-				if (r == null) {
-					if (l.t != Type.root) {
-						l = new Label(Type.root, l.id);
-					}
-					r = l;
-				}
 				map.put(l, list);
 			}
 		} catch (IOException e1) {

@@ -187,5 +187,40 @@ public class RootlessGrammarTest {
 		n = m.match();
 		assertNull("parsed minimal document", n);
 	}
+	
+	@Test
+	public void conditionOnRoot() {
+		String[] rules = {
+				//
+				"emoticon = [ <lr> | <rl> ] !-/.?::/r (well_bounded)",//
+				"      lr = <hat>? <lreyes> <nose>? <lrmouth>",//
+				"      rl = <rlmouth> <nose>? <eyes> <hat>?",//
+				"    eyes = [{een} /[:;=8]/ ]",//
+				"  lreyes = [{een} <eyes> | 'B' ]",//
+				"     hat = /[<>]/",//
+				" lrmouth = [{mou} <mouth> | '>' ]",//
+				" rlmouth = [{mou} <mouth> | '<' ]",//
+				"   mouth = /[()\\[\\]dDpP\\/:{}\\\\@|]/ | /[()]{2}/",//
+				"    nose = /[o*'^v\"-]/",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("well_bounded", new Condition() {
+			@Override
+			public boolean passes(Match n, CharSequence s) {
+				boolean wellBounded = true;
+				if (n.start() > 0
+						&& Character.isLetterOrDigit(s.charAt(n.start()))) {
+					wellBounded &= !Character.isLetterOrDigit(s.charAt(n
+							.start() - 1));
+				}
+				if (wellBounded && n.end() < s.length()
+						&& Character.isLetterOrDigit(s.charAt(n.end() - 1))) {
+					wellBounded &= !Character.isLetterOrDigit(s.charAt(n
+							.end()));
+				}
+				return wellBounded;
+			}
+		});
+	}
 
 }
