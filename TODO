@@ -20,6 +20,7 @@ section at the end of the document.
 . remove requirement that root rule be called ROOT
 . renamed composed in rules only when functionally distinct
 . make Condition.copy() clone when possible
+. eliminated cycle parameter in global state
 
 COMPLETED
 =========
