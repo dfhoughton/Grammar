@@ -9,18 +9,9 @@ section at the end of the document.
 . make sure conditionalized terminals are being cached properly
 . profile some matching to figure out what could be optimized
 . document logically complex conditions
-* clean up javadoc warnings
 . add document for new fat and longStringLength to Options documentation
-* make sure labels propagate properly during grammar composition
-* refactor Rule.subRules to reduce repetition
-* fix deepCopy so that the field reversed is properly handled everywhere
-* add license file to jar
-* optimize cycleCheck so it only occurs in cyclic rule matchers
-* optimize cycleCheck so it is only done for left-headed cycles
-* remove requirement that root rule be called ROOT
 . renamed composed in rules only when functionally distinct
 . make Condition.copy() clone when possible
-* eliminated cycle parameter in global state
 . fix documentation of root rule
 
 COMPLETED
@@ -63,3 +54,12 @@ COMPLETED
 * add fat option to Options
 * fix isTerminal() so it checks on the generating rule
 * make sure conditions are copied during grammar composition
+* clean up javadoc warnings
+* make sure labels propagate properly during grammar composition
+* refactor Rule.subRules to reduce repetition
+* fix deepCopy so that the field reversed is properly handled everywhere
+* add license file to jar
+* optimize cycleCheck so it only occurs in cyclic rule matchers
+* optimize cycleCheck so it is only done for left-headed cycles
+* remove requirement that root rule be called ROOT
+* eliminated cycle parameter in global state
