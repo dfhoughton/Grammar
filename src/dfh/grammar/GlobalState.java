@@ -22,7 +22,7 @@ import java.io.PrintStream;
  * 
  */
 public class GlobalState {
-	public final boolean allowOverlap, study, containsCycles, keepRightmost;
+	public final boolean allowOverlap, study, keepRightmost;
 	public final int start, end, rcsEnd;
 	public final PrintStream trace;
 	public final boolean debug;
@@ -37,9 +37,9 @@ public class GlobalState {
 	 * @param o
 	 * @param containsCycles
 	 */
-	GlobalState(CharSequence cs, Options o, boolean containsCycles) {
+	GlobalState(CharSequence cs, Options o) {
 		this(cs, new ReversedCharSequence(cs), false, o.allowOverlap, o.start,
-				o.end, o.maxRecursionDepth, o.trace, o.study, containsCycles,
+				o.end, o.maxRecursionDepth, o.trace, o.study, 
 				o.keepRightmost);
 	}
 	
@@ -56,7 +56,6 @@ public class GlobalState {
 		this.debug = gs.debug;
 		this.rcsEnd = gs.rcsEnd;
 		this.study = gs.study;
-		this.containsCycles = gs.containsCycles;
 	}
 	
 	/**
@@ -69,7 +68,7 @@ public class GlobalState {
 	private GlobalState(CharSequence cs, ReversedCharSequence rcs,
 			boolean isReversed, boolean allowOverlap, int start, int end,
 			int maxDepth, PrintStream trace, boolean study,
-			boolean containsCycles, boolean keepRightmost) {
+			boolean keepRightmost) {
 		this.cs = cs;
 		this.rcs = rcs;
 		this.isReversed = isReversed;
@@ -78,7 +77,6 @@ public class GlobalState {
 		this.end = end;
 		this.maxDepth = maxDepth;
 		this.trace = trace;
-		this.containsCycles = containsCycles;
 		this.keepRightmost = keepRightmost;
 		this.debug = trace != null;
 		this.rcsEnd = rcs.translate(start) + 1;
@@ -113,7 +111,6 @@ public class GlobalState {
 	@Override
 	public String toString() {
 		return "[overlap: " + allowOverlap + "; study: " + study + "; start: "
-				+ start + "; end: " + end + "; debug: " + debug + "; cycles: "
-				+ containsCycles;
+				+ start + "; end: " + end + "; debug: " + debug;
 	}
 }

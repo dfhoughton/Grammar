@@ -344,7 +344,6 @@ public class Grammar implements Serializable {
 	 * Keeps track of terminals not defined in initial rule set.
 	 */
 	protected final HashSet<Label> undefinedRules;
-	private boolean recursive;
 	protected final Map<String, Set<Label>> undefinedConditions;
 	private final Map<String, Set<Rule>> knownConditions;
 	private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
@@ -553,7 +552,6 @@ public class Grammar implements Serializable {
 		root = c.rules().get(rootLabel);
 		terminalLabelMap = c.terminalLabelMap();
 		undefinedRules = c.undefinedTerminals();
-		recursive = c.recursive();
 		undefinedConditions = c.undefinedConditions();
 		knownConditions = new HashMap<String, Set<Rule>>(
 				undefinedConditions.size() * 2);
@@ -1287,7 +1285,7 @@ public class Grammar implements Serializable {
 					"start offset specified beyond end of string");
 		if (opt.end == -1)
 			opt.end(s.length());
-		return new GlobalState(s, opt, recursive);
+		return new GlobalState(s, opt);
 	}
 
 	public synchronized void defineRule(String label, Grammar g, String id,
@@ -1543,7 +1541,6 @@ public class Grammar implements Serializable {
 	 */
 	public synchronized void defineRule(String label, Grammar g) {
 		defineRule(label, g, null, null);
-		recursive |= g.recursive;
 	}
 
 	/**

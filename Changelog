@@ -2,6 +2,7 @@
   * optimized condition testing in alternation by caching conditionless
     mightHaveNext() test
   * optimized cycle checking to occur only on cyclic rules
+  * eliminated cyclic field in GlobalState
 
 2.0, 17 March 2012
   * improved rule description

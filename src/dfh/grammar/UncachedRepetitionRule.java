@@ -44,7 +44,7 @@ public class UncachedRepetitionRule extends RepetitionRule {
 					rule.matchTrace(this, null);
 				return null;
 			}
-			if (next == null && !(options.containsCycles && cycleCheck()))
+			if (next == null && cycleCheck())
 				fetchNext();
 			Match n = next;
 			next = null;

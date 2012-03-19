@@ -78,7 +78,7 @@ public abstract class NonterminalMatcher extends Matcher {
 				rule.matchTrace(this, null);
 			return null;
 		}
-		if (next == null && !(options.containsCycles && cycleCheck()))
+		if (next == null && cycleCheck())
 			fetchNext();
 		if (cm == null) {
 			cm = next == null ? CachedMatch.MISMATCH : CachedMatch.MATCH;
@@ -97,7 +97,7 @@ public abstract class NonterminalMatcher extends Matcher {
 			return false;
 		if (CachedMatch.MISMATCH.equals(subCache.get(offset)))
 			return false;
-		if (next == null && !(options.containsCycles && cycleCheck()))
+		if (next == null && cycleCheck())
 			fetchNext();
 		return next != null;
 	}
@@ -113,12 +113,12 @@ public abstract class NonterminalMatcher extends Matcher {
 				if (m.rule() == rule) {
 					count++;
 					if (count == options.maxDepth)
-						return true;
+						return false;
 				}
 				m = m.master;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	@Override

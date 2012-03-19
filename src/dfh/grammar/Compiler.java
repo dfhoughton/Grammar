@@ -42,7 +42,6 @@ public class Compiler {
 	private Map<Label, Set<Label>> dependencyMap = new HashMap<Label, Set<Label>>();
 	private Map<Label, Rule> reversedCyclicRuleMap = new HashMap<Label, Rule>();
 	private final Label root;
-	private boolean recursive;
 	private Map<String, Set<Label>> undefinedConditions = new HashMap<String, Set<Label>>();
 	private Map<Label, Match> conditionMap = new HashMap<Label, Match>();
 	/**
@@ -276,7 +275,6 @@ public class Compiler {
 				}
 			}
 			if (map.size() == size) {
-				recursive = true;
 				resolveRecursions(map, gen);
 				if (map.size() == size)
 					throw new GrammarException(
@@ -1001,13 +999,6 @@ public class Compiler {
 
 	HashSet<Label> undefinedTerminals() {
 		return new HashSet<Label>(undefinedRules);
-	}
-
-	/**
-	 * @return whether any cycles had to be dealt with during compilation
-	 */
-	boolean recursive() {
-		return recursive;
 	}
 
 	private Set<Label> allLabels(List<RuleFragment> value) {
