@@ -1235,7 +1235,7 @@ public class Grammar implements Serializable {
 	}
 
 	/**
-	 * @return set of rules that can begin a match
+	 * completes rule initialization
 	 */
 	private synchronized void initialRules() {
 		if (initialRules == null) {
@@ -1253,9 +1253,12 @@ public class Grammar implements Serializable {
 			terminalRules = new HashSet<String>(rules().size() * 2);
 			root.initialRules(initialRules);
 			for (Rule r : rules()) {
-				if (r instanceof NonterminalRule)
+				if (r instanceof NonterminalRule) {
 					initialRules.remove(r.uid());
-				else
+					if (r.cycle) {
+						r.cycle = r.findLeftCycle(r, new HashSet<Rule>(rules().size() * 2));
+					}
+				} else
 					terminalRules.add(r.uid());
 			}
 		}

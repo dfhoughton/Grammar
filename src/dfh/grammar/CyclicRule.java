@@ -163,4 +163,17 @@ public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 		r.r = copy;
 		return r;
 	}
+
+	@Override
+	protected boolean findLeftCycle(Rule sought, Set<Rule> cycleCache) {
+		cycleCache.add(this);
+		if (r == sought)
+			return true;
+		if (!cycleCache.contains(r)) {
+			cycleCache.add(r);
+			if (r.findLeftCycle(sought, cycleCache))
+				return true;
+		}
+		return false;
+	}
 }

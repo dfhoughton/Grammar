@@ -139,6 +139,13 @@ public abstract class Rule {
 		return label.id;
 	}
 
+	/**
+	 * The functionally unique id of this rule. Only available after
+	 * {@link #setUid()} has been called, which occurs during the first
+	 * validation of the containing grammar before matching.
+	 * 
+	 * @return functionally unique id
+	 */
 	public String uid() {
 		return uid;
 	}
@@ -642,6 +649,29 @@ public abstract class Rule {
 	 * @return whether this rule necessarily produces terminal matches
 	 */
 	protected boolean isTerminal() {
+		return false;
+	}
+
+	/**
+	 * Checks to see whether a rule marked as cyclic can occur in a
+	 * *left-headed* cycle, that is, a rule such as
+	 * 
+	 * <pre>
+	 * a = &lt;a&gt; 'b' | 'c'
+	 * </pre>
+	 * 
+	 * where the match graph can potentially branch leftward forever without
+	 * ever advancing the match offset. These are the problematic cycles sought
+	 * by {@link NonterminalMatcher#cycleCheck()}.
+	 * 
+	 * @param sought
+	 *            the rule whose left-headed-cyclicity is being tested
+	 * @param cycleCache
+	 *            cache to prevent cycling during recursive search for
+	 *            left-headed cycles
+	 * @return whether a left-headed cycle was found
+	 */
+	protected boolean findLeftCycle(Rule sought, Set<Rule> cycleCache) {
 		return false;
 	}
 }

@@ -375,4 +375,30 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 		}
 		return r;
 	}
+
+	@Override
+	protected boolean findLeftCycle(Rule sought, Set<Rule> cycleCache) {
+		cycleCache.add(this);
+		for (Rule r: sequence) {
+			if (r == sought)
+				return true;
+			if (cycleCache.contains(r)) {
+				if (r.mayBeZeroWidth)
+					continue;
+				return false;
+			}
+			cycleCache.add(r);
+			if (r instanceof CyclicRule) {
+				CyclicRule cr = (CyclicRule) r;
+				if (cr.r == sought)
+					return true;
+				if (cr.r.findLeftCycle(sought, cycleCache))
+					return true;
+			} else if (r.findLeftCycle(sought, cycleCache))
+				return true;
+			if (!r.mayBeZeroWidth)
+				return false;
+		}
+		return false;
+	}
 }

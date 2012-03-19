@@ -344,4 +344,25 @@ public class AlternationRule extends Rule implements Serializable,
 		}
 		return r;
 	}
+
+	@Override
+	protected boolean findLeftCycle(Rule sought, Set<Rule> cycleCache) {
+		cycleCache.add(this);
+		for (Rule o : alternates) {
+			if (o == sought)
+				return true;
+			if (cycleCache.contains(o))
+				continue;
+			cycleCache.add(o);
+			if (o instanceof CyclicRule) {
+				CyclicRule cr = (CyclicRule) o;
+				if (cr.r == sought)
+					return true;
+				if (cr.r.findLeftCycle(sought, cycleCache))
+					return true;
+			} else if (o.findLeftCycle(sought, cycleCache))
+				return true;
+		}
+		return false;
+	}
 }
