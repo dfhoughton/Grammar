@@ -44,9 +44,11 @@ public class AlternationRule extends Rule implements Serializable,
 				mostRecent = alternates[index].matcher(offset, cache, this);
 			}
 			Match child = null;
-			OUTER: while (mostRecent.mightHaveNext()
+			boolean test;
+			OUTER: while ((test = mostRecent.mightHaveNext())
 					|| index < alternates.length) {
-				while (mostRecent.mightHaveNext()) {
+				// check condition
+				while (test) {
 					child = mostRecent.match();
 					if (child != null) {
 						if (testCondition(c, child))
@@ -54,6 +56,7 @@ public class AlternationRule extends Rule implements Serializable,
 						else
 							child = null;
 					}
+					test = mostRecent.mightHaveNext();
 				}
 				if (++index == alternates.length)
 					break;

@@ -74,6 +74,11 @@ public abstract class Rule {
 	 * reversed.
 	 */
 	Rule unreversed;
+	/**
+	 * Set to <code>true</code> by {@link CyclicRule#setRule(Rule)} to enable
+	 * checking for maximum cycle depth.
+	 */
+	protected boolean cycle = false;
 
 	protected String wrap(StringBuilder b) {
 		if (!(labels == null || labels.isEmpty())) {

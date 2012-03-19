@@ -1543,6 +1543,7 @@ public class Grammar implements Serializable {
 	 */
 	public synchronized void defineRule(String label, Grammar g) {
 		defineRule(label, g, null, null);
+		recursive |= g.recursive;
 	}
 
 	/**

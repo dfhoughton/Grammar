@@ -61,6 +61,7 @@ public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 		if (this.r != null)
 			throw new GrammarException("rule " + label + "already defined");
 		this.r = r;
+		r.cycle = true;
 	}
 
 	@Override

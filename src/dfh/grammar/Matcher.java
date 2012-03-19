@@ -40,7 +40,6 @@ public abstract class Matcher {
 	 * Rightmost match found by this {@link Matcher} or any of its descendants.
 	 */
 	protected Match rightmost = null;
-
 	/**
 	 * Generate a {@link Matcher} with the given state.
 	 * 

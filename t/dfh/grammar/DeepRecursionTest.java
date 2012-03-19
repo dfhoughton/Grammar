@@ -90,7 +90,7 @@ public class DeepRecursionTest {
 
 	@Test
 	public void test3NullQuantification() throws GrammarException, IOException {
-		String s = "asasasa";
+		String s = "asasasasa";
 		Matcher m = gQuantification.matches(s);
 		Match n = m.match();
 		assertNull(n);

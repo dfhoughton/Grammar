@@ -100,37 +100,23 @@ public abstract class NonterminalMatcher extends Matcher {
 		if (next == null && !(options.containsCycles && cycleCheck()))
 			fetchNext();
 		return next != null;
-		// TODO make sure following is not necessary
-		// CachedMatch cm = subCache.get(offset);
-		// if (cm == null || cm == CachedMatch.MATCH) {
-		// if (next == null && !(options.containsCycles && cycleCheck()))
-		// fetchNext();
-		// if (next == null) {
-		// if (cm == null)
-		// subCache.put(offset, CachedMatch.MISMATCH);
-		// return false;
-		// } else {
-		// if (cm == null)
-		// subCache.put(offset, CachedMatch.MATCH);
-		// return true;
-		// }
-		// } else
-		// return false;
 	}
 
 	/**
 	 * @return whether we seem to be in a non-progressing recursive loop
 	 */
 	protected boolean cycleCheck() {
-		Matcher m = master;
-		int count = 0;
-		while (m != null && m.offset.equals(offset)) {
-			if (m.rule() == rule) {
-				count++;
-				if (count == options.maxDepth)
-					return true;
+		if (rule.cycle) {
+			Matcher m = master;
+			int count = 0;
+			while (m != null && m.offset.equals(offset)) {
+				if (m.rule() == rule) {
+					count++;
+					if (count == options.maxDepth)
+						return true;
+				}
+				m = m.master;
 			}
-			m = m.master;
 		}
 		return false;
 	}
