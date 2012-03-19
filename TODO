@@ -14,6 +14,7 @@ section at the end of the document.
 . make Condition.copy() clone when possible
 . fix documentation of root rule
 . add option to turn off condition testing
+. add more unit tests for grammar description after composition with tagging
 
 COMPLETED
 =========
