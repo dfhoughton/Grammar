@@ -13,6 +13,7 @@ section at the end of the document.
 . renamed composed in rules only when functionally distinct
 . make Condition.copy() clone when possible
 . fix documentation of root rule
+. add option to turn off condition testing
 
 COMPLETED
 =========
