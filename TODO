@@ -15,6 +15,7 @@ section at the end of the document.
 . fix documentation of root rule
 . add option to turn off condition testing
 . add more unit tests for grammar description after composition with tagging
+. bail out of recursion via exception rather than the current laborious and expensive reeling in of failed tries
 
 COMPLETED
 =========
