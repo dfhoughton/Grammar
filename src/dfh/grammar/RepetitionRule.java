@@ -305,9 +305,10 @@ public class RepetitionRule extends Rule implements Serializable,
 	public String description(boolean inBrackets) {
 		StringBuilder b = new StringBuilder();
 		boolean hasTags = !(alternateTags == null || alternateTags.isEmpty());
+		boolean requiresBrackets = r instanceof SequenceRule || r instanceof AlternationRule || hasTags && !inBrackets;
+		if (requiresBrackets)
+			b.append('[');
 		if (hasTags) {
-			if (!inBrackets)
-				b.append('[');
 			b.append('{');
 			boolean ni2 = false;
 			for (String label : alternateTags) {
@@ -318,7 +319,8 @@ public class RepetitionRule extends Rule implements Serializable,
 				b.append(label);
 			}
 			b.append("} ");
-		}
+		} else if (requiresBrackets)
+			b.append(' ');
 		if (r.generation == -1) {
 			if ((r instanceof SequenceRule || r instanceof AlternationRule)
 					&& !(inBrackets && repetition.redundant())) {
@@ -328,11 +330,8 @@ public class RepetitionRule extends Rule implements Serializable,
 				b.append(r.description(false));
 		} else
 			b.append(r.label());
-		if (hasTags) {
-			b.append(' ');
-			if (!inBrackets)
-				b.append(']');
-		}
+		if (requiresBrackets)
+			b.append(" ]");
 		b.append(repetition);
 		b = new StringBuilder(wrap(b));
 		if (c != null)

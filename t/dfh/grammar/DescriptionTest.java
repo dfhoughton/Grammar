@@ -212,4 +212,15 @@ public class DescriptionTest {
 		new Grammar(s);
 	}
 
+	@Test
+	public void repetition2() {
+		String[] rules = {
+				//
+				"v4 = <byte> [ '.' <byte> ]{3}",//
+				"byte = /\\d{1,3}/r",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = g.describe();
+		assertTrue(s.indexOf("]{3}") > -1);
+	}
 }
