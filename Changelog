@@ -1,3 +1,5 @@
+2.02
+
 2.01, 23 March 2012
   * optimized condition testing in alternation by caching conditionless
     mightHaveNext() test
