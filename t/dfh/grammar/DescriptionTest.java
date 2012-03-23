@@ -111,4 +111,83 @@ public class DescriptionTest {
 			assertTrue("contains rule " + s, pattern.matcher(d).find());
 		}
 	}
+
+	@Test
+	public void taggedDDRInAlternation1() {
+		String s = "a = [{b} <c> ] | \"d\"";
+		Grammar g = new Grammar(s);
+		Grammar g2 = new Grammar("c = 'c'");
+		g.defineRule("c", g2);
+		s = g.describe();
+		assertTrue(s.indexOf("b") > -1);
+	}
+
+	@Test
+	public void taggedDDRInAlternation2() {
+		String s = "a = [{b} <c> ] | \"d\"";
+		Grammar g = new Grammar(s);
+		g.defineRule("c", "c");
+		s = g.describe();
+		assertTrue(s.indexOf("b") > -1);
+		int count = 0, index = 0;
+		while ((index = s.indexOf("c =", index) + 1) > 0)
+			count++;
+		assertEquals(1, count);
+	}
+
+	@Test
+	public void taggedDDRInAlternation3() {
+		String s = "a = [{b} <c> ] | \"d\"";
+		Grammar g = new Grammar(s);
+		g.defineRule("c", Pattern.compile("c"));
+		s = g.describe();
+		assertTrue(s.indexOf("b") > -1);
+		int count = 0, index = 0;
+		while ((index = s.indexOf("c =", index) + 1) > 0)
+			count++;
+		assertEquals(1, count);
+	}
+
+	@Test
+	public void taggedDDRInAlternation4() {
+		String s = "a = [{b} <c> ] | \"d\"";
+		Grammar g = new Grammar(s);
+		Grammar g2 = new Grammar("c = 'c'");
+		g.defineRule("c", g2, "e", new Condition() {
+		});
+		s = g.describe();
+		assertTrue(s.indexOf("b") > -1);
+		int count = 0, index = 0;
+		while ((index = s.indexOf("(e)", index) + 1) > 0)
+			count++;
+		assertEquals(1, count);
+	}
+
+	@Test
+	public void taggedDDRInAlternation5() {
+		String s = "a = [{b} <c> ] | \"d\"";
+		Grammar g = new Grammar(s);
+		g.defineRule("c", "c", "e", new Condition() {
+		});
+		s = g.describe();
+		assertTrue(s.indexOf("b") > -1);
+		int count = 0, index = 0;
+		while ((index = s.indexOf("(c)", index) + 1) > 0)
+			count++;
+		assertEquals(1, count);
+	}
+
+	@Test
+	public void taggedDDRInAlternation6() {
+		String s = "a = [{b} <c> ] | \"d\"";
+		Grammar g = new Grammar(s);
+		g.defineRule("c", Pattern.compile("c"), "e", new Condition() {
+		});
+		s = g.describe();
+		assertTrue(s.indexOf("b") > -1);
+		int count = 0, index = 0;
+		while ((index = s.indexOf("(e)", index) + 1) > 0)
+			count++;
+		assertEquals(1, count);
+	}
 }

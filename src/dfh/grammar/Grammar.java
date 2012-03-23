@@ -604,12 +604,14 @@ public class Grammar implements Serializable {
 	public synchronized void defineRule(String label, Pattern p, String id,
 			Condition c) throws GrammarException {
 		DeferredDefinitionRule r = checkRuleDefinition(label);
+		String oldId = r.uniqueId();
 		Label l = new Label(Type.terminal, label);
 		LeafRule lr = new LeafRule(l, p, false);
 		if (c != null) {
 			lr = (LeafRule) conditionCheck(id, c, lr);
 		}
 		redefinitionCheck(r, lr);
+		fixAlternationTags(oldId, r);
 	}
 
 	/**
@@ -638,6 +640,7 @@ public class Grammar implements Serializable {
 			if (!(set == null || set.isEmpty()))
 				throw new GrammarException("condition identifier " + id
 						+ " already in use");
+			c.setName(id);
 			if (set == null) {
 				set = new HashSet<Rule>();
 				knownConditions.put(id, set);
@@ -996,9 +999,15 @@ public class Grammar implements Serializable {
 		root.subRules(set, new HashSet<Rule>(), true);
 		List<Rule> rules = new ArrayList<Rule>(set);
 		for (Iterator<Rule> i = rules.iterator(); i.hasNext();) {
-			if (i.next() == root) {
+			Rule r = i.next();
+			if (r == root) {
 				i.remove();
-				break;
+				continue;
+			}
+			if (r instanceof DeferredDefinitionRule) {
+				DeferredDefinitionRule ddr = (DeferredDefinitionRule) r;
+				if (set.contains(ddr.r))
+					i.remove();
 			}
 		}
 		int maxLabel = root.label().id.length();
@@ -1060,6 +1069,7 @@ public class Grammar implements Serializable {
 		}
 		rule.setLabel(label);
 		DeferredDefinitionRule r = checkRuleDefinition(label);
+		String oldId = r.uniqueId();
 		Map<Label, Rule> erules = explicitRules();
 		Map<String, Label> idMap = new HashMap<String, Label>(erules.size() * 2);
 		for (Entry<Label, Rule> e : erules.entrySet())
@@ -1070,7 +1080,41 @@ public class Grammar implements Serializable {
 			r.setRule(rule);
 		} else
 			r.setRule(erules.get(idMap.get(id)));
+		fixAlternationTags(oldId, r);
 		undefinedRules.remove(r.label());
+	}
+
+	/**
+	 * Reassigns tags in structures such as
+	 * 
+	 * <pre>
+	 * foo = [{bar} &lt;a&gt; ] | 'b'
+	 * </pre>
+	 * 
+	 * where a tag is assigned to a {@link DeferredDefinitionRule}.
+	 * 
+	 * @param oldId
+	 *            the unique id of the {@link DeferredDefinitionRule} before
+	 *            definition
+	 * @param r
+	 *            the fully defined rule
+	 */
+	private void fixAlternationTags(String oldId, DeferredDefinitionRule r) {
+		Set<Rule> set = root.subRules(false);
+		String newId = null;
+		for (Rule rule : set) {
+			if (rule == r)
+				continue;
+			if (rule instanceof AlternationRule) {
+				AlternationRule ar = (AlternationRule) rule;
+				Set<String> tags = ar.tagMap.remove(oldId);
+				if (tags != null) {
+					if (newId == null)
+						newId = r.r.uniqueId();
+					ar.tagMap.put(newId, tags);
+				}
+			}
+		}
 	}
 
 	/**
@@ -1256,7 +1300,8 @@ public class Grammar implements Serializable {
 				if (r instanceof NonterminalRule) {
 					initialRules.remove(r.uid());
 					if (r.cycle) {
-						r.cycle = r.findLeftCycle(r, new HashSet<Rule>(rules().size() * 2));
+						r.cycle = r.findLeftCycle(r, new HashSet<Rule>(rules()
+								.size() * 2));
 					}
 				} else
 					terminalRules.add(r.uid());
@@ -1294,6 +1339,7 @@ public class Grammar implements Serializable {
 	public synchronized void defineRule(String label, Grammar g, String id,
 			Condition c) {
 		DeferredDefinitionRule r = checkRuleDefinition(label);
+		String oldId = r.uniqueId();
 		g.checkComplete();
 		// figure out how to adjust the generation numbers so describe()
 		// reflects the dependencies among rules
@@ -1315,7 +1361,7 @@ public class Grammar implements Serializable {
 		Rule rc = g.root.deepCopy(label, new HashMap<String, Rule>(g.rules()
 				.size() * 2), knownLabels, knownConditions);
 		if (c != null)
-			rc = conditionCheck(label, c, rc);
+			rc = conditionCheck(id, c, rc);
 		if (redefinitionCheck(r, rc)) {
 			if (ruleSet != null) {
 				ruleSet.clear();
@@ -1329,6 +1375,7 @@ public class Grammar implements Serializable {
 					sr.generation += greatestGeneration;
 			}
 			rc.generation = -1;
+			fixAlternationTags(oldId, r);
 		}
 	}
 
@@ -1416,11 +1463,13 @@ public class Grammar implements Serializable {
 	public synchronized void defineRule(String label, String literal,
 			String id, Condition c) throws GrammarException {
 		DeferredDefinitionRule r = checkRuleDefinition(label);
+		String oldId = r.uniqueId();
 		Label l = new Label(Type.literal, label);
 		LiteralRule lr = new LiteralRule(l, literal);
 		if (c != null)
 			lr = (LiteralRule) conditionCheck(label, c, lr);
 		redefinitionCheck(r, lr);
+		fixAlternationTags(oldId, r);
 	}
 
 	/**

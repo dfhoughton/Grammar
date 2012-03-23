@@ -136,8 +136,10 @@ public class LiteralRule extends Rule implements Serializable {
 			else
 				s = '"' + s.replaceAll("([\\\\])", "\\\\$1") + '"';
 			b = new StringBuilder(s);
-		} else
-			b = new StringBuilder(uniqueId());
+		} else {
+			b = new StringBuilder(literal.length() * 2);
+			b.append('"').append(literal).append('"');
+		}
 		b = new StringBuilder(wrap(b));
 		if (c != null)
 			b.append(" (").append(c.describe()).append(')');
