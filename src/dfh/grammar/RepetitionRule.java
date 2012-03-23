@@ -323,12 +323,7 @@ public class RepetitionRule extends Rule implements Serializable,
 			if ((r instanceof SequenceRule || r instanceof AlternationRule)
 					&& !(inBrackets && repetition.redundant())) {
 				String d = r.description(true);
-				if (d.startsWith("{"))
-					b.append('[');
-				else
-					b.append("[ ");
 				b.append(d);
-				b.append(" ]");
 			} else
 				b.append(r.description(false));
 		} else

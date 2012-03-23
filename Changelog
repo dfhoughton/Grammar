@@ -1,4 +1,5 @@
 2.02
+  * fixed bugs in description of tagged repetitions and alternations
 
 2.01, 23 March 2012
   * optimized condition testing in alternation by caching conditionless

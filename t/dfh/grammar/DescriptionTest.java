@@ -190,4 +190,26 @@ public class DescriptionTest {
 			count++;
 		assertEquals(1, count);
 	}
+
+	@Test
+	public void taggedDDRInAlternation7() {
+		String[] rules = {
+				//
+				"a = [{e} <c> | [{b} \"d\"] ]++", //
+				"c = 'c'",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = g.describe();
+		new Grammar(s);
+	}
+
+	@Test
+	public void taggedDDRInAlternation8() {
+		String s = "a = [{e} <c> | [{b} \"d\"] ]++";
+		Grammar g = new Grammar(s);
+		g.defineRule("c", Pattern.compile("c"));
+		s = g.describe();
+		new Grammar(s);
+	}
+
 }

@@ -132,9 +132,7 @@ public class AlternationRule extends Rule implements Serializable,
 			else
 				nonInitial = true;
 			if (!(tags == null || tags.isEmpty())) {
-				if (!inBrackets)
-					b.append('[');
-				b.append("{");
+				b.append("[{");
 				boolean ni2 = false;
 				for (String label : tags) {
 					if (ni2)
@@ -150,9 +148,7 @@ public class AlternationRule extends Rule implements Serializable,
 			} else
 				b.append(r.label());
 			if (!(tags == null || tags.isEmpty())) {
-				b.append(' ');
-				if (!inBrackets)
-					b.append(']');
+				b.append(" ]");
 			}
 		}
 		b = new StringBuilder(wrap(b));
