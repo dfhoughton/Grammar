@@ -57,7 +57,7 @@
 		</javadoc>
 	</target>
 
-	<target name="tar" description="bundle up the source and documentation">
+	<target name="tar" depends="udv" description="bundle up the source and documentation">
 		<tar destfile="${build.dir}/grammar-${version}.tgz" compression="gzip">
 			<tarfileset dir="${basedir}">
 				<include name="README" />
@@ -76,12 +76,18 @@
 			</tarfileset>
 		</tar>
 	</target>
+
+	<target name="udv" depends="compile" description="updates version number used in HTML documentation">
+		<replaceregexp match='version\s+=\s+".*"' replace='version = "${version}"' file="documentation/html/headers.json" />
+	</target>
+
 	<target name="test-compile" depends="compile" description="compiles junit tests">
 		<mkdir dir="${test.classes.dir}" />
 		<javac srcdir="${test.dir}" destdir="${test.classes.dir}" includeantruntime="false">
 			<classpath refid="classpath.test" />
 		</javac>
 	</target>
+
 	<target name="test" depends="test-compile" description="runs junit tests">
 		<junit>
 			<classpath refid="classpath.test" />
