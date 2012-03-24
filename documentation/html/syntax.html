@@ -29,10 +29,9 @@
 		<code>dfh.grammar</code>
 		expressed in its own formalism:
 	</div>
-                <pre>                   ROOT = &lt;padding&gt;*+ &lt;root&gt; &lt;definitions&gt;?+
+	<pre>                grammar = &lt;padding&gt;*+ &lt;rule&gt; &lt;definitions&gt;?+
 
             definitions = [ &lt;rule&gt; | &lt;padding&gt; ]++
-                   root = "&lt;"?+ "ROOT" 1 &lt;rule_body&gt;
                    rule = &lt;rule_name&gt; &lt;rule_body&gt; &lt;nl&gt;
               rule_body = &lt;s&gt; "=" &lt;s&gt; [ &lt;unbracketed_sequence&gt; | &lt;unbracketed_alternation&gt; ] &lt;condition&gt;?+ &lt;non_rule&gt;
               condition = &lt;s&gt; &lt;cnd_group&gt;
@@ -102,18 +101,16 @@ unbracketed_alternation = &lt;element&gt; [ &lt;s&gt; "|" &lt;s&gt; &lt;element&
 		whitespace is ignored, so you can format your rules however you wish;
 		but every rule definition must fit on a single line.</p>
 	<h3>Root</h3>
-	<pre>&lt;ROOT&gt; = 'some' 'rule'</pre>
-	<p>
-		The root rule is a rule like any other: a label followed by a
-		definition. It always has the label
-		<code>&lt;ROOT&gt;</code>
-		, however, and it is always the rule the grammar first tries to match.
-		If the grammar can match the root rule against the character sequence,
-		then the grammar matches; it not, it doesn't.
-	</p>
-	<p>It is convenient to list the root rule first in the grammar but
-		this is not required. It is identified not by its position but by its
-		label.</p>
+	<pre>&lt;label&gt; = 'some' 'rule'</pre>
+	<p>Every grammar has a master, or root, rule. This is the rule the
+		grammar tries to match against a character sequence. This rule may
+		have constituent rules and its constituents may have constituents, but
+		these other rules are only invoked as needed in the course of matching
+		the root rule. The root rule is a rule like any other: a label
+		followed by a definition. It is marked in the grammar only by being
+		the first rule listed, though formerly it was required that it bear
+		the label &ldquo;ROOT&rdquo; and most of the examples in this
+		documentation still follow that convention.</p>
 	<h3>Comments</h3>
 	<p>
 		The grammar parser ignores blank lines. The comment character is
@@ -217,8 +214,9 @@ bar = <b>not after &lt;foo&gt;</b> &lt;quux&gt;</pre>
 		Any Java regular expression (aside from multi-line expressions with
 		the
 		<code>x</code>
-		modifier) can be placed inside forward slashes and used in a rule.
-		Modifiers can either be included inside the slashes like so
+		modifier -- everything must be on one line) can be placed inside
+		forward slashes and used in a rule. Modifiers can either be included
+		inside the slashes like so
 	<pre>rule = /(?i:foo)/</pre>
 	or appended after the last slash as in Perl.
 	<pre>rule = /foo/i</pre>
@@ -395,6 +393,78 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 		to iterate over all possible matches, not merely all non-overlapping
 		matches. On the other hand, you will most likely need to apply the
 		test less often than you would in the midst of matching.</p>
+	<h3>Methods on the Condition Object</h3>
+	<p>
+		A condition object by itself does nothing useful -- it doesn't know
+		when it should pass or fail so it always passes. To make such an
+		object useful, you must override one of its
+		<code>passes</code>
+		methods.
+	</p>
+	<h4>
+		<code>passes(Match, Matcher, CharSequence)</code>
+	</h4>
+	<p>
+		This method gives you the most contextual information so it allows you
+		to write the most powerful conditions. You can consider any previous
+		match and its properties<span class="fn">though not subsequent
+			matches; you'll have to use post-match filtering for that</span>. Also, if
+		you override one of the other methods there will be a longer call
+		chain during condition testing, so overriding this method will give
+		you some efficiency gains. However, if you might be dealing with
+		backwards lookbehinds you'll need to take care to handle order
+		reversal and so forth. If you cna get away with it, it is probably
+		best to override one of the methods with a more pared down signature
+		so you don't need to worry about such things.
+	</p>
+	<h4>
+		<code>passes(Match, CharSequence)</code>
+	</h4>
+	<p>This method will give you the entire match tree rooted at this
+		match and the character sequence to work with. You still have to
+		handle character reversal yourself.</p>
+	<h4>
+		<code>passes(CharSequence)</code>
+	</h4>
+	<p>This simplest method is most likely what you want to deal with.
+		It gives you just the sequence of characters matched in proper order.</p>
+	<h3>Numerical Conditions</h3>
+	<p>
+		Quite often conditions express some numerical relation. This requires
+		parsing the matched character sequence as the right sort of number and
+		then applying numerical tests. To facilitated this, there are two
+		numerical subclasses of
+		<code>dfh.grammar.Condition</code>
+		that will do the number parsing for you, leaving you to implement the
+		numerical test. These classes are:
+	</p>
+	<ul>
+		<li><code>dfh.grammar.IntegerCondition</code></li>
+		<li><code>dfh.grammar.FloatingPointCondition</code></li>
+	</ul>
+	<h3>Logical Conditions</h3>
+	<p>
+		Quite often you will want to apply some boolean combination of
+		conditions to a match --
+		<code>a&nbsp;&amp;&nbsp;b</code>
+		or
+		<code>a&nbsp;&amp;&nbsp;!(b&nbsp;|&nbsp;c)</code>
+		, for example. You may do so, using parentheses for grouping and the
+		logical operators
+		<code>&amp;</code>
+		(&ldquo;and&rdquo;),
+		<code>|</code>
+		(&ldquo;or&rdquo;), and
+		<code>^</code>
+		(&ldquo;exclusive or&rdquo;). Blank space is a synonym for
+		<code>&amp;</code>
+		, so
+		<code>a&nbsp;b</code>
+		is interpreted identically to
+		<code>a&nbsp;&amp&nbsp;b</code>
+		. Logical conditions short circuit, so it's best to test your cheap
+		conditions before your expensive ones.
+	</p>
 	<h2>Assertions</h2>
 	<p>Assertions are in effect special conditions that may appear
 		anywhere in a rule. They do not move the character matching offset but
@@ -688,10 +758,8 @@ System.out.println(opt.keepRightmost());         // true</pre>
 	<h3>longest match</h3>
 	<pre>Options opt = new Options().longestMatch(true); // <b>default: true</b>
 System.out.println(opt.longestMatch());         // true</pre>
-<p>
-Suppose your grammar contains the alternation 
-</p>
-<pre>foo = 'cat' | 'cat dog'</pre>
+	<p>Suppose your grammar contains the alternation</p>
+	<pre>foo = 'cat' | 'cat dog'</pre>
 	<p>
 		Because <i>cat</i> is listed first, the first match returned when a
 		find is done against the string <i>camel cat dog fish</i> will be <i>cat</i>
@@ -743,7 +811,8 @@ System.out.println(opt.maxRecursionDepth());       // 10</pre>
 		constructs hypothetical match trees and sees whether they fit the
 		underlying sequence. Or rather, it constructs the left branches of
 		trees. If it can match the leftmost leaf of the tree, it tries adding
-		the next branch. This works fine until you have a recursive grammar that allows the possibility of infinite left-branching, something like
+		the next branch. This works fine until you have a recursive grammar
+		that allows the possibility of infinite left-branching, something like
 	</p>
 	<pre>foo = &lt;foo&gt; '0' | '1'</pre>
 	<p>
@@ -761,14 +830,13 @@ System.out.println(opt.maxRecursionDepth());       // 10</pre>
 		<code>dfh.grammar</code>
 		has a maximum branching depth. When the grammar is compiled, it checks
 		to see whether there are any cycles, any recursion. If it finds
-		recursion, every time it picks an alternate
-		<span class="fn">This problem can arise even if the recursive
-			alternate isn't first. Suppose, for example, that the first <code>n</code>
-			alternates never match and the <code>n + 1</code> alternate is
-			recursive.
-		</span> it first checks to see whether it's in a repeating loop. If it
-		finds that it is, it increments the recursion count. If it finds that
-		it cannot proceed without incrementing the count past the maximum
+		recursion, every time it picks an alternate <span class="fn">This
+			problem can arise even if the recursive alternate isn't first.
+			Suppose, for example, that the first <code>n</code> alternates never
+			match and the <code>n + 1</code> alternate is recursive.
+		</span> it first checks to see whether it's in a repeating loop. If it finds
+		that it is, it increments the recursion count. If it finds that it
+		cannot proceed without incrementing the count past the maximum
 		recursion depth limit, it abandons the alternate and tries the next.
 	</p>
 	<h3>study</h3>
