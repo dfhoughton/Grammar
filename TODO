@@ -17,6 +17,7 @@ section at the end of the document.
 * add more unit tests for grammar description after composition with tagging
 . bail out of recursion via exception rather than the current laborious and expensive reeling in of failed tries
 . clone terminal nodes before assigning parents
+. put tokenization handling into dfh.grammar
 
 COMPLETED
 =========
