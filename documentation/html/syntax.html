@@ -829,19 +829,74 @@ System.out.println(opt.maxRecursionDepth());       // 10</pre>
 		a left-branching rule. To cope with this situation
 		<code>dfh.grammar</code>
 		has a maximum branching depth. When the grammar is compiled, it checks
-		to see whether there are any cycles, any recursion. If it finds
-		recursion, every time it picks an alternate <span class="fn">This
-			problem can arise even if the recursive alternate isn't first.
-			Suppose, for example, that the first <code>n</code> alternates never
-			match and the <code>n + 1</code> alternate is recursive.
-		</span> it first checks to see whether it's in a repeating loop. If it finds
-		that it is, it increments the recursion count. If it finds that it
-		cannot proceed without incrementing the count past the maximum
-		recursion depth limit, it abandons the alternate and tries the next.
+		to see whether there are any problematic cycles of this sort. If it
+		finds left-branching recursion, every time it picks an alternate <span
+			class="fn">This problem can arise even if the recursive
+			alternate isn't first. Suppose, for example, that the first <code>n</code>
+			alternates never match and the <code>n + 1</code> alternate is
+			recursive.
+		</span> in the problematic rule it first checks to see whether it's in a
+		repeating loop. If it finds that it is, it increments the recursion
+		count. If it finds that it cannot proceed without incrementing the
+		count past the maximum recursion depth limit, it abandons the
+		alternate and tries the next.
 	</p>
 	<h3>study</h3>
 	<pre>Options opt = new Options().study(false); // <b>default: true</b>
 System.out.println(opt.study());          // false</pre>
+	<p>
+		One way to accelerate matching is to &ldquo;study&rdquo; the character
+		sequence. Studying consists of finding all the positions at which
+		terminal rules match. This can be done with quick string indexation
+		methods and such and it culls the number of offsets that can even be
+		attempted. However, it is generally only useful if one is using the
+		<code>find</code>
+		method for matching. The
+		<code>matches</code>
+		and
+		<code>lookingAt</code>
+		methods both consider only a single offset, so most of the work done
+		studying is wasted. If you call
+		<code>find</code>
+		without any options, the sequence will be studied. Likewise, if you
+		call the other two without specifying any options the sequence will
+		not be studied.
+	</p>
+	<h3>fat memory</h3>
+	<pre>Options opt = new Options().fatMemory(true); // <b>default: false</b>
+System.out.println(opt.fatMemory());          // true</pre>
+	<p>
+		Another way to accelerating matching is to use a quicker match caching
+		mechanism that wastes more memory. If you do nothing, the grammar will
+		choose its caching mechanism based on the length of the sequence being
+		matched against. If it is long (see below), a hash map based cache
+		will be used. Otherwise an array-based cache is used. If you set
+		<code>fatMemory</code>
+		to true, the array-based cache will be used regardless of the sequence
+		length.
+	</p>
+	<h3>lean memory</h3>
+	<pre>Options opt = new Options().leanMemory(true); // <b>default: false</b>
+System.out.println(opt.leanMemory());          // true</pre>
+	<p>
+		If you are matching against a particularly long character sequence, or
+		you have a particularly complicated grammar, you may be concerned that
+		you will exhaust the heap. You can reduce memory use by choosing a
+		lean match cache. Whereas the fatter caches are array and hash based,
+		the lean cache is a tree map. The array cache allocates storage space
+		for every offset immediately. The hash cache doubles its memory
+		allotment periodically as it fills up. The tree cache only grabs
+		additional memory gradually as it fills up. , Another way to
+		accelerating matching is to use a quicker match caching mechanism that
+		wastes more memory. If you do nothing, the grammar will choose its
+		caching mechanism based on the length of the sequence being matched
+		against. If it is long (see below), a hash map based cache will be
+		used. Otherwise an array-based cache is used. If you set
+		<code>fatMemory</code>
+		to true, the array-based cache will be used regardless of the sequence
+		length.
+	</p>
+	<h3>long string length</h3>
 	<h3>log</h3>
 	<pre>Options opt = new Options().log(System.err); // <b>default: null</b>
 opt.trace().println(10);                       // 10</pre>

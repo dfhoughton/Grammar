@@ -76,7 +76,7 @@ public class Benchmarks {
 		}
 		long end = System.currentTimeMillis();
 		System.out.println(end - start + " milliseconds\n");
-		Options opt = new Options();
+		Options opt = new Options().leanMemory(true);
 		opt.longestMatch(false);
 		System.out.println(g.describe());
 		System.out.println("with studying");
