@@ -8,15 +8,9 @@ section at the end of the document.
 . create xpath-like convention for searching matches
 . make sure conditionalized terminals are being cached properly
 . profile some matching to figure out what could be optimized
-* document logically complex conditions
-* add document for new fat and longStringLength to Options documentation
-* renamed composed in rules only when functionally distinct
 . make Condition.copy() clone when possible
-* fix documentation of root rule
 . add option to turn off condition testing
-* add more unit tests for grammar description after composition with tagging
 . bail out of recursion via exception rather than the current laborious and expensive reeling in of failed tries
-* clone terminal nodes before assigning parents
 . put tokenization handling into dfh.grammar
 
 COMPLETED
@@ -68,3 +62,9 @@ COMPLETED
 * optimize cycleCheck so it is only done for left-headed cycles
 * remove requirement that root rule be called ROOT
 * eliminated cycle parameter in global state
+* document logically complex conditions
+* add document for new fat and longStringLength to Options documentation
+* renamed composed in rules only when functionally distinct
+* fix documentation of root rule
+* add more unit tests for grammar description after composition with tagging
+* clone terminal nodes before assigning parents
