@@ -51,6 +51,7 @@ import org.junit.runners.Suite;
 		SubrulesTest.class,//
 		ExplicitRuleTest.class,//
 		RootlessGrammarTest.class,//
+		TerminalMatchIndependence.class,//
 })
 public class AllTests {
 }

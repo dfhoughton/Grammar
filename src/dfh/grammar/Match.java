@@ -842,10 +842,25 @@ public class Match {
 		if (children == null)
 			children = new Match[0];
 		else {
-			for (Match m : children) {
+			for (int i = 0; i < children.length; i++) {
+				Match m = children[i];
+				if (m.isTerminal()) {
+					m = m.copy();
+					children[i] = m;
+				}
 				m.parent = this;
 				m.done(s);
 			}
 		}
+	}
+
+	/**
+	 * Used in {@link #done(CharSequence)} to prevent cached terminal matches
+	 * from being munged by subsequent overlapping non-terminal matches.
+	 * 
+	 * @return clone of current node
+	 */
+	private Match copy() {
+		return new Match(r, start, end);
 	}
 }

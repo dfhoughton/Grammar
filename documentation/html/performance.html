@@ -44,7 +44,8 @@
 			are *much* faster than the grammars matching against short sequences
 			with a single match but not nearly so much faster on a long sequence.</li>
 		<li>The different caching types impose costs as one would expect
-			-- array &lt; hash &lt; tree -- but that the difference is not great.</li>
+			-- array&nbsp;&lt;&nbsp;hash&nbsp;&lt;&nbsp;tree -- but that the
+			difference is not great.</li>
 		<li>Studying doesn't do all that much for you, even with a long
 			sequence.</li>
 		<li>Requiring longest matches, not surprisingly, will cost you.</li>
@@ -52,6 +53,10 @@
 			various advantages of grammars, either in their expressiveness and
 			clarity or the interpretability of their output, you should stick to
 			regular expressions.</li>
+		<li>These particular tests are a paltry sample of what one can do
+			and do not test anything impossible with vanilla regular expressions,
+			such as variable-length lookbehind and recursion. Your mileage may
+			vary.</li>
 	</ul>
 	<p>I expect, whatever the inadequacies of my algorithms and coding,
 		regular expressions have an inherent advantage in that they're easier

@@ -1,5 +1,7 @@
 2.02
   * fixed bugs in description of tagged repetitions and alternations
+  * fixed bug where cached terminal matches were being munged by subsequent
+    overlapping non-terminals
 
 2.01, 23 March 2012
   * optimized condition testing in alternation by caching conditionless
