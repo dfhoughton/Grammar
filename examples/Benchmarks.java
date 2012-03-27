@@ -1,6 +1,12 @@
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 
+import dfh.cli.Cli;
+import dfh.cli.rules.Range;
+import dfh.cli.rules.StrSet;
 import dfh.grammar.Grammar;
 import dfh.grammar.GrammarException;
 import dfh.grammar.Matcher;
@@ -8,26 +14,69 @@ import dfh.grammar.Options;
 
 public class Benchmarks {
 
-	private static final int DEFAULT_ITERATIONS = 50000;
-	private static final int DEFAULT_WARMUP = 50000;
-	private static int iterations;
 	private static int warmup;
+	private static Integer trials;
+	private static Integer group;
+	private static double trim;
+	private static String cache;
 
 	/**
+	 * <pre>
+	 * USAGE: EXECUTABLE [options]
+	 * 
+	 *   A basic set of benchmark tests comparing grammars using various parameters to 
+	 *   equivalent regular expressions.
+	 * 
+	 *     --group -g   &lt;val&gt;  number or iterations to time together to overcome the
+	 *                         limitations of millisecond time granularity; default: 
+	 *                         2000
+	 *     --trials -t  &lt;val&gt;  number of groups to time; default: 50
+	 *     --trim       &lt;val&gt;  fraction of time-sorted trials to discard from the high
+	 *                         and low ends of the sort to eliminate outliers; default:
+	 *                         0.1
+	 *     --warmup -w  &lt;val&gt;  number to iterations to warm up the JIT compiler;
+	 *                         default: 50000
+	 *     --cache -c   &lt;val&gt;  match cache type; one of {tree,hash,array} default:
+	 *                         array
+	 * 
+	 *     --help -? -h        print usage information
+	 * </pre>
+	 * 
 	 * @param args
 	 * @throws IOException
 	 * @throws GrammarException
 	 */
 	public static void main(String[] args) throws GrammarException, IOException {
-		iterations = DEFAULT_ITERATIONS;
-		warmup = DEFAULT_WARMUP;
-		if (args.length > 0) {
-			iterations = Integer.parseInt(args[0]);
-			if (args.length > 1)
-				warmup = Integer.parseInt(args[1]);
-		}
-		System.out.println(warmup + " JIT warmup iterations");
-		System.out.println(iterations + " test iterations\n");
+		Object[][][] spec = {
+				{ {
+						Cli.Opt.USAGE,
+						"A basic set of benchmark tests comparing grammars using various parameters to equivalent regular expressions." } },//
+				{ { Cli.Opt.ARGS } },//
+				{
+						{ "group", 'g', Integer.class, 2000 },
+						{ "number or iterations to time together to overcome the limitations of millisecond time granularity" },
+						{ Range.positive() } },//
+				{ { "trials", 't', Integer.class, 50 },
+						{ "number of groups to time" }, { Range.positive() } },//
+				{
+						{ "trim", Double.class, .1D },
+						{ "fraction of time-sorted trials to discard from the high and low ends of the sort to eliminate outliers" },
+						{ Range.lowIncl(0, .25) } },//
+				{ { "warmup", 'w', Integer.class, 50000 },
+						{ "number to iterations to warm up the JIT compiler" },
+						{ Range.nonNegative() } },//
+				{ { "cache", 'c', String.class, "array" },
+						{ "match cache type; one of {tree,hash,array}" },
+						{ new StrSet("array", "tree", "hash") } },//
+		};
+		Cli cli = new Cli(spec, Cli.Mod.HELP);
+		cli.parse(args);
+		System.out.println(cli.dump());
+		trials = cli.integer("trials");
+		warmup = cli.integer("warmup");
+		group = cli.integer("group");
+		trim = cli.number("trim").doubleValue();
+		cache = cli.string("cache");
 		test1();
 		test2();
 		test3();
@@ -64,90 +113,78 @@ public class Benchmarks {
 				p.matcher(s).find();
 			}
 		}
-		long start = System.currentTimeMillis();
-		for (int i = 0; i < iterations; i++) {
-			if (allMatches) {
-				java.util.regex.Matcher m = p.matcher(s);
-				while (m.find())
-					;
-			} else {
-				p.matcher(s).find();
+		List<Long> times = new ArrayList<Long>();
+		for (int i = 0; i < trials; i++) {
+			long t1 = System.currentTimeMillis();
+			for (int j = 0; j < group; j++) {
+				if (allMatches) {
+					java.util.regex.Matcher m = p.matcher(s);
+					while (m.find())
+						;
+				} else {
+					p.matcher(s).find();
+				}
 			}
+			times.add(System.currentTimeMillis() - t1);
 		}
-		long end = System.currentTimeMillis();
-		System.out.println(end - start + " milliseconds\n");
-		Options opt = new Options().leanMemory(true);
+		trimmedMean(times);
+		times.clear();
+		Options opt = new Options();
+		if (cache.equals("array"))
+			opt.fatMemory(true);
+		else if (cache.equals("hash"))
+			opt.longStringLength(1);
+		else if (cache.equals("tree"))
+			opt.leanMemory(true);
 		opt.longestMatch(false);
 		System.out.println(g.describe());
 		System.out.println("with studying");
-		for (int i = 0; i < warmup; i++) {
-			if (allMatches) {
-				Matcher m = g.find(s, opt);
-				while (m.match() != null)
-					;
-			} else {
-				g.find(s, opt).match();
-			}
-		}
-		start = System.currentTimeMillis();
-		for (int i = 0; i < iterations; i++) {
-			if (allMatches) {
-				Matcher m = g.find(s, opt);
-				while (m.match() != null)
-					;
-			} else {
-				g.find(s, opt).match();
-			}
-		}
-		end = System.currentTimeMillis();
-		System.out.println(end - start + " milliseconds");
+		timeGrammar(g, s, allMatches, times, opt);
 		System.out.println("without studying");
-		opt.study(false);
-		for (int i = 0; i < warmup; i++) {
-			if (allMatches) {
-				Matcher m = g.find(s, opt);
-				while (m.match() != null)
-					;
-			} else {
-				g.find(s).match();
-			}
-		}
-		start = System.currentTimeMillis();
-		for (int i = 0; i < iterations; i++) {
-			if (allMatches) {
-				Matcher m = g.find(s);
-				while (m.match() != null)
-					;
-			} else {
-				g.find(s, opt).match();
-			}
-		}
-		end = System.currentTimeMillis();
-		System.out.println(end - start + " milliseconds");
+		timeGrammar(g, s, allMatches, times, opt);
 		System.out.println("with studying using LTM");
 		opt.study(true);
 		opt.longestMatch(true);
+		timeGrammar(g, s, allMatches, times, opt);
+	}
+
+	private static void timeGrammar(Grammar g, String s, boolean allMatches,
+			List<Long> times, Options opt) {
 		for (int i = 0; i < warmup; i++) {
 			if (allMatches) {
 				Matcher m = g.find(s, opt);
 				while (m.match() != null)
 					;
 			} else {
-				g.find(s).match();
-			}
-		}
-		start = System.currentTimeMillis();
-		for (int i = 0; i < iterations; i++) {
-			if (allMatches) {
-				Matcher m = g.find(s);
-				while (m.match() != null)
-					;
-			} else {
 				g.find(s, opt).match();
 			}
 		}
-		end = System.currentTimeMillis();
-		System.out.println(end - start + " milliseconds\n");
+		for (int i = 0, lim = trials; i < lim; i++) {
+			long t = System.currentTimeMillis();
+			for (int j = 0; j < group; j++) {
+				if (allMatches) {
+					Matcher m = g.find(s, opt);
+					while (m.match() != null)
+						;
+				} else {
+					g.find(s, opt).match();
+				}
+			}
+			times.add(System.currentTimeMillis() - t);
+		}
+		trimmedMean(times);
+	}
+
+	private static void trimmedMean(List<Long> times) {
+		Collections.sort(times);
+		int start = (int) Math.round(times.size() * trim);
+		int end = times.size() - start;
+		List<Long> sublist = times.subList(start, end);
+		double avg = 0;
+		for (long l : sublist)
+			avg += l;
+		avg /= sublist.size() * 2000;
+		System.out.printf("%.5f milliseconds per sequence%n", avg);
 	}
 
 	private static void test2() throws IOException {

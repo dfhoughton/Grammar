@@ -864,7 +864,7 @@ System.out.println(opt.study());          // false</pre>
 	</p>
 	<h3>fat memory</h3>
 	<pre>Options opt = new Options().fatMemory(true); // <b>default: false</b>
-System.out.println(opt.fatMemory());          // true</pre>
+System.out.println(opt.fatMemory());         // true</pre>
 	<p>
 		Another way to accelerating matching is to use a quicker match caching
 		mechanism that wastes more memory. If you do nothing, the grammar will
@@ -877,29 +877,32 @@ System.out.println(opt.fatMemory());          // true</pre>
 	</p>
 	<h3>lean memory</h3>
 	<pre>Options opt = new Options().leanMemory(true); // <b>default: false</b>
-System.out.println(opt.leanMemory());          // true</pre>
-	<p>
-		If you are matching against a particularly long character sequence, or
-		you have a particularly complicated grammar, you may be concerned that
-		you will exhaust the heap. You can reduce memory use by choosing a
-		lean match cache. Whereas the fatter caches are array and hash based,
-		the lean cache is a tree map. The array cache allocates storage space
-		for every offset immediately. The hash cache doubles its memory
-		allotment periodically as it fills up. The tree cache only grabs
-		additional memory gradually as it fills up. , Another way to
-		accelerating matching is to use a quicker match caching mechanism that
-		wastes more memory. If you do nothing, the grammar will choose its
-		caching mechanism based on the length of the sequence being matched
-		against. If it is long (see below), a hash map based cache will be
-		used. Otherwise an array-based cache is used. If you set
-		<code>fatMemory</code>
-		to true, the array-based cache will be used regardless of the sequence
-		length.
-	</p>
+System.out.println(opt.leanMemory());         // true</pre>
+	<p>If you are matching against a particularly long character
+		sequence, or you have a particularly complicated grammar, you may be
+		concerned that you will exhaust the heap. You can reduce memory use by
+		choosing a lean match cache. Whereas the fatter caches are array and
+		hash based, the lean cache is a tree map. The array cache allocates
+		storage space for every offset immediately. The hash cache doubles its
+		memory allotment periodically as it fills up. The tree cache only
+		grabs additional memory gradually as it fills up.</p>
 	<h3>long string length</h3>
+	<pre>Options opt = new Options().longStringLength(10000); // <b>default: 100000</b>
+System.out.println(opt.longStringLength());          // 10000</pre>
+	<p>
+		If you don't set either
+		<code>fatMemory</code>
+		or
+		<code>leanMemory</code>
+		to true, the match cache will be chosen based on the length of the
+		sequence matched against. Specifically, if the length is less than
+		<code>longStringLength</code>
+		, an array cache will be used. Otherwise it will be a hash-based
+		cache.
+	</p>
 	<h3>log</h3>
 	<pre>Options opt = new Options().log(System.err); // <b>default: null</b>
-opt.trace().println(10);                       // 10</pre>
+opt.trace().println(10);                     // 10</pre>
 	<p>
 		The
 		<code>log</code>

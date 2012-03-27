@@ -9,35 +9,87 @@
 <script type="text/javascript" src="../scripts/pageutils.js"></script>
 </head>
 <body onLoad="dfh.prepare('performance', 'dfh.grammar')">
+	<h1>Performance Issues</h1>
+	<p>Grammars and their output are easy to work with, but this
+		convenience comes at some computational cost. This page discusses
+		these costs and how they can be managed.</p>
 	<span id="toc"></span>
 	<h2>Issues</h2>
+	<h3>Backtracking</h3>
+	<h3>Studying</h3>
+	<h3>Caching</h3>
+	<h3>Recursion</h3>
 	<h2>Benchmarks</h2>
-	<pre class="results">20000 JIT warmup iterations
-50000 test iterations
+	<p>
+		In the examples directory provided by the downloadable tarball you'll
+		find an executable called Benchmarks.<span class="fn">This is
+			dependent on my <code>dfh.cli</code> command line argument parsing
+			library: <a href="/dfh/cli"><code>dfh.cli</code></a>
+		</span> The benchmarks class compares a few simple grammars to equivalent
+		regular expressions, timing how long it takes each to find all matches
+		in a given string. For each test, for both regular expressions and
+		grammars, the code first warms up the JIT compiler by executing the
+		respective match numerous times. Because match times are
+		sub-millisecond, the matching is timed by batch. To factor out the
+		effect of garbage collection the batch times are sorted and the
+		fastest and slowest fractions are eliminated to get rid of outliers. A
+		trimmed mean is calculated from the remainder.
+	</p>
+	<p>The parameters this benchmark class examines are cache type,
+		longest matching, studying, and startup versus matching cost. You can
+		examine the results below. The chief conclusions one can draw are</p>
+	<ul>
+		<li>There's a significant startup cost for grammars not borne by
+			regular expressions. You can see this in that the regular expressions
+			are *much* faster than the grammars matching against short sequences
+			with a single match but not nearly so much faster on a long sequence.</li>
+		<li>The different caching types impose costs as one would expect
+			-- array &lt; hash &lt; tree -- but that the difference is not great.</li>
+		<li>Studying doesn't do all that much for you, even with a long
+			sequence.</li>
+		<li>Requiring longest matches, not surprisingly, will cost you.</li>
+		<li>If you're concerned about performance and don't need the
+			various advantages of grammars, either in their expressiveness and
+			clarity or the interpretability of their output, you should stick to
+			regular expressions.</li>
+	</ul>
+	<p>I expect, whatever the inadequacies of my algorithms and coding,
+		regular expressions have an inherent advantage in that they're easier
+		to implement as a collection of integer pointers into relatively
+		static data structures. Returning a parse tree requires object
+		creation. Implementing rules as matcher factories and matchers as
+		iterators over matches requires object creation. A regular expression
+		engine, however, can be a static state machine paired with a stack for
+		backtracking, and the latter can be something as lightweight as an
+		expandable list of arrays of integers.</p>
+	<h3>Array Cache</h3>
+	<pre>options:
+group: 2000
+trials: 50
+trim: 0.1
+warmup: 50000
+cache: array
 
 =============
 
 string: qewrqewrqewraqwreqewr
 
 pattern: [ab]
-21 milliseconds
-
+0.00035 milliseconds per sequence
 ROOT = "a" | "b"
 
 with studying
-166 milliseconds
+0.00213 milliseconds per sequence
 without studying
-667 milliseconds
+0.00191 milliseconds per sequence
 with studying using LTM
-118 milliseconds
-
+0.00192 milliseconds per sequence
 =============
 
 string: foo bar
 
 pattern: foo\s++bar|quux\s++baz
-45 milliseconds
-
+0.00039 milliseconds per sequence
 ROOT = &lt;a&gt; | &lt;b&gt;
 
    a = &lt;foo&gt; &lt;s&gt; &lt;bar&gt;
@@ -49,19 +101,17 @@ quux = /quux/
    s = /\s++/
 
 with studying
-366 milliseconds
+0.00531 milliseconds per sequence
 without studying
-381 milliseconds
+0.00558 milliseconds per sequence
 with studying using LTM
-389 milliseconds
-
+0.00577 milliseconds per sequence
 =============
 
 string: aabb
 
 pattern: (?:a{0,2}|a{0,2}b){2}b
-48 milliseconds
-
+0.00035 milliseconds per sequence
 ROOT = [ &lt;c&gt; | &lt;d&gt; ]{2} &lt;d&gt;
 
    c = &lt;a&gt;{,2}
@@ -70,64 +120,276 @@ ROOT = [ &lt;c&gt; | &lt;d&gt; ]{2} &lt;d&gt;
    b = /b/
 
 with studying
-531 milliseconds
+0.00923 milliseconds per sequence
 without studying
-476 milliseconds
+0.00925 milliseconds per sequence
 with studying using LTM
-530 milliseconds
-
+0.01119 milliseconds per sequence
 =============
 
 string: qewrqewrqewraqwreqewr
 
 pattern: [ab]
-24 milliseconds
-
+0.00035 milliseconds per sequence
 ROOT = &lt;c&gt; | &lt;d&gt;
 
    c = /a/
    d = /b/
 
 with studying
-179 milliseconds
+0.00313 milliseconds per sequence
 without studying
-780 milliseconds
+0.00314 milliseconds per sequence
 with studying using LTM
-186 milliseconds
-
+0.00328 milliseconds per sequence
 =============
 
 string: aabb
 
 pattern: (?:a{0,2}|ab){2}ab
-22 milliseconds
-
+0.00050 milliseconds per sequence
 ROOT = [ &lt;a&gt; | &lt;b&gt; ]{2} &lt;b&gt;
 
    a = "a"{,2}
    b = "ab"
 
 with studying
-412 milliseconds
+0.00674 milliseconds per sequence
 without studying
-415 milliseconds
+0.00609 milliseconds per sequence
 with studying using LTM
-392 milliseconds
-
+0.00720 milliseconds per sequence
 =============
 
 string: __________cat__________dog__________monkey__________cat_____... (length 13999)
 
 pattern: cat|dog|monkey
-50387 milliseconds
-
+0.66023 milliseconds per sequence
 ROOT = "cat" | "dog" | "monkey"
 
 with studying
-68556 milliseconds
+1.09510 milliseconds per sequence
 without studying
-81284 milliseconds
+1.09273 milliseconds per sequence
 with studying using LTM
-81512 milliseconds</pre>
+1.14907 milliseconds per sequence</pre>
+	<h3>Hash Cache</h3>
+	<pre>options:
+group: 2000
+trials: 50
+trim: 0.1
+warmup: 50000
+cache: hash
+
+=============
+
+string: qewrqewrqewraqwreqewr
+
+pattern: [ab]
+0.00035 milliseconds per sequence
+ROOT = "a" | "b"
+
+with studying
+0.00224 milliseconds per sequence
+without studying
+0.00195 milliseconds per sequence
+with studying using LTM
+0.00190 milliseconds per sequence
+=============
+
+string: foo bar
+
+pattern: foo\s++bar|quux\s++baz
+0.00034 milliseconds per sequence
+ROOT = &lt;a&gt; | &lt;b&gt;
+
+   a = &lt;foo&gt; &lt;s&gt; &lt;bar&gt;
+   b = &lt;quux&gt; &lt;s&gt; &lt;baz&gt;
+ bar = /bar/
+ baz = /baz/
+ foo = /foo/
+quux = /quux/
+   s = /\s++/
+
+with studying
+0.00585 milliseconds per sequence
+without studying
+0.00584 milliseconds per sequence
+with studying using LTM
+0.00595 milliseconds per sequence
+=============
+
+string: aabb
+
+pattern: (?:a{0,2}|a{0,2}b){2}b
+0.00030 milliseconds per sequence
+ROOT = [ &lt;c&gt; | &lt;d&gt; ]{2} &lt;d&gt;
+
+   c = &lt;a&gt;{,2}
+   d = &lt;a&gt; &lt;b&gt;
+   a = /a/
+   b = /b/
+
+with studying
+0.01009 milliseconds per sequence
+without studying
+0.01018 milliseconds per sequence
+with studying using LTM
+0.01238 milliseconds per sequence
+=============
+
+string: qewrqewrqewraqwreqewr
+
+pattern: [ab]
+0.00028 milliseconds per sequence
+ROOT = &lt;c&gt; | &lt;d&gt;
+
+   c = /a/
+   d = /b/
+
+with studying
+0.00294 milliseconds per sequence
+without studying
+0.00294 milliseconds per sequence
+with studying using LTM
+0.00302 milliseconds per sequence
+=============
+
+string: aabb
+
+pattern: (?:a{0,2}|ab){2}ab
+0.00050 milliseconds per sequence
+ROOT = [ &lt;a&gt; | &lt;b&gt; ]{2} &lt;b&gt;
+
+   a = "a"{,2}
+   b = "ab"
+
+with studying
+0.00615 milliseconds per sequence
+without studying
+0.00624 milliseconds per sequence
+with studying using LTM
+0.00761 milliseconds per sequence
+=============
+
+string: __________cat__________dog__________monkey__________cat_____... (length 13999)
+
+pattern: cat|dog|monkey
+0.66539 milliseconds per sequence
+ROOT = "cat" | "dog" | "monkey"
+
+with studying
+1.21196 milliseconds per sequence
+without studying
+1.20669 milliseconds per sequence
+with studying using LTM
+1.26982 milliseconds per sequence</pre>
+	<h3>Tree Cache</h3>
+	<pre>options:
+group: 2000
+trials: 50
+trim: 0.1
+warmup: 50000
+cache: tree
+
+=============
+
+string: qewrqewrqewraqwreqewr
+
+pattern: [ab]
+0.00033 milliseconds per sequence
+ROOT = "a" | "b"
+
+with studying
+0.00189 milliseconds per sequence
+without studying
+0.00174 milliseconds per sequence
+with studying using LTM
+0.00179 milliseconds per sequence
+=============
+
+string: foo bar
+
+pattern: foo\s++bar|quux\s++baz
+0.00030 milliseconds per sequence
+ROOT = &lt;a&gt; | &lt;b&gt;
+
+   a = &lt;foo&gt; &lt;s&gt; &lt;bar&gt;
+   b = &lt;quux&gt; &lt;s&gt; &lt;baz&gt;
+ bar = /bar/
+ baz = /baz/
+ foo = /foo/
+quux = /quux/
+   s = /\s++/
+
+with studying
+0.00525 milliseconds per sequence
+without studying
+0.00510 milliseconds per sequence
+with studying using LTM
+0.00525 milliseconds per sequence
+=============
+
+string: aabb
+
+pattern: (?:a{0,2}|a{0,2}b){2}b
+0.00031 milliseconds per sequence
+ROOT = [ &lt;c&gt; | &lt;d&gt; ]{2} &lt;d&gt;
+
+   c = &lt;a&gt;{,2}
+   d = &lt;a&gt; &lt;b&gt;
+   a = /a/
+   b = /b/
+
+with studying
+0.01058 milliseconds per sequence
+without studying
+0.01063 milliseconds per sequence
+with studying using LTM
+0.01277 milliseconds per sequence
+=============
+
+string: qewrqewrqewraqwreqewr
+
+pattern: [ab]
+0.00035 milliseconds per sequence
+ROOT = &lt;c&gt; | &lt;d&gt;
+
+   c = /a/
+   d = /b/
+
+with studying
+0.00293 milliseconds per sequence
+without studying
+0.00283 milliseconds per sequence
+with studying using LTM
+0.00291 milliseconds per sequence
+=============
+
+string: aabb
+
+pattern: (?:a{0,2}|ab){2}ab
+0.00049 milliseconds per sequence
+ROOT = [ &lt;a&gt; | &lt;b&gt; ]{2} &lt;b&gt;
+
+   a = "a"{,2}
+   b = "ab"
+
+with studying
+0.00658 milliseconds per sequence
+without studying
+0.00639 milliseconds per sequence
+with studying using LTM
+0.00780 milliseconds per sequence
+=============
+
+string: __________cat__________dog__________monkey__________cat_____... (length 13999)
+
+pattern: cat|dog|monkey
+0.68695 milliseconds per sequence
+ROOT = "cat" | "dog" | "monkey"
+
+with studying
+1.53474 milliseconds per sequence</pre>
 </body>
 </html>
