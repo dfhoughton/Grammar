@@ -39,10 +39,9 @@ public class GlobalState {
 	 */
 	GlobalState(CharSequence cs, Options o) {
 		this(cs, new ReversedCharSequence(cs), false, o.allowOverlap, o.start,
-				o.end, o.maxRecursionDepth, o.trace, o.study, 
-				o.keepRightmost);
+				o.end, o.maxRecursionDepth, o.trace, o.study, o.keepRightmost);
 	}
-	
+
 	private GlobalState(GlobalState gs) {
 		this.cs = gs.cs;
 		this.rcs = gs.rcs;
@@ -57,7 +56,7 @@ public class GlobalState {
 		this.rcsEnd = gs.rcsEnd;
 		this.study = gs.study;
 	}
-	
+
 	/**
 	 * @return {@link GlobalState} for use in backwards {@link Assertion}
 	 */
@@ -111,6 +110,6 @@ public class GlobalState {
 	@Override
 	public String toString() {
 		return "[overlap: " + allowOverlap + "; study: " + study + "; start: "
-				+ start + "; end: " + end + "; debug: " + debug;
+				+ start + "; end: " + end + "; debug: " + debug + ']';
 	}
 }

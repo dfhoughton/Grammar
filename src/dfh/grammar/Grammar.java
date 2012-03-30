@@ -536,6 +536,11 @@ public class Grammar implements Serializable {
 	 * {@link #defineRule(String, Rule)} cannot be used in backwards assertions
 	 * -- assertions equivalent to <code>(?&lt;=...)</code> and
 	 * <code>(?&lt;!...)</code> in ordinary Java regular expressions.
+	 * <p>
+	 * <em>NOTE:</em> precompiled rules must implement {@link Cloneable}. They
+	 * will be cloned. This protects state variables such as
+	 * {@link Rule#cacheIndex} from being munged if the rules are reused in
+	 * multiple grammars.
 	 * 
 	 * @param reader
 	 *            rule source

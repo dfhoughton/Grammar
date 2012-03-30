@@ -23,10 +23,15 @@ import dfh.grammar.Label.Type;
 public class ExternalRuleBackwardsAssertionTest {
 	@SuppressWarnings("serial")
 	@Reversible
-	private static class TestRule extends LiteralRule {
+	private static class TestRule extends LiteralRule implements Cloneable {
 
 		public TestRule(Label label, String literal) {
 			super(label, literal);
+		}
+		
+		@Override
+		public Object clone() {
+			return new TestRule(label, literal);
 		}
 
 	}

@@ -10,6 +10,7 @@ package dfh.grammar;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -137,6 +138,21 @@ public class Compiler {
 		String line = null;
 		if (precompiledRules == null)
 			precompiledRules = new HashMap<String, Rule>(0);
+		else {
+			// clone rules to protect them from reuse
+			for (Entry<String, Rule> e : precompiledRules.entrySet()) {
+				Rule r = e.getValue();
+				try {
+					Method m = r.getClass().getMethod("clone");
+					e.setValue((Rule) m.invoke(r));
+				} catch (Exception e1) {
+					throw new GrammarException(
+							"failed to clone precompiled rule "
+									+ r
+									+ "; precompiled rules must be cloned to protect them from reuse");
+				}
+			}
+		}
 		Map<Label, List<RuleFragment>> map = new HashMap<Label, List<RuleFragment>>();
 		Label r = null;
 		try {

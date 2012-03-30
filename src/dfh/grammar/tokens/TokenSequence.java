@@ -1,8 +1,15 @@
+/*
+ * dfh.grammar -- a recursive descent parser library for Java
+ * 
+ * Copyright (C) 2012 David F. Houghton
+ * 
+ * This software is licensed under the LGPL. Please see accompanying NOTICE file
+ * and lgpl.txt.
+ */
 package dfh.grammar.tokens;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -10,21 +17,22 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
+/**
+ * A {@link CharSequence} that knows what tokens it contains.
+ * <p>
+ * 
+ * @author David F. Houghton - Mar 30, 2012
+ * 
+ * @param <K>
+ */
 public class TokenSequence<K extends Token> implements CharSequence {
-
-	private static Comparator<Integer> reverseComparator = new Comparator<Integer>() {
-		@Override
-		public int compare(Integer i1, Integer i2) {
-			return i2 - i1;
-		}
-	};
 	private final CharSequence base;
 	private NavigableMap<Integer, List<K>> startMap, endMap;
 
 	public TokenSequence(CharSequence base, Collection<K> tokens) {
 		this.base = base;
 		startMap = new TreeMap<Integer, List<K>>();
-		endMap = new TreeMap<Integer, List<K>>(reverseComparator);
+		endMap = new TreeMap<Integer, List<K>>();
 		for (K token : tokens) {
 			Integer start = token.start(), end = token.end();
 			List<K> slist = startMap.get(start), elist = endMap.get(end);
@@ -41,10 +49,24 @@ public class TokenSequence<K extends Token> implements CharSequence {
 		}
 	}
 
+	/**
+	 * Returns all tokens starting at the given offset.
+	 * 
+	 * @param i
+	 *            offset
+	 * @return all tokens starting at the given offset
+	 */
 	public List<K> startingAt(Integer i) {
 		return startMap.get(i);
 	}
 
+	/**
+	 * Returns all tokens ending at the given offset.
+	 * 
+	 * @param i
+	 *            offset
+	 * @return all tokens ending at the given offset
+	 */
 	public List<K> endingAt(Integer i) {
 		return endMap.get(i);
 	}
@@ -54,6 +76,11 @@ public class TokenSequence<K extends Token> implements CharSequence {
 		return base.charAt(i);
 	}
 
+	/**
+	 * Returns character length of the sequence.
+	 * 
+	 * @return character length of the sequence
+	 */
 	@Override
 	public int length() {
 		return base.length();
@@ -109,14 +136,6 @@ public class TokenSequence<K extends Token> implements CharSequence {
 		return matches;
 	}
 
-	public boolean beginsToken(Integer i) {
-		return startMap.containsKey(i);
-	}
-
-	public boolean endsToken(Integer i) {
-		return endMap.containsKey(i);
-	}
-
 	/**
 	 * @return start offsets of all tokens
 	 */
@@ -129,6 +148,11 @@ public class TokenSequence<K extends Token> implements CharSequence {
 		return base.toString();
 	}
 
+	/**
+	 * Returns pairings of start offsets and tokens that start at these.
+	 * 
+	 * @return pairings of start offsets and tokens that start at these
+	 */
 	public Collection<Entry<Integer, List<K>>> starts() {
 		return startMap.entrySet();
 	}

@@ -1,3 +1,11 @@
+/*
+ * dfh.grammar -- a recursive descent parser library for Java
+ * 
+ * Copyright (C) 2012 David F. Houghton
+ * 
+ * This software is licensed under the LGPL. Please see accompanying NOTICE file
+ * and lgpl.txt.
+ */
 package dfh.grammar.tokens;
 
 import java.util.List;
@@ -14,6 +22,12 @@ import java.util.List;
 public class TagTest<T extends Enum<T>> implements TokenTest<TaggedToken<T>> {
 	private final T t;
 
+	/**
+	 * Makes a test for the specified tag constant.
+	 * 
+	 * @param t
+	 *            tag constant
+	 */
 	public TagTest(T t) {
 		this.t = t;
 	}

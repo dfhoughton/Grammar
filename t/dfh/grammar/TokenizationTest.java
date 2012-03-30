@@ -17,6 +17,13 @@ import dfh.grammar.tokens.TaggedToken;
 import dfh.grammar.tokens.TokenRule;
 import dfh.grammar.tokens.TokenSequence;
 
+/**
+ * Makes sure the token handling classes work as expected.
+ * <p>
+ * 
+ * @author David F. Houghton - Mar 30, 2012
+ * 
+ */
 public class TokenizationTest {
 	private enum Tags {
 		s, a, b, c
@@ -43,14 +50,14 @@ public class TokenizationTest {
 		}
 		seq = new TokenSequence<TaggedToken<Tags>>(s, tokens);
 		ruleMap = new TreeMap<String, Rule>();
-		ruleMap.put("s", new TokenRule<TaggedToken<Tags>>(
-				new TagTest<TokenizationTest.Tags>(Tags.s)));
-		ruleMap.put("a", new TokenRule<TaggedToken<Tags>>(
-				new TagTest<TokenizationTest.Tags>(Tags.a)));
-		ruleMap.put("b", new TokenRule<TaggedToken<Tags>>(
-				new TagTest<TokenizationTest.Tags>(Tags.b)));
-		ruleMap.put("c", new TokenRule<TaggedToken<Tags>>(
-				new TagTest<TokenizationTest.Tags>(Tags.c)));
+		ruleMap.put("s", new TokenRule<TaggedToken<Tags>>(new TagTest<Tags>(
+				Tags.s)));
+		ruleMap.put("a", new TokenRule<TaggedToken<Tags>>(new TagTest<Tags>(
+				Tags.a)));
+		ruleMap.put("b", new TokenRule<TaggedToken<Tags>>(new TagTest<Tags>(
+				Tags.b)));
+		ruleMap.put("c", new TokenRule<TaggedToken<Tags>>(new TagTest<Tags>(
+				Tags.c)));
 	}
 
 	@Test
@@ -76,7 +83,7 @@ public class TokenizationTest {
 	@Test
 	public void reversalWithStudying() {
 		Grammar g = new Grammar("ROOT = notafter [ <a> <s>? ] <c>", ruleMap);
-		Matcher m = g.find(seq, new Options().study(true).log(System.out));
+		Matcher m = g.find(seq, new Options().study(true));
 		Match n = m.match();
 		assertNotNull(n);
 		assertEquals(8, n.start());

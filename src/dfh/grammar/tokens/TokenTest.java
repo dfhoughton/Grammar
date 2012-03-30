@@ -1,3 +1,11 @@
+/*
+ * dfh.grammar -- a recursive descent parser library for Java
+ * 
+ * Copyright (C) 2012 David F. Houghton
+ * 
+ * This software is licensed under the LGPL. Please see accompanying NOTICE file
+ * and lgpl.txt.
+ */
 package dfh.grammar.tokens;
 
 import java.util.List;
@@ -23,6 +31,9 @@ public interface TokenTest<K extends Token> {
 
 	/**
 	 * Tests whether the tokens at a given offset have a particular property.
+	 * The return value is a token end offset unless the test is on a reversed
+	 * sequence -- in a lookbehind -- in which case it is a start offset. If the
+	 * test fails, it must return -1.
 	 * 
 	 * @param tokens
 	 *            the tokens found at the given offset
