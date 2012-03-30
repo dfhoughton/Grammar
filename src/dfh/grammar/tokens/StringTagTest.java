@@ -13,24 +13,24 @@ import java.util.List;
 import dfh.grammar.GrammarException;
 
 /**
- * Companion class to {@link TaggedToken}, this test is true if some token at
- * the relevant offset bears the specified tag.
+ * Companion class to {@link StringTaggedToken}, this test is true if some token
+ * at the relevant offset bears the specified tag.
  * <p>
  * 
  * @author David F. Houghton - Mar 29, 2012
  * 
  * @param <T>
  */
-public class TagTest<T extends Enum<T>> implements TokenTest<TaggedToken<T>> {
-	private final T t;
+public class StringTagTest implements TokenTest<StringTaggedToken> {
+	private final String t;
 
 	/**
-	 * Makes a test for the specified tag constant.
+	 * Makes a test for the specified tag.
 	 * 
 	 * @param tag
 	 *            tag constant
 	 */
-	public TagTest(T tag) {
+	public StringTagTest(String tag) {
 		this.t = tag;
 		if (tag == null)
 			throw new GrammarException("tag cannot be null");
@@ -42,10 +42,10 @@ public class TagTest<T extends Enum<T>> implements TokenTest<TaggedToken<T>> {
 	}
 
 	@Override
-	public int test(List<TaggedToken<T>> tokens,
-			TokenSequence<TaggedToken<T>> sequence, boolean reversed) {
-		for (TaggedToken<T> tt : tokens) {
-			if (tt.tag() == t)
+	public int test(List<StringTaggedToken> tokens,
+			TokenSequence<StringTaggedToken> sequence, boolean reversed) {
+		for (StringTaggedToken tt : tokens) {
+			if (t.equals(tt.tag()))
 				return reversed ? tt.start() : tt.end();
 		}
 		return -1;
