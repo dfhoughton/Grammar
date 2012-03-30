@@ -8,9 +8,13 @@
  */
 package dfh.grammar.tokens;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import dfh.grammar.Grammar;
 import dfh.grammar.GrammarException;
+import dfh.grammar.Rule;
 
 /**
  * Companion class to {@link TaggedToken}, this test is true if some token at
@@ -49,5 +53,25 @@ public class TagTest<T extends Enum<T>> implements TokenTest<TaggedToken<T>> {
 				return reversed ? tt.start() : tt.end();
 		}
 		return -1;
+	}
+
+	/**
+	 * Convenience method that generates the map required by
+	 * {@link Grammar#Grammar(java.io.BufferedReader, Map)} and the like. This
+	 * method assumes that the rules will be identified in the grammar by the
+	 * string returned the constants' <code>name()</code> method.
+	 * 
+	 * @param tags
+	 *            constants identify a set of {@link TaggedToken TaggedTokens}
+	 * @return map from rule labels to token rules
+	 */
+	public static <K extends Enum<K>> Map<String, Rule> precompile(Class<K> tags) {
+		Map<String, Rule> map = new HashMap<String, Rule>(
+				(int) (tags.getEnumConstants().length * 1.75));
+		for (K k : tags.getEnumConstants()) {
+			Rule r = new TokenRule<TaggedToken<K>>(new TagTest<K>(k));
+			map.put(k.name(), r);
+		}
+		return map;
 	}
 }
