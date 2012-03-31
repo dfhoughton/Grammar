@@ -18,6 +18,7 @@ var dfh = {
 		this.toc();
 		this.footnotes();
 		this.mdash();
+		this.version();
 	},
 
 	/**
@@ -137,6 +138,42 @@ var dfh = {
 			document.body.insertBefore(div, document.body.firstChild);
 		else
 			document.body.appendChild(div);
+	},
+
+	/**
+	 * Searches the document for the string __VERSION__ in text nodes and
+	 * attributes and replaces it with the version value.
+	 */
+	version : function() {
+		// only proceed if the version variable has been set
+		if (version) {
+			var regex = /__VERSION__/g;
+			var recReplace = function(n) {
+				if (n.nodeType == 3) { // text
+					if (regex.test(n.data)) {
+						var replacement = n.data.replace(regex, version);
+						var t = document.createTextNode(replacement);
+						n.parentNode.insertBefore(t, n);
+						n.parentNode.removeChild(n);
+					}
+				} else if (n.nodeType == 1) { // element
+					for ( var i = 0; i < n.childNodes.length; i++) {
+						recReplace(n.childNodes[i]);
+					}
+					for (i = 0; i < n.attributes.length; i++) {
+						var a = n.attributes[i];
+						// webkit hack
+						// for some reason, this only works if I test the regex twice
+						// for node values
+						regex.test(a.nodeValue);
+						if (regex.test(a.nodeValue)) {
+							a.nodeValue = a.nodeValue.replace(regex, version);
+						}
+					}
+				}
+			};
+			recReplace(document.body);
+		}
 	},
 
 	/**
