@@ -73,11 +73,11 @@ import dfh.grammar.Label.Type;
  * <h3>Disadvantages</h3>
  * I am certain that someone who hadn't written these classes would find
  * infelicities to enumerate in the API. The chief disadvantage that I am aware
- * of is that matching with a {@link Grammar} is about an order of magnitude
- * slower than matching with a simple {@link Pattern}. For one thing, fewer
- * people have spent time optimizing the code. But even were Oracle to take over
- * this project the scope for efficiency is less simply because the task
- * attempted is greater.
+ * of is that matching with a {@link Grammar} is considerably slower than
+ * matching with a simple {@link Pattern}. For one thing, fewer people have
+ * spent time optimizing the code. But even were Oracle to take over this
+ * project the scope for efficiency is less simply because the task attempted is
+ * greater.
  * <h2>Rule Definition</h2>
  * <h2>Acknowledgements</h2> This class and its supporting classes was inspired
  * by the recursive regular expressions available in Perl 5.10+, and especially

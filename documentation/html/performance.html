@@ -15,10 +15,67 @@
 		these costs and how they can be managed.</p>
 	<span id="toc"></span>
 	<h2>Issues</h2>
+	<p>These are only some of the issues one should be concerned with
+		when writing grammars. They are the chief ones, though. This list may
+		be augmented in the future.</p>
 	<h3>Backtracking</h3>
+	<p>
+		Backtracking -- returning to an earlier decision point in the matching
+		process to try a different decision -- is where the exponential
+		complexity of recursive pattern matching comes from. If you can tell
+		the grammar *not* to backtrack at any point, this is the best way to
+		improve efficiency. So, for example, if you know that characters of a
+		particular type -- whitespace, say -- should always be treated as an
+		atomic block, use possessive matching:
+		<code>\s*+</code>
+		is good;
+		<code>\s*</code>
+		less so. Likewise, if you know that once some prefix of a rule has
+		matched, all the rest must match if the rule is to match at all, you
+		can mark this point with a backtracking barrier.
+	</p>
+	<pre>rule = &lt;prefix&gt; <b>:</b> &lt;remainder&gt;</pre>
+	<p>And of course you can place these barriers at multiple points in
+		the same rule.</p>
+	<p>
+		If you know that a particular rule must match in its entirety or the
+		entire grammar will fail to match, use a double colon barrier --
+		<code>::</code>
+	</p>
+	<pre>rule = <b>::</b> &lt;rule1&gt; &lt;rule2&gt; # if we start on this one, it had better match</pre>
 	<h3>Studying</h3>
+	<p>The study option causes the grammar to find all terminal matches
+		and all possible start offsets for a complete match before attempting
+		any matching. This generally doesn't hurt and with some patterns and
+		character sequences may considerably accelerate matching, though
+		generally only when the start offset of any possible match is unknown.</p>
 	<h3>Caching</h3>
+	<p>One can reduce the exponential complexity of matching
+		considerably by caching all sub-matches or points of failure.
+		Unfortunately, this trades exponential time for exponential memory and
+		makes cache hits themselves complex and slow: a rule may match
+		exponentially many ways at a particular offset. These grammars
+		therefore do not attempt to cache everything. Rather, they cache
+		failure offsets and terminal matches. Furthermore, there are three
+		cache implementations which make different tradeoffs between time and
+		space: an array-based cache, which is fastest but puffiest; a
+		hash-based cache, the middle way; and a tree-based cache, which is
+		leanest but slowest. These three mechanisms are among the parameters
+		examined by the benchmark results below.</p>
 	<h3>Recursion</h3>
+	<p>
+		If you have a choice between recursion and repetition, go with the
+		repetition.
+		<code>rule&nbsp;=&nbsp;'a'*&nbsp;'b'</code>
+		is good;
+		<code>rule&nbsp;=&nbsp;'a'&nbsp;&lt;rule&gt;&nbsp;|&nbsp;'b'</code>
+		is bad. The former is both clearer and more efficient. Particularly
+		bad is left branching recursion, as the recursive descent fails to
+		advance the match offset or test anything, so in theory it could be
+		infinitely deep.
+	</p>
+	<pre>rule1 = &lt;rule1&gt; "a" | "b" # <b>BAD!!!</b>
+rule2 = "b" "a"*          # fine! and equivalent</pre>
 	<h2>Benchmarks</h2>
 	<p>
 		In the examples directory provided by the downloadable tarball you'll

@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>dfh.grammar.Grammar</title>
+<link rel="icon" type="image/png" href="/dfh.png" />
+<link href="../css/dfh.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="headers.json"></script>
+<script type="text/javascript" src="../scripts/pageutils.js"></script>
+</head>
+<body onLoad="dfh.prepare('tokens', 'dfh.grammar')">
+	<h1>Matching Against Token Sequences</h1>
+	<p>
+		Suppose you have a character sequence that has already been <a
+			href="http://en.wikipedia.org/wiki/Lexical_analysis">lexed</a>,
+		tokenized, or tagged. It would be useful to be able to write a grammar
+		that described patterns of these pre-discovered units. The classes in
+		<code>dfh.grammar.tokens</code>
+		facilitate writing such grammars. This page discusses their use.
+	</p>
+	<span id="toc"></span>
+	<h2>The General Procedure</h2>
+	<p>
+		Suppose you have a natural language processing pipeline that takes
+		text and sentences it, assigns part of speech tags to tokens, and
+		otherwise provides you some sort of annotation for regions of the
+		text. You wish to find regions that have certain patterns of
+		annotations. You can write your own implementations of
+		<code>java.util.CharSequence</code>
+		,
+		<code>dfh.grammar.Rule</code>
+		, and so forth the achieve this, but the simplest way to proceed is to
+		write an extension of
+		<code>dfh.grammar.tokens.Token</code>
+		that can wrap the annotated regions and implement
+		<code>dfh.grammar.tokens.TokenTest</code>
+		to produce a class that can test these annotations. If the annotations
+		are as simple as a tag or type which appears one per token and you can
+		collect these tags into an enumeration, you need only implement code
+		to generate instances of
+		<code>dfh.grammar.tokens.TaggedToken</code>
+		; the companion class
+		<code>dfh.grammar.tokens.TagTest</code>
+		will generate your rules for you. For example:<span class="fn">You
+			will find this code among the examples in the downloadable tarball.</span>
+	</p>
+	<pre>import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+import dfh.grammar.Grammar;
+import dfh.grammar.Match;
+import dfh.grammar.Matcher;
+import dfh.grammar.Options;
+import dfh.grammar.Rule;
+import dfh.grammar.tokens.TagTest;
+import dfh.grammar.tokens.TaggedToken;
+import dfh.grammar.tokens.TokenSequence;
+
+public class TokenGrammar {
+	enum Types {
+		n, a, v, d, s
+	};
+
+	static Map&lt;String, Rule&gt; rules = TagTest.precompile(Types.class);
+	static Grammar g = new Grammar(
+			"phrase = [ &lt;a&gt; &lt;s&gt; ]* &lt;n&gt; | &lt;v&gt; [ &lt;s&gt; &lt;n&gt; ]?", rules);
+
+	static Collection&lt;TaggedToken&lt;Types&gt;&gt; tokenize(String s) {
+		Pattern p = Pattern.compile("[navd]|\\s++");
+		java.util.regex.Matcher m = p.matcher(s);
+		List&lt;TaggedToken&lt;Types&gt;&gt; list = new ArrayList&lt;TaggedToken&lt;Types&gt;&gt;();
+		while (m.find()) {
+			String tok = m.group();
+			Types t;
+			int start = m.start(), end = m.end();
+			if (Character.isWhitespace(tok.charAt(0)))
+				t = Types.s;
+			else
+				t = Types.valueOf(tok);
+			list.add(new TaggedToken&lt;Types&gt;(start, end, t));
+
+		}
+		return list;
+	}
+
+	public static void main(String[] args) {
+		String s = "d n v n a a n";
+		TokenSequence&lt;TaggedToken&lt;Types&gt;&gt; seq = new TokenSequence&lt;TaggedToken&lt;Types&gt;&gt;(
+				s, tokenize(s));
+		Matcher m = g.find(seq, new Options().allowOverlap(true));
+		Match n;
+		while ((n = m.match()) != null)
+			System.out.printf("[%d, %d] %s%n", n.start(), n.end(), n.group());
+	}
+}</pre>
+	<p>This class, if run, produces</p>
+	<pre class="results">[2, 3] n
+[4, 7] v n
+[6, 7] n
+[8, 13] a a n
+[10, 13] a n
+[12, 13] n</pre>
+	<p>
+		You would want to replace the
+		<code>tokenize(String)</code>
+		method with something that ingested the annotated regions and returned
+		a collection of
+		<code>TaggedToken</code>
+		objects, but this should be straightforward.
+	</p>
+	<p>Let us examine the parts of this class in detail. They will
+		mirror the parts of more useful code you might write.</p>
+	<h3>enumerated annotations</h3>
+	<pre>	enum Types {
+		n, a, v, d, s
+	};</pre>
+	<p>You aren't required to represent the annotations as an
+		enumeration, but doing so has two advantages:</p>
+	<ol>
+		<li>the code itself is concise and declarative, making clear, in
+			fact necessitating, that the annotations be a closed class</li>
+		<li>the tests generated will be maximally efficient</li>
+	</ol>
+	<h3>
+		rules provided a parameter to the
+		<code>Grammar</code>
+		constructor
+	</h3>
+	<pre>	static Map&lt;String, Rule&gt; rules = TagTest.precompile(Types.class);
+	static Grammar g = new Grammar(
+			"phrase = [ &lt;a&gt; &lt;s&gt; ]* &lt;n&gt; | &lt;v&gt; [ &lt;s&gt; &lt;n&gt; ]?", rules);</pre>
+	<p>You can use ad hoc rules in a grammar either by providing a map
+		from their labels to their instantiations to the constructor, as
+		above, or individually after construction. Rules can only be used in
+		lookbehinds, however, if they are available during construction. And
+		if you have many such rules, providing them as a map during
+		construction produces much more concise, readable, maintainable code.</p>
+	<h3>tokenization</h3>
+	<pre>	static Collection&lt;TaggedToken&lt;Types&gt;&gt; tokenize(String s) { ...</pre>
+	<p>
+		This part will vary according to the nature of your annotations. It
+		essentially wraps the annotations in an interface the other
+		<code>dfh.grammar</code>
+		classes will understand.
+	</p>
+	<h3>
+		generation of a
+		<code>TokenSequence</code>
+	</h3>
+	<pre>		String s = "d n v n a a n";
+		TokenSequence&lt;TaggedToken&lt;Types&gt;&gt; seq = new TokenSequence&lt;TaggedToken&lt;Types&gt;&gt;(
+				s, tokenize(s));</pre>
+	<p>
+		The
+		<code>dfh.grammar.tokens.TokenSequence</code>
+		class is a
+		<code>java.util.CharSequence</code>
+		which knows the offsets of tokens as well as characters. It requires
+		as parameters the base character sequence and a collection of
+		annotations. These annotations may overlap and need not cover the
+		entire sequence.
+	</p>
+	<h2>Non-Character Sequences</h2>
+	<p>
+		In principle one may use the
+		<code>TokenSequence</code>
+		class and the mechanisms to write grammars over such sequences to find
+		patterns in sequences which underlyingly contain no characters. You
+		will still have to provide a character sequence of some sort of the
+		proper length. This sequence will provide the various services to the
+		grammar, none of which will depend on the characters at particular
+		offsets. As long as your tokenization code produces tokens maintaining
+		a reference to the objects tokenized, you will be able to use match
+		offsets and the methods of the
+		<code>TokenSequence</code>
+		to retrieve the objects corresponding to a particular match.
+	</p>
+</body>
+</html>
