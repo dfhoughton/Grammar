@@ -1,4 +1,4 @@
-2.02
+2.02, 31 March 2012
   * fixed bugs in description of tagged repetitions and alternations
   * fixed bug where cached terminal matches were being munged by subsequent
     overlapping non-terminals
