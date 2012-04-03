@@ -47,7 +47,7 @@ public class TagTest<T extends Enum<T>> implements TokenTest<TaggedToken<T>> {
 
 	@Override
 	public int test(List<TaggedToken<T>> tokens,
-			TokenSequence<TaggedToken<T>> sequence, boolean reversed) {
+			TokenSequence<TaggedToken<T>> sequence, int offset, boolean reversed) {
 		for (TaggedToken<T> tt : tokens) {
 			if (tt.tag() == t)
 				return reversed ? tt.start() : tt.end();

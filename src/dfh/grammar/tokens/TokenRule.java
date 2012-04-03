@@ -79,7 +79,7 @@ public class TokenRule<K extends Token> extends Rule implements Cloneable,
 					cm = CachedMatch.MISMATCH;
 				} else {
 					int other = test.test((List<K>) tokensAt,
-							(TokenSequence<K>) ccs, reversed);
+							(TokenSequence<K>) ccs, off, reversed);
 					if (other == -1) {
 						cm = CachedMatch.MISMATCH;
 					} else {
@@ -178,7 +178,7 @@ public class TokenRule<K extends Token> extends Rule implements Cloneable,
 		if (subCache.isEmpty()) {
 			for (Entry<Integer, List<K>> e : ccs.starts()) {
 				Integer i = e.getKey();
-				int end = test.test(e.getValue(), ccs, false);
+				int end = test.test(e.getValue(), ccs, i, false);
 				if (end > -1) {
 					boolean good = true;
 					Match m = null;

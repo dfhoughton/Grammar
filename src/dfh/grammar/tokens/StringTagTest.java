@@ -48,7 +48,8 @@ public class StringTagTest implements TokenTest<StringTaggedToken> {
 
 	@Override
 	public int test(List<StringTaggedToken> tokens,
-			TokenSequence<StringTaggedToken> sequence, boolean reversed) {
+			TokenSequence<StringTaggedToken> sequence, int offset,
+			boolean reversed) {
 		for (StringTaggedToken tt : tokens) {
 			if (t.equals(tt.tag()))
 				return reversed ? tt.start() : tt.end();

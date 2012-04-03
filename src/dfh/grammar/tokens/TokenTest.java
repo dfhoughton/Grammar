@@ -39,11 +39,14 @@ public interface TokenTest<K extends Token> {
 	 *            the tokens found at the given offset
 	 * @param sequence
 	 *            the token sequence of which these are a part
+	 * @param offset
+	 *            the matching offset being tested
 	 * @param reversed
 	 *            whether the test is occurring in a reversed sequence
 	 * @return the opposite offset of the token matched; must return -1 if the
 	 *         test fails
 	 */
-	public int test(List<K> tokens, TokenSequence<K> sequence, boolean reversed);
+	public int test(List<K> tokens, TokenSequence<K> sequence, int offset,
+			boolean reversed);
 
 }
