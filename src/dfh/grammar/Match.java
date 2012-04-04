@@ -112,6 +112,10 @@ public class Match {
 	private int end = -1;
 	private Match parent;
 	private Match[] children;
+	/**
+	 * Cached empty array to save object creation.
+	 */
+	private static final Match[] NO_CHILDREN = new Match[0];
 	private String group;
 	private Set<String> labels;
 	/**
@@ -840,7 +844,7 @@ public class Match {
 		done = true;
 		group = s.subSequence(start, end).toString();
 		if (children == null)
-			children = new Match[0];
+			children = NO_CHILDREN;
 		else {
 			for (int i = 0; i < children.length; i++) {
 				Match m = children[i];

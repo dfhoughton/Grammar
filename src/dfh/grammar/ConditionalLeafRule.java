@@ -36,7 +36,7 @@ public class ConditionalLeafRule extends LeafRule {
 				CachedMatch cm = cache.get(offset);
 				if (cm == null) {
 					if (options.study
-							&& (!matchesTrivially || offset < options.end())) {
+							&& (!matchesTrivially || offset <= options.end())) {
 						if (options.debug)
 							ConditionalLeafRule.this.matchTrace(this, null);
 						return null;
@@ -123,7 +123,7 @@ public class ConditionalLeafRule extends LeafRule {
 				if (c.passes(n, null, s))
 					subCache.put(i, new CachedMatch(n));
 				int newStart = m.start() + 1;
-				if (newStart == options.end())
+				if (newStart > options.end())
 					break;
 				m.region(newStart, options.end());
 			}
