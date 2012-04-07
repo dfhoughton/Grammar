@@ -1,3 +1,5 @@
+2.04
+
 2.03, 7 April 2012
   * fixed bug in reversed token rules
   * improved logging so unreversed sequence and indices are shown even for
