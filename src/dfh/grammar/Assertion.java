@@ -61,7 +61,7 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 				CachedMatch cm = subCache.get(offset);
 				if (cm == null) {
 					Match n = r.matcher(
-							backward ? master.options.rcs.translate(offset) + 1
+							backward ? options.rcs.translate(offset) + 1
 									: offset, cache, this).match();
 					if (positive) {
 						if (n != null) {

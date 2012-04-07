@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * A {@link CharSequence} that knows what tokens it contains.
@@ -149,11 +149,14 @@ public class TokenSequence<K extends Token> implements CharSequence {
 	}
 
 	/**
-	 * Returns pairings of start offsets and tokens that start at these.
+	 * Returns offsets at which tokens start or end.
 	 * 
-	 * @return pairings of start offsets and tokens that start at these
+	 * @return offsets at which tokens start or end
 	 */
-	public Collection<Entry<Integer, List<K>>> starts() {
-		return startMap.entrySet();
+	public Collection<Integer> boundaries() {
+		Set<Integer> boundaries = new TreeSet<Integer>();
+		boundaries.addAll(startMap.keySet());
+		boundaries.addAll(endMap.keySet());
+		return boundaries;
 	}
 }

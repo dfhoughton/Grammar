@@ -47,12 +47,13 @@ public class StringTagTest implements TokenTest<StringTaggedToken> {
 	}
 
 	@Override
-	public int test(List<StringTaggedToken> tokens,
-			TokenSequence<StringTaggedToken> sequence, int offset,
-			boolean reversed) {
-		for (StringTaggedToken tt : tokens) {
-			if (t.equals(tt.tag()))
-				return reversed ? tt.start() : tt.end();
+	public int test(List<StringTaggedToken> starting,
+			List<StringTaggedToken> ending, boolean reversed) {
+		if (starting != null) {
+			for (StringTaggedToken tt : starting) {
+				if (t.equals(tt.tag()))
+					return reversed ? tt.start() : tt.end();
+			}
 		}
 		return -1;
 	}

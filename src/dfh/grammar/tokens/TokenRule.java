@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import dfh.grammar.CachedMatch;
@@ -73,18 +72,25 @@ public class TokenRule<K extends Token> extends Rule implements Cloneable,
 						.bottomSequence() : options.cs);
 				Integer off = reversed ? options.rcs.translate(offset - 1)
 						: offset;
-				List<K> tokensAt = reversed ? ccs.endingAt(off) : ccs
-						.startingAt(off);
-				if (tokensAt == null || tokensAt.isEmpty()) {
+				List<K> starting, ending;
+				if (reversed) {
+					starting = ccs.endingAt(off);
+					ending = ccs.startingAt(off);
+				} else {
+					starting = ccs.startingAt(off);
+					ending = ccs.endingAt(off);
+				}
+				if (starting == null && ending == null) {
 					cm = CachedMatch.MISMATCH;
 				} else {
-					int other = test.test((List<K>) tokensAt,
-							(TokenSequence<K>) ccs, off, reversed);
+					int other = test.test(starting, ending, reversed);
 					if (other == -1) {
 						cm = CachedMatch.MISMATCH;
 					} else {
-						int start = reversed ? other : off.intValue();
-						int end = reversed ? off.intValue() : other;
+						int start = reversed ? options.rcs.translate(off
+								.intValue()) + 1 : off.intValue();
+						int end = reversed ? options.rcs.translate(other) + 1
+								: other;
 						Match m = new Match(TokenRule.this, start, end);
 						if (c == null || c.passes(m, this, s))
 							cm = new CachedMatch(m);
@@ -176,9 +182,8 @@ public class TokenRule<K extends Token> extends Rule implements Cloneable,
 		Map<Integer, CachedMatch> subCache = cache[cacheIndex];
 		Set<Integer> startOffsets = new HashSet<Integer>();
 		if (subCache.isEmpty()) {
-			for (Entry<Integer, List<K>> e : ccs.starts()) {
-				Integer i = e.getKey();
-				int end = test.test(e.getValue(), ccs, i, false);
+			for (Integer i : ccs.boundaries()) {
+				int end = test.test(ccs.startingAt(i), ccs.endingAt(i), false);
 				if (end > -1) {
 					boolean good = true;
 					Match m = null;

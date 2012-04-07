@@ -35,18 +35,15 @@ public interface TokenTest<K extends Token> {
 	 * sequence -- in a lookbehind -- in which case it is a start offset. If the
 	 * test fails, it must return -1.
 	 * 
-	 * @param tokens
-	 *            the tokens found at the given offset
-	 * @param sequence
-	 *            the token sequence of which these are a part
-	 * @param offset
-	 *            the matching offset being tested
+	 * @param starting
+	 *            the tokens starting at the given offset
+	 * @param ending
+	 *            the tokens ending at the given offset
 	 * @param reversed
 	 *            whether the test is occurring in a reversed sequence
 	 * @return the opposite offset of the token matched; must return -1 if the
 	 *         test fails
 	 */
-	public int test(List<K> tokens, TokenSequence<K> sequence, int offset,
-			boolean reversed);
+	public int test(List<K> starting, List<K> ending, boolean reversed);
 
 }

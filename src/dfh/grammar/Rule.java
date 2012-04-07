@@ -218,7 +218,10 @@ public abstract class Rule {
 		b.append("\nstack:\n\t");
 		List<String> labels = new ArrayList<String>();
 		while (m.rule() != null) {
-			labels.add(String.format("%s %d", m.rule().label(), m.offset));
+			int i = m.offset;
+			if (m.options.isReversed && !(m.rule() instanceof Assertion))
+				i = m.options.rcs.translate(i) + 1;
+			labels.add(String.format("%s %d", m.rule().label(), i));
 			if (m.master != null)
 				m = m.master;
 		}
@@ -234,26 +237,49 @@ public abstract class Rule {
 	}
 
 	private void locate(StringBuilder b, CharSequence s, int offset) {
+		boolean reversed = s instanceof ReversedCharSequence;
+		ReversedCharSequence rcs = (ReversedCharSequence) (reversed ? s : null);
 		b.append(" at ");
-		b.append(offset);
+		b.append(reversed ? rcs.translate(offset) + 1 : offset);
 		b.append(" (");
 		int start = Math.max(0, offset - 5);
 		int end = Math.min(s.length(), offset + 5);
-		if (start < offset) {
-			if (start > 0)
-				b.append("...");
-			b.append('"');
-			b.append(s.subSequence(start, offset));
-			b.append('"');
-		}
-		b.append('_');
-		if (end > offset) {
-			b.append('"');
-			CharSequence ss = s.subSequence(offset, end);
-			b.append(ss);
-			b.append('"');
-			if (end < s.length())
-				b.append("...");
+		if (reversed) {
+			if (end > offset) {
+				if (end < s.length())
+					b.append("...");
+				b.append('"');
+				for (int i = end - 1; i >= offset; i--)
+					b.append(s.charAt(i));
+				b.append('"');
+			}
+			b.append('_');
+			if (start < offset) {
+				b.append('"');
+				for (int i = offset - 1; i >= start; i--)
+					b.append(s.charAt(i));
+				b.append('"');
+				if (start > 0)
+					b.append("...");
+			}
+		} else {
+			if (start < offset) {
+				if (start > 0)
+					b.append("...");
+				b.append('"');
+				for (int i = start; i < offset; i++)
+					b.append(s.charAt(i));
+				b.append('"');
+			}
+			b.append('_');
+			if (end > offset) {
+				b.append('"');
+				for (int i = offset; i < end; i++)
+					b.append(s.charAt(i));
+				b.append('"');
+				if (end < s.length())
+					b.append("...");
+			}
 		}
 		b.append(')');
 	}
@@ -272,9 +298,22 @@ public abstract class Rule {
 		b.append("result for ").append(m.rule().label).append("\n\t");
 		if (n == null)
 			b.append("NO MATCH");
-		else
-			b.append(String.format("(%d, %d) \"%s\"", n.start(), n.end(),
-					m.s.subSequence(n.start(), n.end())));
+		else {
+			if (m.options.isReversed && !(m.rule() instanceof Assertion)) {
+				int s = m.options.rcs.translate(n.end()) + 1;
+				int e = m.options.rcs.translate(n.start()) + 1;
+				b.append('(').append(s).append(", ").append(e).append(") \"");
+				for (int i = n.end() - 1; i >= n.start(); i--)
+					b.append(m.s.charAt(i));
+				b.append('"');
+			} else {
+				b.append('(').append(n.start()).append(", ").append(n.end())
+						.append(") \"");
+				for (int i = n.start(); i < n.end(); i++)
+					b.append(m.s.charAt(i));
+				b.append('"');
+			}
+		}
 		m.options.trace.println(b);
 	}
 
