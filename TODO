@@ -12,7 +12,7 @@ section at the end of the document.
 . add option to turn off condition testing
 . bail out of recursion via exception rather than the current laborious and expensive reeling in of failed tries
 * put tokenization handling into dfh.grammar
-. document new tokenization handling
+* document new tokenization handling
 
 COMPLETED
 =========

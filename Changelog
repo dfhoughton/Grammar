@@ -1,3 +1,9 @@
+2.03
+  * fixed bug in reversed token rules
+  * improved logging so unreversed sequence and indices are shown even for
+    reversed rules
+  * logging code made more efficient
+
 2.02, 31 March 2012
   * fixed bugs in description of tagged repetitions and alternations
   * fixed bug where cached terminal matches were being munged by subsequent
