@@ -610,7 +610,7 @@ public class Grammar implements Serializable {
 			Condition c) throws GrammarException {
 		DeferredDefinitionRule r = checkRuleDefinition(label);
 		String oldId = r.uniqueId();
-		Label l = new Label(Type.terminal, label);
+		Label l = new Label(Type.explicit, label);
 		LeafRule lr = new LeafRule(l, p, false);
 		if (c != null) {
 			lr = (LeafRule) conditionCheck(id, c, lr);
@@ -1469,7 +1469,7 @@ public class Grammar implements Serializable {
 			String id, Condition c) throws GrammarException {
 		DeferredDefinitionRule r = checkRuleDefinition(label);
 		String oldId = r.uniqueId();
-		Label l = new Label(Type.literal, label);
+		Label l = new Label(Type.explicit, label);
 		LiteralRule lr = new LiteralRule(l, literal);
 		if (c != null)
 			lr = (LiteralRule) conditionCheck(label, c, lr);

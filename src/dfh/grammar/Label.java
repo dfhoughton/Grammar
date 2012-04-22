@@ -21,10 +21,6 @@ import java.io.Serializable;
 public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		Serializable, Cloneable {
 	private static final long serialVersionUID = 6L;
-	/**
-	 * label reserved for root rule label
-	 */
-	public static final String ROOT = "ROOT";
 
 	/**
 	 * Type of {@link Rule} associated with {@link Label}.
@@ -39,37 +35,17 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 	 */
 	public enum Type {
 		/**
-		 * A regular expression. The grammar cannot backtrack within whatever
-		 * this rule matches. As far as the grammar is concerned, it is atomic.
+		 * A rule defined on its own line in the specification.
 		 */
-		terminal(2),
+		explicit(0),
 		/**
-		 * Basically a string that must match literally.
+		 * A rule defined as part of another rule.
 		 */
-		literal(3),
-		/**
-		 * This is a non-repeating identical match with an early constituent of
-		 * a sequence.
-		 */
-		backreference(4),
-		/**
-		 * Like {@link #backreference} but allows repetition and branching and
-		 * cannot be used in lookbehinds
-		 */
-		uplevelbackreference(5),
-		/**
-		 * The root rule of the grammar. Every grammar must have one and only
-		 * one root and it can parse a string only if it passes the root rule.
-		 */
-		root(0),
+		implicit(1),
 		/**
 		 * Rule awaiting further identification during parsing.
 		 */
-		indeterminate(-1),
-		/**
-		 * Any non-terminal rule except the root rule.
-		 */
-		nonTerminal(1);
+		indeterminate(-1);
 		private final int ranking;
 
 		private Type(int ranking) {
@@ -136,10 +112,10 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 	@Override
 	public String toString() {
 		switch (t) {
-		case backreference:
-			return id;
-		default:
+		case explicit:
 			return '<' + id + '>' + rep;
+		default:
+			return id;
 		}
 	}
 

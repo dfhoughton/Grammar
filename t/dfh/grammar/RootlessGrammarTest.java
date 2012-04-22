@@ -120,7 +120,7 @@ public class RootlessGrammarTest {
 		Grammar g = new Grammar(rules);
 		g.defineRule("q", Pattern.compile("[\"']"));
 		g.defineRule("text", new DeferredRuleTest.ARule(new Label(
-				Type.terminal, "text")));
+				Type.explicit, "text")));
 		String s = "'ned'";
 		Options options = new Options();
 		options.study(false);

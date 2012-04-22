@@ -146,7 +146,7 @@ public class TokenRule<K extends Token> extends Rule implements Cloneable,
 	 * @param test
 	 */
 	public TokenRule(TokenTest<K> test) {
-		this(new Label(Type.terminal, test.id()), test);
+		this(new Label(Type.explicit, test.id()), test);
 	}
 
 	@Override

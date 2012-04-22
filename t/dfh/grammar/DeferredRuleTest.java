@@ -137,7 +137,7 @@ public class DeferredRuleTest {
 		};
 		Grammar g = new Grammar(rules);
 		g.defineRule("q", Pattern.compile("[\"']"));
-		g.defineRule("text", new ARule(new Label(Type.terminal, "text")));
+		g.defineRule("text", new ARule(new Label(Type.explicit, "text")));
 		String s = "'ned'";
 		Options options = new Options();
 		options.study(false);
@@ -155,7 +155,7 @@ public class DeferredRuleTest {
 		};
 		Grammar g = new Grammar(rules);
 		g.defineRule("q", Pattern.compile("[\"']"));
-		g.defineRule("text", new ARule(new Label(Type.terminal, "foo")));
+		g.defineRule("text", new ARule(new Label(Type.explicit, "foo")));
 		String s = "'ned'";
 		Options options = new Options();
 		options.study(false);

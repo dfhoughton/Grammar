@@ -162,8 +162,8 @@ public class Compiler {
 					continue; // blank line or comment
 				Label l = (Label) list.removeFirst();
 				if (r == null) {
-					if (l.t != Type.root) {
-						l = new Label(Type.root, l.id);
+					if (l.t != Type.explicit) {
+						l = new Label(Type.explicit, l.id);
 					}
 					r = l;
 				}
@@ -213,7 +213,7 @@ public class Compiler {
 				Label l = e.getKey();
 				Match condition = conditionMap.get(l);
 				i.remove();
-				Type t = rf instanceof Regex ? Type.terminal : Type.literal;
+				Type t = Type.explicit;
 				l = new Label(t, l.id);
 				terminals.add(l);
 				Rule ru;
@@ -250,7 +250,7 @@ public class Compiler {
 						rules.put(ru.label(), ru);
 						terminals.add(ru.label());
 					} else {
-						l = new Label(Type.terminal, l.id);
+						l = new Label(Type.explicit, l.id);
 						DeferredDefinitionRule ddr = new DeferredDefinitionRule(
 								l);
 						ddr.generation = gen;
@@ -418,7 +418,8 @@ public class Compiler {
 		Map<Label, CyclicRule> cycleMap = new HashMap<Label, CyclicRule>(
 				cycle.size() * 2);
 		for (Entry<Label, List<RuleFragment>> e : cycle) {
-			CyclicRule ddr = new CyclicRule(e.getKey());
+			CyclicRule ddr = new CyclicRule(new Label(Type.explicit,
+					e.getKey().id));
 			cycleMap.put(e.getKey(), ddr);
 		}
 		for (Entry<Label, List<RuleFragment>> e : cycle) {
@@ -659,11 +660,11 @@ public class Compiler {
 				sr = reverse(sr);
 			}
 			String id = (af.positive ? '~' : '!') + (af.forward ? "+" : "-")
-					+ subLabel(sr);
+					+ sr.label().toString();
 			if (!af.forward)
 				// strip off redundant ":r" to improve logging
 				id = id.substring(0, id.length() - 2);
-			Label l = new Label(Type.nonTerminal, id);
+			Label l = new Label(Type.implicit, id);
 			Assertion a = new Assertion(l, sr, af.positive, af.forward);
 			if (subDescription != null)
 				a.setSubDescription(subDescription);
@@ -679,43 +680,43 @@ public class Compiler {
 				r = cycleMap.get(l);
 			if (l.rep.redundant())
 				return r;
-			Label label = new Label(Type.nonTerminal, l.toString());
+			Label label = new Label(Type.explicit, l.toString());
 			r = new RepetitionRule(label, r, l.rep, new HashSet<String>(0));
 			setCondition(condition, r);
 			return r;
 		} else if (rf instanceof LiteralFragment) {
 			LiteralFragment lf = (LiteralFragment) rf;
-			Label l = new Label(Type.literal, '"' + lf.literal + '"');
+			Label l = new Label(Type.implicit, '"' + lf.literal + '"');
 			Rule r = new LiteralRule(l, lf.literal);
 			if (lf.rep.redundant()) {
 				setCondition(condition, r);
 				return r;
 			}
-			l = new Label(Type.nonTerminal, lf.toString());
+			l = new Label(Type.implicit, lf.toString());
 			r = new RepetitionRule(l, r, lf.rep, new HashSet<String>(0));
 			setCondition(condition, r);
 			return r;
 		} else if (rf instanceof BackReferenceFragment) {
 			BackReferenceFragment brf = (BackReferenceFragment) rf;
-			Label l = new Label(Type.backreference, rf.toString());
+			Label l = new Label(Type.implicit, rf.toString());
 			Rule r = new BackReferenceRule(l, brf.reference);
 			return r;
 		} else if (rf instanceof UplevelBackReferenceFragment) {
 			UplevelBackReferenceFragment ubf = (UplevelBackReferenceFragment) rf;
-			Label l = new Label(Type.uplevelbackreference, rf.toString());
+			Label l = new Label(Type.implicit, rf.toString());
 			UpLevelBackReferenceRule ulbr = new UpLevelBackReferenceRule(l,
 					ubf.reference, ubf.level);
 			Rule r = ulbr;
 			if (ubf.rep.redundant())
 				return r;
-			l = new Label(Type.nonTerminal, ubf.toString());
+			l = new Label(Type.implicit, ubf.toString());
 			Set<String> tags = new HashSet<String>(2);
 			r = new UncachedRepetitionRule(l, r, ubf.rep, tags);
 			tags.add(r.uniqueId());
 			return r;
 		} else if (rf instanceof Regex) {
 			Regex rx = (Regex) rf;
-			Label l = new Label(Type.terminal, '/' + rf.toString() + '/');
+			Label l = new Label(Type.implicit, '/' + rf.toString() + '/');
 			Rule r = new LeafRule(l, rx.re, rx.reversible);
 			setCondition(condition, r);
 			return r;
@@ -780,10 +781,10 @@ public class Compiler {
 					b.append('|');
 				else
 					nonInitial = true;
-				b.append(subLabel(r));
+				b.append(r.label().toString());
 			}
 			b.append(']');
-			Label l = new Label(Type.nonTerminal, b.toString());
+			Label l = new Label(Type.implicit, b.toString());
 			r = new AlternationRule(l, alternates.toArray(new Rule[alternates
 					.size()]), tagMap);
 			if (gf.rep.redundant()) { // TODO confirm that this won't be true
@@ -791,7 +792,7 @@ public class Compiler {
 				return r;
 			}
 		}
-		Label l = new Label(Type.nonTerminal, subLabel(r) + gf.rep);
+		Label l = new Label(Type.implicit, r.label().toString() + gf.rep);
 		r = new RepetitionRule(l, r, gf.rep, tags);
 		setCondition(condition, r);
 		return r;
@@ -837,14 +838,14 @@ public class Compiler {
 				tagMap.put(children[i].uniqueId(),
 						ar.tagMap.get(ar.alternates[i].uniqueId()));
 			}
-			Label l = new Label(Type.nonTerminal, id);
+			Label l = new Label(Type.implicit, id);
 			ru = new AlternationRule(l, children, tagMap);
 		} else if (sr instanceof Assertion) {
 			Assertion as = (Assertion) sr;
 			Rule child = as.forward ? reverse(as.r) : as.r;
 			id = (as.positive ? '~' : '!') + (as.forward ? "-" : "+")
-					+ subLabel(child);
-			Label l = new Label(Type.nonTerminal, id);
+					+ child.label().toString();
+			Label l = new Label(Type.implicit, id);
 			ru = new Assertion(l, child, as.positive, !as.forward);
 		} else if (sr instanceof BackReferenceRule) {
 			ru = sr;
@@ -857,13 +858,13 @@ public class Compiler {
 						"terminal rule "
 								+ lr
 								+ " has not been marked as reversible; it cannot be used in a backwards assertion");
-			Label l = new Label(Type.terminal, id);
+			Label l = new Label(Type.implicit, id);
 			ru = new LeafRule(l, lr.p, true);
 		} else if (sr instanceof LiteralRule) {
 			LiteralRule lr = (LiteralRule) sr;
 			ReversedCharSequence rcs = new ReversedCharSequence(lr.literal);
 			String s = rcs.toString();
-			Label l = new Label(Type.terminal, id);
+			Label l = new Label(Type.implicit, id);
 			ru = new LiteralRule(l, s);
 		} else if (sr instanceof RepetitionRule) {
 			RepetitionRule rr = (RepetitionRule) sr;
@@ -871,7 +872,7 @@ public class Compiler {
 			// check for redundant repetition and eliminate
 			if (rr.repetition.redundant())
 				return child;
-			Label l = new Label(Type.nonTerminal, id);
+			Label l = new Label(Type.implicit, id);
 			ru = new RepetitionRule(l, child, rr.repetition,
 					new HashSet<String>(rr.alternateTags));
 		} else if (sr instanceof SequenceRule) {
@@ -893,7 +894,7 @@ public class Compiler {
 			for (int i = 0; i < children.length; i++) {
 				children[i] = reverse(sqr.sequence[children.length - i - 1]);
 			}
-			Label l = new Label(Type.nonTerminal, id);
+			Label l = new Label(Type.implicit, id);
 			List<Set<String>> tagList = new ArrayList<Set<String>>(sqr.tagList);
 			Collections.reverse(tagList);
 			ru = new SequenceRule(l, children, tagList);
@@ -902,7 +903,7 @@ public class Compiler {
 				ru = reversedCyclicRuleMap.get(sr.label);
 			} else {
 				CyclicRule cr = (CyclicRule) sr;
-				Label l = new Label(sr.label.t, id);
+				Label l = new Label(Type.explicit, id);
 				cr = new CyclicRule(l);
 				reversedCyclicRuleMap.put(sr.label, cr);
 				cr.setRule(reverse(((CyclicRule) sr).r));
@@ -944,10 +945,6 @@ public class Compiler {
 		if (c instanceof LogicalCondition)
 			return ((LogicalCondition) c).duplicate();
 		return c;
-	}
-
-	private String subLabel(Rule r) {
-		return r.generation == -1 ? r.label().id : r.label().toString();
 	}
 
 	private Rule makeSequence(Label label, List<RuleFragment> fragments,
@@ -1000,10 +997,10 @@ public class Compiler {
 				nonInitial = true;
 			tagList.add(tagSet);
 			sequence[index++] = r;
-			b.append(subLabel(r));
+			b.append(r.label().toString());
 		}
 		b.append(']');
-		Label l = new Label(Type.nonTerminal, b.toString());
+		Label l = new Label(Type.implicit, b.toString());
 		Rule r = new SequenceRule(l, sequence, tagList);
 		setCondition(condition, r);
 		return r;

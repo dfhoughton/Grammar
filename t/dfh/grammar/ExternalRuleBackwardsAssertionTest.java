@@ -39,7 +39,7 @@ public class ExternalRuleBackwardsAssertionTest {
 	@Test
 	public void compilationTest() {
 		Map<String, Rule> map = new HashMap<String, Rule>(1);
-		map.put("r", new TestRule(new Label(Type.literal, "foo"), "foo"));
+		map.put("r", new TestRule(new Label(Type.explicit, "foo"), "foo"));
 		String[] rules = {
 		//
 		"ROOT = ~- <r> 'bar'",//
@@ -54,7 +54,7 @@ public class ExternalRuleBackwardsAssertionTest {
 	@Test
 	public void simpleTest() {
 		Map<String, Rule> map = new HashMap<String, Rule>(1);
-		map.put("r", new TestRule(new Label(Type.literal, "foo"), "foo"));
+		map.put("r", new TestRule(new Label(Type.explicit, "foo"), "foo"));
 		String[] rules = {
 		//
 		"ROOT = ~- <r> 'bar'",//
@@ -71,7 +71,7 @@ public class ExternalRuleBackwardsAssertionTest {
 	@Test
 	public void negativeTest() {
 		Map<String, Rule> map = new HashMap<String, Rule>(1);
-		map.put("r", new TestRule(new Label(Type.literal, "foo"), "foo"));
+		map.put("r", new TestRule(new Label(Type.explicit, "foo"), "foo"));
 		String[] rules = {
 		//
 		"ROOT = !- <r> 'bar'",//
@@ -88,7 +88,7 @@ public class ExternalRuleBackwardsAssertionTest {
 	@Test
 	public void variableWidthTest1() {
 		Map<String, Rule> map = new HashMap<String, Rule>(1);
-		map.put("r", new TestRule(new Label(Type.literal, "foo"), "foo"));
+		map.put("r", new TestRule(new Label(Type.explicit, "foo"), "foo"));
 		String[] rules = {
 		//
 		"ROOT = ~- <r>{2,} 'bar'",//
@@ -106,7 +106,7 @@ public class ExternalRuleBackwardsAssertionTest {
 	@Test
 	public void variableWidthTest2() {
 		Map<String, Rule> map = new HashMap<String, Rule>(1);
-		map.put("r", new TestRule(new Label(Type.literal, "foo"), "foo"));
+		map.put("r", new TestRule(new Label(Type.explicit, "foo"), "foo"));
 		String[] rules = {
 		//
 		"ROOT = ~- <r>{4,} 'bar'",//
@@ -123,7 +123,7 @@ public class ExternalRuleBackwardsAssertionTest {
 	@Test
 	public void variableWidthTest3() {
 		Map<String, Rule> map = new HashMap<String, Rule>(1);
-		map.put("r", new TestRule(new Label(Type.literal, "foo"), "foo"));
+		map.put("r", new TestRule(new Label(Type.explicit, "foo"), "foo"));
 		String[] rules = {
 		//
 		"ROOT = !- <r>{4,} 'bar'",//

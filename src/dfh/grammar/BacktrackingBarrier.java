@@ -29,12 +29,11 @@ public class BacktrackingBarrier extends Rule implements Serializable,
 	/**
 	 * {@link Label} used by all : barriers.
 	 */
-	public static final Label SINGLE_COLON_LABEL = new Label(Type.nonTerminal,
-			":");
+	public static final Label SINGLE_COLON_LABEL = new Label(Type.implicit, ":");
 	/**
 	 * {@link Label} used by all :: barriers.
 	 */
-	public static final Label DOUBLE_COLON_LABEL = new Label(Type.nonTerminal,
+	public static final Label DOUBLE_COLON_LABEL = new Label(Type.implicit,
 			"::");
 	/**
 	 * Whether this is a single or double colon barrier.

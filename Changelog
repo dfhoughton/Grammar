@@ -1,4 +1,5 @@
 2.04
+  * simplified label types and improved match log output
 
 2.03, 7 April 2012
   * fixed bug in reversed token rules

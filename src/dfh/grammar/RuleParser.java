@@ -82,11 +82,7 @@ public class RuleParser {
 			if (remainder.length() == 0)
 				throw new GrammarException("no rule body provided in " + line);
 			LinkedList<RuleFragment> parse = new LinkedList<RuleFragment>();
-			Type t;
-			if (id.equals(Label.ROOT)) {
-				t = Type.root;
-			} else
-				t = Type.indeterminate;
+			Type t = Type.explicit;
 			// we've parsed out the rule label
 			parse.add(new Label(t, id));
 			int[] offset = { 0 };
@@ -640,10 +636,7 @@ public class RuleParser {
 		if (m.lookingAt()) {
 			offset[0] += m.end();
 			String id = m.group(1);
-			if (id.equals(Label.ROOT))
-				return new Label(Label.Type.root, id);
-			else
-				return new Label(Label.Type.indeterminate, id);
+			return new Label(Label.Type.indeterminate, id);
 		} else
 			throw new GrammarException("ill-formed rule: " + body);
 	}

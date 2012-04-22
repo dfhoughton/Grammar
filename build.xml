@@ -61,7 +61,9 @@
 		<tar destfile="${build.dir}/grammar-${version}.tgz" compression="gzip">
 			<tarfileset dir="${basedir}">
 				<include name="README" />
+				<include name="NOTICE" />
 				<include name="VERSION" />
+				<include name="TODO" />
 				<include name="lgpl.txt" />
 				<include name="build.xml" />
 				<include name="t/**/*.java" />
