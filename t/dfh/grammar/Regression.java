@@ -73,4 +73,10 @@ public class Regression {
 		assertNotNull("found initial word break in backwards assertion", g
 				.matches("a").match());
 	}
+	
+	@Test
+	public void quantifiedRegex() {
+		Grammar g = new Grammar("rule = /a/? '1'");
+		assertNotNull(g.matches("1").match());
+	}
 }

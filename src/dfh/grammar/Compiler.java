@@ -137,7 +137,7 @@ public class Compiler {
 			throws GrammarException {
 		String line = null;
 		if (precompiledRules == null)
-			precompiledRules = new HashMap<String, Rule>(0);
+			precompiledRules = Collections.emptyMap();
 		else {
 			// clone rules to protect them from reuse
 			for (Entry<String, Rule> e : precompiledRules.entrySet()) {
@@ -718,6 +718,12 @@ public class Compiler {
 			Regex rx = (Regex) rf;
 			Label l = new Label(Type.implicit, '/' + rf.toString() + '/');
 			Rule r = new LeafRule(l, rx.re, rx.reversible);
+			if (rx.rep.redundant()) {
+				setCondition(condition, r);
+				return r;
+			}
+			l = new Label(Type.implicit, rx.toString());
+			r = new RepetitionRule(l, r, rx.rep, new HashSet<String>(0));
 			setCondition(condition, r);
 			return r;
 		}
