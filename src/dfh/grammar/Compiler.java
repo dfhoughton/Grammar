@@ -116,6 +116,7 @@ public class Compiler {
 			return false;
 		}
 	};
+	private static final Set<String> EMPTY_STR_SET = Collections.emptySet();
 	private static Grammar cg;
 	static {
 		try {
@@ -681,7 +682,7 @@ public class Compiler {
 			if (l.rep.redundant())
 				return r;
 			Label label = new Label(Type.explicit, l.toString());
-			r = new RepetitionRule(label, r, l.rep, new HashSet<String>(0));
+			r = new RepetitionRule(label, r, l.rep, EMPTY_STR_SET);
 			setCondition(condition, r);
 			return r;
 		} else if (rf instanceof LiteralFragment) {
@@ -693,7 +694,7 @@ public class Compiler {
 				return r;
 			}
 			l = new Label(Type.implicit, lf.toString());
-			r = new RepetitionRule(l, r, lf.rep, new HashSet<String>(0));
+			r = new RepetitionRule(l, r, lf.rep, EMPTY_STR_SET);
 			setCondition(condition, r);
 			return r;
 		} else if (rf instanceof BackReferenceFragment) {
@@ -723,7 +724,7 @@ public class Compiler {
 				return r;
 			}
 			l = new Label(Type.implicit, rx.toString());
-			r = new RepetitionRule(l, r, rx.rep, new HashSet<String>(0));
+			r = new RepetitionRule(l, r, rx.rep, EMPTY_STR_SET);
 			setCondition(condition, r);
 			return r;
 		}
@@ -780,7 +781,7 @@ public class Compiler {
 					}
 				} else {
 					r = makeSequence(alternate, cycleMap, null);
-					tagMap.put(r.uniqueId(), new HashSet<String>(0));
+					tagMap.put(r.uniqueId(), EMPTY_STR_SET);
 				}
 				alternates.add(r);
 				if (nonInitial)
@@ -990,11 +991,11 @@ public class Compiler {
 									null);
 					}
 				} else {
-					tagSet = new HashSet<String>(0);
+					tagSet = EMPTY_STR_SET;
 					r = makeSingle(rf, cycleMap, null);
 				}
 			} else {
-				tagSet = new HashSet<String>(0);
+				tagSet = EMPTY_STR_SET;
 				r = makeSingle(rf, cycleMap, null);
 			}
 			if (nonInitial)
