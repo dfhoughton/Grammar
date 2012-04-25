@@ -28,31 +28,45 @@
 		to which debugging information should be sent and the grammar will
 		provide a trace of the entire matching process. This is in effect a
 		very detailed, human readable log. E.g.,
-	<pre>		String[] rules = {
-		//
-		"ROOT = 'a' | 'b'",//
-		};
-		Grammar g = new Grammar(rules);
-		g.lookingAt("babs", <b>new Options().trace(System.err)</b>);</pre>
+	<pre>		Grammar g = new Grammar("babs = 'a' | 'b'");
+		Match m = g.lookingAt("babs", new Options().log(System.out)).match();
+		System.out.println(m);</pre>
 	produces
-	<pre class="results">&lt;ROOT&gt; at 0 (_"babs ")
+	<span class="fn">You may be confused by the <pre>result for &lt;babs&gt;
+	NO MATCH</pre>in the log output. Remember that the matcher is an iterator
+		over matches. It obtains the next match to show in preparation for the
+		next call of its <code>match()</code> method. In this case there is
+		only one match, so the matcher is prepared to return <code>null</code>
+		the next time it's called.
+	</span>
+	<pre class="results">matching &lt;babs&gt;
+	 at 0 (_"babs")
 stack:
-&lt;ROOT&gt; 0 :: 
+	&lt;babs&gt; 0
 
-&lt;"a"&gt; at 0 (_"babs ")
+matching "a"
+	 at 0 (_"babs")
 stack:
-&lt;"a"&gt; 0 :: &lt;ROOT&gt; 0 :: 
-post match:
-&lt;"a"&gt; at 0 (_"babs ") returning null
-stack:
-&lt;"a"&gt; 0 :: &lt;ROOT&gt; 0 :: 
+	&lt;babs&gt; 0 =&gt; "a" 0
+result for "a"
+	NO MATCH
 
-&lt;"b"&gt; at 0 (_"babs ")
+matching "b"
+	 at 0 (_"babs")
 stack:
-&lt;"b"&gt; 0 :: &lt;ROOT&gt; 0 :: 
-post match:
-&lt;"b"&gt; at 0 (_"babs ") returning ("b": 0, 1) = 'b'</pre>
-	and so forth.
+	&lt;babs&gt; 0 =&gt; "b" 0
+result for "b"
+	(0, 1) "b"
+result for &lt;babs&gt;
+	(0, 1) "b"
+
+matching &lt;babs&gt;
+	 at 0 (_"babs")
+stack:
+	&lt;babs&gt; 0
+result for &lt;babs&gt;
+	NO MATCH
+("a" | "b": 0, 1 [("b": 0, 1)])</pre>
 	</p>
 	<h2>Rightmost Match</h2>
 	<p>
