@@ -134,7 +134,7 @@ public class Compiler {
 	 * @throws GrammarException
 	 * @throws IOException
 	 */
-	public Compiler(LineReader reader, Map<String, Rule> precompiledRules)
+	protected Compiler(LineReader reader, Map<String, Rule> precompiledRules)
 			throws GrammarException {
 		String line = null;
 		if (precompiledRules == null)

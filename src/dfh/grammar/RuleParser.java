@@ -28,6 +28,12 @@ import dfh.grammar.Label.Type;
  */
 public class RuleParser {
 	/**
+	 * To ensure that this class is used only procedurally.
+	 */
+	private RuleParser() {
+	}
+
+	/**
 	 * Basic pattern of a labeled rule.
 	 */
 	private static final Pattern labelPattern = Pattern.compile("<(\\w++)>");
