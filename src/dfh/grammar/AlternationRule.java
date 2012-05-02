@@ -9,6 +9,7 @@
 package dfh.grammar;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -199,7 +200,9 @@ public class AlternationRule extends Rule implements Serializable,
 
 	@Override
 	public void addLabels(Match match, Set<String> labels) {
-		labels.addAll(tagMap.get(match.rule().uid()));
+		Collection<String> c = tagMap.get(match.rule().uid());
+		if (c != null)
+			labels.addAll(c);
 	}
 
 	@Override

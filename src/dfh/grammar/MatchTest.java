@@ -8,6 +8,8 @@
  */
 package dfh.grammar;
 
+import java.io.Serializable;
+
 /**
  * For testing whether a {@link Match} meets some arbitrary test.
  * <p>
@@ -16,7 +18,7 @@ package dfh.grammar;
  * @author David Houghton
  * 
  */
-public interface MatchTest {
+public interface MatchTest extends Serializable {
 	/**
 	 * Maximally flexible test prototype.
 	 * 
