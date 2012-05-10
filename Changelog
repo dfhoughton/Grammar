@@ -1,3 +1,5 @@
+2.05
+
 2.04, 10 May 2012
   * simplified label types and improved match log output
   * fixed bug whereby quantifiers on in-line regexes were being ignored
