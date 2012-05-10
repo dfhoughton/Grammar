@@ -30,6 +30,8 @@ public abstract class LogicalCondition extends Condition implements
 	private static final long serialVersionUID = 6L;
 	protected final Condition[] subconditions;
 	public static final MatchTest expOrGroupTest = new MatchTest() {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public boolean test(Match m) {
 			return m.hasLabel("exp") || m.hasLabel("group")

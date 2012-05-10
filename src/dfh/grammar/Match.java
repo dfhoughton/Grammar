@@ -30,6 +30,8 @@ public class Match {
 	 * {@link #get(MatchTest)} and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest TERMINAL = new MatchTest() {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public boolean test(Match m) {
 			return m.isTerminal();
@@ -40,6 +42,8 @@ public class Match {
 	 * {@link #get(MatchTest)} and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest NON_TERMINAL = new MatchTest() {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public boolean test(Match m) {
 			return !m.isTerminal();
@@ -51,6 +55,8 @@ public class Match {
 	 * and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest NAMED = new MatchTest() {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public boolean test(Match m) {
 			return m.explicit();
@@ -62,6 +68,8 @@ public class Match {
 	 * {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest ANONYMOUS = new MatchTest() {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public boolean test(Match m) {
 			return !m.explicit();
@@ -72,6 +80,8 @@ public class Match {
 	 * {@link #get(MatchTest)} and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest ALL = new MatchTest() {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public boolean test(Match m) {
 			return true;
@@ -82,6 +92,8 @@ public class Match {
 	 * {@link #get(MatchTest)} and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest ZERO_WIDTH = new MatchTest() {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public boolean test(Match m) {
 			return m.zeroWidth();
@@ -92,6 +104,8 @@ public class Match {
 	 * {@link #get(MatchTest)} and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest WIDE = new MatchTest() {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public boolean test(Match m) {
 			return !m.zeroWidth();
@@ -102,6 +116,8 @@ public class Match {
 	 * in {@link #get(MatchTest)} and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest WIDE_LEAF = new MatchTest() {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public boolean test(Match m) {
 			return m.isTerminal() && !m.zeroWidth();
@@ -673,6 +689,8 @@ public class Match {
 	 */
 	public List<Match> get(final String rule) {
 		return get(new MatchTest() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public boolean test(Match m) {
 				return m.hasLabel(rule);
@@ -691,6 +709,8 @@ public class Match {
 	 */
 	public Match first(final String rule) {
 		return first(new MatchTest() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public boolean test(Match m) {
 				return m.hasLabel(rule);
@@ -707,6 +727,8 @@ public class Match {
 	 */
 	public Match ancestor(final String rule) {
 		return ancestor(new MatchTest() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public boolean test(Match m) {
 				return m.hasLabel(rule);
@@ -723,6 +745,8 @@ public class Match {
 	 */
 	public List<Match> ancestors(final String rule) {
 		return ancestors(new MatchTest() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public boolean test(Match m) {
 				return m.hasLabel(rule);
