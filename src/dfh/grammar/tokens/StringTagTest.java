@@ -24,7 +24,6 @@ import dfh.grammar.Rule;
  * 
  * @author David F. Houghton - Mar 29, 2012
  * 
- * @param <T>
  */
 public class StringTagTest implements TokenTest<StringTaggedToken> {
 	private final String t;

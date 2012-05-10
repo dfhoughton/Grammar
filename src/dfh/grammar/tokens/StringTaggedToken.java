@@ -17,7 +17,6 @@ package dfh.grammar.tokens;
  * 
  * @author David F. Houghton - Mar 29, 2012
  * 
- * @param <T>
  */
 public class StringTaggedToken extends Token {
 

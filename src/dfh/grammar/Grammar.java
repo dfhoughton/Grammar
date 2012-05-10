@@ -336,8 +336,7 @@ public class Grammar implements Serializable {
 	 */
 	protected Rule root;
 	/**
-	 * Collection of labels for rules of {@link Type#terminal} or
-	 * {@link Type#literal}.
+	 * Collection of labels for rules.
 	 */
 	protected final Map<String, Label> terminalLabelMap;
 	/**
