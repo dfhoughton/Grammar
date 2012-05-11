@@ -126,8 +126,8 @@
 	<h4>
 		<code>get(MatchTest)</code>
 	</h4>
-		<p>This method returns a list of all nodes matching the given
-			test. Children are returned before parents.</p>
+	<p>This method returns a list of all nodes matching the given test.
+		Children are returned before parents.</p>
 	<h4>
 		<code>first(String)</code>
 		,
@@ -172,20 +172,18 @@
 	<h4>
 		<code>children()</code>
 	</h4>
-	<p>
-	The children of the match.
-	</p>
+	<p>The children of the match.</p>
 	<h4>
 		<code>parent()</code>
 	</h4>
 	<p>
-		The parent node of the match in the match tree.
-		<span class="fn">Nodes are not linked to their parents during the
-			matching process. This step is performed immediately before a match
-			is returned by a <code>find()</code>, <code>lookingAt()</code>, or <code>matches()</code>.
-			In the event that a match fails and rightmost matching is on (see
-			options in <a href="syntax.html">syntax</a>), the match tree of the
-			rightmost node will have its child-to-parent links completed.
+		The parent node of the match in the match tree. <span class="fn">Nodes
+			are not linked to their parents during the matching process. This
+			step is performed immediately before a match is returned by a <code>find()</code>,
+			<code>lookingAt()</code>, or <code>matches()</code>. In the event
+			that a match fails and rightmost matching is on (see options in <a
+			href="syntax.html">syntax</a>), the match tree of the rightmost node
+			will have its child-to-parent links completed.
 		</span>
 	</p>
 	<h4>
@@ -197,17 +195,17 @@
 		This method is somewhat similar to
 		<code>closest</code>
 		: it returns the nearest single node to the current node matching the
-		test, but
-		<em>ascending</em> the match tree rather than descending, moving
-		towards the root rather than the leaves.
+		test, but <em>ascending</em> the match tree rather than descending,
+		moving towards the root rather than the leaves.
 	</p>
 	<h4>
 		<code>ancestors(String)</code>
 		,
 		<code>ancestors(MatchTest)</code>
 	</h4>
-	<p>This method climbs the match tree from the current node returning a
-		list of nodes matching the test in the order of their discovery.</p>
+	<p>This method climbs the match tree from the current node
+		returning a list of nodes matching the test in the order of their
+		discovery.</p>
 	<h4>
 		<code>leaves()</code>
 	</h4>
@@ -217,7 +215,8 @@
 		objects
 	</h3>
 	<p>
-	<code>MatchTest</code> is a simple, one method interface:
+		<code>MatchTest</code>
+		is a simple, one method interface:
 	</p>
 	<pre>public interface MatchTest {
 	boolean test(Match m);
@@ -234,7 +233,18 @@
 				return m.hasLabel(rule);
 			}
 		});
-	}</pre>
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	</pre>
 	<p>
 		You can gain some efficiency by pre-compiling all the
 		<code>MatchTests</code>
@@ -297,5 +307,125 @@
 		advance the match offset at all. These are such things as empty string
 		literals, trivially matching regexes, assertions, and backtracking
 		barriers.</p>
+	<h2>
+		<code>dfh.treepath.MatchPath</code>
+	</h2>
+	<p>
+		I have written a generic tree querying library called
+		<code>dfh.treepath</code>
+		. It is similar to XPath in most respects, but it provides additional
+		axes like
+		<code>leaf</code>
+		and other extensions. I wrote it in order to generate a means of
+		querying
+		<code>dfh.grammar</code>
+		parse trees, so it provides all the facilities one needs to navigate
+		<code>Match</code>
+		trees in a concise, declarative fashion. The particular class one uses
+		for
+		<code>Match</code>
+		trees is called
+		<code>dfh.treepath.MatchPath</code>
+		. For example,
+	</p>
+	<pre>MatchPath mp = MatchPath.standard();     // use the standard singleton MatchPath
+Path&lt;Match&gt; p = mp.path(".//foo/&gt;bar[@group = 'quux' and ../following-sibling::*[0][@length = 2]]");
+List&lt;Match&gt; quuxBars = p.select(m);      // m is a Match</pre>
+	<p>
+		Here is the equivalent query using
+		<code>MatchTest</code>
+		objects.
+	</p>
+	<pre>Set&lt;Match&gt; set = new LinkedHashSet&lt;Match&gt;();
+final MatchTest worthLookingAt = new MatchTest() {
+    @Override
+    public boolean test(Match m) {
+        return !(m.zeroWidth() || m.group().matches("//s++"));
+    }
+};
+MatchTest fooTest = new MatchTest() {
+    @Override
+    public boolean test(Match m) {
+        Match n = m;
+        while (n != null) {
+            if (!worthLookingAt.test(n))
+                return false;
+            n = n.parent();
+        }
+        return m.hasLabel("foo");
+    }
+};
+List&lt;Match&gt; allFoos = m.get(fooTest);
+MatchTest mt = new MatchTest() {
+    @Override
+    public boolean test(Match m) {
+        if (m.hasLabel("bar") &amp;&amp; m.group().equals("quux")) {
+            Match n = m;
+            while (n != null) {
+                if (!worthLookingAt.test(n))
+                    return false;
+                n = n.parent();
+            }
+            Match p = m.parent();
+            if (p != null) {
+                Match gp = p.parent();
+                if (gp != null) {
+                    boolean found = false;
+                    for (Match c : gp.children()) {
+                        if (!worthLookingAt.test(c))
+                            continue;
+                        if (found) {
+                            return c.length() == 2;
+                        }
+                        found = c == p;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+};
+for (Match foo : allFoos)
+    set.addAll(foo.closest(mt));
+List&lt;Match&gt; quuxBars = new ArrayList&lt;Match&gt;(set);</pre>
+	<p>You can see the advantage of using tree path expressions. Tree
+		path expressions will be somewhat less efficient -- they will walk
+		more nodes and create more objects and they require compilation -- but
+		if you find yourself writing complex code and are not desperate for
+		speed, they are the way to go.</p>
+	<p>
+		You will see in the example code above that a great deal of effort is
+		spent determining which nodes are ignorable. This is one of the chief
+		advantages of TreePath when dealing with
+		<code>Match</code>
+		parse trees. Grammars tend to produce a lot of nodes -- assertions,
+		quantified expressions that matched nothing, barriers -- that are of
+		no interest. If you use a TreePath
+		<code>Forester</code>
+		--
+		<code>MatchPath</code>
+		is a
+		<code>Forester</code>
+		, an object that understands trees -- you can construct it with a set
+		of tests specifying types of node to ignore. The standard
+		<code>MatchPath</code>
+		object ignores zero-width nodes and whitespace. If this is not what
+		you want, construct some new tests, or if you want to ignore nothing,
+		construct a
+		<code>MatchPath</code>
+		using the zero-argument constructor.
+	</p>
+	<pre>MatchPath mp = new MatchPath(new NodeTest&lt;Match&gt;() {
+    @Override
+    public boolean passes(Match n, Index&lt;Match&gt; i) {
+        return n.group().startsWith("foo");
+    }
+}); // we ignore only matches whose group starts with "foo"</pre>
+	<p>
+		For more information about TreePath, please look at its documentation.
+		This library is not included with
+		<code>dfh.grammar</code>
+		but must be downloaded or cloned separately.
+	</p>
 </body>
 </html>
