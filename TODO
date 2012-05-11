@@ -5,7 +5,7 @@ section at the end of the document.
 . add zero-width optimizations to conditionalized leaf rules
 . allow notation to selectively disable studying of certain expressions
 . clean up uid() uniqueId() business
-. create xpath-like convention for searching matches
+* create xpath-like convention for searching matches
 . make sure conditionalized terminals are being cached properly
 . profile some matching to figure out what could be optimized
 . make Condition.copy() clone when possible
