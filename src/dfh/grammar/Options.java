@@ -20,7 +20,7 @@ import java.util.TreeMap;
  * @author David Houghton
  * 
  */
-public class Options {
+public class Options implements Cloneable {
 
 	/**
 	 * Whether matches may overlap.
@@ -161,6 +161,26 @@ public class Options {
 		this.start = options.start;
 		this.study = options.study;
 		this.trace = options.trace;
+	}
+
+	/**
+	 * Creates a clone of the input parameter.
+	 * 
+	 * @param o
+	 *            clone of parameter
+	 */
+	public Options(Options o) {
+		this.allowOverlap = o.allowOverlap;
+		this.end = o.end;
+		this.fatMemory = o.fatMemory;
+		this.keepRightmost = o.keepRightmost;
+		this.leanMemory = o.leanMemory;
+		this.longestMatch = o.longestMatch;
+		this.longStringLength = o.longStringLength;
+		this.maxRecursionDepth = o.maxRecursionDepth;
+		this.start = o.start;
+		this.study = o.study;
+		this.trace = o.trace;
 	}
 
 	/**
@@ -392,5 +412,10 @@ public class Options {
 			throw new GrammarException("longStringLength must be positive");
 		this.longStringLength = longStringLength;
 		return this;
+	}
+
+	@Override
+	public Object clone() {
+		return new Options(this);
 	}
 }

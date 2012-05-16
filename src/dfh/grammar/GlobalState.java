@@ -30,6 +30,7 @@ public class GlobalState {
 	public final CharSequence cs;
 	public final ReversedCharSequence rcs;
 	public final boolean isReversed;
+	public final int length;
 
 	/**
 	 * Constructor called in {@link Grammar} only.
@@ -55,6 +56,7 @@ public class GlobalState {
 		this.debug = gs.debug;
 		this.rcsEnd = gs.rcsEnd;
 		this.study = gs.study;
+		this.length = this.end - this.start;
 	}
 
 	/**
@@ -80,6 +82,7 @@ public class GlobalState {
 		this.debug = trace != null;
 		this.rcsEnd = rcs.translate(start) + 1;
 		this.study = study;
+		this.length = end - start;
 	}
 
 	/**

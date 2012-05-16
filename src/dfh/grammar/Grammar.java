@@ -798,7 +798,7 @@ public class Grammar implements Serializable {
 		checkComplete();
 		final GlobalState co = verifyOptions(cs, opt);
 		final boolean ltm = containsAlternation && opt.longestMatch();
-		final Map<Integer, CachedMatch>[] cache = offsetCache(opt);
+		final Map<Integer, CachedMatch>[] cache = offsetCache(opt, co.length);
 		final Set<Integer> startOffsets = startOffsets(cs, co, cache);
 		final Matcher m = root.matcher(co.start, cache, new DummyMatcher(co));
 		final LTMMatcher ltmm = ltm ? new LTMMatcher(m) : null;
@@ -913,7 +913,8 @@ public class Grammar implements Serializable {
 		checkComplete();
 		final GlobalState options = verifyOptions(s, opt);
 		final boolean ltm = containsAlternation && opt.longestMatch();
-		final Map<Integer, CachedMatch>[] cache = offsetCache(opt);
+		final Map<Integer, CachedMatch>[] cache = offsetCache(opt,
+				options.length);
 		List<Integer> list = new ArrayList<Integer>(startOffsets(s, options,
 				cache));
 		Collections.sort(list);
@@ -927,11 +928,13 @@ public class Grammar implements Serializable {
 	 * take place.
 	 * 
 	 * @param options
+	 * @param length
+	 *            length of character sequence
 	 * 
 	 * @return map from labels to sets of offsets where the associated rules are
 	 *         known not to match
 	 */
-	private Map<Integer, CachedMatch>[] offsetCache(Options options) {
+	private Map<Integer, CachedMatch>[] offsetCache(Options options, int length) {
 		if (initialRules == null) {
 			synchronized (this) {
 				// look for reversals
@@ -951,13 +954,13 @@ public class Grammar implements Serializable {
 		Map<Integer, CachedMatch>[] offsetCache = new Map[max + 1];
 		boolean lean = options.leanMemory, fat = options.fatMemory;
 		if (!(lean || fat))
-			fat = options.end - options.start < options.longStringLength;
+			fat = length < options.longStringLength;
 		for (int i = 0; i < offsetCache.length; i++) {
 			Map<Integer, CachedMatch> m;
 			if (lean)
 				m = new TreeMap<Integer, CachedMatch>();
 			else if (fat)
-				m = new MatchCache(options.end - options.start);
+				m = new MatchCache(length);
 			else
 				m = new HashMap<Integer, CachedMatch>();
 			offsetCache[i] = m;
@@ -1137,7 +1140,8 @@ public class Grammar implements Serializable {
 			throws GrammarException {
 		checkComplete();
 		final GlobalState options = verifyOptions(s, opt);
-		final Map<Integer, CachedMatch>[] cache = offsetCache(opt);
+		final Map<Integer, CachedMatch>[] cache = offsetCache(opt,
+				options.length);
 		final Set<Integer> startOffsets = startOffsets(s, options, cache);
 		final Matcher m = root.matcher(options.start, cache, new DummyMatcher(
 				options));
@@ -1335,8 +1339,10 @@ public class Grammar implements Serializable {
 		if (opt.start() > 0 && opt.start() >= s.length())
 			throw new GrammarException(
 					"start offset specified beyond end of string");
-		if (opt.end == -1)
+		if (opt.end == -1) {
+			opt = new Options(opt);
 			opt.end(s.length());
+		}
 		return new GlobalState(s, opt);
 	}
 
