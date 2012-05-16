@@ -1339,10 +1339,6 @@ public class Grammar implements Serializable {
 		if (opt.start() > 0 && opt.start() >= s.length())
 			throw new GrammarException(
 					"start offset specified beyond end of string");
-		if (opt.end == -1) {
-			opt = new Options(opt);
-			opt.end(s.length());
-		}
 		return new GlobalState(s, opt);
 	}
 

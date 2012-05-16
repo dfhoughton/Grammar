@@ -40,7 +40,8 @@ public class GlobalState {
 	 */
 	GlobalState(CharSequence cs, Options o) {
 		this(cs, new ReversedCharSequence(cs), false, o.allowOverlap, o.start,
-				o.end, o.maxRecursionDepth, o.trace, o.study, o.keepRightmost);
+				o.end == -1 || o.end > cs.length() ? cs.length() : o.end,
+				o.maxRecursionDepth, o.trace, o.study, o.keepRightmost);
 	}
 
 	private GlobalState(GlobalState gs) {
