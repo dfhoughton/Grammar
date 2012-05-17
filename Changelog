@@ -1,4 +1,8 @@
 2.05
+  * added numerous convenience methods to Match, so the various node testing
+    or fetching methods all have MatchTest, String, and Pattern variants
+  * fixed end offset bug preventing Options reuse in some cases
+  * make rules renamed in grammar composition still discoverable by old labels
 
 2.04, 10 May 2012
   * simplified label types and improved match log output
