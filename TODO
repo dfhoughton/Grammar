@@ -18,7 +18,7 @@ section at the end of the document.
 * make Options reusable
 . make convenience methods Match.closest(String) and Match.closest(Pattern)
 . added unit tests for Match.hasLabel(String), which appears to have a latent bug having to do with alternations
-. preserve original rule names as labels where necessary during grammar composition
+* preserve original rule names as labels where necessary during grammar composition
 . comment on PEG and Packrat in documentation
 . fix typos in documentation
 . edit grammar grammar in documentation

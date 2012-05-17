@@ -252,4 +252,15 @@ public class TerminalGrammarTest {
 		assertTrue("tag copied", s.indexOf("null") == -1);
 	}
 
+	@Test
+	public void labelTest() {
+		Grammar ga = new Grammar("foo = <a> 'bar'");
+		Grammar gb = new Grammar("foo = 'quux'");
+		ga.defineRule("a", gb);
+		String s = "quuxbar";
+		Match m = ga.matches(s).match();
+		assertNotNull(m);
+		assertTrue(m.children()[0].has("foo"));
+	}
+
 }

@@ -645,12 +645,20 @@ public abstract class Rule {
 		Rule rr = cycleMap.get(label().id);
 		if (rr == null) {
 			String id = label().id;
-			if (generation > -1 && knownLabels.contains(id))
+			boolean renamed = false;
+			if (generation > -1 && knownLabels.contains(id)) {
 				id = nameBase + ':' + id;
+				renamed = true;
+			}
 			Label l = new Label(label().t, id);
 			rr = deepCopy(l, nameBase, cycleMap, knownLabels, knownConditions);
 			if (labels != null)
 				rr.labels = new TreeSet<String>(labels);
+			if (renamed) {
+				if (rr.labels == null)
+					rr.labels = new TreeSet<String>();
+				rr.labels.add(label().id);
+			}
 			rr.setUid();
 			cycleMap.put(label().id, rr);
 			rr.generation = generation;
