@@ -7,18 +7,12 @@ section at the end of the document.
   this one.)
 . allow notation to selectively disable studying of certain expressions
 . clean up uid() uniqueId() business
-* create xpath-like convention for searching matches
 . make sure conditionalized terminals are being cached properly
 . profile some matching to figure out what could be optimized
 . make Condition.copy() clone when possible
 . add option to turn off condition testing
 . bail out of recursion via exception rather than the current laborious and expensive reeling in of failed tries
-* put tokenization handling into dfh.grammar
-* document new tokenization handling
-* make Options reusable
-* make convenience methods Match.closest(String) and Match.closest(Pattern)
 . added unit tests for Match.hasLabel(String), which appears to have a latent bug having to do with alternations
-* preserve original rule names as labels where necessary during grammar composition
 . comment on PEG and Packrat in documentation
 . fix typos in documentation
 . edit grammar grammar in documentation
@@ -78,3 +72,9 @@ COMPLETED
 * fix documentation of root rule
 * add more unit tests for grammar description after composition with tagging
 * clone terminal nodes before assigning parents
+* create xpath-like convention for searching matches
+* put tokenization handling into dfh.grammar
+* document new tokenization handling
+* make Options reusable
+* make convenience methods Match.closest(String) and Match.closest(Pattern)
+* preserve original rule names as labels where necessary during grammar composition
