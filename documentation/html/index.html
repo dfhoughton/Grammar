@@ -29,17 +29,14 @@
 		pattern matching facilities and craved the same for Java, the language
 		which is my bread and butter.
 	</p>
-	<p>
-		Java's character class syntax is fabulous. I love being able to
+	<p>Java's character class syntax is fabulous. I love being able to
 		combine character classes like sets. But Java regular expressions of
 		any size are unreadable, and there's no way to make them recursive.
 		Compositionality may be achieved to some extent by adding patterns
-		together like strings, but I wanted more. Being too lazy or selfish to
-		find someone else's solution<span class="fn">I love writing
-			code. Learning someone else's API is less thrilling.</span>, I decided to
-		write one myself. This library, which is still evolving but certainly
-		usable, is the product of this labor of obsession.
-	</p>
+		together like strings, but I wanted more. Since I prefer coding to
+		Googling for code, I decided to write one myself. This library, which
+		is still evolving but certainly usable, is the product of this labor
+		of obsession.</p>
 	<span id="toc"></span>
 	<h2>The Basic Idea</h2>
 	<div>
@@ -116,20 +113,24 @@
 		This is roughly the algorithm in a nutshell: The grammar compiles into
 		what I gather from poking about in Wikipedia is a <a
 			href="http://en.wikipedia.org/wiki/Recursive_descent_parser">recursive
-			descent parser</a>.<span class="fn">I am a linguist, not a
-			computer scientist. I hit upon this design by making the grammar work
-			in what I thought was the obvious way, not by studying parsing
-			theory. A computer scientist could probably better fit my algorithm
-			into a standard taxonomy.</span> Basically this is a finite state automaton
-		that consumes symbols as it moves over a symbol sequence. This
-		automaton examines symbols in two streams: the character sequence you
-		give it and a reversed version of this sequence for lookbehinds. To
-		accelerate matching, terminal matches are cached. Also, all rules
-		cache offsets at which they fail to match so they never attempt to
-		match at such offsets twice. Functionally identical rules share
-		caches, so, for example, a literal sub-rule in one rule will not
-		attempt to match where an identical literal from another rule has
-		already been tried.
+			descent parser</a>.<span class="fn">The <code>dfh.grammar</code>
+			formalism bears a resemblance to <a
+			href="http://en.wikipedia.org/wiki/Parsing_expression_grammar">parsing
+				expression grammar</a>, though its rules, aside from the first, are not
+			ordered, and its grammars may be ambiguous. It uses a caching
+			algorithm similar to that of <a href="http://bford.info/packrat/">packrat
+				parsers</a>, but it only stores the success or failure of matching for
+			non-terminal rules. For terminal rules, the entire match is cached.
+			This accelerates parsing without require exponential memory.
+		</span> Basically this is a finite state automaton that consumes symbols as
+		it moves over a symbol sequence. This automaton examines symbols in
+		two streams: the character sequence you give it and a reversed version
+		of this sequence for lookbehinds. To accelerate matching, terminal
+		matches are cached. Also, all rules cache offsets at which they fail
+		to match so they never attempt to match at such offsets twice.
+		Functionally identical rules share caches, so, for example, a literal
+		sub-rule in one rule will not attempt to match where an identical
+		literal from another rule has already been tried.
 	</p>
 	<h2>Why?</h2>
 	<div>
