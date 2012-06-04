@@ -29,7 +29,7 @@ public class Match {
 	 * {@link #get(MatchTest)} and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest TERMINAL = new MatchTest() {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
 
 		@Override
 		public boolean test(Match m) {
@@ -41,7 +41,7 @@ public class Match {
 	 * {@link #get(MatchTest)} and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest NON_TERMINAL = new MatchTest() {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
 
 		@Override
 		public boolean test(Match m) {
@@ -54,7 +54,7 @@ public class Match {
 	 * and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest NAMED = new MatchTest() {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
 
 		@Override
 		public boolean test(Match m) {
@@ -67,7 +67,7 @@ public class Match {
 	 * {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest ANONYMOUS = new MatchTest() {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
 
 		@Override
 		public boolean test(Match m) {
@@ -79,7 +79,7 @@ public class Match {
 	 * {@link #get(MatchTest)} and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest ALL = new MatchTest() {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
 
 		@Override
 		public boolean test(Match m) {
@@ -91,7 +91,7 @@ public class Match {
 	 * {@link #get(MatchTest)} and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest ZERO_WIDTH = new MatchTest() {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
 
 		@Override
 		public boolean test(Match m) {
@@ -103,7 +103,7 @@ public class Match {
 	 * {@link #get(MatchTest)} and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest WIDE = new MatchTest() {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
 
 		@Override
 		public boolean test(Match m) {
@@ -115,7 +115,7 @@ public class Match {
 	 * in {@link #get(MatchTest)} and {@link #passes(MatchTest)}.
 	 */
 	public static final MatchTest WIDE_LEAF = new MatchTest() {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
 
 		@Override
 		public boolean test(Match m) {

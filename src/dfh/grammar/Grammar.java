@@ -326,7 +326,7 @@ public class Grammar implements Serializable {
 		}
 	}
 
-	private static final long serialVersionUID = 6L;
+	private static final long serialVersionUID = 7L;
 	/**
 	 * {@link Label} of root {@link Rule}.
 	 */

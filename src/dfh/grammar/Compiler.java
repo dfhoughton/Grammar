@@ -66,9 +66,9 @@ public class Compiler {
 	 * conjunction rather than a conjunction of conjunctions.
 	 */
 	public static final MatchTest badMatch = new MatchTest() {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
 		MatchTest expTest = new MatchTest() {
-			private static final long serialVersionUID = 1L;
+			private static final long serialVersionUID = 2L;
 
 			@Override
 			public boolean test(Match m) {

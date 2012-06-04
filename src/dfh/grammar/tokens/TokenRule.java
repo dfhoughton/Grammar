@@ -37,7 +37,7 @@ import dfh.grammar.Rule;
 @Reversible
 public class TokenRule<K extends Token> extends Rule implements Cloneable,
 		Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	private class TokenMatcher extends Matcher {
 		private final Map<Integer, CachedMatch> cache;

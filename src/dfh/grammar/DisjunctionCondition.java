@@ -16,7 +16,7 @@ import java.util.List;
  *
  */
 public class DisjunctionCondition extends LogicalCondition {
-	private static final long serialVersionUID = 6L;
+	private static final long serialVersionUID = 7L;
 
 	public DisjunctionCondition(List<Condition> conditions) {
 		super(conditions);
