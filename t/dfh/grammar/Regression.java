@@ -1,6 +1,7 @@
 package dfh.grammar;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
@@ -73,10 +74,20 @@ public class Regression {
 		assertNotNull("found initial word break in backwards assertion", g
 				.matches("a").match());
 	}
-	
+
 	@Test
 	public void quantifiedRegex() {
 		Grammar g = new Grammar("rule = /a/? '1'");
 		assertNotNull(g.matches("1").match());
+	}
+
+	@Test
+	public void infiniteQuantification() {
+		Grammar g = new Grammar("rule = [ 'a'* | 'b'* ]+");
+		try {
+			g.matches("c").match();
+		} catch (GrammarException e) {
+			assertTrue(e.getMessage().startsWith("non-advancing repetition"));
+		}
 	}
 }

@@ -54,6 +54,10 @@ public class RepetitionRule extends Rule implements Serializable,
 				matchers.removeLast();
 				return true;
 			} else {
+				// catch things like foo = [ 'a'* | 'b'* ]+
+				if (n.end() == start && repetition.top == Integer.MAX_VALUE)
+					throw new GrammarException(
+							"non-advancing repetition in rule " + rule());
 				matched.add(n);
 				return false;
 			}
@@ -305,7 +309,8 @@ public class RepetitionRule extends Rule implements Serializable,
 	public String description(boolean inBrackets) {
 		StringBuilder b = new StringBuilder();
 		boolean hasTags = !(alternateTags == null || alternateTags.isEmpty());
-		boolean requiresBrackets = r instanceof SequenceRule || r instanceof AlternationRule || hasTags && !inBrackets;
+		boolean requiresBrackets = r instanceof SequenceRule
+				|| r instanceof AlternationRule || hasTags && !inBrackets;
 		if (requiresBrackets)
 			b.append('[');
 		if (hasTags) {
