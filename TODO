@@ -16,6 +16,7 @@ section at the end of the document.
 * comment on PEG and Packrat in documentation
 . fix typos in documentation
 . edit grammar grammar in documentation
+. add test for ['foo'*|'bar'*]* infinite loops
 
 COMPLETED
 =========
