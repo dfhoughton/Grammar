@@ -1,3 +1,5 @@
+2.06
+  
 2.05, 4 June 2012
   * added numerous convenience methods to Match, so the various node testing
     or fetching methods all have MatchTest, String, and Pattern variants
