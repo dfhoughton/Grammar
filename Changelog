@@ -3,6 +3,9 @@
     or fetching methods all have MatchTest, String, and Pattern variants
   * fixed end offset bug preventing Options reuse in some cases
   * make rules renamed in grammar composition still discoverable by old labels
+  * non-advancing repetition expressions -- ['a'*|'b'*]+, e.g. -- now throw an
+    error when they fail to advance rather than looping until the stack is
+    blown
 
 2.04, 10 May 2012
   * simplified label types and improved match log output
