@@ -17,6 +17,7 @@ section at the end of the document.
 . fix typos in documentation
 . edit grammar grammar in documentation
 * add test for ['foo'*|'bar'*]* infinite loops
+. turn off studying in all cases
 
 COMPLETED
 =========
