@@ -1,5 +1,6 @@
 2.06
   * turned off default studying for find()
+  * fixed bug in logging of quantified labels such as <s>?
   
 2.05, 4 June 2012
   * added numerous convenience methods to Match, so the various node testing

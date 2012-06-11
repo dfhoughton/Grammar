@@ -684,7 +684,8 @@ public class Compiler {
 				r = cycleMap.get(l);
 			if (l.rep.redundant())
 				return r;
-			Label label = new Label(Type.explicit, l.toString());
+			Label label = new Label(Type.implicit, new Label(Type.explicit,
+					l.id) + l.rep.toString());
 			r = new RepetitionRule(label, r, l.rep, EMPTY_STR_SET);
 			setCondition(condition, r);
 			return r;

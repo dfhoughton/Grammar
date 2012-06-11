@@ -19,7 +19,7 @@ section at the end of the document.
 * add test for ['foo'*|'bar'*]* infinite loops
 * turn off studying in all cases
 . implement automatic space insertion in sequences upon specification
-. examine logging of elements such as <s>?
+* examine logging of elements such as <s>?
 . fix asteriskQ test regression in ConditionTest
 
 COMPLETED

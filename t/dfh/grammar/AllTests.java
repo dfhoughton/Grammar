@@ -53,7 +53,8 @@ import org.junit.runners.Suite;
 		RootlessGrammarTest.class,//
 		TerminalMatchIndependence.class,//
 		TokenizationTest.class,//
-		OptionsTest.class//
+		OptionsTest.class,//
+		LoggingTest.class //
 })
 public class AllTests {
 }
