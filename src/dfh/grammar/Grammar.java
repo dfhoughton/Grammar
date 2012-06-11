@@ -716,7 +716,7 @@ public class Grammar implements Serializable {
 	 * @throws GrammarException
 	 */
 	public Matcher matches(CharSequence s) throws GrammarException {
-		return matches(s, new Options().study(false));
+		return matches(s, new Options());
 	}
 
 	/**
@@ -780,7 +780,7 @@ public class Grammar implements Serializable {
 	 * @throws GrammarException
 	 */
 	public Matcher lookingAt(CharSequence s) throws GrammarException {
-		return lookingAt(s, new Options().study(false));
+		return lookingAt(s, new Options());
 	}
 
 	/**
