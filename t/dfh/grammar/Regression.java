@@ -4,6 +4,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.junit.Test;
 
 public class Regression {
@@ -88,6 +92,54 @@ public class Regression {
 			g.matches("c").match();
 		} catch (GrammarException e) {
 			assertTrue(e.getMessage().startsWith("non-advancing repetition"));
+		}
+	}
+
+	@Test
+	public void asteriskQTest() throws GrammarException, IOException {
+		final boolean[] success = { false };
+		Runnable r = new Runnable() {
+
+			@Override
+			public void run() {
+				String[] rules = {
+						//
+						"<ROOT> = <a>*? (2)",//
+						"<a> = 'a'",//
+				};
+				Grammar g = new Grammar(rules);
+				g.defineCondition("2", new Condition() {
+					@Override
+					public boolean passes(Match m, Matcher n, CharSequence s) {
+						return m.end() - m.start() == 2;
+					}
+				});
+				String s = "aaaaaa a";
+				Options opt = new Options().study(false);
+				opt.longestMatch(false);
+				Matcher m = g.find(s, opt);
+				while (m.match() != null)
+					;
+				synchronized (success) {
+					success[0] = true;
+				}
+			}
+		};
+		final Thread t = new Thread(r);
+		t.start();
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				System.out.println("ping");
+				if (t.isAlive()) {
+					t.interrupt();
+				}
+			}
+		}, 2000);
+		synchronized (success) {
+			assertTrue(success[0]);
 		}
 	}
 }

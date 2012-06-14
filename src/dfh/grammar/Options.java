@@ -30,7 +30,7 @@ public class Options implements Cloneable {
 	 * Whether to study the character sequence before matching to accelerate the
 	 * matching of terminal rules.
 	 */
-	public static final boolean STUDY = false;
+	public static final boolean STUDY = true;
 	/**
 	 * Character offset at which to begin matching.
 	 */

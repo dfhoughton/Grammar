@@ -895,7 +895,7 @@ public class Grammar implements Serializable {
 	 * @throws GrammarException
 	 */
 	public Matcher find(CharSequence s) throws GrammarException {
-		return find(s, new Options());
+		return find(s, new Options().study(false));
 	}
 
 	/**
