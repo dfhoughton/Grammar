@@ -95,6 +95,7 @@ public class MismatchTest {
 		Matcher m = g.find(s, opt);
 		Match n = m.match();
 		assertNull("no match", n);
+		assertNotNull(m.rightmostMatch());
 		assertNotNull("rightmost has group", m.rightmostMatch().group());
 	}
 }

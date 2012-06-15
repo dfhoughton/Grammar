@@ -116,6 +116,20 @@ public class TaggingTest {
 	}
 
 	@Test
+	public void labelTest1b() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = <a> /\\s++/ <b>",//
+				"<a> = 'a'",//
+				"<b> = 'a'",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "a  a";
+		Match m = g.matches(s).match();
+		assertNotNull(m.first("a"));
+	}
+
+	@Test
 	public void labelTest2() throws GrammarException, IOException {
 		String[] rules = {
 				//

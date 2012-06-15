@@ -138,8 +138,8 @@ public class Grammar implements Serializable {
 		 * @return null
 		 */
 		protected Match bad(Matcher m) {
-			if (options.keepRightmost && m.rightmost != null)
-				m.rightmost.done(s);
+			if (options.keepRightmost && rightmost != null)
+				rightmost.done(s);
 			return null;
 		}
 	}
@@ -254,11 +254,6 @@ public class Grammar implements Serializable {
 				return maybeGood(n, m);
 			}
 			return bad(m);
-		}
-
-		@Override
-		public Match rightmostMatch() {
-			return m.rightmost;
 		}
 
 		private Match fetchNext() {
@@ -895,7 +890,7 @@ public class Grammar implements Serializable {
 	 * @throws GrammarException
 	 */
 	public Matcher find(CharSequence s) throws GrammarException {
-		return find(s, new Options().study(false));
+		return find(s, new Options());
 	}
 
 	/**
