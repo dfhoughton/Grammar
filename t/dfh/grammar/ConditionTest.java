@@ -183,7 +183,7 @@ public class ConditionTest {
 		int count = 0;
 		while (m.match() != null)
 			count++;
-		assertTrue("found all the matches", count == 3);
+		assertEquals("found all the matches", 3, count);
 	}
 
 	@Test

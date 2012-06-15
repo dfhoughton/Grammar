@@ -40,6 +40,12 @@ public class RepetitionRule extends Rule implements Serializable,
 			super(offset, cache, RepetitionRule.this, master);
 		}
 
+		/**
+		 * Try to add a repetition to the chain.
+		 * 
+		 * @return whether this attempt failed -- true if no repetition could be
+		 *         added
+		 */
 		protected boolean grab() {
 			int start = matched.isEmpty() ? offset : matched.peekLast().end();
 			Matcher m;
@@ -154,6 +160,7 @@ public class RepetitionRule extends Rule implements Serializable,
 
 	private class StingyMatcher extends RepetitionMatcher {
 		private int goal;
+		private boolean neverMatched = true;
 
 		protected StingyMatcher(Integer offset,
 				Map<Integer, CachedMatch>[] cache, Label label, Matcher master) {
@@ -166,8 +173,11 @@ public class RepetitionRule extends Rule implements Serializable,
 				done = true;
 				matched = null;
 				matchers = null;
-			} else if (!testCondition(c, next))
-				fetchNext();
+			} else {
+				neverMatched = false;
+				if (!testCondition(c, next))
+					fetchNext();
+			}
 		}
 
 		private void seekGoal() {
@@ -175,18 +185,26 @@ public class RepetitionRule extends Rule implements Serializable,
 			next = null;
 			OUTER: while (matched.size() < goal) {
 				if (grab()) {
+					// could not get a repetition with current matcher, try to
+					// get a new one
 					if (matchers.isEmpty()) {
+						// nothing left to try
 						found = false;
 						break;
 					} else {
+						// clear out exhausted matchers looking for one with
+						// some juice left
 						while (!matchers.peekLast().mightHaveNext()) {
 							if (matchers.size() == 1) {
+								// nothing left to try; give up
 								found = false;
 								done = true;
 								matchers = null;
 								matched = null;
 								break OUTER;
 							} else {
+								// jettisom the last matcher and the match it
+								// was responsible for
 								matchers.removeLast();
 								matched.removeLast();
 							}
@@ -216,9 +234,14 @@ public class RepetitionRule extends Rule implements Serializable,
 					seekGoal();
 					if (done)
 						return;
-					if (matchers.isEmpty())
+					if (matchers.isEmpty()) {
+						if (neverMatched) {
+							done = true;
+							return;
+						}
+						neverMatched = true;
 						goal++;
-					else
+					} else
 						break;
 				}
 				if (goal > repetition.top) {
@@ -226,8 +249,11 @@ public class RepetitionRule extends Rule implements Serializable,
 					matchers = null;
 					matched = null;
 					break;
-				} else if (testCondition(c, next))
-					break;
+				} else {
+					neverMatched = false;
+					if (testCondition(c, next))
+						break;
+				}
 			}
 		}
 	}

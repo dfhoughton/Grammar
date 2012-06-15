@@ -126,24 +126,8 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  a";
 		Match m = g.matches(s).match();
-		assertNotNull(m.first("b"));
-	}
-
-	@Test
-	public void labelTest3() throws GrammarException, IOException {
-		String[] rules = {
-				//
-				"<ROOT> = [ <c> | <a> ] /\\s++/ <b>",//
-				"<a> = 'a'",//
-				"<b> = 'a'",//
-				"<c> = 'a'",//
-		};
-		Grammar g = new Grammar(rules);
-		String s = "a  a";
-		Match m = g.matches(s).match();
-		assertNotNull(m.first("\"a\""));
-		assertNotNull(m.first("b"));
-		assertNotNull(m.first("c"));
+		Match n = m.first("b");
+		assertNotNull(n);
 	}
 
 	@Test
@@ -198,7 +182,7 @@ public class TaggingTest {
 		Grammar g = new Grammar(rules);
 		String s = "a  a";
 		Match m = g.matches(s).match();
-		assertTrue(m.get("a").size() == 1);
+		assertEquals(1, m.get("a").size());
 	}
 
 	@Test

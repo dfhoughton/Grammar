@@ -44,20 +44,47 @@ public class GlobalState {
 				o.maxRecursionDepth, o.trace, o.study, o.keepRightmost);
 	}
 
+	/**
+	 * Used for reversing global state slightly more efficiently.
+	 * 
+	 * @param gs
+	 */
 	private GlobalState(GlobalState gs) {
-		this.cs = gs.cs;
-		this.rcs = gs.rcs;
-		this.isReversed = !gs.isReversed;
-		this.allowOverlap = gs.allowOverlap;
-		this.start = gs.start;
-		this.end = gs.end;
-		this.maxDepth = gs.maxDepth;
-		this.trace = gs.trace;
-		this.keepRightmost = gs.keepRightmost;
-		this.debug = gs.debug;
-		this.rcsEnd = gs.rcsEnd;
-		this.study = gs.study;
-		this.length = this.end - this.start;
+		cs = gs.cs;
+		rcs = gs.rcs;
+		isReversed = !gs.isReversed;
+		allowOverlap = gs.allowOverlap;
+		start = gs.start;
+		end = gs.end;
+		maxDepth = gs.maxDepth;
+		trace = gs.trace;
+		keepRightmost = gs.keepRightmost;
+		debug = gs.debug;
+		rcsEnd = gs.rcsEnd;
+		study = false;
+		length = gs.length;
+	}
+
+	/**
+	 * Used for creating global state with studing turned off slightly more
+	 * efficiently.
+	 * 
+	 * @param gs
+	 */
+	private GlobalState(GlobalState gs, boolean b) {
+		cs = gs.cs;
+		rcs = gs.rcs;
+		isReversed = gs.isReversed;
+		allowOverlap = gs.allowOverlap;
+		start = gs.start;
+		end = gs.end;
+		maxDepth = gs.maxDepth;
+		trace = gs.trace;
+		keepRightmost = gs.keepRightmost;
+		debug = gs.debug;
+		rcsEnd = gs.rcsEnd;
+		study = false;
+		length = gs.length;
 	}
 
 	/**
@@ -65,6 +92,13 @@ public class GlobalState {
 	 */
 	GlobalState reverse() {
 		return new GlobalState(this);
+	}
+
+	/**
+	 * @return {@link GlobalState} for use in forwards {@link Assertion}
+	 */
+	GlobalState unstudy() {
+		return new GlobalState(this, true);
 	}
 
 	private GlobalState(CharSequence cs, ReversedCharSequence rcs,

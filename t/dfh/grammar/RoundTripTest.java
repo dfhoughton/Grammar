@@ -69,7 +69,9 @@ public class RoundTripTest {
 	public void forwardAssertion1() {
 		String[] rules = { "ROOT = 'a' ~ /\\b/",//
 		};
-		Grammar g = new Grammar(new Grammar(rules).describe());
+		Grammar g = new Grammar(rules);
+		assertNotNull(g.matches("a").match());
+		g = new Grammar(new Grammar(rules).describe());
 		assertNotNull(g.matches("a").match());
 	}
 

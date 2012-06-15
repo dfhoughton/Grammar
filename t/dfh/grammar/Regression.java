@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -74,7 +75,7 @@ public class Regression {
 
 	@Test
 	public void backwardAssertionWordBreak() {
-		Grammar g = new Grammar("ROOT = ~- /\\b/r 'a'");
+		Grammar g = new Grammar("ROOT = after /\\b/r 'a'");
 		assertNotNull("found initial word break in backwards assertion", g
 				.matches("a").match());
 	}
@@ -95,50 +96,46 @@ public class Regression {
 		}
 	}
 
+	/**
+	 * For diagnosing an infinite loop.
+	 * 
+	 * @throws InterruptedException
+	 */
 	@Test
-	public void asteriskQTest() throws GrammarException, IOException {
+	public void studyPlusStinginess() throws InterruptedException {
 		final boolean[] success = { false };
 		Runnable r = new Runnable() {
-
 			@Override
 			public void run() {
-				String[] rules = {
-						//
-						"<ROOT> = <a>*? (2)",//
-						"<a> = 'a'",//
-				};
-				Grammar g = new Grammar(rules);
+				Grammar g = new Grammar("rule = 'a'*? (2)");
 				g.defineCondition("2", new Condition() {
 					@Override
 					public boolean passes(Match m, Matcher n, CharSequence s) {
-						return m.end() - m.start() == 2;
+						return m.length() == 2;
 					}
 				});
-				String s = "aaaaaa a";
+				String s = "aa a";
 				Options opt = new Options().study(false);
-				opt.longestMatch(false);
 				Matcher m = g.find(s, opt);
+				int count = 0;
 				while (m.match() != null)
-					;
+					count++;
+				assertEquals(1, count);
 				synchronized (success) {
 					success[0] = true;
+					success.notify();
 				}
 			}
 		};
 		final Thread t = new Thread(r);
 		t.start();
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-
-			@Override
-			public void run() {
-				System.out.println("ping");
-				if (t.isAlive()) {
-					t.interrupt();
-				}
-			}
-		}, 2000);
 		synchronized (success) {
+			// if the match doesn't complete in 1 second, we've got an infinite
+			// loop
+			success.wait();
+			if (t.isAlive()) {
+				t.interrupt();
+			}
 			assertTrue(success[0]);
 		}
 	}

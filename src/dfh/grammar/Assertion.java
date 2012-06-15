@@ -44,11 +44,11 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 
 		public AssertionMatcher(Integer offset,
 				Map<Integer, CachedMatch>[] cache, Matcher master,
-				GlobalState gs) {
+				GlobalState gs, boolean b) {
 			super(offset, master, gs);
 			this.cache = cache;
 			this.subCache = cache[rule().cacheIndex];
-			backward = true;
+			backward = b;
 		}
 
 		private boolean fresh = true;
@@ -166,10 +166,14 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 	@Override
 	public Matcher matcher(Integer offset, Map<Integer, CachedMatch>[] cache,
 			Matcher master) {
-		if (forward)
-			return new AssertionMatcher(offset, cache, master);
+		if (forward) {
+			if (!master.options.study)
+				return new AssertionMatcher(offset, cache, master);
+			GlobalState gs = master.options.unstudy();
+			return new AssertionMatcher(offset, cache, master, gs, false);
+		}
 		GlobalState gs = master.options.reverse();
-		return new AssertionMatcher(offset, cache, master, gs);
+		return new AssertionMatcher(offset, cache, master, gs, true);
 	}
 
 	@Override
