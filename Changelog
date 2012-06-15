@@ -1,4 +1,4 @@
-2.06
+2.06, 15 June 2012
   * turned off default studying for find()
   * fixed bug in logging of quantified labels such as <s>?
   * fixed issue with combined stingy repetition and conditions
