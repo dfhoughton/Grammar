@@ -38,7 +38,7 @@ import dfh.grammar.Label.Type;
  * @author David Houghton
  * 
  */
-public final class Compiler {
+final class Compiler {
 	private HashMap<Label, Rule> rules;
 	private Map<String, Label> terminalLabelMap;
 	private Collection<Label> undefinedRules = new HashSet<Label>();

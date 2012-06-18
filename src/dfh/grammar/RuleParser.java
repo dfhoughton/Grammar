@@ -29,7 +29,7 @@ import dfh.grammar.Label.Type;
  * 
  * @author David Houghton
  */
-public final class RuleParser {
+final class RuleParser {
 	private final LineReader reader;
 	private int lineNumber;
 
