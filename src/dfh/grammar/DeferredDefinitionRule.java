@@ -176,4 +176,14 @@ public class DeferredDefinitionRule extends Rule implements Serializable,
 		ddr.r = copy;
 		return ddr;
 	}
+
+	@Override
+	public Match checkCacheSlip(int i, Match m) {
+		Rule ru = r;
+		// highly improbable -- I believe impossible, but this will future-proof
+		// it
+		while (ru instanceof DeferredDefinitionRule)
+			ru = ((DeferredDefinitionRule) r).r;
+		return new Match(ru, m.start(), m.end());
+	}
 }

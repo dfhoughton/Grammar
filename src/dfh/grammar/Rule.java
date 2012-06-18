@@ -724,4 +724,20 @@ public abstract class Rule {
 	protected boolean findLeftCycle(Rule sought, Set<Rule> cycleCache) {
 		return false;
 	}
+
+	/**
+	 * Fixes situations where two rules have identical cache indices and a
+	 * cached match is provided with the wrong rule assigned.
+	 * <em>This must be overridden by non-terminal rules.</em>
+	 * <p>
+	 * Where this has not happened it also prevents cached terminal matches from
+	 * being munged by subsequent overlapping non-terminal matches.
+	 * 
+	 * @param i
+	 * @param m
+	 * @return
+	 */
+	public Match checkCacheSlip(int i, Match m) {
+		return null;
+	}
 }

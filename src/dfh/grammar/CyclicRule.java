@@ -176,4 +176,10 @@ public class CyclicRule extends Rule implements Serializable, NonterminalRule {
 		}
 		return false;
 	}
+
+	@Override
+	public Match checkCacheSlip(int i, Match m) {
+		// should never be called as r cannot be terminal
+		return new Match(r, m.start(), m.end());
+	}
 }

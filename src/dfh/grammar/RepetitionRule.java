@@ -538,4 +538,12 @@ public class RepetitionRule extends Rule implements Serializable,
 		}
 		return false;
 	}
+
+	@Override
+	public Match checkCacheSlip(int i, Match m) {
+		Rule ru = r;
+		while (ru instanceof DeferredDefinitionRule)
+			ru = ((DeferredDefinitionRule) r).r;
+		return new Match(ru, m.start(), m.end());
+	}
 }

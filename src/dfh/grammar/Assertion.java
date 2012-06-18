@@ -317,4 +317,9 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 		ass.r = copy;
 		return ass;
 	}
+
+	@Override
+	public Match checkCacheSlip(int i, Match m) {
+		return new Match(r, m.start(), m.end());
+	}
 }

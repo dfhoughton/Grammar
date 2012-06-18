@@ -996,22 +996,12 @@ public class Match {
 			for (int i = 0; i < children.length; i++) {
 				Match m = children[i];
 				if (m.isTerminal()) {
-					m = m.copy();
+					m = r.checkCacheSlip(i, m);
 					children[i] = m;
 				}
 				m.parent = this;
 				m.done(s);
 			}
 		}
-	}
-
-	/**
-	 * Used in {@link #done(CharSequence)} to prevent cached terminal matches
-	 * from being munged by subsequent overlapping non-terminal matches.
-	 * 
-	 * @return clone of current node
-	 */
-	private Match copy() {
-		return new Match(r, start, end);
 	}
 }

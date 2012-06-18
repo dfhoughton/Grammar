@@ -379,7 +379,7 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 	@Override
 	protected boolean findLeftCycle(Rule sought, Set<Rule> cycleCache) {
 		cycleCache.add(this);
-		for (Rule r: sequence) {
+		for (Rule r : sequence) {
 			if (r == sought)
 				return true;
 			if (cycleCache.contains(r)) {
@@ -400,5 +400,13 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 				return false;
 		}
 		return false;
+	}
+
+	@Override
+	public Match checkCacheSlip(int i, Match m) {
+		Rule r = sequence[i];
+		while (r instanceof DeferredDefinitionRule)
+			r = ((DeferredDefinitionRule) r).r;
+		return new Match(r, m.start(), m.end());
 	}
 }

@@ -131,6 +131,36 @@ public class TaggingTest {
 	}
 
 	@Test
+	public void studiedSynonyms1() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = <a> /\\s++/ <b>",//
+				"<a> = 'a'",//
+				"<b> = 'a'",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "a  a";
+		Match m = g.matches(s, new Options().study(true)).match();
+		Match n = m.first("b");
+		assertNotNull(n);
+	}
+
+	@Test
+	public void studiedSynonyms2() throws GrammarException, IOException {
+		String[] rules = {
+				//
+				"<ROOT> = '1' <a> | '2' <b>",//
+				"<a> = 'a'",//
+				"<b> = 'a'",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "2a";
+		Match m = g.matches(s, new Options().study(true)).match();
+		Match n = m.first("b");
+		assertNotNull(n);
+	}
+
+	@Test
 	public void labelTest4() throws GrammarException, IOException {
 		String[] rules = {
 				//

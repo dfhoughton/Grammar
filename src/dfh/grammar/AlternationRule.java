@@ -364,4 +364,15 @@ public class AlternationRule extends Rule implements Serializable,
 		}
 		return false;
 	}
+
+	@Override
+	public Match checkCacheSlip(int i, Match m) {
+		for (Rule r : alternates) {
+			while (r instanceof DeferredDefinitionRule)
+				r = ((DeferredDefinitionRule) r).r;
+			if (r.cacheIndex == m.rule().cacheIndex)
+				return new Match(r, m.start(), m.end());
+		}
+		return null;
+	}
 }
