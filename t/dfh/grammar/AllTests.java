@@ -54,7 +54,8 @@ import org.junit.runners.Suite;
 		TerminalMatchIndependence.class,//
 		TokenizationTest.class,//
 		OptionsTest.class,//
-		LoggingTest.class //
+		LoggingTest.class,//
+		MultilineRuleTest.class //
 })
 public class AllTests {
 }

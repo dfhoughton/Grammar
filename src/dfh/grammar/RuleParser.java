@@ -8,6 +8,7 @@
  */
 package dfh.grammar;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,18 +20,21 @@ import java.util.regex.Pattern;
 import dfh.grammar.Label.Type;
 
 /**
- * Creates {@link Rule} objects from stringified specifications. This is a bunch
- * of stateless functional code that assists a {@link Compiler} object.
+ * Creates {@link Rule} objects from stringified specifications. This is
+ * basically an iterator over parsings. It assists a {@link Compiler} object. A
+ * {@link RuleParser} is responsible for syntax; a {@link Compiler} is
+ * responsible for semantics.
  * <p>
  * <b>Creation date:</b> Feb 19, 2011
  * 
  * @author David Houghton
  */
-public class RuleParser {
-	/**
-	 * To ensure that this class is used only procedurally.
-	 */
-	private RuleParser() {
+public final class RuleParser {
+	private final LineReader reader;
+	private int lineNumber;
+
+	RuleParser(LineReader reader) {
+		this.reader = reader;
 	}
 
 	/**
@@ -74,34 +78,38 @@ public class RuleParser {
 	 *            string representation of a grammar rule
 	 * @return line parsed into properly nested tokens
 	 * @throws GrammarException
+	 * @throws IOException
 	 */
-	public static LinkedList<RuleFragment> parse(String line)
-			throws GrammarException {
-		if (line == null)
-			throw new GrammarException("cannot parse nulls");
-		if (ignorePattern.matcher(line).matches())
-			return null;
-		Matcher m = basePattern.matcher(line);
-		if (m.matches()) {
-			String id = m.group(1) == null ? m.group(2) : m.group(1);
-			String remainder = m.group(3);
-			if (remainder.length() == 0)
-				throw new GrammarException("no rule body provided in " + line);
-			LinkedList<RuleFragment> parse = new LinkedList<RuleFragment>();
-			Type t = Type.explicit;
-			// we've parsed out the rule label
-			parse.add(new Label(t, id));
-			int[] offset = { 0 };
-			LinkedList<RuleFragment> body = parseBody(remainder, offset,
-					(char) 0);
-			List<RuleFragment> nonconditions = body.peekLast() instanceof ConditionFragment ? body
-					.subList(0, body.size() - 1) : body;
-			checkUplevelBackReferences(line, nonconditions, 0, 0);
-			checkBarriers(nonconditions);
-			parse.addAll(body);
-			return parse;
-		} else
-			throw new GrammarException("ill-formed rule: " + line);
+	public LinkedList<RuleFragment> next() throws GrammarException, IOException {
+		String line;
+		while ((line = reader.readLine()) != null) {
+			if (ignorePattern.matcher(line).matches())
+				continue;
+			lineNumber = reader.lineNumber();
+			Matcher m = basePattern.matcher(line);
+			if (m.matches()) {
+				String id = m.group(1) == null ? m.group(2) : m.group(1);
+				String remainder = m.group(3);
+				if (remainder.length() == 0)
+					throw new GrammarException("no rule body provided in "
+							+ line);
+				LinkedList<RuleFragment> parse = new LinkedList<RuleFragment>();
+				Type t = Type.explicit;
+				// we've parsed out the rule label
+				parse.add(new Label(t, id));
+				int[] offset = { 0 };
+				LinkedList<RuleFragment> body = parseBody(remainder, offset,
+						(char) 0);
+				List<RuleFragment> nonconditions = body.peekLast() instanceof ConditionFragment ? body
+						.subList(0, body.size() - 1) : body;
+				checkUplevelBackReferences(line, nonconditions, 0, 0);
+				checkBarriers(nonconditions);
+				parse.addAll(body);
+				return parse;
+			} else
+				throw new GrammarException("ill-formed rule: " + line);
+		}
+		return null;
 	}
 
 	/**
@@ -176,9 +184,11 @@ public class RuleParser {
 	 *            end bracket character being sought, 0 when none is sought
 	 * @return
 	 * @throws GrammarException
+	 * @throws IOException
 	 */
-	private static LinkedList<RuleFragment> parseBody(String body,
-			int[] offset, char bracket) throws GrammarException {
+	private LinkedList<RuleFragment> parseBody(String body, int[] offset,
+			char bracket) throws GrammarException, IOException {
+		StringBuilder b = new StringBuilder(body);
 		LinkedList<RuleFragment> parse = new LinkedList<RuleFragment>();
 		GroupFragment gf = null;
 		OUTER: while (offset[0] < body.length()) {
@@ -187,6 +197,21 @@ public class RuleParser {
 				break;
 			char c = body.charAt(offset[0]);
 			switch (c) {
+			case '\\': // multi-line rule
+				Matcher m = ignorePattern.matcher(body);
+				m.region(offset[0] + 1, body.length());
+				if (!m.matches())
+					throw new GrammarException(
+							"significant characters after \\ in " + body);
+				while ((body = reader.readLine()) != null) {
+					if (!ignorePattern.matcher(body).matches())
+						break;
+				}
+				if (body == null)
+					break OUTER;
+				b.append('\n').append(body);
+				offset[0] = 0;
+				break;
 			case '[':
 				offset[0]++;
 				Set<String> alternateTags = alternateTags(body, offset);
@@ -325,7 +350,7 @@ public class RuleParser {
 			throw new GrammarException("empty rule body: " + body);
 		if (gf != null)
 			gf.done();
-		completeAssertions(parse, body);
+		completeAssertions(parse, b.toString());
 		return parse;
 	}
 
@@ -561,7 +586,7 @@ public class RuleParser {
 		return b.toString();
 	}
 
-	private static Repetition getRepetition(String body, int[] offset)
+	private Repetition getRepetition(String body, int[] offset)
 			throws GrammarException {
 		Matcher m = repetitionPattern.matcher(body.substring(offset[0]));
 		// necessarily matches because it will match the null string
@@ -700,5 +725,9 @@ public class RuleParser {
 			throw new GrammarException("two many colons in '" + body
 					+ "' barriers must appear singly");
 		return new BarrierFragment(count == 1);
+	}
+
+	public int getLineNumber() {
+		return lineNumber;
 	}
 }

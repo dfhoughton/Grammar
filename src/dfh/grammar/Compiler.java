@@ -30,13 +30,15 @@ import dfh.grammar.Label.Type;
 /**
  * A companion to {@link RuleParser}, {@link Compiler} encapsulates the messy
  * code that takes the output of the former and weaves a {@link Grammar}.
+ * {@link RuleParser} is responsible for syntax; {@link Compiler}, for
+ * semantics.
  * <p>
  * <b>Creation date:</b> Mar 21, 2011
  * 
  * @author David Houghton
  * 
  */
-public class Compiler {
+public final class Compiler {
 	private HashMap<Label, Rule> rules;
 	private Map<String, Label> terminalLabelMap;
 	private Collection<Label> undefinedRules = new HashSet<Label>();
@@ -159,11 +161,10 @@ public class Compiler {
 		}
 		Map<Label, List<RuleFragment>> map = new HashMap<Label, List<RuleFragment>>();
 		Label r = null;
+		RuleParser parser = new RuleParser(reader);
 		try {
-			while ((line = reader.readLine()) != null) {
-				LinkedList<RuleFragment> list = RuleParser.parse(line);
-				if (list == null)
-					continue; // blank line or comment
+			LinkedList<RuleFragment> list;
+			while ((list = parser.next()) != null) {
 				Label l = (Label) list.removeFirst();
 				if (r == null) {
 					if (l.t != Type.explicit) {
@@ -189,7 +190,7 @@ public class Compiler {
 				}
 				if (map.containsKey(l))
 					throw new GrammarException("rule " + l
-							+ " redefined at line " + reader.lineNumber());
+							+ " redefined at line " + parser.getLineNumber());
 				map.put(l, list);
 			}
 		} catch (IOException e1) {

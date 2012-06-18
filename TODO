@@ -21,7 +21,8 @@ section at the end of the document.
 . implement automatic space insertion in sequences upon specification
 * examine logging of elements such as <s>?
 * fix asteriskQ test regression in ConditionTest
-. implement multi-line rules
+* implement multi-line rules
+. document multi-line rules
 
 COMPLETED
 =========
