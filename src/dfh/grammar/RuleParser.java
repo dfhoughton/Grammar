@@ -10,7 +10,6 @@ package dfh.grammar;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -79,9 +78,13 @@ final class RuleParser {
 	 */
 	public SyntacticParse next() throws GrammarException, IOException {
 		String line;
+		StringBuilder b = new StringBuilder();
 		while ((line = reader.readLine()) != null) {
 			if (ignorePattern.matcher(line).matches())
 				continue;
+			if (b.length() > 0)
+				b.append('\n');
+			b.append(line);
 			lineNumber = reader.lineNumber();
 			Matcher m = basePattern.matcher(line);
 			if (m.matches()) {
@@ -90,22 +93,22 @@ final class RuleParser {
 				if (remainder.length() == 0)
 					throw new GrammarException("no rule body provided in "
 							+ line);
-				LinkedList<RuleFragment> parse = new LinkedList<RuleFragment>();
 				Type t = Type.explicit;
 				// we've parsed out the rule label
 				Label l = new Label(t, id);
 				int[] offset = { 0 };
 				SequenceFragment body = parseBody(remainder, offset, (char) 0);
-				SequenceFragment nonconditions = body.last() instanceof ConditionFragment ? body
-						.nonConditions() : body;
-				checkUplevelBackReferences(line, nonconditions, 0, 0);
-				checkBarriers(nonconditions);
-				parse.add(body);
-				return new SyntacticParse(l, nonconditions,
-						(ConditionFragment) (body == nonconditions ? null
-								: body.last()));
+				RuleFragment lf = body.last();
+				ConditionFragment cf = null;
+				if (lf instanceof ConditionFragment) {
+					body.sequence.removeLast();
+					cf = (ConditionFragment) lf;
+				}
+				checkUplevelBackReferences(b.toString(), body, 0, 0);
+				checkBarriers(body);
+				return new SyntacticParse(l, body, cf);
 			} else
-				throw new GrammarException("ill-formed rule: " + line);
+				throw new GrammarException("ill-formed rule: " + b);
 		}
 		return null;
 	}

@@ -19,6 +19,10 @@ import java.util.LinkedList;
  * </pre>
  * 
  * <p>
+ * This is mostly a wrapper {@link LinkedList} of {@link RuleFragment
+ * RuleFragments} that adds some functionality to modify the list in case the
+ * rule has modified whitespace delimiting.
+ * <p>
  * 
  * @author David Houghton
  */
@@ -66,11 +70,6 @@ public class SequenceFragment extends RepeatableRuleFragment {
 
 	public RuleFragment last() {
 		return sequence.peekLast();
-	}
-
-	public SequenceFragment nonConditions() {
-		return new SequenceFragment(new LinkedList<RuleFragment>(
-				sequence.subList(0, sequence.size() - 1)));
 	}
 
 	public RuleFragment get(int i) {
