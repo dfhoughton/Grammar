@@ -8,7 +8,6 @@
  */
 package dfh.grammar;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -71,19 +70,6 @@ public class GroupFragment extends RepeatableRuleFragment {
 			throw new GrammarException("empty alternate");
 		alternates.add(currentSequence);
 		currentSequence = null;
-	}
-
-	/**
-	 * @return a lightweight clone of this fragment with the repetition set to
-	 *         <code>NONE</code>
-	 */
-	public GroupFragment noRep() {
-		Iterator<LinkedList<RuleFragment>> i = alternates.iterator();
-		GroupFragment clone = new GroupFragment(i.next(), alternateTags);
-		clone.rep = Repetition.NONE;
-		while (i.hasNext())
-			clone.alternates.add(i.next());
-		return clone;
 	}
 
 	@Override
