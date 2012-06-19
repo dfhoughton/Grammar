@@ -76,8 +76,8 @@ public class SequenceFragment extends RepeatableRuleFragment {
 		return sequence.get(i);
 	}
 
-	public void set(int i, BackReferenceFragment f) {
-		sequence.set(i, f);
+	public void set(int i, RuleFragment rf) {
+		sequence.set(i, rf);
 	}
 
 	public void clear() {

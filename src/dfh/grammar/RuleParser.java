@@ -9,7 +9,11 @@
 package dfh.grammar;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -141,18 +145,19 @@ final class RuleParser {
 				if (rf instanceof BarrierFragment)
 					continue; // ignore barriers
 				if (rf instanceof AssertionFragment) {
-					AssertionFragment af = (AssertionFragment) rf;
-					if (af.forward) {
-						// TODO
-						// * need to handle multiple assertions
-						// * need to treat assertion and the following fragment
-						// as a single unit
-						// * need to avoid inserting delimiters between an
-						// assertion and the constituents its going to be
-						// testing
-					} else {
-
-					}
+					// * need to handle multiple assertions
+					// * need to rearrange assertions perhaps, moving all
+					// backwards assertions to the left and forward
+					// assertions to the right
+					// * need to treat assertion and the following fragment
+					// as a single unit
+					// * need to avoid inserting delimiters between an
+					// assertion and the constituents its going to be
+					// testing
+					int[] indices = rearrangeAssertions(body, i);
+					body.sequence.set(indices[0], Space.l);
+					i = indices[1];
+					needDelimiter = false;
 				} else {
 					if (needDelimiter) {
 						body.sequence.add(i, Space.l);
@@ -169,6 +174,58 @@ final class RuleParser {
 					addWhitespaceDelimiters(sf);
 			}
 		}
+	}
+
+	/**
+	 * sorts assertions such that backwards assertions are before forward
+	 * assertions
+	 * 
+	 * @param body
+	 *            the list of fragments being examined
+	 * @param i
+	 *            current index being examined -- the location of an assertion
+	 *            fragment
+	 * @return an index at which a space delimiter should be inserted and the
+	 *         index to move the checking index to
+	 */
+	private int[] rearrangeAssertions(SequenceFragment body, final int i) {
+		List<RuleFragment[]> list = new ArrayList<RuleFragment[]>(
+				body.size() / 2);
+		// extract all the assertions at this point
+		while (i < body.size() && body.get(i) instanceof AssertionFragment) {
+			RuleFragment[] pair = { body.sequence.remove(i),
+					body.sequence.remove(i) };
+			list.add(pair);
+		}
+		// sort assertions so backwards assertions come before forwards
+		if (list.size() > 1) {
+			Collections.sort(list, new Comparator<RuleFragment[]>() {
+				@Override
+				public int compare(RuleFragment[] o1, RuleFragment[] o2) {
+					boolean b1 = ((AssertionFragment) o1[0]).forward;
+					boolean b2 = ((AssertionFragment) o2[0]).forward;
+					if (b1 ^ b2)
+						return b1 ? 1 : -1;
+					return 0;
+				}
+			});
+		}
+		// find where to insert a space delimiter
+		int j = 0;
+		for (; j < list.size(); j++) {
+			RuleFragment[] pair = list.get(j);
+			if (((AssertionFragment) pair[0]).forward) 
+				break;
+		}
+		// record the return values
+		int[] rv = {i + 2*j, i + list.size() * 2};
+		// put all the assertions back into the sequence
+		for (RuleFragment[] pair: list) {
+			for (RuleFragment rf: pair) {
+				body.set(i, rf);
+			}
+		}
+		return rv;
 	}
 
 	/**
