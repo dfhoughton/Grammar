@@ -23,6 +23,7 @@ section at the end of the document.
 * fix asteriskQ test regression in ConditionTest
 * implement multi-line rules
 . document multi-line rules
+. document semantics of xor operator in conditions
 
 COMPLETED
 =========
