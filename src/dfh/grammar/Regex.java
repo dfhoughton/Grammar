@@ -73,6 +73,12 @@ public class Regex extends RepeatableRuleFragment {
 
 	@Override
 	public String toString() {
-		return re.toString();
+		StringBuilder b = new StringBuilder();
+		b.append('/');
+		b.append(re);
+		b.append('/');
+		if (reversible)
+			b.append('r');
+		return b.toString();
 	}
 }

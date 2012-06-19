@@ -63,6 +63,24 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		}
 	}
 
+	public enum Whitespace {
+		/**
+		 * no whitespace is assumed between tokens in a sequence constituent of
+		 * this rule
+		 */
+		none,
+		/**
+		 * whitespace is assumed between tokens in a sequence constituent of
+		 * this rule
+		 */
+		required,
+		/**
+		 * whitespace may occur between tokens in a sequence constituent of this
+		 * rule
+		 */
+		maybe
+	}
+
 	/**
 	 * {@link Type} of the associated {@link Rule}.
 	 */

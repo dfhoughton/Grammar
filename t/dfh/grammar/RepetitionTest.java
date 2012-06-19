@@ -163,6 +163,14 @@ public class RepetitionTest {
 		Match n = m.match();
 		assertNotNull("[]{2} worked", n);
 	}
+	
+	@Test
+	public void literalTest() {
+		Grammar g = new Grammar("rule = 'a'?");
+		Matcher m = g.matches("");
+		Match n = m.match();
+		assertNotNull(n);
+	}
 
 	@Test
 	public void stingyThenGreedy() throws GrammarException, IOException {

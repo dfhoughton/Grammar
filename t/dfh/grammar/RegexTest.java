@@ -36,7 +36,7 @@ public class RegexTest {
 	}
 
 	@Test
-	public void repetitionTest() throws GrammarException, IOException {
+	public void repetitionTest1() throws GrammarException, IOException {
 		String[] rules = {
 		//
 		"<ROOT> = /joe/{2}",//
@@ -46,5 +46,18 @@ public class RegexTest {
 		Matcher m = g.find(s);
 		Match n = m.match();
 		assertNotNull("found double joe", n);
+	}
+
+	@Test
+	public void repetitionTest2() throws GrammarException, IOException {
+		String[] rules = {
+		//
+		"<ROOT> = /joe/?",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = "";
+		Matcher m = g.find(s);
+		Match n = m.match();
+		assertNotNull("found empty joe", n);
 	}
 }

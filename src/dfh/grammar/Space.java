@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import dfh.grammar.Label.Type;
 
 /**
- * Rule representing space that must occur between non-trivial constituents in a
+ * Rule representing space that may occur between non-trivial constituents in a
  * rule such as
  * 
  * <pre/>
@@ -19,6 +19,19 @@ import dfh.grammar.Label.Type;
  * <pre/>
  * rule   = ['my' /\s++/r]? 'cat'
  * </pre>
+ * 
+ * or
+ * 
+ * <pre/>
+ * rule  := 'my'? 'cat'
+ * </pre>
+ * 
+ * which becomes equivalent to
+ * 
+ * <pre/>
+ * rule   = 'my'? /\s++/r? 'cat'
+ * </pre>
+ * 
  * <p>
  * 
  * @author David F. Houghton - Jun 18, 2012
@@ -29,7 +42,7 @@ public class Space extends RepetitionRule {
 
 	private static class SS extends LeafRule {
 		private static final long serialVersionUID = 1L;
-		public static final Pattern p = Pattern.compile("\\s*+");
+		public static final Pattern p = Pattern.compile("\\s++");
 		public static final Label lss = new Label(Type.implicit, ".ss");
 		private static final String fixedIdSS = '/' + p.toString() + "/r";
 

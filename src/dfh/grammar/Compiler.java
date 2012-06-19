@@ -211,6 +211,8 @@ final class Compiler {
 			RuleFragment rf = body.get(0);
 			if (body.size() == 1
 					&& (rf instanceof Regex || rf instanceof LiteralFragment)) {
+				// TODO I can't recall why literal fragments are treated
+				// differently here; should make sure this can't be simplified
 				if (rf instanceof LiteralFragment
 						&& !((RepeatableRuleFragment) rf).rep.redundant())
 					continue;
@@ -223,11 +225,18 @@ final class Compiler {
 				Rule ru;
 				if (rf instanceof Regex) {
 					Regex rx = (Regex) rf;
-					ru = new LeafRule(l, rx.re, rx.reversible);
-					if (condition != null)
-						ru = new ConditionalLeafRule((LeafRule) ru,
-								LogicalCondition.manufacture(condition),
-								condition.group());
+					if (rx.rep.redundant()) {
+						ru = new LeafRule(l, rx.re, rx.reversible);
+						if (condition != null)
+							ru = new ConditionalLeafRule((LeafRule) ru,
+									LogicalCondition.manufacture(condition),
+									condition.group());
+					} else {
+						Label rxl = new Label(Type.implicit, rx.toString());
+						Rule rxr = new LeafRule(rxl, rx.re, rx.reversible);
+						ru = new RepetitionRule(l, rxr, rx.rep, EMPTY_STR_SET);
+						setCondition(condition, ru);
+					}
 				} else {
 					ru = new LiteralRule(l, ((LiteralFragment) rf).literal);
 					setCondition(condition, ru);
@@ -466,8 +475,7 @@ final class Compiler {
 	 * @return whether there is some way to escape from a mutual dependency
 	 *         cycle in this rule
 	 */
-	private boolean findEscape(Entry<Label, SequenceFragment> e,
-			Set<Label> set) {
+	private boolean findEscape(Entry<Label, SequenceFragment> e, Set<Label> set) {
 		SequenceFragment list = e.getValue();
 		for (RuleFragment r : list.sequence) {
 			if (!set.contains(r))
@@ -721,13 +729,13 @@ final class Compiler {
 			return r;
 		} else if (rf instanceof Regex) {
 			Regex rx = (Regex) rf;
-			Label l = new Label(Type.implicit, '/' + rf.toString() + '/');
+			Label l = new Label(Type.implicit, rf.toString());
 			Rule r = new LeafRule(l, rx.re, rx.reversible);
 			if (rx.rep.redundant()) {
 				setCondition(condition, r);
 				return r;
 			}
-			l = new Label(Type.implicit, rx.toString());
+			l = new Label(Type.implicit, rx.toString() + rx.rep);
 			r = new RepetitionRule(l, r, rx.rep, EMPTY_STR_SET);
 			setCondition(condition, r);
 			return r;

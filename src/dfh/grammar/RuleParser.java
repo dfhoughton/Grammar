@@ -49,7 +49,7 @@ final class RuleParser {
 	 * Pattern that defines a rule as "<"<name>">" "=" <remainder>
 	 */
 	private static final Pattern basePattern = Pattern.compile("\\s*+"
-			+ leftValuePattern + "\\s*+=\\s*+(.*?)\\s*+");
+			+ leftValuePattern + "\\s*+(:{0,2}=)\\s*+(.*?)\\s*+");
 	/**
 	 * Pattern of repetition symbols such as <code>*</code>.
 	 */
@@ -89,7 +89,7 @@ final class RuleParser {
 			Matcher m = basePattern.matcher(line);
 			if (m.matches()) {
 				String id = m.group(1) == null ? m.group(2) : m.group(1);
-				String remainder = m.group(3);
+				String remainder = m.group(4);
 				if (remainder.length() == 0)
 					throw new GrammarException("no rule body provided in "
 							+ line);
