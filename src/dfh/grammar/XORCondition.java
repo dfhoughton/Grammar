@@ -34,8 +34,10 @@ public class XORCondition extends LogicalCondition {
 		for (Condition c : subconditions) {
 			if (c.passes(n, m, s))
 				count++;
+			if (count > 1)
+				return false;
 		}
-		return count % 2 == 1;
+		return count == 1;
 	}
 
 	@Override
