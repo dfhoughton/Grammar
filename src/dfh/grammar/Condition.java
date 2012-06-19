@@ -172,4 +172,15 @@ public abstract class Condition implements Serializable {
 		set.add(name);
 		return set;
 	}
+
+	/**
+	 * Returns whether the condition will be displayed by
+	 * {@link Grammar#describe()}.
+	 * 
+	 * @return whether the condition will be displayed by
+	 *         {@link Grammar#describe()}
+	 */
+	public boolean visible() {
+		return true;
+	}
 }

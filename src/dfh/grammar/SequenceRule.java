@@ -197,7 +197,7 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 			}
 		}
 		b = new StringBuilder(wrap(b));
-		if (c != null)
+		if (c != null && c.visible())
 			b.append(" (").append(c.describe()).append(')');
 		return b.toString();
 	}

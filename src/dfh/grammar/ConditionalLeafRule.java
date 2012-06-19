@@ -166,7 +166,8 @@ public class ConditionalLeafRule extends LeafRule {
 	public String description(boolean inBrackets) {
 		StringBuilder b = descriptionWOCondition();
 		b = new StringBuilder(wrap(b));
-		b.append(" (").append(c.describe()).append(')');
+		if (c.visible())
+			b.append(" (").append(c.describe()).append(')');
 		return b.toString();
 	}
 

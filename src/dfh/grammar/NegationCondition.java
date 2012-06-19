@@ -41,7 +41,7 @@ public class NegationCondition extends LogicalCondition {
 	}
 
 	@Override
-	protected LogicalCondition duplicate() {
+	protected Condition duplicate() {
 		NegationCondition cj = new NegationCondition(subconditions.length);
 		for (int i = 0; i < subconditions.length; i++) {
 			Condition c = subconditions[i];

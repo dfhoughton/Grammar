@@ -38,7 +38,7 @@ public class ConjunctionCondition extends LogicalCondition {
 	}
 
 	@Override
-	protected LogicalCondition duplicate() {
+	protected Condition duplicate() {
 		ConjunctionCondition cj = new ConjunctionCondition(subconditions.length);
 		for (int i = 0; i < subconditions.length; i++) {
 			Condition c = subconditions[i];

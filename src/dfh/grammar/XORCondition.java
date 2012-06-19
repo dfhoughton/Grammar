@@ -39,7 +39,7 @@ public class XORCondition extends LogicalCondition {
 	}
 
 	@Override
-	protected LogicalCondition duplicate() {
+	protected Condition duplicate() {
 		XORCondition cj = new XORCondition(subconditions.length);
 		for (int i = 0; i < subconditions.length; i++) {
 			Condition c = subconditions[i];

@@ -36,7 +36,7 @@ public class DisjunctionCondition extends LogicalCondition {
 	}
 
 	@Override
-	protected LogicalCondition duplicate() {
+	protected Condition duplicate() {
 		DisjunctionCondition cj = new DisjunctionCondition(subconditions.length);
 		for (int i = 0; i < subconditions.length; i++) {
 			Condition c = subconditions[i];

@@ -34,4 +34,9 @@ public class SpaceCondition extends Condition {
 		}
 		return true;
 	}
+
+	@Override
+	public boolean visible() {
+		return false;
+	}
 }

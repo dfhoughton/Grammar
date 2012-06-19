@@ -111,7 +111,7 @@ public class AlternationRule extends Rule implements Serializable,
 			b.append(r.uniqueId());
 		}
 		b.append(']');
-		if (condition != null)
+		if (c != null)
 			b.append('(').append(c.describe()).append(')');
 		return b.toString();
 	}
@@ -153,7 +153,7 @@ public class AlternationRule extends Rule implements Serializable,
 			}
 		}
 		b = new StringBuilder(wrap(b));
-		if (condition != null)
+		if (c != null && c.visible())
 			b.append(" (").append(c.describe()).append(')');
 		return b.toString();
 	}

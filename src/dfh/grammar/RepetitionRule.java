@@ -365,7 +365,7 @@ public class RepetitionRule extends Rule implements Serializable,
 			b.append(" ]");
 		b.append(repetition);
 		b = new StringBuilder(wrap(b));
-		if (c != null)
+		if (c != null && c.visible())
 			b.append(" (").append(c.describe()).append(')');
 		return b.toString();
 	}

@@ -38,6 +38,7 @@ public abstract class LogicalCondition extends Condition implements
 					|| m.hasLabel("cnd");
 		}
 	};
+	protected int visibleConditions = -1;
 
 	public LogicalCondition(List<Condition> conditions) {
 		subconditions = conditions.toArray(new Condition[conditions.size()]);
@@ -144,7 +145,7 @@ public abstract class LogicalCondition extends Condition implements
 		}
 	}
 
-	protected abstract LogicalCondition duplicate();
+	protected abstract Condition duplicate();
 
 	protected abstract boolean allPass(Match n, Matcher m, CharSequence s);
 
@@ -161,14 +162,18 @@ public abstract class LogicalCondition extends Condition implements
 	 * @return string representing this logical condition
 	 */
 	protected String describe(String operator) {
+		initVisibility();
 		StringBuilder b = new StringBuilder();
 		boolean initial = true;
 		for (Condition cnd : subconditions) {
+			if (!cnd.visible()) 
+				continue;
 			if (initial)
 				initial = false;
 			else
 				b.append(operator);
-			if (cnd instanceof LogicalCondition)
+			if (visibleConditions > 1 && cnd instanceof LogicalCondition)
+				// special treatment of hidden conditions
 				b.append('(').append(cnd.describe()).append(')');
 			else
 				b.append(cnd.describe());
@@ -176,12 +181,30 @@ public abstract class LogicalCondition extends Condition implements
 		return b.toString();
 	}
 
+	protected void initVisibility() {
+		synchronized (this) {
+			if (visibleConditions == -1) {
+				visibleConditions = 0;
+				for (Condition c : subconditions) {
+					if (c.visible())
+						visibleConditions++;
+				}
+			}
+		}
+	}
+
+	@Override
+	public boolean visible() {
+		initVisibility();
+		return visibleConditions > 0;
+	}
+
 	@Override
 	Condition copy(String namebase, Set<String> knownConditions) {
 		List<Condition> copies = new ArrayList<Condition>(subconditions.length);
 		for (int i = 0; i < subconditions.length; i++)
 			copies.add(subconditions[i].copy(namebase, knownConditions));
-		LogicalCondition lc = null;
+		Condition lc = null;
 		if (this instanceof ConjunctionCondition)
 			lc = new ConjunctionCondition(copies);
 		else if (this instanceof DisjunctionCondition)
