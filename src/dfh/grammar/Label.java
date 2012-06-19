@@ -63,6 +63,14 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		}
 	}
 
+	/**
+	 * Possible treatments of inter-rule whitespace in sequences which are
+	 * constituents of a given labeled rule.
+	 * <p>
+	 * 
+	 * @author David F. Houghton - Jun 19, 2012
+	 * 
+	 */
 	public enum Whitespace {
 		/**
 		 * no whitespace is assumed between tokens in a sequence constituent of
@@ -85,6 +93,19 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 	 * {@link Type} of the associated {@link Rule}.
 	 */
 	public final Type t;
+	Whitespace ws = Whitespace.none;
+
+	/**
+	 * Returns treatment of inter-rule whitespace in sequences which are
+	 * constituents of a rule bearing this label.
+	 * 
+	 * @return treatment of inter-rule whitespace in sequences which are
+	 *         constituents of a rule bearing this label
+	 */
+	public Whitespace whitespace() {
+		return ws;
+	}
+
 	/**
 	 * Identifier of associated {@link Rule}.
 	 */

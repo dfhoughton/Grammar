@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dfh.grammar.Label.Type;
+import dfh.grammar.Label.Whitespace;
 
 /**
  * Creates {@link Rule} objects from stringified specifications. This is
@@ -78,17 +79,28 @@ final class RuleParser {
 	 */
 	public SyntacticParse next() throws GrammarException, IOException {
 		String line;
-		StringBuilder b = new StringBuilder();
 		while ((line = reader.readLine()) != null) {
 			if (ignorePattern.matcher(line).matches())
 				continue;
-			if (b.length() > 0)
-				b.append('\n');
-			b.append(line);
 			lineNumber = reader.lineNumber();
 			Matcher m = basePattern.matcher(line);
 			if (m.matches()) {
 				String id = m.group(1) == null ? m.group(2) : m.group(1);
+				Whitespace ws;
+				switch (m.group(3).length()) {
+				case 1:
+					ws = Whitespace.none;
+					break;
+				case 2:
+					ws = Whitespace.maybe;
+					break;
+				case 3:
+					ws = Whitespace.required;
+					break;
+				default:
+					throw new GrammarException("code does not anticipate "
+							+ m.group(3) + " in " + line);
+				}
 				String remainder = m.group(4);
 				if (remainder.length() == 0)
 					throw new GrammarException("no rule body provided in "
@@ -96,6 +108,7 @@ final class RuleParser {
 				Type t = Type.explicit;
 				// we've parsed out the rule label
 				Label l = new Label(t, id);
+				l.ws = ws;
 				int[] offset = { 0 };
 				SequenceFragment body = parseBody(remainder, offset, (char) 0);
 				RuleFragment lf = body.last();
@@ -104,13 +117,58 @@ final class RuleParser {
 					body.sequence.removeLast();
 					cf = (ConditionFragment) lf;
 				}
-				checkUplevelBackReferences(b.toString(), body, 0, 0);
+				checkUplevelBackReferences(line, body, 0, 0);
 				checkBarriers(body);
+				if (ws != Whitespace.none)
+					addWhitespaceDelimiters(body);
 				return new SyntacticParse(l, body, cf);
 			} else
-				throw new GrammarException("ill-formed rule: " + b);
+				throw new GrammarException("ill-formed rule: " + line);
 		}
 		return null;
+	}
+
+	/**
+	 * Look for sequences and add whitespace delimiters as appropriate.
+	 * 
+	 * @param body
+	 */
+	private void addWhitespaceDelimiters(SequenceFragment body) {
+		if (body.size() > 1) {
+			boolean needDelimiter = false;
+			for (int i = 0; i < body.size(); i++) {
+				RuleFragment rf = body.get(i);
+				if (rf instanceof BarrierFragment)
+					continue; // ignore barriers
+				if (rf instanceof AssertionFragment) {
+					AssertionFragment af = (AssertionFragment) rf;
+					if (af.forward) {
+						// TODO
+						// * need to handle multiple assertions
+						// * need to treat assertion and the following fragment
+						// as a single unit
+						// * need to avoid inserting delimiters between an
+						// assertion and the constituents its going to be
+						// testing
+					} else {
+
+					}
+				} else {
+					if (needDelimiter) {
+						body.sequence.add(i, Space.l);
+						i++;
+					} else
+						needDelimiter = true;
+				}
+			}
+		}
+		for (RuleFragment rf : body.sequence) {
+			if (rf instanceof GroupFragment) {
+				GroupFragment gf = (GroupFragment) rf;
+				for (SequenceFragment sf : gf.alternates)
+					addWhitespaceDelimiters(sf);
+			}
+		}
 	}
 
 	/**
