@@ -19,6 +19,7 @@ import dfh.grammar.Label.Type;
  * @author David F. Houghton - Mar 19, 2012
  * 
  */
+@SuppressWarnings("serial")
 public class RootlessGrammarTest {
 
 	@Test
@@ -71,7 +72,6 @@ public class RootlessGrammarTest {
 		assertNull("couldn't shrink initial match", g.matches("b").match());
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void simpleConjunction() {
 		String[] rules = {
@@ -187,7 +187,7 @@ public class RootlessGrammarTest {
 		n = m.match();
 		assertNull("parsed minimal document", n);
 	}
-	
+
 	@Test
 	public void conditionOnRoot() {
 		String[] rules = {
@@ -215,8 +215,7 @@ public class RootlessGrammarTest {
 				}
 				if (wellBounded && n.end() < s.length()
 						&& Character.isLetterOrDigit(s.charAt(n.end() - 1))) {
-					wellBounded &= !Character.isLetterOrDigit(s.charAt(n
-							.end()));
+					wellBounded &= !Character.isLetterOrDigit(s.charAt(n.end()));
 				}
 				return wellBounded;
 			}

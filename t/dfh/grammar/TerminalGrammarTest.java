@@ -16,6 +16,7 @@ import org.junit.Test;
  * @author David Houghton
  * 
  */
+@SuppressWarnings("serial")
 public class TerminalGrammarTest {
 
 	@Test
@@ -130,7 +131,6 @@ public class TerminalGrammarTest {
 				.indexOf("lt100") > -1);
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void logicalConditionTest() {
 		Grammar ga = new Grammar("ROOT = <b>");
@@ -227,7 +227,6 @@ public class TerminalGrammarTest {
 		assertTrue("tag copied", s.indexOf("foo") > -1);
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void tagTest9() {
 		Grammar ga = new Grammar("ROOT = <b>");

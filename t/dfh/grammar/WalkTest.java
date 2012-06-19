@@ -9,6 +9,7 @@ import org.junit.Test;
  * 
  * @author houghton
  */
+@SuppressWarnings("serial")
 public class WalkTest {
 
 	@Test

@@ -8,6 +8,7 @@
  */
 package dfh.grammar;
 
+import java.io.Serializable;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -19,8 +20,8 @@ import java.util.TreeSet;
  * @author David Houghton
  * 
  */
-public abstract class Condition {
-
+public abstract class Condition implements Serializable {
+	private static final long serialVersionUID = 1L;
 	public String name;
 
 	/**

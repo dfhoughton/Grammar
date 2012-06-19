@@ -51,6 +51,8 @@ public class BalancedBrackets {
 						"escape = /(?<!\\\\)(?:\\\\)++/r (odd)",//
 				});
 		g.defineCondition("odd", new Condition() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public boolean passes(CharSequence subsequence) {
 				return subsequence.length() % 2 == 1;

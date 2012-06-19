@@ -5,10 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.junit.Test;
 
 public class Regression {
@@ -105,6 +101,7 @@ public class Regression {
 	public void studyPlusStinginess() throws InterruptedException {
 		final boolean[] success = { false };
 		Runnable r = new Runnable() {
+			@SuppressWarnings("serial")
 			@Override
 			public void run() {
 				Grammar g = new Grammar("rule = 'a'*? (2)");

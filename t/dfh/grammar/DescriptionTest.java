@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 
+@SuppressWarnings("serial")
 public class DescriptionTest {
 
 	@Test

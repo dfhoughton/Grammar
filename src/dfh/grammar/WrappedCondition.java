@@ -17,6 +17,7 @@ package dfh.grammar;
  * 
  */
 public class WrappedCondition extends Condition {
+	private static final long serialVersionUID = 1L;
 	private Condition inner;
 
 	WrappedCondition(String namebase, Condition inner) {
