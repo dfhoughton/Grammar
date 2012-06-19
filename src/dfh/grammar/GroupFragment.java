@@ -27,15 +27,15 @@ import java.util.TreeSet;
  * @author David Houghton
  */
 public class GroupFragment extends RepeatableRuleFragment {
-	List<LinkedList<RuleFragment>> alternates = new LinkedList<LinkedList<RuleFragment>>();
-	LinkedList<RuleFragment> currentSequence = new LinkedList<RuleFragment>();
+	List<SequenceFragment> alternates = new LinkedList<SequenceFragment>();
+	SequenceFragment currentSequence;
 	Set<String> alternateTags = new TreeSet<String>();
 	private boolean did = false;
 
-	public GroupFragment(List<RuleFragment> list, Set<String> alternateTags) {
-		currentSequence.addAll(list);
+	public GroupFragment(SequenceFragment list, Set<String> alternateTags) {
+		currentSequence = list.copy();
 		alternates.add(currentSequence);
-		currentSequence = new LinkedList<RuleFragment>();
+		currentSequence = new SequenceFragment();
 		this.alternateTags.addAll(alternateTags);
 	}
 
@@ -53,7 +53,7 @@ public class GroupFragment extends RepeatableRuleFragment {
 			throw new GrammarException("empty alternate");
 		else {
 			alternates.add(currentSequence);
-			currentSequence = new LinkedList<RuleFragment>();
+			currentSequence = new SequenceFragment();
 		}
 	}
 
@@ -79,26 +79,15 @@ public class GroupFragment extends RepeatableRuleFragment {
 
 	String alternateString() {
 		if (alternates.size() == 1 && alternates.get(0).size() == 1)
-			return alternates.get(0).get(0).toString();
+			return alternates.get(0).first().toString();
 		StringBuilder b = new StringBuilder();
 		b.append('[');
-		for (List<RuleFragment> alternate : alternates) {
+		for (SequenceFragment alternate : alternates) {
 			if (b.length() > 1)
 				b.append('|');
-			appendAlternate(b, alternate);
+			b.append(alternate);
 		}
 		b.append(']');
 		return b.toString();
-	}
-
-	private void appendAlternate(StringBuilder b, List<RuleFragment> alternate) {
-		boolean nonFirst = false;
-		for (RuleFragment rf : alternate) {
-			if (nonFirst)
-				b.append(' ');
-			else
-				nonFirst = true;
-			b.append(rf);
-		}
 	}
 }

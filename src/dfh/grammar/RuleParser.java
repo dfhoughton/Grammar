@@ -11,7 +11,6 @@ package dfh.grammar;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -74,13 +73,11 @@ final class RuleParser {
 	 * Parses a line of the string representation of a grammar. Does
 	 * tokenization and parsing but does not check completeness of rule set.
 	 * 
-	 * @param line
-	 *            string representation of a grammar rule
 	 * @return line parsed into properly nested tokens
 	 * @throws GrammarException
 	 * @throws IOException
 	 */
-	public LinkedList<RuleFragment> next() throws GrammarException, IOException {
+	public SyntacticParse next() throws GrammarException, IOException {
 		String line;
 		while ((line = reader.readLine()) != null) {
 			if (ignorePattern.matcher(line).matches())
@@ -96,16 +93,17 @@ final class RuleParser {
 				LinkedList<RuleFragment> parse = new LinkedList<RuleFragment>();
 				Type t = Type.explicit;
 				// we've parsed out the rule label
-				parse.add(new Label(t, id));
+				Label l = new Label(t, id);
 				int[] offset = { 0 };
-				LinkedList<RuleFragment> body = parseBody(remainder, offset,
-						(char) 0);
-				List<RuleFragment> nonconditions = body.peekLast() instanceof ConditionFragment ? body
-						.subList(0, body.size() - 1) : body;
+				SequenceFragment body = parseBody(remainder, offset, (char) 0);
+				SequenceFragment nonconditions = body.last() instanceof ConditionFragment ? body
+						.nonConditions() : body;
 				checkUplevelBackReferences(line, nonconditions, 0, 0);
 				checkBarriers(nonconditions);
-				parse.addAll(body);
-				return parse;
+				parse.add(body);
+				return new SyntacticParse(l, nonconditions,
+						(ConditionFragment) (body == nonconditions ? null
+								: body.last()));
 			} else
 				throw new GrammarException("ill-formed rule: " + line);
 		}
@@ -117,12 +115,12 @@ final class RuleParser {
 	 * replaces these fragments with {@link BackReferenceFragment} fragments
 	 * where appropriate.
 	 * 
-	 * @param frags
+	 * @param sl2
 	 */
 	private static void checkUplevelBackReferences(String line,
-			List<RuleFragment> frags, int level, int pos) {
-		for (int i = 0; i < frags.size(); i++) {
-			RuleFragment rf = frags.get(i);
+			SequenceFragment sl2, int level, int pos) {
+		for (int i = 0; i < sl2.size(); i++) {
+			RuleFragment rf = sl2.get(i);
 			int cpos = level == 0 ? i : pos;
 			if (rf instanceof UplevelBackReferenceFragment) {
 				UplevelBackReferenceFragment ubf = (UplevelBackReferenceFragment) rf;
@@ -135,14 +133,14 @@ final class RuleParser {
 							+ " in " + line + " references its own position");
 				if (ubf.rep.redundant()) {
 					if (level == 0) {
-						frags.set(i, new BackReferenceFragment(ubf.reference));
+						sl2.set(i, new BackReferenceFragment(ubf.reference));
 					}
 				} else
 					ubf.level = 1;
 				ubf.level += level;
 			} else if (rf instanceof GroupFragment) {
 				GroupFragment gf = (GroupFragment) rf;
-				for (List<RuleFragment> sl : gf.alternates) {
+				for (SequenceFragment sl : gf.alternates) {
 					checkUplevelBackReferences(line, sl, level + 1, cpos);
 				}
 			}
@@ -153,11 +151,11 @@ final class RuleParser {
 	 * Makes sure we don't have any '::' barriers unaccompanied by other rule
 	 * fragments.
 	 * 
-	 * @param body
+	 * @param alternate
 	 */
-	private static void checkBarriers(List<RuleFragment> body) {
-		boolean oneElementList = body.size() == 1;
-		for (RuleFragment r : body)
+	private static void checkBarriers(SequenceFragment alternate) {
+		boolean oneElementList = alternate.size() == 1;
+		for (RuleFragment r : alternate.sequence)
 			checkBarriers(r, oneElementList);
 	}
 
@@ -167,7 +165,7 @@ final class RuleParser {
 					"all backtracking barriers must occur as members of a sequence");
 		if (r instanceof GroupFragment) {
 			GroupFragment gf = (GroupFragment) r;
-			for (List<RuleFragment> alternate : gf.alternates)
+			for (SequenceFragment alternate : gf.alternates)
 				checkBarriers(alternate);
 		}
 	}
@@ -186,10 +184,10 @@ final class RuleParser {
 	 * @throws GrammarException
 	 * @throws IOException
 	 */
-	private LinkedList<RuleFragment> parseBody(String body, int[] offset,
-			char bracket) throws GrammarException, IOException {
+	private SequenceFragment parseBody(String body, int[] offset, char bracket)
+			throws GrammarException, IOException {
 		StringBuilder b = new StringBuilder(body);
-		LinkedList<RuleFragment> parse = new LinkedList<RuleFragment>();
+		SequenceFragment parse = new SequenceFragment();
 		GroupFragment gf = null;
 		OUTER: while (offset[0] < body.length()) {
 			trimWhitespace(body, offset);
@@ -225,7 +223,7 @@ final class RuleParser {
 					if (gf == null)
 						parse.addAll(r.alternates.get(0));
 					else {
-						for (RuleFragment rf : r.alternates.get(0))
+						for (RuleFragment rf : r.alternates.get(0).sequence)
 							gf.add(rf);
 					}
 				} else {
@@ -442,9 +440,8 @@ final class RuleParser {
 	 * 
 	 * @param parse
 	 */
-	private static void completeAssertions(LinkedList<RuleFragment> parse,
-			String body) {
-		if (parse.peekLast() instanceof AssertionFragment)
+	private static void completeAssertions(SequenceFragment parse, String body) {
+		if (parse.last() instanceof AssertionFragment)
 			throw new GrammarException("no rule after assertion marker in "
 					+ body);
 		RuleFragment previous = null;
@@ -452,7 +449,7 @@ final class RuleParser {
 			RuleFragment rf = i.next();
 			if (rf instanceof GroupFragment) {
 				GroupFragment gf = (GroupFragment) rf;
-				for (LinkedList<RuleFragment> list : gf.alternates)
+				for (SequenceFragment list : gf.alternates)
 					completeAssertions(list, body);
 			}
 			if (previous != null && previous instanceof AssertionFragment) {
@@ -509,7 +506,7 @@ final class RuleParser {
 		return Integer.parseInt(body.substring(start, offset[0]));
 	}
 
-	private static void add(List<RuleFragment> parse, GroupFragment gf,
+	private static void add(SequenceFragment parse, GroupFragment gf,
 			RuleFragment r) {
 		if (gf == null)
 			parse.add(r);

@@ -159,22 +159,21 @@ final class Compiler {
 				}
 			}
 		}
-		Map<Label, List<RuleFragment>> map = new HashMap<Label, List<RuleFragment>>();
+		Map<Label, SequenceFragment> map = new HashMap<Label, SequenceFragment>();
 		Label r = null;
 		RuleParser parser = new RuleParser(reader);
 		try {
-			LinkedList<RuleFragment> list;
+			SyntacticParse list;
 			while ((list = parser.next()) != null) {
-				Label l = (Label) list.removeFirst();
+				Label l = list.l;
 				if (r == null) {
 					if (l.t != Type.explicit) {
 						l = new Label(Type.explicit, l.id);
 					}
 					r = l;
 				}
-				if (list.peekLast() instanceof ConditionFragment) {
-					ConditionFragment cf = (ConditionFragment) list
-							.removeLast();
+				if (list.c != null) {
+					ConditionFragment cf = list.c;
 					String cnd = cf.id.trim();
 					Match m = parseCondition(line, cnd);
 					for (Match cm : m.get("cnd")) {
@@ -191,7 +190,7 @@ final class Compiler {
 				if (map.containsKey(l))
 					throw new GrammarException("rule " + l
 							+ " redefined at line " + parser.getLineNumber());
-				map.put(l, list);
+				map.put(l, list.f);
 			}
 		} catch (IOException e1) {
 			throw new GrammarException(e1);
@@ -205,10 +204,10 @@ final class Compiler {
 		Set<Label> terminals = new HashSet<Label>(map.size() * 2);
 		int gen = 1;
 		// first we extract all the terminals we can
-		for (Iterator<Entry<Label, List<RuleFragment>>> i = map.entrySet()
+		for (Iterator<Entry<Label, SequenceFragment>> i = map.entrySet()
 				.iterator(); i.hasNext();) {
-			Entry<Label, List<RuleFragment>> e = i.next();
-			List<RuleFragment> body = e.getValue();
+			Entry<Label, SequenceFragment> e = i.next();
+			SequenceFragment body = e.getValue();
 			RuleFragment rf = body.get(0);
 			if (body.size() == 1
 					&& (rf instanceof Regex || rf instanceof LiteralFragment)) {
@@ -245,7 +244,7 @@ final class Compiler {
 			knownIds.add(l.id);
 		for (Label l : rules.keySet())
 			knownIds.add(l.id);
-		for (List<RuleFragment> list : map.values()) {
+		for (SequenceFragment list : map.values()) {
 			Set<Label> labels = allLabels(list);
 			for (Label l : labels) {
 				if (l.t == Type.indeterminate && !knownIds.contains(l.id)) {
@@ -267,7 +266,7 @@ final class Compiler {
 			}
 		}
 		// create dependency map
-		for (Entry<Label, List<RuleFragment>> e : map.entrySet()) {
+		for (Entry<Label, SequenceFragment> e : map.entrySet()) {
 			Set<Label> dependents = new HashSet<Label>(allLabels(e.getValue()));
 			dependents.retainAll(map.keySet());
 			if (!dependents.isEmpty()) {
@@ -280,10 +279,10 @@ final class Compiler {
 			int size = map.size();
 			// we process rules by generation, from less dependent to more, in
 			// order to optimize the cache
-			List<Entry<Label, List<RuleFragment>>> generation = new LinkedList<Map.Entry<Label, List<RuleFragment>>>();
-			for (Iterator<Entry<Label, List<RuleFragment>>> i = map.entrySet()
+			List<Entry<Label, SequenceFragment>> generation = new LinkedList<Entry<Label, SequenceFragment>>();
+			for (Iterator<Entry<Label, SequenceFragment>> i = map.entrySet()
 					.iterator(); i.hasNext();) {
-				Entry<Label, List<RuleFragment>> e = i.next();
+				Entry<Label, SequenceFragment> e = i.next();
 				Set<Label> labels = allLabels(e.getValue());
 				boolean defined = true;
 				for (Label l : labels) {
@@ -311,13 +310,13 @@ final class Compiler {
 			// first we sort them to ensure those rules which are likely to be
 			// components of others are handled first
 			class Sorter implements Comparable<Sorter> {
-				final Entry<Label, List<RuleFragment>> e;
+				final Entry<Label, SequenceFragment> e;
 				final int length;
 
-				Sorter(Entry<Label, List<RuleFragment>> e) {
+				Sorter(Entry<Label, SequenceFragment> e2) {
 					int i = 0;
-					this.e = e;
-					for (RuleFragment r : e.getValue())
+					this.e = e2;
+					for (RuleFragment r : e2.getValue().sequence)
 						i += r.toString().length() + 1;
 					length = i;
 				}
@@ -329,13 +328,13 @@ final class Compiler {
 
 			}
 			List<Sorter> sorters = new ArrayList<Sorter>(generation.size());
-			for (Entry<Label, List<RuleFragment>> e : generation)
+			for (Entry<Label, SequenceFragment> e : generation)
 				sorters.add(new Sorter(e));
 			Collections.sort(sorters);
 			// now we make the rules
 			for (Sorter s : sorters) {
 				Label l = s.e.getKey();
-				List<RuleFragment> body = s.e.getValue();
+				SequenceFragment body = s.e.getValue();
 				Rule ru = parseRule(l, body, null);
 				if (redundancyTest(body)) {
 					Label l2 = (Label) body.get(0);
@@ -352,7 +351,7 @@ final class Compiler {
 			terminalLabelMap.put(l.id, l);
 	}
 
-	private boolean redundancyTest(List<RuleFragment> body) {
+	private boolean redundancyTest(SequenceFragment body) {
 		if (body.size() == 1 && body.get(0) instanceof Label)
 			return ((Label) body.get(0)).rep.redundant();
 		return false;
@@ -390,7 +389,7 @@ final class Compiler {
 	 * 
 	 * @param map
 	 */
-	private void resolveRecursions(Map<Label, List<RuleFragment>> map,
+	private void resolveRecursions(Map<Label, SequenceFragment> map,
 			int generation) {
 		for (Iterator<Entry<Label, Set<Label>>> i = dependencyMap.entrySet()
 				.iterator(); i.hasNext();) {
@@ -400,13 +399,13 @@ final class Compiler {
 			else
 				i.remove();
 		}
-		Map<Label, List<RuleFragment>> copy = new HashMap<Label, List<RuleFragment>>(
+		Map<Label, SequenceFragment> copy = new HashMap<Label, SequenceFragment>(
 				map);
 		removeStrictlyDominating(copy);
-		List<List<Entry<Label, List<RuleFragment>>>> cycles = separateCycles(copy);
-		for (List<Entry<Label, List<RuleFragment>>> cycle : cycles) {
+		List<List<Entry<Label, SequenceFragment>>> cycles = separateCycles(copy);
+		for (List<Entry<Label, SequenceFragment>> cycle : cycles) {
 			processCycle(cycle, generation);
-			for (Entry<Label, List<RuleFragment>> e : cycle)
+			for (Entry<Label, SequenceFragment> e : cycle)
 				map.remove(e.getKey());
 		}
 	}
@@ -417,17 +416,17 @@ final class Compiler {
 	 * @param cycle
 	 * @param generation
 	 */
-	private void processCycle(List<Entry<Label, List<RuleFragment>>> cycle,
+	private void processCycle(List<Entry<Label, SequenceFragment>> cycle,
 			int generation) {
 		testCycle(cycle);
 		Map<Label, CyclicRule> cycleMap = new HashMap<Label, CyclicRule>(
 				cycle.size() * 2);
-		for (Entry<Label, List<RuleFragment>> e : cycle) {
+		for (Entry<Label, SequenceFragment> e : cycle) {
 			CyclicRule ddr = new CyclicRule(new Label(Type.explicit,
 					e.getKey().id));
 			cycleMap.put(e.getKey(), ddr);
 		}
-		for (Entry<Label, List<RuleFragment>> e : cycle) {
+		for (Entry<Label, SequenceFragment> e : cycle) {
 			Rule r = parseRule(e.getKey(), e.getValue(), cycleMap);
 			r.generation = generation;
 			cycleMap.get(e.getKey()).setRule(r);
@@ -440,18 +439,18 @@ final class Compiler {
 	 * 
 	 * @param cycle
 	 */
-	private void testCycle(List<Entry<Label, List<RuleFragment>>> cycle) {
+	private void testCycle(List<Entry<Label, SequenceFragment>> cycle) {
 		Set<Label> set = new HashSet<Label>(cycle.size() * 2);
-		for (Entry<Label, List<RuleFragment>> e : cycle)
+		for (Entry<Label, SequenceFragment> e : cycle)
 			set.add(e.getKey());
-		for (Entry<Label, List<RuleFragment>> e : cycle) {
+		for (Entry<Label, SequenceFragment> e : cycle) {
 			if (findEscape(e, set))
 				return;
 		}
 		StringBuilder b = new StringBuilder();
 		b.append("cycle found in rules: ");
 		boolean nonInitial = false;
-		for (Entry<Label, List<RuleFragment>> e : cycle) {
+		for (Entry<Label, SequenceFragment> e : cycle) {
 			if (nonInitial)
 				b.append(", ");
 			else
@@ -467,10 +466,10 @@ final class Compiler {
 	 * @return whether there is some way to escape from a mutual dependency
 	 *         cycle in this rule
 	 */
-	private boolean findEscape(Entry<Label, List<RuleFragment>> e,
+	private boolean findEscape(Entry<Label, SequenceFragment> e,
 			Set<Label> set) {
-		List<RuleFragment> list = e.getValue();
-		for (RuleFragment r : list) {
+		SequenceFragment list = e.getValue();
+		for (RuleFragment r : list.sequence) {
 			if (!set.contains(r))
 				return true;
 			if (((RepeatableRuleFragment) r).rep.bottom == 0)
@@ -479,26 +478,26 @@ final class Compiler {
 		return false;
 	}
 
-	private List<List<Entry<Label, List<RuleFragment>>>> separateCycles(
-			Map<Label, List<RuleFragment>> copy) {
-		List<List<Entry<Label, List<RuleFragment>>>> cycles = new LinkedList<List<Entry<Label, List<RuleFragment>>>>();
+	private List<List<Entry<Label, SequenceFragment>>> separateCycles(
+			Map<Label, SequenceFragment> copy) {
+		List<List<Entry<Label, SequenceFragment>>> cycles = new LinkedList<List<Entry<Label, SequenceFragment>>>();
 		while (true) {
 			// first, we find the entry with the fewest dependencies
-			List<Entry<Label, List<RuleFragment>>> list = new ArrayList<Map.Entry<Label, List<RuleFragment>>>(
+			List<Entry<Label, SequenceFragment>> list = new ArrayList<Entry<Label, SequenceFragment>>(
 					copy.entrySet());
 			Collections.sort(list,
-					new Comparator<Entry<Label, List<RuleFragment>>>() {
+					new Comparator<Entry<Label, SequenceFragment>>() {
 						@Override
-						public int compare(Entry<Label, List<RuleFragment>> o1,
-								Entry<Label, List<RuleFragment>> o2) {
+						public int compare(Entry<Label, SequenceFragment> o1,
+								Entry<Label, SequenceFragment> o2) {
 							return dependencyMap.get(o1.getKey()).size()
 									- dependencyMap.get(o2.getKey()).size();
 						}
 					});
-			Entry<Label, List<RuleFragment>> least = list.get(0);
+			Entry<Label, SequenceFragment> least = list.get(0);
 			Set<Label> set = new HashSet<Label>();
 			set.add(least.getKey());
-			List<Entry<Label, List<RuleFragment>>> cycle = new LinkedList<Map.Entry<Label, List<RuleFragment>>>();
+			List<Entry<Label, SequenceFragment>> cycle = new LinkedList<Entry<Label, SequenceFragment>>();
 			LinkedList<Label> searchQueue = new LinkedList<Label>(
 					dependencyMap.get(least.getKey()));
 			while (!searchQueue.isEmpty()) {
@@ -510,9 +509,9 @@ final class Compiler {
 				}
 				set.add(l);
 			}
-			for (Iterator<Entry<Label, List<RuleFragment>>> i = copy.entrySet()
+			for (Iterator<Entry<Label, SequenceFragment>> i = copy.entrySet()
 					.iterator(); i.hasNext();) {
-				Entry<Label, List<RuleFragment>> e = i.next();
+				Entry<Label, SequenceFragment> e = i.next();
 				if (set.contains(e.getKey())) {
 					cycle.add(e);
 					i.remove();
@@ -531,10 +530,10 @@ final class Compiler {
 	 * 
 	 * @param copy
 	 */
-	private void removeStrictlyDominating(Map<Label, List<RuleFragment>> copy) {
+	private void removeStrictlyDominating(Map<Label, SequenceFragment> copy) {
 		while (true) {
 			Set<Label> required = new HashSet<Label>(copy.size() * 2);
-			for (List<RuleFragment> list : copy.values())
+			for (SequenceFragment list : copy.values())
 				required.addAll(allLabels(list));
 			boolean changed = false;
 			for (Iterator<Label> i = copy.keySet().iterator(); i.hasNext();) {
@@ -548,7 +547,7 @@ final class Compiler {
 		}
 	}
 
-	private Rule parseRule(Label label, List<RuleFragment> fragments,
+	private Rule parseRule(Label label, SequenceFragment fragments,
 			Map<Label, CyclicRule> cycleMap) {
 		Rule r;
 		if (fragments.size() == 1) {
@@ -755,7 +754,7 @@ final class Compiler {
 			boolean nonInitial = false;
 			Map<String, Set<String>> tagMap = new HashMap<String, Set<String>>(
 					gf.alternates.size() * 2);
-			for (List<RuleFragment> alternate : gf.alternates) {
+			for (SequenceFragment alternate : gf.alternates) {
 				Set<String> innerTags = null;
 				if (alternate.size() == 1) {
 					RuleFragment rfInner = alternate.get(0);
@@ -959,7 +958,7 @@ final class Compiler {
 		return c;
 	}
 
-	private Rule makeSequence(Label label, List<RuleFragment> fragments,
+	private Rule makeSequence(Label label, SequenceFragment fragments,
 			Map<Label, CyclicRule> cycleMap) {
 		if (rules.containsKey(label))
 			return rules.get(label);
@@ -969,7 +968,7 @@ final class Compiler {
 		return r;
 	}
 
-	private Rule makeSequence(List<RuleFragment> value,
+	private Rule makeSequence(SequenceFragment value,
 			Map<Label, CyclicRule> cycleMap, Match condition) {
 		if (value.size() == 1)
 			throw new GrammarException(
@@ -980,7 +979,7 @@ final class Compiler {
 		List<Set<String>> tagList = new ArrayList<Set<String>>(value.size());
 		StringBuilder b = new StringBuilder();
 		b.append('[');
-		for (RuleFragment rf : value) {
+		for (RuleFragment rf : value.sequence) {
 			Set<String> tagSet = null;
 			Rule r = null;
 			if (rf instanceof GroupFragment) {
@@ -1030,19 +1029,19 @@ final class Compiler {
 		return new HashSet<Label>(undefinedRules);
 	}
 
-	private Set<Label> allLabels(List<RuleFragment> value) {
+	private Set<Label> allLabels(SequenceFragment list2) {
 		Set<Label> allLabels = new TreeSet<Label>();
-		for (RuleFragment rf : value) {
+		for (RuleFragment rf : list2.sequence) {
 			if (rf instanceof Label)
 				allLabels.add((Label) rf);
 			else if (rf instanceof GroupFragment) {
 				GroupFragment gf = (GroupFragment) rf;
-				for (List<RuleFragment> l : gf.alternates) {
+				for (SequenceFragment l : gf.alternates) {
 					allLabels.addAll(allLabels(l));
 				}
 			} else if (rf instanceof AssertionFragment) {
 				AssertionFragment af = (AssertionFragment) rf;
-				List<RuleFragment> list = new ArrayList<RuleFragment>(1);
+				SequenceFragment list = new SequenceFragment();
 				list.add(af.rf);
 				allLabels.addAll(allLabels(list));
 			}
