@@ -1015,12 +1015,14 @@ public class Grammar implements Serializable {
 			}
 		}
 		int maxLabel = root.label().id.length();
+		int maxEquals = root.label().ws.length();
 		for (Rule r : rules) {
+			maxEquals = Math.max(maxEquals, r.label().ws.length());
 			int l = r.label().id.length();
 			if (l > maxLabel)
 				maxLabel = l;
 		}
-		String format = "%" + maxLabel + "s =";
+		String format = "%" + maxLabel + "s %" + maxEquals + 's';
 		// put rules in canonical order
 		Collections.sort(rules, new Comparator<Rule>() {
 			@Override
@@ -1042,7 +1044,8 @@ public class Grammar implements Serializable {
 		if (!rules.isEmpty()) {
 			b.append('\n');
 			for (Rule r : rules) {
-				b.append(String.format(format, r.label().id));
+				b.append(String.format(format, r.label().ws.symbol(),
+						r.label().id));
 				b.append(' ');
 				b.append(r.description());
 				b.append("\n");
