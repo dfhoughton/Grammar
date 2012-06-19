@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import dfh.grammar.Label.Type;
+import dfh.grammar.Label.Whitespace;
 
 /**
  * A companion to {@link RuleParser}, {@link Compiler} encapsulates the messy
@@ -235,11 +236,11 @@ final class Compiler {
 						Label rxl = new Label(Type.implicit, rx.toString());
 						Rule rxr = new LeafRule(rxl, rx.re, rx.reversible);
 						ru = new RepetitionRule(l, rxr, rx.rep, EMPTY_STR_SET);
-						setCondition(condition, ru);
+						setCondition(condition, ru, false);
 					}
 				} else {
 					ru = new LiteralRule(l, ((LiteralFragment) rf).literal);
-					setCondition(condition, ru);
+					setCondition(condition, ru, false);
 				}
 				ru.generation = gen;
 				rules.put(l, ru);
@@ -581,9 +582,11 @@ final class Compiler {
 
 	private Rule makeSingle(Label label, RuleFragment ruleFragment,
 			Map<Label, CyclicRule> cycleMap) {
+		// TODO add space delimiter condition as appropriate
 		if (rules.containsKey(label))
 			return rules.get(label);
-		Rule r = makeSingle(ruleFragment, cycleMap, conditionMap.get(label));
+		Rule r = makeSingle(ruleFragment, cycleMap, conditionMap.get(label),
+				label.ws == Whitespace.required);
 		r = fixLabel(label, r, conditionMap.get(label));
 		fixConditions(label, r);
 		return r;
@@ -635,7 +638,7 @@ final class Compiler {
 		if (ru == null)
 			throw new GrammarException("unanticipated rule type: "
 					+ r.getClass().getName());
-		setCondition(match, ru);
+		setCondition(match, ru, false);
 
 		if (match != null && r.condition == null) {
 			ru = ru.conditionalize(LogicalCondition.manufacture(match),
@@ -657,13 +660,14 @@ final class Compiler {
 	 * 
 	 * @param rf
 	 * @param cycleMap
+	 * @param whitespaceCondition
 	 * @return
 	 */
 	private Rule makeSingle(RuleFragment rf, Map<Label, CyclicRule> cycleMap,
-			Match condition) {
+			Match condition, boolean whitespaceCondition) {
 		if (rf instanceof AssertionFragment) {
 			AssertionFragment af = (AssertionFragment) rf;
-			Rule sr = makeSingle(af.rf, cycleMap, null);
+			Rule sr = makeSingle(af.rf, cycleMap, null, whitespaceCondition);
 			String subDescription = null;
 			if (!af.forward) {
 				StringBuilder b = new StringBuilder();
@@ -695,19 +699,19 @@ final class Compiler {
 			Label label = new Label(Type.implicit, new Label(Type.explicit,
 					l.id) + l.rep.toString());
 			r = new RepetitionRule(label, r, l.rep, EMPTY_STR_SET);
-			setCondition(condition, r);
+			setCondition(condition, r, false);
 			return r;
 		} else if (rf instanceof LiteralFragment) {
 			LiteralFragment lf = (LiteralFragment) rf;
 			Label l = new Label(Type.implicit, '"' + lf.literal + '"');
 			Rule r = new LiteralRule(l, lf.literal);
 			if (lf.rep.redundant()) {
-				setCondition(condition, r);
+				setCondition(condition, r, false);
 				return r;
 			}
 			l = new Label(Type.implicit, lf.toString());
 			r = new RepetitionRule(l, r, lf.rep, EMPTY_STR_SET);
-			setCondition(condition, r);
+			setCondition(condition, r, false);
 			return r;
 		} else if (rf instanceof BackReferenceFragment) {
 			BackReferenceFragment brf = (BackReferenceFragment) rf;
@@ -732,12 +736,12 @@ final class Compiler {
 			Label l = new Label(Type.implicit, rf.toString());
 			Rule r = new LeafRule(l, rx.re, rx.reversible);
 			if (rx.rep.redundant()) {
-				setCondition(condition, r);
+				setCondition(condition, r, false);
 				return r;
 			}
 			l = new Label(Type.implicit, rx.toString() + rx.rep);
 			r = new RepetitionRule(l, r, rx.rep, EMPTY_STR_SET);
-			setCondition(condition, r);
+			setCondition(condition, r, false);
 			return r;
 		}
 		GroupFragment gf = (GroupFragment) rf;
@@ -749,10 +753,12 @@ final class Compiler {
 		if (gf.alternates.size() == 1) {
 			// repeated rule with capture
 			if (gf.alternates.get(0).size() == 1) {
-				r = makeSingle(gf.alternates.get(0).get(0), cycleMap, null);
+				r = makeSingle(gf.alternates.get(0).get(0), cycleMap, null,
+						whitespaceCondition);
 			} else {
 				// repeated sequence
-				r = makeSequence(gf.alternates.get(0), cycleMap, null);
+				r = makeSequence(gf.alternates.get(0), cycleMap, null,
+						whitespaceCondition);
 			}
 		} else {
 			// repeated alternation
@@ -773,14 +779,16 @@ final class Compiler {
 							if (gfInner.alternates.get(0).size() == 1)
 								r = makeSingle(
 										gfInner.alternates.get(0).get(0),
-										cycleMap, null);
+										cycleMap, null, whitespaceCondition);
 							else
 								r = makeSequence(gfInner.alternates.get(0),
-										cycleMap, null);
+										cycleMap, null, whitespaceCondition);
 						} else
-							r = makeSingle(rfInner, cycleMap, null);
+							r = makeSingle(rfInner, cycleMap, null,
+									whitespaceCondition);
 					} else {
-						r = makeSingle(rfInner, cycleMap, null);
+						r = makeSingle(rfInner, cycleMap, null,
+								whitespaceCondition);
 					}
 					String id = r.uniqueId();
 					if (tagMap.containsKey(id)) {
@@ -792,7 +800,8 @@ final class Compiler {
 								0) : innerTags);
 					}
 				} else {
-					r = makeSequence(alternate, cycleMap, null);
+					r = makeSequence(alternate, cycleMap, null,
+							whitespaceCondition);
 					tagMap.put(r.uniqueId(), EMPTY_STR_SET);
 				}
 				alternates.add(r);
@@ -807,21 +816,35 @@ final class Compiler {
 			r = new AlternationRule(l, alternates.toArray(new Rule[alternates
 					.size()]), tagMap);
 			if (gf.rep.redundant()) { // TODO confirm that this won't be true
-				setCondition(condition, r);
+				setCondition(condition, r, false);
 				return r;
 			}
 		}
 		Label l = new Label(Type.implicit, r.label().toString() + gf.rep);
 		r = new RepetitionRule(l, r, gf.rep, tags);
-		setCondition(condition, r);
+		setCondition(condition, r, false);
 		return r;
 	}
 
-	private static void setCondition(Match condition, Rule r) {
+	private static void setCondition(Match condition, Rule r,
+			boolean whitespaceCondition) {
 		if (condition != null) {
 			r.condition = condition.group();
-			r.conditionalize(LogicalCondition.manufacture(condition),
-					r.condition);
+			Condition c;
+			Condition lc = LogicalCondition.manufacture(condition);
+			if (whitespaceCondition) {
+				LeafCondition leaf = new LeafCondition(SpaceCondition.ID);
+				List<Condition> list = new ArrayList<Condition>(2);
+				list.add(leaf);
+				list.add(lc);
+				c = new ConjunctionCondition(list);
+			} else
+				c = lc;
+			r.conditionalize(c, r.condition);
+		} else if (whitespaceCondition) {
+			r.condition = SpaceCondition.ID;
+			LeafCondition c = new LeafCondition(SpaceCondition.ID);
+			r.conditionalize(c, r.condition);
 		}
 	}
 
@@ -968,16 +991,19 @@ final class Compiler {
 
 	private Rule makeSequence(Label label, SequenceFragment fragments,
 			Map<Label, CyclicRule> cycleMap) {
+		// TODO add space delimiter condition as appropriate
 		if (rules.containsKey(label))
 			return rules.get(label);
-		Rule r = makeSequence(fragments, cycleMap, conditionMap.get(label));
+		Rule r = makeSequence(fragments, cycleMap, conditionMap.get(label),
+				label.ws == Whitespace.required);
 		r = fixLabel(label, r, conditionMap.get(label));
 		fixConditions(label, r);
 		return r;
 	}
 
 	private Rule makeSequence(SequenceFragment value,
-			Map<Label, CyclicRule> cycleMap, Match condition) {
+			Map<Label, CyclicRule> cycleMap, Match condition,
+			boolean whitespaceCondition) {
 		if (value.size() == 1)
 			throw new GrammarException(
 					"logic error in compiler; no singleton lists should arrive at this point");
@@ -997,18 +1023,18 @@ final class Compiler {
 					if (gf.alternates.size() == 1) {
 						if (gf.alternates.get(0).size() == 1)
 							r = makeSingle(gf.alternates.get(0).get(0),
-									cycleMap, null);
+									cycleMap, null, whitespaceCondition);
 						else
 							r = makeSequence(gf.alternates.get(0), cycleMap,
-									null);
+									null, whitespaceCondition);
 					}
 				} else {
 					tagSet = EMPTY_STR_SET;
-					r = makeSingle(rf, cycleMap, null);
+					r = makeSingle(rf, cycleMap, null, whitespaceCondition);
 				}
 			} else {
 				tagSet = EMPTY_STR_SET;
-				r = makeSingle(rf, cycleMap, null);
+				r = makeSingle(rf, cycleMap, null, whitespaceCondition);
 			}
 			if (nonInitial)
 				b.append(' ');
@@ -1021,7 +1047,15 @@ final class Compiler {
 		b.append(']');
 		Label l = new Label(Type.implicit, b.toString());
 		Rule r = new SequenceRule(l, sequence, tagList);
-		setCondition(condition, r);
+		if (whitespaceCondition) {
+			Set<Label> set = undefinedConditions.get(SpaceCondition.ID);
+			if (set == null) {
+				set = new TreeSet<Label>();
+				undefinedConditions.put(SpaceCondition.ID, set);
+			}
+			set.add(l);
+		}
+		setCondition(condition, r, whitespaceCondition);
 		return r;
 	}
 

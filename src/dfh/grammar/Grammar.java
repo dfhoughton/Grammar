@@ -554,6 +554,8 @@ public class Grammar implements Serializable {
 		undefinedConditions = c.undefinedConditions();
 		knownConditions = new HashMap<String, Set<Rule>>(
 				undefinedConditions.size() * 2);
+		if (undefinedConditions.containsKey(SpaceCondition.ID))
+			defineCondition(SpaceCondition.ID, new SpaceCondition());
 	}
 
 	/**
