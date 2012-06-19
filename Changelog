@@ -4,6 +4,7 @@
   * multi-line rules now enabled; e.g.,
     rule = 'foo' \ # comments and whitespace may come after this
            'bar'
+  * fixed simpled repeated regex rules; e.g., rule = /rx/?
 
 2.06, 15 June 2012
   * turned off default studying for find()
