@@ -11,8 +11,10 @@ final class SyntacticParse {
 	final Label l;
 	final SequenceFragment f;
 	final ConditionFragment c;
+	final String text;
 
-	SyntacticParse(Label l, SequenceFragment f, ConditionFragment c) {
+	SyntacticParse(String text, Label l, SequenceFragment f, ConditionFragment c) {
+		this.text = text;
 		this.l = l;
 		this.f = f;
 		this.c = c;

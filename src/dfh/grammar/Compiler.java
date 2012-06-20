@@ -61,7 +61,8 @@ final class Compiler {
 			" conj = <exp> [ [ /\\s*+/ '&' /\\s*+/ | /\\s++/ ] <exp> ]+",//
 			" disj = <exp> [ /\\s*+/ '|' /\\s*+/ <exp> ]+",//
 			"  xor = <exp> [ /\\s*+/ '^' /\\s*+/ <exp> ]+",//
-			"  cnd = /\\w++/",//
+			"  cnd = /\\w++/ | <res>",//
+			"  res = /\\.\\w++/",//
 	};
 	/**
 	 * {@link MatchTest} that filters out parse trees that don't respect the
@@ -143,7 +144,6 @@ final class Compiler {
 	 */
 	Compiler(LineReader reader, Map<String, Rule> precompiledRules)
 			throws GrammarException {
-		String line = null;
 		if (precompiledRules == null)
 			precompiledRules = Collections.emptyMap();
 		else {
@@ -165,25 +165,25 @@ final class Compiler {
 		Label r = null;
 		RuleParser parser = new RuleParser(reader);
 		try {
-			SyntacticParse list;
-			while ((list = parser.next()) != null) {
-				Label l = list.l;
+			SyntacticParse parsed;
+			while ((parsed = parser.next()) != null) {
+				Label l = parsed.l;
 				if (r == null) {
 					if (l.t != Type.explicit) {
 						l = new Label(Type.explicit, l.id);
 					}
 					r = l;
 				}
-				if (list.c != null) {
-					ConditionFragment cf = list.c;
+				if (parsed.c != null) {
+					ConditionFragment cf = parsed.c;
 					String cnd = cf.id.trim();
-					Match m = parseCondition(line, cnd);
+					Match m = parseCondition(parsed.text, cnd);
 					conditionMap.put(l, m);
 				}
 				if (map.containsKey(l))
 					throw new GrammarException("rule " + l
 							+ " redefined at line " + parser.getLineNumber());
-				map.put(l, list.f);
+				map.put(l, parsed.f);
 			}
 		} catch (IOException e1) {
 			throw new GrammarException(e1);
@@ -572,7 +572,6 @@ final class Compiler {
 
 	private Rule makeSingle(Label label, RuleFragment ruleFragment,
 			Map<Label, CyclicRule> cycleMap) {
-		// TODO add space delimiter condition as appropriate
 		if (rules.containsKey(label))
 			return rules.get(label);
 		Rule r = makeSingle(ruleFragment, cycleMap, conditionMap.get(label),
@@ -616,6 +615,12 @@ final class Compiler {
 			DeferredDefinitionRule ddr = new DeferredDefinitionRule(label);
 			ddr.r = old;
 			ru = ddr;
+		} else if (r instanceof ConditionalizedLabel) {
+			ConditionalizedLabel cl = (ConditionalizedLabel) r;
+			ConditionalizedLabel cl2 = new ConditionalizedLabel(label, cl.r);
+			cl2.c = cl.c;
+			cl2.condition = cl.condition;
+			ru = cl2;
 		}
 		if (ru == null)
 			throw new GrammarException("unanticipated rule type: "
@@ -676,9 +681,11 @@ final class Compiler {
 			Rule r = rules.get(l);
 			if (r == null)
 				r = cycleMap.get(l);
-			if (l.rep.redundant() && r.condition != null && (whitespaceCondition || condition != null )) {
+			if (l.rep.redundant() && r.condition != null
+					&& (whitespaceCondition || condition != null)) {
 				// TODO add creation of ConditionalizedLabel here
-				Label label = new Label(Type.implicit, l + "(" + condition.group() + ")");
+				Label label = new Label(Type.implicit, l + "("
+						+ condition.group() + ")");
 				r = new ConditionalizedLabel(label, r);
 			} else if (!l.rep.redundant()) {
 				Label label = new Label(Type.implicit, new Label(Type.explicit,
@@ -814,7 +821,9 @@ final class Compiler {
 
 	private Rule setCondition(Match condition, Rule r,
 			boolean whitespaceCondition) {
+		// keep track of whether the whitespace condition is ever required
 		setWhitespaceCondition |= whitespaceCondition;
+
 		if (condition != null) {
 			r.condition = whitespaceCondition ? SpaceCondition.ID + " ("
 					+ condition.group() + ')' : condition.group();

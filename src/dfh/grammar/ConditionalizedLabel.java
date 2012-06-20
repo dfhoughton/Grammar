@@ -96,4 +96,10 @@ public class ConditionalizedLabel extends Rule implements Serializable,
 		return r.mayBeZeroWidth(cache);
 	}
 
+	@Override
+	public Rule conditionalize(Condition c, String id) {
+		this.c = c;
+		this.condition = id;
+		return this;
+	}
 }

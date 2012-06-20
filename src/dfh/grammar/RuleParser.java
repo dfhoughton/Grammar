@@ -125,7 +125,7 @@ final class RuleParser {
 				checkBarriers(body);
 				if (ws != Whitespace.none)
 					addWhitespaceDelimiters(body);
-				return new SyntacticParse(l, body, cf);
+				return new SyntacticParse(line, l, body, cf);
 			} else
 				throw new GrammarException("ill-formed rule: " + line);
 		}

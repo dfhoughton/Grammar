@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -49,7 +50,7 @@ public class ReversedCycle {
 			int count = 0;
 			while (m.match() != null)
 				count++;
-			assertTrue("correct count using condition", count == 1);
+			assertEquals("correct count using condition", 1, count);
 		} catch (Exception e) {
 			fail("threw exception: " + e);
 		}
@@ -83,7 +84,7 @@ public class ReversedCycle {
 			int count = 0;
 			while (m.match() != null)
 				count++;
-			assertTrue("correct count using condition", count == 1);
+			assertEquals("correct count using condition", 1, count);
 		} catch (Exception e) {
 			fail("threw exception: " + e);
 		}
