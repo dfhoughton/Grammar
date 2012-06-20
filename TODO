@@ -24,7 +24,7 @@ section at the end of the document.
 * implement multi-line rules
 . document multi-line rules
 . document semantics of xor operator in conditions
-. create ConditionalizedReference rule to handle rule = <a> (c)
+* create ConditionalizedReference rule to handle rule = <a> (c)
 
 COMPLETED
 =========
