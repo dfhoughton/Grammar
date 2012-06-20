@@ -94,6 +94,6 @@ public class MultithreadTest {
 				}
 			}
 		}
-		assertTrue("got all matches", matchCount.get() == count.get());
+		assertEquals("got all matches", matchCount.get(), count.get());
 	}
 }

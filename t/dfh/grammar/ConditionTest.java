@@ -63,7 +63,7 @@ public class ConditionTest {
 		int count = 0;
 		while (m.match() != null)
 			count++;
-		assertTrue("only found value lower than 100", count == 1);
+		assertEquals("only found value lower than 100", 1, count);
 	}
 
 	@Test

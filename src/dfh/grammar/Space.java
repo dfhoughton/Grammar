@@ -42,7 +42,7 @@ public class Space extends RepetitionRule {
 
 	private static class SS extends LeafRule {
 		private static final long serialVersionUID = 1L;
-		public static final Pattern p = Pattern.compile("\\s++");
+		public static final Pattern p = Pattern.compile("\\s");
 		public static final Label lss = new Label(Type.implicit, ".ss");
 		private static final String fixedIdSS = '/' + p.toString() + "/r";
 
@@ -59,11 +59,10 @@ public class Space extends RepetitionRule {
 
 	private static final Set<String> noTags = Collections.emptySet();
 	public static final Label l = new Label(Type.implicit, ".s");
-	private static final SS ss = new SS();
-	private static final String fixedId = SS.fixedIdSS + '?';
+	private static final String fixedId = SS.fixedIdSS + Repetition.ASTERISK;
 
 	Space() {
-		super(l, ss, Repetition.PLUS, noTags);
+		super(l, new SS(), Repetition.ASTERISK, noTags);
 	}
 
 	@Override

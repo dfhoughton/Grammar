@@ -21,15 +21,15 @@ public class SpaceCondition extends Condition {
 		for (Match c : n.children()) {
 			if (c.rule().label.id.equals(Space.l.id)) {
 				// if this node represents whitespace, we stop needing space
-				needS &= n.end() == n.start();
-			} else if (n.end() > n.start()) {
+				needS &= c.end() == c.start();
+			} else if (c.end() > c.start()) {
 				// do we need space? If so, can some be found either in the
 				// preceding non-trivial nodes or the node itself?
-				if (needS && !Character.isWhitespace(s.charAt(n.start())))
+				if (needS && !Character.isWhitespace(s.charAt(c.start())))
 					return false;
 				// if this node ends in whitespace, we have already accounted
 				// for any space we may need immediately following this node
-				needS = !Character.isWhitespace(s.charAt(n.end() - 1));
+				needS = !Character.isWhitespace(s.charAt(c.end() - 1));
 			}
 		}
 		return true;

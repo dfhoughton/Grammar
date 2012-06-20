@@ -127,8 +127,9 @@ public class TerminalGrammarTest {
 		gb.defineCondition("lt100", new Condition() {
 		});
 		ga.defineRule("b", gb);
-		assertTrue("condition name appears in description", ga.describe()
-				.indexOf("lt100") > -1);
+		String description = ga.describe();
+		assertTrue("condition name appears in description",
+				description.indexOf("lt100") > -1);
 	}
 
 	@Test

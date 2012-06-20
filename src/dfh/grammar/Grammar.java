@@ -338,7 +338,7 @@ public class Grammar implements Serializable {
 	 * Keeps track of terminals not defined in initial rule set.
 	 */
 	protected final HashSet<Label> undefinedRules;
-	protected final Map<String, Set<Label>> undefinedConditions;
+	protected final Map<String, Set<String>> undefinedConditions;
 	private final Map<String, Set<Rule>> knownConditions;
 	private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
 	/**
@@ -554,7 +554,7 @@ public class Grammar implements Serializable {
 		undefinedConditions = c.undefinedConditions();
 		knownConditions = new HashMap<String, Set<Rule>>(
 				undefinedConditions.size() * 2);
-		if (undefinedConditions.containsKey(SpaceCondition.ID))
+		if (c.setWhitespaceCondition())
 			defineCondition(SpaceCondition.ID, new SpaceCondition());
 	}
 
@@ -1017,8 +1017,10 @@ public class Grammar implements Serializable {
 		int maxLabel = root.label().id.length();
 		int maxEquals = root.label().ws.length();
 		for (Rule r : rules) {
-			maxEquals = Math.max(maxEquals, r.label().ws.length());
-			int l = r.label().id.length();
+			int l = r.label().ws.length();
+			if (l > maxEquals)
+				maxEquals = l;
+			l = r.label().id.length();
 			if (l > maxLabel)
 				maxLabel = l;
 		}
@@ -1037,15 +1039,15 @@ public class Grammar implements Serializable {
 		});
 
 		StringBuilder b = new StringBuilder();
-		b.append(String.format(format, rootLabel.id));
+		b.append(String.format(format, rootLabel.id, rootLabel.ws.symbol()));
 		b.append(' ');
 		b.append(root.description());
 		b.append('\n');
 		if (!rules.isEmpty()) {
 			b.append('\n');
 			for (Rule r : rules) {
-				b.append(String.format(format, r.label().ws.symbol(),
-						r.label().id));
+				b.append(String.format(format, r.label().id,
+						r.label().ws.symbol()));
 				b.append(' ');
 				b.append(r.description());
 				b.append("\n");
@@ -1518,75 +1520,41 @@ public class Grammar implements Serializable {
 	 * @param c
 	 */
 	public synchronized void defineCondition(String label, Condition c) {
-		Set<Label> set = undefinedConditions.remove(label);
-		if (set == null)
-			throw new GrammarException("no undefined condition " + label);
-		Set<Rule> rset = new HashSet<Rule>(set.size() * 2);
-		knownConditions.put(label, rset);
-		Set<Rule> allRules = new HashSet<Rule>();
-		root.subRules(allRules, new HashSet<Rule>(), true);
-		root.subRules(allRules, new HashSet<Rule>(), false);
-		Map<Label, Rule> ruleMap = new HashMap<Label, Rule>(allRules.size() * 2);
-		for (Rule r : allRules)
-			ruleMap.put(r.label, r);
-		for (Label l : set) {
-			Rule r = ruleMap.remove(l);
-			if (r == null)
-				continue;
-			Rule nr = r.conditionalize(c, label);
-			if (r != nr)
-				fix(this, r, nr);
-			ruleMap.put(l, nr);
-			if (l.equals(rootLabel))
-				root = nr;
-			rset.add(nr);
-			String reversedId = l.id + Assertion.REVERSAL_SUFFIX;
-			for (Rule rr : findRulesById(reversedId)) {
-				Rule nrr = rr.conditionalize(c, label);
-				if (rr != nrr)
-					fix(this, rr, nrr);
+		boolean cantFind = true;
+		Map<String, List<Rule>> idMap = new HashMap<String, List<Rule>>(rules().size() * 2);
+		for (Rule r: rules()) {
+			String id = r.uniqueId();
+			List<Rule> list = idMap.get(id);
+			if (list == null) {
+				list = new ArrayList<Rule>();
+				idMap.put(id, list);
+			}
+			list.add(r);
+		}
+		for (Iterator<Entry<String, Set<String>>> i = undefinedConditions
+				.entrySet().iterator(); i.hasNext();) {
+			Entry<String, Set<String>> e = i.next();
+			String ruleId = e.getKey();
+			Set<String> conditions = e.getValue();
+			if (conditions.contains(label)) {
+				cantFind = false;
+				List<Rule> list = idMap.get(ruleId);
+				if (list == null)
+					list = Collections.emptyList();
+				for (Rule r : list) {
+					Rule nr = r.conditionalize(c, label);
+					if (r != nr)
+						fix(this, r, nr);
+				}
+				conditions.remove(label);
+				if (conditions.isEmpty())
+					i.remove();
 			}
 		}
+		if (cantFind)
+			throw new GrammarException(
+					"could not find any rule with condition " + label);
 		c.setName(label);
-	}
-
-	/**
-	 * Find all the rules with the given label id.
-	 * 
-	 * @param reversedId
-	 * @return
-	 */
-	private Set<Rule> findRulesById(String reversedId) {
-		Set<Rule> set = new HashSet<Rule>(), cycleSet = new HashSet<Rule>();
-		for (Rule r : rules()) {
-			findRulesById(r, set, reversedId, cycleSet);
-		}
-		return set;
-	}
-
-	private void findRulesById(Rule r, Set<Rule> set, String reversedId,
-			Set<Rule> cycleSet) {
-		if (r.label.id.equals(reversedId))
-			set.add(r);
-		// recursively search non-terminal rules
-		if (r instanceof SequenceRule) {
-			SequenceRule sr = (SequenceRule) r;
-			for (Rule srr : sr.sequence)
-				findRulesById(srr, set, reversedId, cycleSet);
-		} else if (r instanceof AlternationRule) {
-			AlternationRule ar = (AlternationRule) r;
-			for (Rule sr : ar.alternates)
-				findRulesById(sr, set, reversedId, cycleSet);
-		} else if (r instanceof RepetitionRule) {
-			findRulesById(((RepetitionRule) r).r, set, reversedId, cycleSet);
-		} else if (r instanceof Assertion) {
-			findRulesById(((Assertion) r).r, set, reversedId, cycleSet);
-		} else if (r instanceof CyclicRule) {
-			if (!cycleSet.contains(r)) {
-				cycleSet.add(r);
-				findRulesById(((CyclicRule) r).r, set, reversedId, cycleSet);
-			}
-		}
 	}
 
 	/**

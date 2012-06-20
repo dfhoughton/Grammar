@@ -46,8 +46,9 @@ final class Compiler {
 	private Map<Label, Set<Label>> dependencyMap = new HashMap<Label, Set<Label>>();
 	private Map<Label, Rule> reversedCyclicRuleMap = new HashMap<Label, Rule>();
 	private final Label root;
-	private Map<String, Set<Label>> undefinedConditions = new HashMap<String, Set<Label>>();
+	private Map<String, Set<String>> undefinedConditions = new HashMap<String, Set<String>>();
 	private Map<Label, Match> conditionMap = new HashMap<Label, Match>();
+	private boolean setWhitespaceCondition = false;
 	/**
 	 * The grammar of conditions at the end of rules.
 	 */
@@ -140,7 +141,7 @@ final class Compiler {
 	 * @throws GrammarException
 	 * @throws IOException
 	 */
-	protected Compiler(LineReader reader, Map<String, Rule> precompiledRules)
+	Compiler(LineReader reader, Map<String, Rule> precompiledRules)
 			throws GrammarException {
 		String line = null;
 		if (precompiledRules == null)
@@ -177,15 +178,6 @@ final class Compiler {
 					ConditionFragment cf = list.c;
 					String cnd = cf.id.trim();
 					Match m = parseCondition(line, cnd);
-					for (Match cm : m.get("cnd")) {
-						String cs = cm.group();
-						Set<Label> set = undefinedConditions.get(cs);
-						if (set == null) {
-							set = new TreeSet<Label>();
-							undefinedConditions.put(cs, set);
-						}
-						set.add(l);
-					}
 					conditionMap.put(l, m);
 				}
 				if (map.containsKey(l))
@@ -208,6 +200,9 @@ final class Compiler {
 		for (Iterator<Entry<Label, SequenceFragment>> i = map.entrySet()
 				.iterator(); i.hasNext();) {
 			Entry<Label, SequenceFragment> e = i.next();
+			Label label = e.getKey();
+			if (!(label.ws == Whitespace.none || rules.containsKey(Space.l)))
+				rules.put(Space.l, new Space());
 			SequenceFragment body = e.getValue();
 			RuleFragment rf = body.get(0);
 			if (body.size() == 1
@@ -228,20 +223,15 @@ final class Compiler {
 					Regex rx = (Regex) rf;
 					if (rx.rep.redundant()) {
 						ru = new LeafRule(l, rx.re, rx.reversible);
-						if (condition != null)
-							ru = new ConditionalLeafRule((LeafRule) ru,
-									LogicalCondition.manufacture(condition),
-									condition.group());
 					} else {
 						Label rxl = new Label(Type.implicit, rx.toString());
 						Rule rxr = new LeafRule(rxl, rx.re, rx.reversible);
 						ru = new RepetitionRule(l, rxr, rx.rep, EMPTY_STR_SET);
-						setCondition(condition, ru, false);
 					}
 				} else {
 					ru = new LiteralRule(l, ((LiteralFragment) rf).literal);
-					setCondition(condition, ru, false);
 				}
+				ru = setCondition(condition, ru, false);
 				ru.generation = gen;
 				rules.put(l, ru);
 			}
@@ -588,19 +578,7 @@ final class Compiler {
 		Rule r = makeSingle(ruleFragment, cycleMap, conditionMap.get(label),
 				label.ws == Whitespace.required);
 		r = fixLabel(label, r, conditionMap.get(label));
-		fixConditions(label, r);
 		return r;
-	}
-
-	private void fixConditions(Label label, Rule r) {
-		if (r.condition != null) {
-			Match m = cg.matches(r.condition).match();
-			conditionMap.put(label, m);
-			for (Match n : m.get("cnd")) {
-				Set<Label> set = undefinedConditions().get(n.group());
-				set.add(label);
-			}
-		}
 	}
 
 	/**
@@ -611,7 +589,7 @@ final class Compiler {
 	 * @param match
 	 * @return named {@link Rule}
 	 */
-	static Rule fixLabel(Label label, Rule r, Match match) {
+	Rule fixLabel(Label label, Rule r, Match match) {
 		Rule ru = null;
 		Set<String> labels = r.labels;
 		if (r instanceof AlternationRule) {
@@ -626,6 +604,10 @@ final class Compiler {
 					((SequenceRule) r).tagList);
 		} else if (r instanceof LiteralRule) {
 			ru = new LiteralRule(label, ((LiteralRule) r).literal);
+		} else if (r instanceof ConditionalLeafRule) {
+			ConditionalLeafRule clr = (ConditionalLeafRule) r;
+			LeafRule lr = new LeafRule(label, clr.p, clr.reversible);
+			ru = new ConditionalLeafRule(lr, clr.c, clr.condition);
 		} else if (r instanceof LeafRule) {
 			LeafRule lr = (LeafRule) r;
 			ru = new LeafRule(label, lr.p, lr.reversible);
@@ -694,11 +676,11 @@ final class Compiler {
 			Rule r = rules.get(l);
 			if (r == null)
 				r = cycleMap.get(l);
-			if (l.rep.redundant())
-				return r;
-			Label label = new Label(Type.implicit, new Label(Type.explicit,
-					l.id) + l.rep.toString());
-			r = new RepetitionRule(label, r, l.rep, EMPTY_STR_SET);
+			if (!l.rep.redundant()) {
+				Label label = new Label(Type.implicit, new Label(Type.explicit,
+						l.id) + l.rep.toString());
+				r = new RepetitionRule(label, r, l.rep, EMPTY_STR_SET);
+			}
 			setCondition(condition, r, false);
 			return r;
 		} else if (rf instanceof LiteralFragment) {
@@ -826,10 +808,12 @@ final class Compiler {
 		return r;
 	}
 
-	private static void setCondition(Match condition, Rule r,
+	private Rule setCondition(Match condition, Rule r,
 			boolean whitespaceCondition) {
+		setWhitespaceCondition |= whitespaceCondition;
 		if (condition != null) {
-			r.condition = condition.group();
+			r.condition = whitespaceCondition ? SpaceCondition.ID + " ("
+					+ condition.group() + ')' : condition.group();
 			Condition c;
 			Condition lc = LogicalCondition.manufacture(condition);
 			if (whitespaceCondition) {
@@ -840,12 +824,27 @@ final class Compiler {
 				c = new ConjunctionCondition(list);
 			} else
 				c = lc;
-			r.conditionalize(c, r.condition);
+			r = r.conditionalize(c, r.condition);
 		} else if (whitespaceCondition) {
 			r.condition = SpaceCondition.ID;
 			LeafCondition c = new LeafCondition(SpaceCondition.ID);
-			r.conditionalize(c, r.condition);
+			r = r.conditionalize(c, r.condition);
 		}
+		if (whitespaceCondition || condition != null) {
+			String id = r.uniqueId();
+			Set<String> set = undefinedConditions.get(id);
+			if (set == null) {
+				set = new TreeSet<String>();
+				undefinedConditions.put(id, set);
+			}
+			if (whitespaceCondition)
+				set.add(SpaceCondition.ID);
+			if (condition != null) {
+				for (Match m : condition.get("cnd"))
+					set.add(m.group());
+			}
+		}
+		return r;
 	}
 
 	private Rule reverse(Rule sr) {
@@ -997,7 +996,6 @@ final class Compiler {
 		Rule r = makeSequence(fragments, cycleMap, conditionMap.get(label),
 				label.ws == Whitespace.required);
 		r = fixLabel(label, r, conditionMap.get(label));
-		fixConditions(label, r);
 		return r;
 	}
 
@@ -1047,14 +1045,6 @@ final class Compiler {
 		b.append(']');
 		Label l = new Label(Type.implicit, b.toString());
 		Rule r = new SequenceRule(l, sequence, tagList);
-		if (whitespaceCondition) {
-			Set<Label> set = undefinedConditions.get(SpaceCondition.ID);
-			if (set == null) {
-				set = new TreeSet<Label>();
-				undefinedConditions.put(SpaceCondition.ID, set);
-			}
-			set.add(l);
-		}
 		setCondition(condition, r, whitespaceCondition);
 		return r;
 	}
@@ -1095,7 +1085,11 @@ final class Compiler {
 		return root;
 	}
 
-	public Map<String, Set<Label>> undefinedConditions() {
-		return new HashMap<String, Set<Label>>(undefinedConditions);
+	Map<String, Set<String>> undefinedConditions() {
+		return undefinedConditions;
+	}
+
+	public boolean setWhitespaceCondition() {
+		return setWhitespaceCondition;
 	}
 }
