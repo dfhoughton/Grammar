@@ -676,7 +676,11 @@ final class Compiler {
 			Rule r = rules.get(l);
 			if (r == null)
 				r = cycleMap.get(l);
-			if (!l.rep.redundant()) {
+			if (l.rep.redundant() && r.condition != null && (whitespaceCondition || condition != null )) {
+				// TODO add creation of ConditionalizedLabel here
+				Label label = new Label(Type.implicit, l + "(" + condition.group() + ")");
+				r = new ConditionalizedLabel(label, r);
+			} else if (!l.rep.redundant()) {
 				Label label = new Label(Type.implicit, new Label(Type.explicit,
 						l.id) + l.rep.toString());
 				r = new RepetitionRule(label, r, l.rep, EMPTY_STR_SET);
