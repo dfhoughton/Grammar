@@ -25,6 +25,7 @@ section at the end of the document.
 . document multi-line rules
 . document semantics of xor operator in conditions
 * create ConditionalizedReference rule to handle rule = <a> (c)
+. ensure proper handling of rule ::= 'foo' ['bar' 'quux']+
 
 COMPLETED
 =========
