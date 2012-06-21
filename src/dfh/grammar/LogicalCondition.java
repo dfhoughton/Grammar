@@ -145,6 +145,12 @@ public abstract class LogicalCondition extends Condition implements
 		}
 	}
 
+	/**
+	 * TODO the motivation for this system is lost in the mists of time; must
+	 * determine whether this is useful complexity
+	 * 
+	 * @return
+	 */
 	protected abstract Condition duplicate();
 
 	protected abstract boolean allPass(Match n, Matcher m, CharSequence s);
@@ -166,7 +172,7 @@ public abstract class LogicalCondition extends Condition implements
 		StringBuilder b = new StringBuilder();
 		boolean initial = true;
 		for (Condition cnd : subconditions) {
-			if (!cnd.visible()) 
+			if (!cnd.visible())
 				continue;
 			if (initial)
 				initial = false;

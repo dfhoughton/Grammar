@@ -683,7 +683,6 @@ final class Compiler {
 				r = cycleMap.get(l);
 			if (l.rep.redundant() && r.condition != null
 					&& (whitespaceCondition || condition != null)) {
-				// TODO add creation of ConditionalizedLabel here
 				Label label = new Label(Type.implicit, l + "("
 						+ condition.group() + ")");
 				r = new ConditionalizedLabel(label, r);
@@ -844,11 +843,11 @@ final class Compiler {
 			r = r.conditionalize(c, r.condition);
 		}
 		if (whitespaceCondition || condition != null) {
-			String id = r.uniqueId();
-			Set<String> set = undefinedConditions.get(id);
+//			String id = r.uniqueId();
+			Set<String> set = undefinedConditions.get(r.condition);
 			if (set == null) {
 				set = new TreeSet<String>();
-				undefinedConditions.put(id, set);
+				undefinedConditions.put(r.condition, set);
 			}
 			if (whitespaceCondition)
 				set.add(SpaceCondition.ID);
@@ -1003,7 +1002,6 @@ final class Compiler {
 
 	private Rule makeSequence(Label label, SequenceFragment fragments,
 			Map<Label, CyclicRule> cycleMap) {
-		// TODO add space delimiter condition as appropriate
 		if (rules.containsKey(label))
 			return rules.get(label);
 		Rule r = makeSequence(fragments, cycleMap, conditionMap.get(label),

@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+@SuppressWarnings("serial")
 public class ReversedCycle {
 
 	@Test
@@ -28,12 +29,11 @@ public class ReversedCycle {
 		}
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void conditionTest1() {
 		String[] rules = {
 				//
-				"ROOT = !- [ <bar> /\\s++/r ] <bar>",//
+				"ROOT = not after [ <bar> /\\s++/r ] <bar>",//
 				"bar = /\\b/r <foo> /\\b/r (lt100)",//
 				"foo = '1' | <foo> '0'",//
 		};
@@ -56,7 +56,6 @@ public class ReversedCycle {
 		}
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void conditionTest2() {
 		String[] rules = {

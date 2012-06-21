@@ -1521,24 +1521,26 @@ public class Grammar implements Serializable {
 	 */
 	public synchronized void defineCondition(String label, Condition c) {
 		boolean cantFind = true;
-		Map<String, List<Rule>> idMap = new HashMap<String, List<Rule>>(rules().size() * 2);
-		for (Rule r: rules()) {
-			String id = r.uniqueId();
-			List<Rule> list = idMap.get(id);
+		Map<String, List<Rule>> idMap = new HashMap<String, List<Rule>>(rules()
+				.size() * 2);
+		for (Rule r : rules()) {
+			if (r.condition == null)
+				continue;
+			List<Rule> list = idMap.get(r.condition);
 			if (list == null) {
 				list = new ArrayList<Rule>();
-				idMap.put(id, list);
+				idMap.put(r.condition, list);
 			}
 			list.add(r);
 		}
 		for (Iterator<Entry<String, Set<String>>> i = undefinedConditions
 				.entrySet().iterator(); i.hasNext();) {
 			Entry<String, Set<String>> e = i.next();
-			String ruleId = e.getKey();
+			String condition = e.getKey();
 			Set<String> conditions = e.getValue();
 			if (conditions.contains(label)) {
 				cantFind = false;
-				List<Rule> list = idMap.get(ruleId);
+				List<Rule> list = idMap.get(condition);
 				if (list == null)
 					list = Collections.emptyList();
 				for (Rule r : list) {
