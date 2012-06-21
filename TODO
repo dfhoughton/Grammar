@@ -26,7 +26,7 @@ section at the end of the document.
 . document semantics of xor operator in conditions
 * create ConditionalizedReference rule to handle rule = <a> (c)
 . ensure proper handling of rule ::= 'foo' ['bar' 'quux']+
-. change log text "result for <ROOT>" to "result for <ROOT> n", where n is the offset being tested
+- change log text "result for <ROOT>" to "result for <ROOT> n", where n is the offset being tested
 
 COMPLETED
 =========
