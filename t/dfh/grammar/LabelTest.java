@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -63,7 +64,7 @@ public class LabelTest {
 	@Test
 	public void testE() {
 		Match a = n.first("e");
-		assertTrue("e has three labels", a.labels().size() == 3);
+		assertEquals("e has three labels", 3, a.labels().size());
 	}
 
 	@Test

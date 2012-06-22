@@ -50,4 +50,17 @@ public class WhitespaceDelimiterTest {
 		Match n = m.match();
 		assertNull(n);
 	}
+
+	@Test
+	public void reversal1() {
+		String[] rules = { "foo ::= not after <bar> <quux>",//
+				"bar ::= 'the' 'cat'",//
+				"quux ::= 'the' 'dog'",//
+		};
+		Grammar g = new Grammar(rules);
+		Matcher m = g.find("the cat the dog the dog");
+		Match n = m.match();
+		assertNotNull(n);
+	}
+
 }

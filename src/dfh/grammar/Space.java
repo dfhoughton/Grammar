@@ -37,9 +37,11 @@ import dfh.grammar.Label.Type;
  * @author David F. Houghton - Jun 18, 2012
  * 
  */
+@Reversible
 public class Space extends RepetitionRule {
 	private static final long serialVersionUID = 1L;
 
+	@Reversible
 	private static class SS extends LeafRule {
 		private static final long serialVersionUID = 1L;
 		public static final Pattern p = Pattern.compile("\\s");

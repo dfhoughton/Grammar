@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -153,7 +154,7 @@ public class TerminalGrammarTest {
 		int count = 0;
 		while (m.match() != null)
 			count++;
-		assertTrue("logical condition worked after copying", count == 2);
+		assertEquals("logical condition worked after copying", 2, count);
 	}
 
 	@Test

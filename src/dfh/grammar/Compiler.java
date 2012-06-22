@@ -592,17 +592,27 @@ final class Compiler {
 		Rule ru = null;
 		Set<String> labels = r.labels;
 		if (r instanceof AlternationRule) {
-			ru = new AlternationRule(label, ((AlternationRule) r).alternates,
-					((AlternationRule) r).tagMap);
+			AlternationRule ar = (AlternationRule) r;
+			AlternationRule ar2 = new AlternationRule(label, ar.alternates,
+					ar.tagMap);
+			ar2.c = ar.c;
+			ru = ar2;
 		} else if (r instanceof RepetitionRule) {
 			RepetitionRule rr = (RepetitionRule) r;
-			ru = new RepetitionRule(label, rr.r, rr.repetition,
+			RepetitionRule rr2 = new RepetitionRule(label, rr.r, rr.repetition,
 					new HashSet<String>(rr.alternateTags));
+			rr2.c = rr.c;
+			ru = rr2;
 		} else if (r instanceof SequenceRule) {
-			ru = new SequenceRule(label, ((SequenceRule) r).sequence,
-					((SequenceRule) r).tagList);
+			SequenceRule sr = (SequenceRule) r;
+			SequenceRule sr2 = new SequenceRule(label, sr.sequence, sr.tagList);
+			sr2.c = sr.c;
+			ru = sr2;
 		} else if (r instanceof LiteralRule) {
-			ru = new LiteralRule(label, ((LiteralRule) r).literal);
+			LiteralRule lr = (LiteralRule) r;
+			LiteralRule lr2 = new LiteralRule(label, lr.literal);
+			lr2.c = lr.c;
+			ru = lr2;
 		} else if (r instanceof ConditionalLeafRule) {
 			ConditionalLeafRule clr = (ConditionalLeafRule) r;
 			LeafRule lr = new LeafRule(label, clr.p, clr.reversible);
@@ -611,27 +621,25 @@ final class Compiler {
 			LeafRule lr = (LeafRule) r;
 			ru = new LeafRule(label, lr.p, lr.reversible);
 		} else if (r instanceof DeferredDefinitionRule) {
-			DeferredDefinitionRule old = (DeferredDefinitionRule) r;
-			DeferredDefinitionRule ddr = new DeferredDefinitionRule(label);
-			ddr.r = old;
-			ru = ddr;
+			DeferredDefinitionRule ddr = (DeferredDefinitionRule) r;
+			DeferredDefinitionRule ddr2 = new DeferredDefinitionRule(label);
+			ddr2.r = ddr;
+			ru = ddr2;
 		} else if (r instanceof ConditionalizedLabel) {
 			ConditionalizedLabel cl = (ConditionalizedLabel) r;
 			ConditionalizedLabel cl2 = new ConditionalizedLabel(label, cl.r);
 			cl2.c = cl.c;
-			cl2.condition = cl.condition;
 			ru = cl2;
 		}
 		if (ru == null)
 			throw new GrammarException("unanticipated rule type: "
 					+ r.getClass().getName());
+		ru.condition = r.condition;
 		setCondition(match, ru, false);
 
 		if (match != null && r.condition == null) {
 			ru = ru.conditionalize(LogicalCondition.manufacture(match),
 					match.group());
-		} else if (r.condition != null) {
-			ru.condition = r.condition;
 		}
 		if (labels != null) {
 			if (ru.labels == null)
@@ -681,12 +689,14 @@ final class Compiler {
 			Rule r = rules.get(l);
 			if (r == null)
 				r = cycleMap.get(l);
-			if (l.rep.redundant() && r.condition != null
-					&& (whitespaceCondition || condition != null)) {
-				Label label = new Label(Type.implicit, l + "("
-						+ condition.group() + ")");
-				r = new ConditionalizedLabel(label, r);
-			} else if (!l.rep.redundant()) {
+			if (l.rep.redundant()) {
+				if (condition != null) {
+					String cnd = condition.group();
+					Label label = new Label(Type.implicit, l + "(" + cnd + ")");
+					r = new ConditionalizedLabel(label, r);
+					r.condition = cnd;
+				}
+			} else {
 				Label label = new Label(Type.implicit, new Label(Type.explicit,
 						l.id) + l.rep.toString());
 				r = new RepetitionRule(label, r, l.rep, EMPTY_STR_SET);
@@ -824,8 +834,11 @@ final class Compiler {
 		setWhitespaceCondition |= whitespaceCondition;
 
 		if (condition != null) {
-			r.condition = whitespaceCondition ? SpaceCondition.ID + " ("
+			String cnd = whitespaceCondition ? SpaceCondition.ID + " ("
 					+ condition.group() + ')' : condition.group();
+			if (cnd.equals(r.condition))
+				return r;
+			r.condition = cnd;
 			Condition c;
 			Condition lc = LogicalCondition.manufacture(condition);
 			if (whitespaceCondition) {
@@ -843,7 +856,7 @@ final class Compiler {
 			r = r.conditionalize(c, r.condition);
 		}
 		if (whitespaceCondition || condition != null) {
-//			String id = r.uniqueId();
+			// String id = r.uniqueId();
 			Set<String> set = undefinedConditions.get(r.condition);
 			if (set == null) {
 				set = new TreeSet<String>();
@@ -919,6 +932,12 @@ final class Compiler {
 			String s = rcs.toString();
 			Label l = new Label(Type.implicit, id);
 			ru = new LiteralRule(l, s);
+		} else if (sr instanceof ConditionalizedLabel) {
+			ConditionalizedLabel cl = (ConditionalizedLabel) sr;
+			Rule rr = reverse(cl.r);
+			ConditionalizedLabel cl2 = new ConditionalizedLabel(new Label(
+					Type.implicit, id), rr);
+			ru = cl2;
 		} else if (sr instanceof RepetitionRule) {
 			RepetitionRule rr = (RepetitionRule) sr;
 			Rule child = reverse(rr.r);
@@ -980,6 +999,10 @@ final class Compiler {
 		} else if (r instanceof SequenceRule) {
 			SequenceRule sr = (SequenceRule) r, sr2 = (SequenceRule) nr;
 			sr2.c = duplicateCondition(sr.c);
+		} else if (r instanceof ConditionalizedLabel) {
+			ConditionalizedLabel cl = (ConditionalizedLabel) r;
+			ConditionalizedLabel cl2 = (ConditionalizedLabel) nr;
+			cl2.c = duplicateCondition(cl.c);
 		} else if (r instanceof RepetitionRule) {
 			RepetitionRule rr = (RepetitionRule) r, rr2 = (RepetitionRule) nr;
 			rr2.c = duplicateCondition(rr.c);

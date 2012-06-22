@@ -1,6 +1,6 @@
 package dfh.grammar;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,7 +21,7 @@ public class SubrulesTest {
 			if (r.generation == -1)
 				i.remove();
 		}
-		assertTrue(set.size() == 1);
+		assertEquals(1, set.size());
 	}
 
 	@Test
@@ -39,7 +39,7 @@ public class SubrulesTest {
 			if (r.generation == -1)
 				i.remove();
 		}
-		assertTrue(set.size() == 1);
+		assertEquals(1, set.size());
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class SubrulesTest {
 			if (r.generation == -1)
 				i.remove();
 		}
-		assertTrue(set.size() == 3);
+		assertEquals(3, set.size());
 	}
 
 	@Test
@@ -77,7 +77,7 @@ public class SubrulesTest {
 			if (r.generation == -1)
 				i.remove();
 		}
-		assertTrue(set.size() == 3);
+		assertEquals(3, set.size());
 	}
 
 	@Test
@@ -94,7 +94,7 @@ public class SubrulesTest {
 			if (r.generation == -1)
 				i.remove();
 		}
-		assertTrue(set.size() == 1);
+		assertEquals(1, set.size());
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class SubrulesTest {
 			if (r.generation == -1)
 				i.remove();
 		}
-		assertTrue(set.size() == 8);
+		assertEquals(8, set.size());
 	}
 
 	@Test
@@ -144,7 +144,7 @@ public class SubrulesTest {
 			if (r.generation == -1)
 				i.remove();
 		}
-		assertTrue(set.size() == 8);
+		assertEquals(8, set.size());
 	}
 
 }

@@ -92,4 +92,8 @@ public class SequenceFragment extends RepeatableRuleFragment {
 		// TODO Auto-generated method stub
 		return new SequenceFragment(new LinkedList<RuleFragment>(sequence));
 	}
+
+	public void add(int i, RuleFragment rf) {
+		sequence.add(i, rf);
+	}
 }

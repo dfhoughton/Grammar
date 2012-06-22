@@ -155,7 +155,7 @@ final class RuleParser {
 					// assertion and the constituents its going to be
 					// testing
 					int[] indices = rearrangeAssertions(body, i);
-					body.sequence.set(indices[0], Space.l);
+					body.add(indices[0], Space.l);
 					i = indices[1];
 					needDelimiter = false;
 				} else {
@@ -189,21 +189,17 @@ final class RuleParser {
 	 *         index to move the checking index to
 	 */
 	private int[] rearrangeAssertions(SequenceFragment body, final int i) {
-		List<RuleFragment[]> list = new ArrayList<RuleFragment[]>(
-				body.size() / 2);
+		List<RuleFragment> list = new ArrayList<RuleFragment>(body.size());
 		// extract all the assertions at this point
-		while (i < body.size() && body.get(i) instanceof AssertionFragment) {
-			RuleFragment[] pair = { body.sequence.remove(i),
-					body.sequence.remove(i) };
-			list.add(pair);
-		}
+		while (i < body.size() && body.get(i) instanceof AssertionFragment)
+			list.add(body.sequence.remove(i));
 		// sort assertions so backwards assertions come before forwards
 		if (list.size() > 1) {
-			Collections.sort(list, new Comparator<RuleFragment[]>() {
+			Collections.sort(list, new Comparator<RuleFragment>() {
 				@Override
-				public int compare(RuleFragment[] o1, RuleFragment[] o2) {
-					boolean b1 = ((AssertionFragment) o1[0]).forward;
-					boolean b2 = ((AssertionFragment) o2[0]).forward;
+				public int compare(RuleFragment o1, RuleFragment o2) {
+					boolean b1 = ((AssertionFragment) o1).forward;
+					boolean b2 = ((AssertionFragment) o2).forward;
 					if (b1 ^ b2)
 						return b1 ? 1 : -1;
 					return 0;
@@ -213,17 +209,15 @@ final class RuleParser {
 		// find where to insert a space delimiter
 		int j = 0;
 		for (; j < list.size(); j++) {
-			RuleFragment[] pair = list.get(j);
-			if (((AssertionFragment) pair[0]).forward) 
+			RuleFragment rf = list.get(j);
+			if (((AssertionFragment) rf).forward)
 				break;
 		}
 		// record the return values
-		int[] rv = {i + 2*j, i + list.size() * 2};
+		int[] rv = { i + j, i + list.size() };
 		// put all the assertions back into the sequence
-		for (RuleFragment[] pair: list) {
-			for (RuleFragment rf: pair) {
-				body.set(i, rf);
-			}
+		for (RuleFragment rf : list) {
+			body.add(i, rf);
 		}
 		return rv;
 	}

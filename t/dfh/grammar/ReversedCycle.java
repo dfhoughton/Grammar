@@ -60,7 +60,7 @@ public class ReversedCycle {
 	public void conditionTest2() {
 		String[] rules = {
 				//
-				"ROOT = !- [ <bar> /\\s++/r ] <bar>",//
+				"ROOT = not after [ <bar> /\\s++/r ] <bar>",//
 				"bar = /\\b/r <foo> /\\b/r (lt100 gt0)",//
 				"foo = '1' | <foo> '0'",//
 		};

@@ -19,4 +19,9 @@ final class SyntacticParse {
 		this.f = f;
 		this.c = c;
 	}
+	
+	@Override
+	public String toString() {
+		return text;
+	}
 }
