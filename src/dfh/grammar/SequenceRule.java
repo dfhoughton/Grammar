@@ -139,6 +139,8 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 
 	@Override
 	protected String uniqueId() {
+		if (uid != null)
+			return uid;
 		StringBuilder b = new StringBuilder();
 		b.append('[');
 		boolean nonInitial = false;

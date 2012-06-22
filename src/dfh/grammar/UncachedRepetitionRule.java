@@ -305,6 +305,8 @@ public class UncachedRepetitionRule extends RepetitionRule {
 
 	@Override
 	protected String uniqueId() {
+		if (uid != null)
+			return uid;
 		StringBuilder b = new StringBuilder("{{UC}}");
 		b.append(r.uniqueId()).append(repetition);
 		if (condition != null)

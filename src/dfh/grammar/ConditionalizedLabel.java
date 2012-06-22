@@ -63,6 +63,8 @@ public class ConditionalizedLabel extends Rule implements Serializable,
 
 	@Override
 	protected String uniqueId() {
+		if (uid != null)
+			return uid;
 		StringBuilder b = new StringBuilder();
 		b.append(r.uniqueId());
 		b.append('(').append(condition).append(')');

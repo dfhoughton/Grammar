@@ -121,6 +121,8 @@ public class LeafRule extends Rule implements Serializable {
 
 	@Override
 	protected String uniqueId() {
+		if (uid != null)
+			return uid;
 		String s = descriptionWOCondition().toString();
 		if ((p.flags() & Pattern.COMMENTS) == Pattern.COMMENTS) {
 			// must normalize away spaces and comments

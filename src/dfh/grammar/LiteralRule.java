@@ -117,6 +117,8 @@ public class LiteralRule extends Rule implements Serializable {
 
 	@Override
 	protected String uniqueId() {
+		if (uid != null)
+			return uid;
 		StringBuilder b = new StringBuilder();
 		b.append('"').append(literal).append('"');
 		if (condition != null)

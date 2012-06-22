@@ -173,6 +173,8 @@ public class ConditionalLeafRule extends LeafRule {
 
 	@Override
 	protected String uniqueId() {
+		if (uid != null)
+			return uid;
 		return super.uniqueId() + '(' + c.describe() + ')';
 	}
 

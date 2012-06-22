@@ -324,6 +324,8 @@ public class RepetitionRule extends Rule implements Serializable,
 
 	@Override
 	protected String uniqueId() {
+		if (uid != null)
+			return uid;
 		StringBuilder b = new StringBuilder();
 		b.append(r.uniqueId()).append(repetition);
 		if (condition != null)

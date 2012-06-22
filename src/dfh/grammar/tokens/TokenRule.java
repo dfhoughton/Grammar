@@ -165,6 +165,8 @@ public class TokenRule<K extends Token> extends Rule implements Cloneable,
 	 */
 	@Override
 	protected String uniqueId() {
+		if (uid != null)
+			return uid;
 		return "<<" + test.id() + ">>";
 	}
 
