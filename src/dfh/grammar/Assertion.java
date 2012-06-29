@@ -29,7 +29,7 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 	 */
 	public static final String REVERSAL_SUFFIX = ":r";
 
-	private class AssertionMatcher extends Matcher {
+	class AssertionMatcher extends Matcher {
 		private final Map<Integer, CachedMatch>[] cache;
 		private final Map<Integer, CachedMatch> subCache;
 		private final boolean backward;
@@ -96,8 +96,7 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 					if (options.debug)
 						Assertion.this.matchTrace(this, null);
 					return null;
-				}
-				else if (positive) {
+				} else if (positive) {
 					Match n;
 					if (backward) {
 						n = r.matcher(0, cache, this).match();

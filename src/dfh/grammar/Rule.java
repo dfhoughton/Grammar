@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import dfh.grammar.Assertion.AssertionMatcher;
+
 /**
  * A {@link Matcher} generator. <code>Rules</code> generate
  * <code>Matchers</code> with properly initialized state but have no dynamic
@@ -191,7 +193,15 @@ public abstract class Rule {
 	protected final void matchTrace(Matcher m) {
 		StringBuilder b = new StringBuilder();
 		b.append("\nmatching ").append(label()).append("\n\t");
-		locate(b, m.s, m.offset);
+		CharSequence s = m.s;
+		if (m instanceof AssertionMatcher) {
+			if (s instanceof ReversedCharSequence) {
+				s = m.options.cs;
+			} else {
+				s = m.options.rcs;
+			}
+		}
+		locate(b, s, m.offset);
 		stackTrace(b, m);
 		m.options.trace.println(b);
 	}
