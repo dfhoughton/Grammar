@@ -13,20 +13,15 @@ section at the end of the document.
 . add option to turn off condition testing
 . bail out of recursion via exception rather than the current laborious and expensive reeling in of failed tries
 . added unit tests for Match.hasLabel(String), which appears to have a latent bug having to do with alternations
-* comment on PEG and Packrat in documentation
 . fix typos in documentation
 . edit grammar grammar in documentation
-* add test for ['foo'*|'bar'*]* infinite loops
-* turn off studying in all cases
 . implement automatic space insertion in sequences upon specification
-* examine logging of elements such as <s>?
-* fix asteriskQ test regression in ConditionTest
-* implement multi-line rules
 . document multi-line rules
 . document semantics of xor operator in conditions
-* create ConditionalizedReference rule to handle rule = <a> (c)
 . ensure proper handling of rule ::= 'foo' ['bar' 'quux']+
-- change log text "result for <ROOT>" to "result for <ROOT> n", where n is the offset being tested
+. factor condition handling into ConditionalRule
+. replace := with .= and ::= with :=
+. create . explicit whitespace rule
 
 COMPLETED
 =========
@@ -89,3 +84,11 @@ COMPLETED
 * make Options reusable
 * make convenience methods Match.closest(String) and Match.closest(Pattern)
 * preserve original rule names as labels where necessary during grammar composition
+* comment on PEG and Packrat in documentation
+* add test for ['foo'*|'bar'*]* infinite loops
+* turn off studying in all cases
+* examine logging of elements such as <s>?
+* fix asteriskQ test regression in ConditionTest
+* implement multi-line rules
+* create ConditionalizedReference rule to handle rule = <a> (c)
+- change log text "result for <ROOT>" to "result for <ROOT> n", where n is the offset being tested
