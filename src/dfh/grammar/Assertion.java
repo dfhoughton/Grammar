@@ -55,6 +55,8 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 
 		@Override
 		public Match match() {
+			if (options.debug)
+				Assertion.this.matchTrace(this);
 			if (fresh) {
 				fresh = false;
 				// TODO: should we check cache here at all?
@@ -80,14 +82,21 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 					}
 					if (n == null) {
 						subCache.put(offset, CachedMatch.MISMATCH);
+						if (options.debug)
+							Assertion.this.matchTrace(this, null);
 						return null;
 					}
 					// cm = n == null ? CachedMatch.MISMATCH :
 					// CachedMatch.MATCH;
 					// subCache.put(offset, cm);
+					if (options.debug)
+						Assertion.this.matchTrace(this, n);
 					return register(n);
-				} else if (cm == CachedMatch.MISMATCH)
+				} else if (cm == CachedMatch.MISMATCH) {
+					if (options.debug)
+						Assertion.this.matchTrace(this, null);
 					return null;
+				}
 				else if (positive) {
 					Match n;
 					if (backward) {
@@ -101,9 +110,13 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 					return register(next);
 				} else {
 					Match n = new Match(Assertion.this, offset, offset);
+					if (options.debug)
+						Assertion.this.matchTrace(this, n);
 					return register(n);
 				}
 			}
+			if (options.debug)
+				Assertion.this.matchTrace(this, null);
 			return null;
 		}
 

@@ -8,6 +8,7 @@
   * converted "xor" operator in conditions to have "one" semantics -- the
     composite logical condition is true if one and only one of its
     constituents is true
+  * added missing logging of assertions
 
 2.06, 15 June 2012
   * turned off default studying for find()
