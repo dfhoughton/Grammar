@@ -9,6 +9,8 @@
     composite logical condition is true if one and only one of its
     constituents is true
   * added missing logging of assertions
+  * added .= and := assignments for rules allowing or requiring whitespace
+    between tokens, respectively
 
 2.06, 15 June 2012
   * turned off default studying for find()
