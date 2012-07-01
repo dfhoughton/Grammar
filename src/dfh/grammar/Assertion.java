@@ -29,7 +29,7 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 	 */
 	public static final String REVERSAL_SUFFIX = ":r";
 
-	private class AssertionMatcher extends Matcher {
+	class AssertionMatcher extends Matcher {
 		private final Map<Integer, CachedMatch>[] cache;
 		private final Map<Integer, CachedMatch> subCache;
 		private final boolean backward;
@@ -55,6 +55,8 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 
 		@Override
 		public Match match() {
+			if (options.debug)
+				Assertion.this.matchTrace(this);
 			if (fresh) {
 				fresh = false;
 				// TODO: should we check cache here at all?
@@ -80,15 +82,21 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 					}
 					if (n == null) {
 						subCache.put(offset, CachedMatch.MISMATCH);
+						if (options.debug)
+							Assertion.this.matchTrace(this, null);
 						return null;
 					}
 					// cm = n == null ? CachedMatch.MISMATCH :
 					// CachedMatch.MATCH;
 					// subCache.put(offset, cm);
+					if (options.debug)
+						Assertion.this.matchTrace(this, n);
 					return register(n);
-				} else if (cm == CachedMatch.MISMATCH)
+				} else if (cm == CachedMatch.MISMATCH) {
+					if (options.debug)
+						Assertion.this.matchTrace(this, null);
 					return null;
-				else if (positive) {
+				} else if (positive) {
 					Match n;
 					if (backward) {
 						n = r.matcher(0, cache, this).match();
@@ -101,9 +109,13 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 					return register(next);
 				} else {
 					Match n = new Match(Assertion.this, offset, offset);
+					if (options.debug)
+						Assertion.this.matchTrace(this, n);
 					return register(n);
 				}
 			}
+			if (options.debug)
+				Assertion.this.matchTrace(this, null);
 			return null;
 		}
 
@@ -217,9 +229,7 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 	 */
 	static void subDescription(Rule r, StringBuilder b) {
 		if (r.generation == -1) {
-			boolean needsBrackets = r instanceof SequenceRule
-					|| r instanceof RepetitionRule
-					|| r instanceof AlternationRule;
+			boolean needsBrackets = needsBrackets(r);
 			if (needsBrackets)
 				b.append("[ ");
 			b.append(r.description(true));
@@ -227,6 +237,31 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 				b.append(" ]");
 		} else
 			b.append(r.label);
+	}
+
+	/**
+	 * @param r
+	 * @return whether the assertion's rule needs brackets in a description
+	 */
+	protected static boolean needsBrackets(Rule r) {
+		if (r instanceof AlternationRule)
+			return true;
+		if (r instanceof RepetitionRule)
+			return false;
+		if (!(r.labels == null || r.labels.isEmpty()))
+			return true;
+		if (r instanceof SequenceRule) {
+			SequenceRule sr = (SequenceRule) r;
+			int count = 0;
+			for (Rule c : sr.sequence) {
+				if (c.label.id.charAt(0) != '.') {
+					count++;
+					if (count > 1)
+						return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override

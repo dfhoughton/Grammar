@@ -58,13 +58,12 @@ public class WhitespaceDelimiterTest {
 
 	@Test
 	public void reversal1() throws FileNotFoundException {
-		String[] rules = { "foo ::= not after <bar> <quux>",//
-				"bar ::= 't' 'c'",//
-				"quux ::= 't' 'd'",//
+		String[] rules = { "lone_t_d ::= not after <t_c> <t_d>",//
+				"t_c ::= 't' 'c'",//
+				"t_d ::= 't' 'd'",//
 		};
 		Grammar g = new Grammar(rules);
-		PrintStream ps = new PrintStream(new FileOutputStream(new File("/tmp/debugging.txt")));
-		Matcher m = g.find("t c t d t d", new Options().log(ps));
+		Matcher m = g.find("t c t d t d");
 		Match n = m.match();
 		assertNotNull(n);
 		int count = 1;

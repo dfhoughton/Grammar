@@ -9,11 +9,7 @@
 package dfh.grammar;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -124,7 +120,7 @@ final class RuleParser {
 				checkUplevelBackReferences(line, body, 0, 0);
 				checkBarriers(body);
 				if (ws != Whitespace.none)
-					addWhitespaceDelimiters(body);
+					addWhitespaceDelimiters(body, ws == Whitespace.required);
 				return new SyntacticParse(line, l, body, cf);
 			} else
 				throw new GrammarException("ill-formed rule: " + line);
@@ -136,11 +132,25 @@ final class RuleParser {
 	 * Look for sequences and add whitespace delimiters as appropriate.
 	 * 
 	 * @param body
+	 * @param required
 	 */
-	private void addWhitespaceDelimiters(SequenceFragment body) {
+	private void addWhitespaceDelimiters(SequenceFragment body, boolean required) {
 		if (body.size() > 1) {
 			boolean needDelimiter = false;
-			for (int i = 0; i < body.size(); i++) {
+			boolean add = false;
+			int addCount = 0;
+			for (RuleFragment rf : body.sequence) {
+				if (!(rf instanceof BarrierFragment || rf instanceof AssertionFragment)) {
+					addCount++;
+					add = true;
+					if (addCount > 1)
+						break;
+				}
+			}
+			if (addCount > 1)
+				body.setSpaceRequired(required);
+			boolean findFollower = true;
+			OUTER: for (int i = 0; i < body.size(); i++) {
 				RuleFragment rf = body.get(i);
 				if (rf instanceof BarrierFragment)
 					continue; // ignore barriers
@@ -154,14 +164,38 @@ final class RuleParser {
 					// * need to avoid inserting delimiters between an
 					// assertion and the constituents its going to be
 					// testing
-					int[] indices = rearrangeAssertions(body, i);
-					body.add(indices[0], Space.l);
-					i = indices[1];
-					needDelimiter = false;
+					do {
+						AssertionFragment af = (AssertionFragment) rf;
+						if (af.forward) {
+							if (needDelimiter)
+								addSpaceToAssertion(af, required);
+						} else {
+							if (findFollower) {
+								for (int j = i + 1; j < body.size(); j++) {
+									rf = body.get(j);
+									if (rf instanceof BarrierFragment
+											|| rf instanceof Assertion)
+										continue;
+									findFollower = false;
+									break;
+								}
+								if (findFollower)
+									break OUTER;
+							}
+							addSpaceToAssertion(af, required);
+						}
+						i++;
+						if (i == body.size())
+							break OUTER;
+						rf = body.get(i);
+					} while (rf instanceof AssertionFragment);
+					i--;
 				} else {
 					if (needDelimiter) {
-						body.sequence.add(i, Space.l);
-						i++;
+						if (add) {
+							body.sequence.add(i, Space.l);
+							i++;
+						}
 					} else
 						needDelimiter = true;
 				}
@@ -171,55 +205,38 @@ final class RuleParser {
 			if (rf instanceof GroupFragment) {
 				GroupFragment gf = (GroupFragment) rf;
 				for (SequenceFragment sf : gf.alternates)
-					addWhitespaceDelimiters(sf);
+					addWhitespaceDelimiters(sf, required);
 			}
 		}
 	}
 
 	/**
-	 * sorts assertions such that backwards assertions are before forward
-	 * assertions
+	 * Inserts space into an assertion on the appropriate side.
 	 * 
-	 * @param body
-	 *            the list of fragments being examined
-	 * @param i
-	 *            current index being examined -- the location of an assertion
-	 *            fragment
-	 * @return an index at which a space delimiter should be inserted and the
-	 *         index to move the checking index to
+	 * @param af
+	 * @param add
 	 */
-	private int[] rearrangeAssertions(SequenceFragment body, final int i) {
-		List<RuleFragment> list = new ArrayList<RuleFragment>(body.size());
-		// extract all the assertions at this point
-		while (i < body.size() && body.get(i) instanceof AssertionFragment)
-			list.add(body.sequence.remove(i));
-		// sort assertions so backwards assertions come before forwards
-		if (list.size() > 1) {
-			Collections.sort(list, new Comparator<RuleFragment>() {
-				@Override
-				public int compare(RuleFragment o1, RuleFragment o2) {
-					boolean b1 = ((AssertionFragment) o1).forward;
-					boolean b2 = ((AssertionFragment) o2).forward;
-					if (b1 ^ b2)
-						return b1 ? 1 : -1;
-					return 0;
-				}
-			});
+	private void addSpaceToAssertion(AssertionFragment af, boolean required) {
+		GroupFragment gf = null;
+		if (af.rf instanceof GroupFragment) {
+			GroupFragment ogf = (GroupFragment) af.rf;
+			for (SequenceFragment sf : ogf.alternates)
+				addWhitespaceDelimiters(sf, required);
+			if (ogf.rep.redundant() && ogf.alternates.size() == 1)
+				gf = ogf;
 		}
-		// find where to insert a space delimiter
-		int j = 0;
-		for (; j < list.size(); j++) {
-			RuleFragment rf = list.get(j);
-			if (((AssertionFragment) rf).forward)
-				break;
+		if (gf == null) {
+			SequenceFragment sf = new SequenceFragment();
+			sf.add(af.rf);
+			gf = new GroupFragment(sf, new TreeSet<String>());
 		}
-		// record the return values
-		int[] rv = { i + j, i + list.size() };
-		// put all the assertions back into the sequence
-		for (RuleFragment rf : list) {
-			body.add(i, rf);
-		}
-		return rv;
+		SequenceFragment sf = gf.alternates.get(0);
+		sf.setSpaceRequired(required);
+		if (af.forward)
+			sf.add(0, Space.l);
+		else
+			sf.add(Space.l);
+		af.rf = gf;
 	}
 
 	/**
