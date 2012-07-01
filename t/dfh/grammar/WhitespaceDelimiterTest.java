@@ -13,17 +13,17 @@ public class WhitespaceDelimiterTest {
 
 	@Test
 	public void compilationRequires() {
-		new Grammar("rule ::= 'the' 'cat'");
-	}
-
-	@Test
-	public void compilationMaybe() {
 		new Grammar("rule := 'the' 'cat'");
 	}
 
 	@Test
+	public void compilationMaybe() {
+		new Grammar("rule .= 'the' 'cat'");
+	}
+
+	@Test
 	public void maybe1() {
-		Grammar g = new Grammar("rule := 'the' 'cat'");
+		Grammar g = new Grammar("rule .= 'the' 'cat'");
 		Matcher m = g.matches("the cat");
 		Match n = m.match();
 		assertNotNull(n);
@@ -32,7 +32,7 @@ public class WhitespaceDelimiterTest {
 
 	@Test
 	public void maybe2() {
-		Grammar g = new Grammar("rule := 'the' 'cat'");
+		Grammar g = new Grammar("rule .= 'the' 'cat'");
 		Matcher m = g.matches("thecat");
 		Match n = m.match();
 		assertNotNull(n);
@@ -41,7 +41,7 @@ public class WhitespaceDelimiterTest {
 
 	@Test
 	public void required1() {
-		Grammar g = new Grammar("rule ::= 'the' 'cat'");
+		Grammar g = new Grammar("rule := 'the' 'cat'");
 		Matcher m = g.matches("the cat");
 		Match n = m.match();
 		assertNotNull(n);
@@ -50,7 +50,7 @@ public class WhitespaceDelimiterTest {
 
 	@Test
 	public void required2() {
-		Grammar g = new Grammar("rule ::= 'the' 'cat'");
+		Grammar g = new Grammar("rule := 'the' 'cat'");
 		Matcher m = g.matches("thecat");
 		Match n = m.match();
 		assertNull(n);
@@ -58,9 +58,9 @@ public class WhitespaceDelimiterTest {
 
 	@Test
 	public void reversal1() throws FileNotFoundException {
-		String[] rules = { "lone_t_d ::= not after <t_c> <t_d>",//
-				"t_c ::= 't' 'c'",//
-				"t_d ::= 't' 'd'",//
+		String[] rules = { "lone_t_d := not after <t_c> <t_d>",//
+				"t_c := 't' 'c'",//
+				"t_d := 't' 'd'",//
 		};
 		Grammar g = new Grammar(rules);
 		Matcher m = g.find("t c t d t d");
@@ -74,9 +74,9 @@ public class WhitespaceDelimiterTest {
 
 	@Test
 	public void description1() {
-		String[] rules = { "foo ::= not after <bar> <quux>",//
-				"bar ::= 'the' 'cat'",//
-				"quux ::= 'the' 'dog'",//
+		String[] rules = { "foo := not after <bar> <quux>",//
+				"bar := 'the' 'cat'",//
+				"quux := 'the' 'dog'",//
 		};
 		Grammar g = new Grammar(rules);
 		String s = g.describe();

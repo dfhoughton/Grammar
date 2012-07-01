@@ -50,7 +50,7 @@ final class RuleParser {
 	 * Pattern that defines a rule as "<"<name>">" "=" <remainder>
 	 */
 	private static final Pattern basePattern = Pattern.compile("\\s*+"
-			+ leftValuePattern + "\\s*+(:{0,2}=)\\s*+(.*?)\\s*+");
+			+ leftValuePattern + "\\s*+([:.]?)=\\s*+(.*?)\\s*+");
 	/**
 	 * Pattern of repetition symbols such as <code>*</code>.
 	 */
@@ -87,20 +87,11 @@ final class RuleParser {
 			if (m.matches()) {
 				String id = m.group(1) == null ? m.group(2) : m.group(1);
 				Whitespace ws;
-				switch (m.group(3).length()) {
-				case 1:
+				String g3 = m.group(3);
+				if (g3.length() == 1)
+					ws = g3.charAt(0) == ':' ? Whitespace.required : Whitespace.maybe;
+				else
 					ws = Whitespace.none;
-					break;
-				case 2:
-					ws = Whitespace.maybe;
-					break;
-				case 3:
-					ws = Whitespace.required;
-					break;
-				default:
-					throw new GrammarException("code does not anticipate "
-							+ m.group(3) + " in " + line);
-				}
 				String remainder = m.group(4);
 				if (remainder.length() == 0)
 					throw new GrammarException("no rule body provided in "
@@ -602,7 +593,6 @@ final class RuleParser {
 	}
 
 	private static AssertionFragment getAssertion(String body, int[] offset) {
-		// TODO implement modifier for backwards assertions
 		Matcher m = beforeAfterPattern.matcher(body);
 		m.region(offset[0], body.length());
 		boolean positive = true, forward = true;
