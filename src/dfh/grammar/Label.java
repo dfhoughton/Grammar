@@ -81,12 +81,12 @@ public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		 * whitespace is assumed between tokens in a sequence constituent of
 		 * this rule
 		 */
-		required("::="),
+		required(":="),
 		/**
 		 * whitespace may occur between tokens in a sequence constituent of this
 		 * rule
 		 */
-		maybe(":=");
+		maybe(".=");
 		private final String symbol;
 
 		private Whitespace(String symbol) {
