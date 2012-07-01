@@ -22,6 +22,7 @@ section at the end of the document.
 . factor condition handling into ConditionalRule
 . replace := with .= and ::= with :=
 . create . explicit whitespace rule
+. make sure xor conditions aren't being improperly normalized -- "a^(b^c)" != "a^b^c"
 
 COMPLETED
 =========
