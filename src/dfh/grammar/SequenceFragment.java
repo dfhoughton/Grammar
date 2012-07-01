@@ -28,6 +28,7 @@ import java.util.LinkedList;
  */
 public class SequenceFragment extends RepeatableRuleFragment {
 	LinkedList<RuleFragment> sequence;
+	private boolean spaceRequired;
 
 	public SequenceFragment() {
 		sequence = new LinkedList<RuleFragment>();
@@ -89,11 +90,25 @@ public class SequenceFragment extends RepeatableRuleFragment {
 	}
 
 	public SequenceFragment copy() {
-		// TODO Auto-generated method stub
 		return new SequenceFragment(new LinkedList<RuleFragment>(sequence));
 	}
 
 	public void add(int i, RuleFragment rf) {
 		sequence.add(i, rf);
+	}
+
+	/**
+	 * @param required
+	 *            whether this sequence required {@link SpaceCondition}
+	 */
+	public void setSpaceRequired(boolean required) {
+		this.spaceRequired = required;
+	}
+
+	/**
+	 * @return whether this sequence required {@link SpaceCondition}
+	 */
+	public boolean getSpaceRequired() {
+		return spaceRequired;
 	}
 }

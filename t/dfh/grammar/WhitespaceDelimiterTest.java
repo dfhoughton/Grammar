@@ -63,8 +63,7 @@ public class WhitespaceDelimiterTest {
 				"t_d ::= 't' 'd'",//
 		};
 		Grammar g = new Grammar(rules);
-		PrintStream ps = new PrintStream(new FileOutputStream(new File("/tmp/debugging.txt")));
-		Matcher m = g.find("t c t d t d", new Options().log(ps));
+		Matcher m = g.find("t c t d t d");
 		Match n = m.match();
 		assertNotNull(n);
 		int count = 1;

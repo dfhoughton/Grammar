@@ -181,6 +181,6 @@ public abstract class Condition implements Serializable {
 	 *         {@link Grammar#describe()}
 	 */
 	public boolean visible() {
-		return true;
+		return name.charAt(0) != '.';
 	}
 }

@@ -229,9 +229,7 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 	 */
 	static void subDescription(Rule r, StringBuilder b) {
 		if (r.generation == -1) {
-			boolean needsBrackets = r instanceof SequenceRule
-					|| r instanceof RepetitionRule
-					|| r instanceof AlternationRule;
+			boolean needsBrackets = needsBrackets(r);
 			if (needsBrackets)
 				b.append("[ ");
 			b.append(r.description(true));
@@ -239,6 +237,31 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 				b.append(" ]");
 		} else
 			b.append(r.label);
+	}
+
+	/**
+	 * @param r
+	 * @return whether the assertion's rule needs brackets in a description
+	 */
+	protected static boolean needsBrackets(Rule r) {
+		if (r instanceof AlternationRule)
+			return true;
+		if (r instanceof RepetitionRule)
+			return false;
+		if (!(r.labels == null || r.labels.isEmpty()))
+			return true;
+		if (r instanceof SequenceRule) {
+			SequenceRule sr = (SequenceRule) r;
+			int count = 0;
+			for (Rule c : sr.sequence) {
+				if (c.label.id.charAt(0) != '.') {
+					count++;
+					if (count > 1)
+						return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override

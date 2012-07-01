@@ -574,8 +574,7 @@ final class Compiler {
 			Map<Label, CyclicRule> cycleMap) {
 		if (rules.containsKey(label))
 			return rules.get(label);
-		Rule r = makeSingle(ruleFragment, cycleMap, conditionMap.get(label),
-				label.ws == Whitespace.required);
+		Rule r = makeSingle(ruleFragment, cycleMap, conditionMap.get(label));
 		r = fixLabel(label, r, conditionMap.get(label));
 		return r;
 	}
@@ -659,10 +658,10 @@ final class Compiler {
 	 * @return
 	 */
 	private Rule makeSingle(RuleFragment rf, Map<Label, CyclicRule> cycleMap,
-			Match condition, boolean whitespaceCondition) {
+			Match condition) {
 		if (rf instanceof AssertionFragment) {
 			AssertionFragment af = (AssertionFragment) rf;
-			Rule sr = makeSingle(af.rf, cycleMap, null, whitespaceCondition);
+			Rule sr = makeSingle(af.rf, cycleMap, null);
 			String subDescription = null;
 			if (!af.forward) {
 				StringBuilder b = new StringBuilder();
@@ -748,19 +747,14 @@ final class Compiler {
 		}
 		GroupFragment gf = (GroupFragment) rf;
 		Set<String> tags = gf.alternateTags;
-		// if we've gotten here then !gf.rep.redundant(), because these
-		// cases are handled by the sequence parser or the initial rule body
-		// parser
 		Rule r = null;
 		if (gf.alternates.size() == 1) {
 			// repeated rule with capture
 			if (gf.alternates.get(0).size() == 1) {
-				r = makeSingle(gf.alternates.get(0).get(0), cycleMap, null,
-						whitespaceCondition);
+				r = makeSingle(gf.alternates.get(0).get(0), cycleMap, null);
 			} else {
 				// repeated sequence
-				r = makeSequence(gf.alternates.get(0), cycleMap, null,
-						whitespaceCondition);
+				r = makeSequence(gf.alternates.get(0), cycleMap, null);
 			}
 		} else {
 			// repeated alternation
@@ -781,16 +775,14 @@ final class Compiler {
 							if (gfInner.alternates.get(0).size() == 1)
 								r = makeSingle(
 										gfInner.alternates.get(0).get(0),
-										cycleMap, null, whitespaceCondition);
+										cycleMap, null);
 							else
 								r = makeSequence(gfInner.alternates.get(0),
-										cycleMap, null, whitespaceCondition);
+										cycleMap, null);
 						} else
-							r = makeSingle(rfInner, cycleMap, null,
-									whitespaceCondition);
+							r = makeSingle(rfInner, cycleMap, null);
 					} else {
-						r = makeSingle(rfInner, cycleMap, null,
-								whitespaceCondition);
+						r = makeSingle(rfInner, cycleMap, null);
 					}
 					String id = r.uniqueId();
 					if (tagMap.containsKey(id)) {
@@ -802,8 +794,7 @@ final class Compiler {
 								0) : innerTags);
 					}
 				} else {
-					r = makeSequence(alternate, cycleMap, null,
-							whitespaceCondition);
+					r = makeSequence(alternate, cycleMap, null);
 					tagMap.put(r.uniqueId(), EMPTY_STR_SET);
 				}
 				alternates.add(r);
@@ -822,8 +813,10 @@ final class Compiler {
 				return r;
 			}
 		}
-		Label l = new Label(Type.implicit, r.label().toString() + gf.rep);
-		r = new RepetitionRule(l, r, gf.rep, tags);
+		if (!gf.rep.redundant()) {
+			Label l = new Label(Type.implicit, r.label().toString() + gf.rep);
+			r = new RepetitionRule(l, r, gf.rep, tags);
+		}
 		setCondition(condition, r, false);
 		return r;
 	}
@@ -1027,15 +1020,13 @@ final class Compiler {
 			Map<Label, CyclicRule> cycleMap) {
 		if (rules.containsKey(label))
 			return rules.get(label);
-		Rule r = makeSequence(fragments, cycleMap, conditionMap.get(label),
-				label.ws == Whitespace.required);
+		Rule r = makeSequence(fragments, cycleMap, conditionMap.get(label));
 		r = fixLabel(label, r, conditionMap.get(label));
 		return r;
 	}
 
 	private Rule makeSequence(SequenceFragment value,
-			Map<Label, CyclicRule> cycleMap, Match condition,
-			boolean whitespaceCondition) {
+			Map<Label, CyclicRule> cycleMap, Match condition) {
 		if (value.size() == 1)
 			throw new GrammarException(
 					"logic error in compiler; no singleton lists should arrive at this point");
@@ -1055,18 +1046,18 @@ final class Compiler {
 					if (gf.alternates.size() == 1) {
 						if (gf.alternates.get(0).size() == 1)
 							r = makeSingle(gf.alternates.get(0).get(0),
-									cycleMap, null, whitespaceCondition);
+									cycleMap, null);
 						else
 							r = makeSequence(gf.alternates.get(0), cycleMap,
-									null, whitespaceCondition);
+									null);
 					}
 				} else {
 					tagSet = EMPTY_STR_SET;
-					r = makeSingle(rf, cycleMap, null, whitespaceCondition);
+					r = makeSingle(rf, cycleMap, null);
 				}
 			} else {
 				tagSet = EMPTY_STR_SET;
-				r = makeSingle(rf, cycleMap, null, whitespaceCondition);
+				r = makeSingle(rf, cycleMap, null);
 			}
 			if (nonInitial)
 				b.append(' ');
@@ -1079,7 +1070,7 @@ final class Compiler {
 		b.append(']');
 		Label l = new Label(Type.implicit, b.toString());
 		Rule r = new SequenceRule(l, sequence, tagList);
-		setCondition(condition, r, whitespaceCondition);
+		setCondition(condition, r, value.getSpaceRequired());
 		return r;
 	}
 
