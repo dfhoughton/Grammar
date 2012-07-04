@@ -246,8 +246,6 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 	protected static boolean needsBrackets(Rule r) {
 		if (r instanceof AlternationRule)
 			return true;
-		if (r instanceof RepetitionRule)
-			return false;
 		if (!(r.labels == null || r.labels.isEmpty()))
 			return true;
 		if (r instanceof SequenceRule) {
