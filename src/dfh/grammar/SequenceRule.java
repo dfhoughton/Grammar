@@ -95,10 +95,8 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 						Match[] children = matched
 								.toArray(new Match[sequence.length]);
 						next.setChildren(children);
-						if (testCondition(c, next))
-							break;
-					} else
-						break;
+					}
+					break;
 				}
 			} catch (SingleColonBarrier s) {
 				done = true;
@@ -152,8 +150,6 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 			b.append(r.uniqueId());
 		}
 		b.append(']');
-		if (condition != null)
-			b.append('(').append(condition).append(')');
 		return b.toString();
 	}
 
@@ -163,7 +159,7 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 		boolean nonInitial = false;
 		int index = -1;
 		for (Rule r : sequence) {
-			index++; 
+			index++;
 			if (r.label().equals(Space.l))
 				continue;
 			boolean hasTags = !tagList.get(index).isEmpty();
@@ -222,29 +218,29 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 		return true;
 	}
 
-	@Override
-	public Rule conditionalize(Condition c, String id) {
-		if (this.c == null) {
-			this.c = c;
-			this.condition = id;
-		} else {
-			if (this.c instanceof LogicalCondition) {
-				if (!((LogicalCondition) this.c).replace(id, c))
-					throw new GrammarException("could not define " + id
-							+ " in this condition");
-			} else if (this.c instanceof LeafCondition) {
-				LeafCondition lc = (LeafCondition) this.c;
-				if (lc.cnd.equals(id))
-					this.c = c;
-				else
-					throw new GrammarException("rule " + this
-							+ " does not carry condition " + id);
-			} else
-				throw new GrammarException("condition on rule " + this
-						+ " cannot be redefined");
-		}
-		return this;
-	}
+//	@Override
+//	public Rule conditionalize(Condition c, String id) {
+//		if (this.c == null) {
+//			this.c = c;
+//			this.condition = id;
+//		} else {
+//			if (this.c instanceof LogicalCondition) {
+//				if (!((LogicalCondition) this.c).replace(id, c))
+//					throw new GrammarException("could not define " + id
+//							+ " in this condition");
+//			} else if (this.c instanceof LeafCondition) {
+//				LeafCondition lc = (LeafCondition) this.c;
+//				if (lc.cnd.equals(id))
+//					this.c = c;
+//				else
+//					throw new GrammarException("rule " + this
+//							+ " does not carry condition " + id);
+//			} else
+//				throw new GrammarException("condition on rule " + this
+//						+ " cannot be redefined");
+//		}
+//		return this;
+//	}
 
 	@Override
 	public void addLabels(Match match, Set<String> labels) {
@@ -349,12 +345,12 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 		}
 	}
 
-	@Override
-	public Set<String> conditionNames() {
-		if (c != null)
-			return c.conditionNames();
-		return super.conditionNames();
-	}
+//	@Override
+//	public Set<String> conditionNames() {
+//		if (c != null)
+//			return c.conditionNames();
+//		return super.conditionNames();
+//	}
 
 	@Override
 	public Rule deepCopy(Label l, String nameBase, Map<String, Rule> cycleMap,
@@ -371,11 +367,6 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 				copy = or.deepCopy(nameBase, cycleMap, knownLabels,
 						knownConditions);
 			copies[i] = copy;
-		}
-		if (c != null) {
-			r.condition = knownConditions.contains(condition) ? nameBase + ':'
-					+ condition : condition;
-			r.c = c.copy(nameBase, knownConditions);
 		}
 		return r;
 	}

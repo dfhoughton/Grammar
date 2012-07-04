@@ -12,8 +12,9 @@ import java.util.List;
 
 /**
  * <p>
+ * 
  * @author David F. Houghton - Mar 15, 2012
- *
+ * 
  */
 public class DisjunctionCondition extends LogicalCondition {
 	private static final long serialVersionUID = 7L;
@@ -48,8 +49,8 @@ public class DisjunctionCondition extends LogicalCondition {
 	}
 
 	@Override
-	protected String describe() {
-		return describe(" | ");
+	protected String describe(boolean showAll) {
+		return describe(" | ", showAll);
 	}
 
 }

@@ -232,23 +232,19 @@ public class TokenRule<K extends Token> extends Rule implements Cloneable,
 	public Object clone() {
 		Label l = new Label(label.t, label.id);
 		Rule r = new TokenRule<K>(l, test);
-		if (c != null)
-			r = r.conditionalize(c, c.getName());
 		return r;
 	}
 
-	@Override
-	public Rule conditionalize(Condition c, String id) {
-		this.c = c;
-		this.condition = id;
-		return this;
-	}
+//	@Override
+//	public Rule conditionalize(Condition c, String id) {
+//		this.c = c;
+//		this.condition = id;
+//		return this;
+//	}
 
 	@Override
 	public String description(boolean withinBrackets) {
 		StringBuilder b = new StringBuilder(label.toString());
-		if (condition != null)
-			b.append(" (").append(condition).append(')');
 		return wrap(b);
 	}
 

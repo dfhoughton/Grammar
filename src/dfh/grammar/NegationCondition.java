@@ -53,11 +53,11 @@ public class NegationCondition extends LogicalCondition {
 	}
 
 	@Override
-	protected String describe() {
+	protected String describe(boolean showAll) {
 		Condition cnd = subconditions[0];
 		if (cnd instanceof LogicalCondition)
-			return "!(" + cnd.describe() + ')';
-		return '!' + cnd.describe();
+			return "!(" + cnd.describe(showAll) + ')';
+		return '!' + cnd.describe(showAll);
 	}
 
 }

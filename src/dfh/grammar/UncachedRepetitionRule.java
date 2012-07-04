@@ -176,8 +176,7 @@ public class UncachedRepetitionRule extends RepetitionRule {
 				done = true;
 				matched = null;
 				matchers = null;
-			} else if (!testCondition(c, next))
-				fetchNext();
+			}
 		}
 
 		private void seekGoal() {
@@ -309,8 +308,6 @@ public class UncachedRepetitionRule extends RepetitionRule {
 			return uid;
 		StringBuilder b = new StringBuilder("{{UC}}");
 		b.append(r.uniqueId()).append(repetition);
-		if (condition != null)
-			b.append('(').append(condition).append(')');
 		return b.toString();
 	}
 }

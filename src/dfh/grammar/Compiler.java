@@ -610,12 +610,11 @@ final class Compiler {
 		} else if (r instanceof LiteralRule) {
 			LiteralRule lr = (LiteralRule) r;
 			LiteralRule lr2 = new LiteralRule(label, lr.literal);
-			lr2.c = lr.c;
 			ru = lr2;
-		} else if (r instanceof ConditionalLeafRule) {
-			ConditionalLeafRule clr = (ConditionalLeafRule) r;
-			LeafRule lr = new LeafRule(label, clr.p, clr.reversible);
-			ru = new ConditionalLeafRule(lr, clr.c, clr.condition);
+		} else if (r instanceof ConditionalRule) {
+			ConditionalRule ocr = (ConditionalRule) r;
+			ConditionalRule cr = new ConditionalRule(label, ocr.r, ocr.c);
+			ru = cr;
 		} else if (r instanceof LeafRule) {
 			LeafRule lr = (LeafRule) r;
 			ru = new LeafRule(label, lr.p, lr.reversible);
@@ -624,16 +623,10 @@ final class Compiler {
 			DeferredDefinitionRule ddr2 = new DeferredDefinitionRule(label);
 			ddr2.r = ddr;
 			ru = ddr2;
-		} else if (r instanceof ConditionalizedLabel) {
-			ConditionalizedLabel cl = (ConditionalizedLabel) r;
-			ConditionalizedLabel cl2 = new ConditionalizedLabel(label, cl.r);
-			cl2.c = cl.c;
-			ru = cl2;
 		}
 		if (ru == null)
 			throw new GrammarException("unanticipated rule type: "
 					+ r.getClass().getName());
-		ru.condition = r.condition;
 		setCondition(match, ru, false);
 
 		if (match != null && r.condition == null) {

@@ -205,33 +205,33 @@ public class ConditionTest {
 		assertTrue("found right match", n.start() == 3);
 	}
 
-	@Test
-	public void assignmentTest() throws GrammarException, IOException {
-		String[] rules = {
-		//
-		"<ROOT> = /\\b\\d++/",//
-		};
-		Grammar g = new Grammar(rules);
-		String s = "1 10 100";
-		Matcher m = g.find(s);
-		int count1 = 0;
-		while (m.match() != null)
-			count1++;
-		g.assignCondition("ROOT", "less_than_100", new Condition() {
-
-			@Override
-			public boolean passes(Match n, Matcher m, CharSequence s) {
-				int i = Integer.parseInt(s.subSequence(n.start(), n.end())
-						.toString());
-				return i < 100;
-			}
-		});
-		m = g.find(s);
-		int count2 = 0;
-		while (m.match() != null)
-			count2++;
-		assertTrue("changed match count", count1 == 3 && count2 == 2);
-	}
+//	@Test
+//	public void assignmentTest() throws GrammarException, IOException {
+//		String[] rules = {
+//		//
+//		"<ROOT> = /\\b\\d++/",//
+//		};
+//		Grammar g = new Grammar(rules);
+//		String s = "1 10 100";
+//		Matcher m = g.find(s);
+//		int count1 = 0;
+//		while (m.match() != null)
+//			count1++;
+//		g.assignCondition("ROOT", "less_than_100", new Condition() {
+//
+//			@Override
+//			public boolean passes(Match n, Matcher m, CharSequence s) {
+//				int i = Integer.parseInt(s.subSequence(n.start(), n.end())
+//						.toString());
+//				return i < 100;
+//			}
+//		});
+//		m = g.find(s);
+//		int count2 = 0;
+//		while (m.match() != null)
+//			count2++;
+//		assertTrue("changed match count", count1 == 3 && count2 == 2);
+//	}
 
 	@Test
 	public void leafTest2() throws GrammarException, IOException {

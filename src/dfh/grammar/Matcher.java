@@ -126,21 +126,4 @@ public abstract class Matcher {
 		}
 		return m;
 	}
-
-	/**
-	 * Called by matchers possibly involving conditions while matching to
-	 * enforce logging of condition testing when appropriate.
-	 * 
-	 * @param c
-	 * @param child
-	 * @return whether the child match passes the condition
-	 */
-	protected boolean testCondition(Condition c, Match child) {
-		if (c == null)
-			return true;
-		boolean passes = c.passes(child, this, s);
-		if (options.debug)
-			child.rule().logCondition(this, passes);
-		return passes;
-	}
 }

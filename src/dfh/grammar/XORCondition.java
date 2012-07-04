@@ -53,8 +53,8 @@ public class XORCondition extends LogicalCondition {
 	}
 
 	@Override
-	protected String describe() {
-		return describe(" ^ ");
+	protected String describe(boolean showAll) {
+		return describe(" ^ ", showAll);
 	}
 
 }

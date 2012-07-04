@@ -63,10 +63,7 @@ public class LiteralRule extends Rule implements Serializable {
 					}
 					if (matched) {
 						Match m = new Match(LiteralRule.this, offset, end);
-						if (testCondition(c, m))
 							cm = new CachedMatch(m);
-						else
-							cm = CachedMatch.MISMATCH;
 					} else
 						cm = CachedMatch.MISMATCH;
 				} else
@@ -102,8 +99,6 @@ public class LiteralRule extends Rule implements Serializable {
 	 */
 	private static final long serialVersionUID = 7L;
 	protected final String literal;
-	protected Condition c;
-
 	public LiteralRule(Label label, String literal) {
 		super(label);
 		this.literal = literal;
@@ -121,8 +116,6 @@ public class LiteralRule extends Rule implements Serializable {
 			return uid;
 		StringBuilder b = new StringBuilder();
 		b.append('"').append(literal).append('"');
-		if (condition != null)
-			b.append('(').append(c.describe()).append(')');
 		return b.toString();
 	}
 
@@ -143,8 +136,6 @@ public class LiteralRule extends Rule implements Serializable {
 			b.append('"').append(literal).append('"');
 		}
 		b = new StringBuilder(wrap(b));
-		if (c != null && c.visible())
-			b.append(" (").append(c.describe()).append(')');
 		return b.toString();
 	}
 
@@ -161,7 +152,6 @@ public class LiteralRule extends Rule implements Serializable {
 					&& (index = string.indexOf(literal, o)) > -1) {
 				Integer i = index + options.start;
 				Match n = new Match(this, i, i + literal.length());
-				if (c == null || c.passes(n, null, s))
 					subCache.put(i, new CachedMatch(n));
 				startOffsets.add(i);
 				o = index + 1;
@@ -177,29 +167,29 @@ public class LiteralRule extends Rule implements Serializable {
 		return false;
 	}
 
-	@Override
-	public Rule conditionalize(Condition c, String id) {
-		if (this.c == null) {
-			this.c = c;
-			this.condition = id;
-		} else {
-			if (this.c instanceof LogicalCondition) {
-				if (!((LogicalCondition) this.c).replace(id, c))
-					throw new GrammarException("could not define " + id
-							+ " in this condition");
-			} else if (this.c instanceof LeafCondition) {
-				LeafCondition lc = (LeafCondition) this.c;
-				if (lc.cnd.equals(id))
-					this.c = c;
-				else
-					throw new GrammarException("rule " + this
-							+ " does not carry condition " + id);
-			} else
-				throw new GrammarException("condition on rule " + this
-						+ " cannot be redefined");
-		}
-		return this;
-	}
+//	@Override
+//	public Rule conditionalize(Condition c, String id) {
+//		if (this.c == null) {
+//			this.c = c;
+//			this.condition = id;
+//		} else {
+//			if (this.c instanceof LogicalCondition) {
+//				if (!((LogicalCondition) this.c).replace(id, c))
+//					throw new GrammarException("could not define " + id
+//							+ " in this condition");
+//			} else if (this.c instanceof LeafCondition) {
+//				LeafCondition lc = (LeafCondition) this.c;
+//				if (lc.cnd.equals(id))
+//					this.c = c;
+//				else
+//					throw new GrammarException("rule " + this
+//							+ " does not carry condition " + id);
+//			} else
+//				throw new GrammarException("condition on rule " + this
+//						+ " cannot be redefined");
+//		}
+//		return this;
+//	}
 
 	@Override
 	protected Boolean mayBeZeroWidth(Map<String, Boolean> cache) {
@@ -208,22 +198,17 @@ public class LiteralRule extends Rule implements Serializable {
 		return b;
 	}
 
-	@Override
-	public Set<String> conditionNames() {
-		if (c != null)
-			return c.conditionNames();
-		return super.conditionNames();
-	}
+//	@Override
+//	public Set<String> conditionNames() {
+//		if (c != null)
+//			return c.conditionNames();
+//		return super.conditionNames();
+//	}
 
 	@Override
 	public Rule deepCopy(Label l, String nameBase, Map<String, Rule> cycleMap,
 			Set<String> knownLabels, Set<String> knownConditions) {
 		LiteralRule lr = new LiteralRule(l, literal);
-		if (c != null) {
-			lr.condition = knownConditions.contains(condition) ? nameBase + ':'
-					+ condition : condition;
-			lr.c = c.copy(nameBase, knownConditions);
-		}
 		return lr;
 	}
 

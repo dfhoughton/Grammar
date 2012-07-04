@@ -139,12 +139,28 @@ public abstract class Condition implements Serializable {
 	}
 
 	/**
-	 * Required by {@link Grammar#describe()}.
+	 * Required by {@link Grammar#describe()}. Delegates to
+	 * {@link #describe(boolean)} with the parameter <code>false</code>.
 	 * 
 	 * @return string representing condition
 	 */
-	protected String describe() {
-		return name;
+	protected final String describe() {
+		return describe(false);
+	}
+
+	/**
+	 * Returns string representing condition, showing hidden sub-conditions only
+	 * if <code>showAll</code> is <code>true</code>.
+	 * 
+	 * @param showAll
+	 *            whether to show even hidden conditions
+	 * @return string representing condition, showing hidden sub-conditions only
+	 *         if <code>showAll</code> is <code>true</code>
+	 */
+	protected String describe(boolean showAll) {
+		if (visible())
+			return name;
+		return showAll ? name : "";
 	}
 
 	/**

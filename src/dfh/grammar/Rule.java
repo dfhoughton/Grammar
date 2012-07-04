@@ -53,12 +53,6 @@ public abstract class Rule {
 	int generation = -1;
 
 	/**
-	 * Used during compilation to hold condition identifier for use in
-	 * constructing unique ids. See {@link #uniqueId()}.
-	 */
-	protected String condition;
-
-	/**
 	 * A set of labels associated with this rule wherever it appears. Such
 	 * labels are assigned like so:
 	 * 
@@ -391,22 +385,22 @@ public abstract class Rule {
 	 */
 	public abstract boolean zeroWidth();
 
-	/**
-	 * Returns a {@link Rule} that duplicates this except that it won't return
-	 * any {@link Match} that doesn't meet the given condition. This method must
-	 * be overridden by child classes as the base implementation only throws a
-	 * {@link GrammarException} when called.
-	 * 
-	 * @param c
-	 * @param id
-	 *            condition identifier
-	 * @return a {@link Rule} that duplicates this except that it won't return
-	 *         any {@link Match} that doesn't meet the given condition
-	 */
-	public Rule conditionalize(Condition c, String id) {
-		throw new GrammarException(this.getClass()
-				+ " cannot be conditionalized");
-	}
+//	/**
+//	 * Returns a {@link Rule} that duplicates this except that it won't return
+//	 * any {@link Match} that doesn't meet the given condition. This method must
+//	 * be overridden by child classes as the base implementation only throws a
+//	 * {@link GrammarException} when called.
+//	 * 
+//	 * @param c
+//	 * @param id
+//	 *            condition identifier
+//	 * @return a {@link Rule} that duplicates this except that it won't return
+//	 *         any {@link Match} that doesn't meet the given condition
+//	 */
+//	public Rule conditionalize(Condition c, String id) {
+//		throw new GrammarException(this.getClass()
+//				+ " cannot be conditionalized");
+//	}
 
 	/**
 	 * Method required by {@link Grammar#defineRule(String, Rule)}. It should
@@ -521,9 +515,19 @@ public abstract class Rule {
 	protected void fixAlternation() {
 	}
 
-	protected void logCondition(Matcher m, boolean passes) {
+	/**
+	 * Adds result of condition testing to match trace.
+	 * 
+	 * @param m
+	 *            matcher associated with condition
+	 * @param c
+	 *            condition being tested
+	 * @param passes
+	 *            whether the condition passed
+	 */
+	protected void logCondition(Matcher m, Condition c, boolean passes) {
 		StringBuilder b = new StringBuilder();
-		b.append("\ncondition ").append(condition).append(' ');
+		b.append("\ncondition ").append(c.describe(true)).append(' ');
 		b.append(passes ? "passes" : "does not pass");
 		b.append('\n');
 		m.options.trace.println(b);
@@ -688,15 +692,15 @@ public abstract class Rule {
 
 	}
 
-	/**
-	 * Returns the names of conditions associated with this rule. This base
-	 * implementation should be overridden in rules that may carry conditions.
-	 * 
-	 * @return the names of conditions associated with this rule
-	 */
-	public Set<String> conditionNames() {
-		return new HashSet<String>(0);
-	}
+//	/**
+//	 * Returns the names of conditions associated with this rule. This base
+//	 * implementation should be overridden in rules that may carry conditions.
+//	 * 
+//	 * @return the names of conditions associated with this rule
+//	 */
+//	public Set<String> conditionNames() {
+//		return new HashSet<String>(0);
+//	}
 
 	/**
 	 * Returns whether this rule necessarily produces terminal matches. This

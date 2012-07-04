@@ -156,33 +156,35 @@ public abstract class LogicalCondition extends Condition implements
 	protected abstract boolean allPass(Match n, Matcher m, CharSequence s);
 
 	@Override
-	protected abstract String describe();
+	protected abstract String describe(boolean showAll);
 
 	/**
-	 * Used to implement {@link #describe()} for various logical condition
-	 * subtypes.
+	 * Used to implement {@link #describe(boolean))} for various logical
+	 * condition subtypes.
 	 * 
 	 * @param operator
 	 *            string representing the logical operator at work in this
 	 *            condition
+	 * @param showAll
+	 *            whether to show even hidden sub-conditions
 	 * @return string representing this logical condition
 	 */
-	protected String describe(String operator) {
+	protected String describe(String operator, boolean showAll) {
 		initVisibility();
 		StringBuilder b = new StringBuilder();
 		boolean initial = true;
 		for (Condition cnd : subconditions) {
-			if (!cnd.visible())
+			if (!(showAll || cnd.visible()))
 				continue;
 			if (initial)
 				initial = false;
 			else
 				b.append(operator);
-			if (visibleConditions > 1 && cnd instanceof LogicalCondition)
+			if ((showAll && subconditions.length > 1 || visibleConditions > 1) && cnd instanceof LogicalCondition)
 				// special treatment of hidden conditions
-				b.append('(').append(cnd.describe()).append(')');
+				b.append('(').append(cnd.describe(showAll)).append(')');
 			else
-				b.append(cnd.describe());
+				b.append(cnd.describe(showAll));
 		}
 		return b.toString();
 	}

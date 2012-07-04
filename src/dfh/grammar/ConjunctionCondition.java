@@ -50,8 +50,8 @@ public class ConjunctionCondition extends LogicalCondition {
 	}
 
 	@Override
-	protected String describe() {
-		return describe(" ");
+	protected String describe(boolean showAll) {
+		return describe(" ", showAll);
 	}
 
 }

@@ -651,7 +651,12 @@ public class Grammar implements Serializable {
 			// remove lr from any set already containing it
 			for (Set<Rule> s : knownConditions.values())
 				s.remove(lr);
-			lr = lr.conditionalize(c, id);
+			if (c != null) {
+				// TODO figure out how to make label unique -- this is left
+				// after some serious hacking on the handling of conditions
+				ConditionalRule cr = new ConditionalRule(lr.label, lr, c);
+				lr = cr;
+			}
 			set.add(lr);
 			return lr;
 		}
@@ -1245,7 +1250,7 @@ public class Grammar implements Serializable {
 											r, countercache, options.rcs);
 									cache[r.cacheIndex] = owncache;
 								} else if (r instanceof LeafRule
-										|| (r instanceof LiteralRule && ((LiteralRule) r).c == null)) {
+										|| r instanceof LiteralRule) {
 									if (reversed == null)
 										reversed = options.rcs.toString();
 									r.study(reversed, cache, options);
@@ -1364,7 +1369,10 @@ public class Grammar implements Serializable {
 				explicitRules.size() * 2);
 		for (Rule er : explicitRules) {
 			knownLabels.add(er.label().id);
-			knownLabels.addAll(er.conditionNames());
+			if (er instanceof ConditionalRule) {
+				ConditionalRule cr = (ConditionalRule) er;
+				knownLabels.addAll(cr.c.conditionNames());
+			}
 		}
 		Rule rc = g.root.deepCopy(label, new HashMap<String, Rule>(g.rules()
 				.size() * 2), knownLabels, knownConditions);
@@ -1384,73 +1392,6 @@ public class Grammar implements Serializable {
 			}
 			rc.generation = -1;
 			fixAlternationTags(oldId, r);
-		}
-	}
-
-	/**
-	 * Replace all instances of old {@link Rule} with new.
-	 * 
-	 * @param g
-	 * @param ru
-	 *            old rule
-	 * @param nru
-	 *            new rule
-	 */
-	private void fix(Grammar g, Rule ru, Rule nru) {
-		nru.generation = ru.generation;
-		Set<Rule> set = new HashSet<Rule>();
-		root.subRules(set, new HashSet<Rule>(), false);
-		for (Rule r : set) {
-			fix(ru, nru, r);
-		}
-	}
-
-	/**
-	 * Replace all instances of old {@link Rule} with new.
-	 * 
-	 * @param ru
-	 *            old rule
-	 * @param nru
-	 *            new rule
-	 * @param r
-	 */
-	private void fix(Rule ru, Rule nru, Rule r) {
-		if (r instanceof AlternationRule) {
-			AlternationRule ar = (AlternationRule) r;
-			for (int i = 0; i < ar.alternates.length; i++) {
-				if (ar.alternates[i] == ru)
-					ar.alternates[i] = nru;
-				else
-					fix(ru, nru, ar.alternates[i]);
-			}
-		} else if (r instanceof SequenceRule) {
-			SequenceRule sr = (SequenceRule) r;
-			for (int i = 0; i < sr.sequence.length; i++) {
-				if (sr.sequence[i] == ru)
-					sr.sequence[i] = nru;
-				else
-					fix(ru, nru, sr.sequence[i]);
-			}
-		} else if (r instanceof RepetitionRule) {
-			RepetitionRule rr = (RepetitionRule) r;
-			if (rr.r == ru)
-				rr.r = nru;
-			else
-				fix(ru, nru, rr.r);
-		} else if (r instanceof DeferredDefinitionRule) {
-			DeferredDefinitionRule ddr = (DeferredDefinitionRule) r;
-			if (ddr.r == ru)
-				ddr.r = nru;
-		} else if (r instanceof CyclicRule) {
-			CyclicRule cr = (CyclicRule) r;
-			if (cr.r == ru)
-				cr.r = nru;
-		} else if (r instanceof Assertion) {
-			Assertion a = (Assertion) r;
-			if (a.r == ru)
-				a.r = nru;
-			else
-				fix(ru, nru, a.r);
 		}
 	}
 
@@ -1480,39 +1421,39 @@ public class Grammar implements Serializable {
 		fixAlternationTags(oldId, r);
 	}
 
-	/**
-	 * Assign a condition to an arbitrary {@link Rule}.
-	 * 
-	 * @param labelId
-	 * @param conditionId
-	 * @param c
-	 */
-	public synchronized void assignCondition(String labelId,
-			String conditionId, Condition c) {
-		if (undefinedConditions.containsKey(conditionId))
-			throw new GrammarException(conditionId
-					+ " belongs to an as yet undefined condition");
-		// clear some caches
-		initialRules = null;
-		ruleSet = null;
-
-		Label l = null;
-		Map<Label, Rule> erules = explicitRules();
-		for (Label label : erules.keySet()) {
-			if (label.id.equals(labelId)) {
-				l = label;
-				break;
-			}
-		}
-		if (l == null)
-			throw new GrammarException("unknown rule: " + labelId);
-		Rule r = erules.remove(l);
-		Rule nr = conditionCheck(conditionId, c, r);
-		if (l.equals(rootLabel))
-			root = nr;
-		fix(this, r, nr);
-		erules.put(l, nr);
-	}
+	// /**
+	// * Assign a condition to an arbitrary {@link Rule}.
+	// *
+	// * @param labelId
+	// * @param conditionId
+	// * @param c
+	// */
+	// public synchronized void assignCondition(String labelId,
+	// String conditionId, Condition c) {
+	// if (undefinedConditions.containsKey(conditionId))
+	// throw new GrammarException(conditionId
+	// + " belongs to an as yet undefined condition");
+	// // clear some caches
+	// initialRules = null;
+	// ruleSet = null;
+	//
+	// Label l = null;
+	// Map<Label, Rule> erules = explicitRules();
+	// for (Label label : erules.keySet()) {
+	// if (label.id.equals(labelId)) {
+	// l = label;
+	// break;
+	// }
+	// }
+	// if (l == null)
+	// throw new GrammarException("unknown rule: " + labelId);
+	// Rule r = erules.remove(l);
+	// Rule nr = conditionCheck(conditionId, c, r);
+	// if (l.equals(rootLabel))
+	// root = nr;
+	// fix(this, r, nr);
+	// erules.put(l, nr);
+	// }
 
 	/**
 	 * @param label
@@ -1521,17 +1462,19 @@ public class Grammar implements Serializable {
 	 */
 	public synchronized void defineCondition(String label, Condition c) {
 		boolean cantFind = true;
-		Map<String, List<Rule>> idMap = new HashMap<String, List<Rule>>(rules()
-				.size() * 2);
+		Map<String, List<ConditionalRule>> idMap = new HashMap<String, List<ConditionalRule>>(
+				rules().size() * 2);
 		for (Rule r : rules()) {
-			if (r.condition == null)
+			if (!(r instanceof ConditionalRule))
 				continue;
-			List<Rule> list = idMap.get(r.condition);
+			ConditionalRule cr = (ConditionalRule) r;
+			String condition = cr.c.describe(true);
+			List<ConditionalRule> list = idMap.get(condition);
 			if (list == null) {
-				list = new ArrayList<Rule>();
-				idMap.put(r.condition, list);
+				list = new ArrayList<ConditionalRule>();
+				idMap.put(condition, list);
 			}
-			list.add(r);
+			list.add(cr);
 		}
 		for (Iterator<Entry<String, Set<String>>> i = undefinedConditions
 				.entrySet().iterator(); i.hasNext();) {
@@ -1540,13 +1483,16 @@ public class Grammar implements Serializable {
 			Set<String> conditions = e.getValue();
 			if (conditions.contains(label)) {
 				cantFind = false;
-				List<Rule> list = idMap.get(condition);
+				List<ConditionalRule> list = idMap.get(condition);
 				if (list == null)
 					list = Collections.emptyList();
-				for (Rule r : list) {
-					Rule nr = r.conditionalize(c, label);
-					if (r != nr)
-						fix(this, r, nr);
+				for (ConditionalRule r : list) {
+					if (r.c instanceof LeafCondition) {
+						r.c = c;
+					} else if (r.c instanceof LogicalCondition) {
+						LogicalCondition lc = (LogicalCondition) r.c;
+						lc.replace(label, c);
+					}
 				}
 				conditions.remove(label);
 				if (conditions.isEmpty())
