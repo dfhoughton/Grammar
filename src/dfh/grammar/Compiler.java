@@ -47,7 +47,7 @@ final class Compiler {
 	private Map<Label, Rule> reversedCyclicRuleMap = new HashMap<Label, Rule>();
 	private final Label root;
 	private Map<String, Set<String>> undefinedConditions = new HashMap<String, Set<String>>();
-	private Map<Label, Match> conditionMap = new HashMap<Label, Match>();
+	private Map<String, Condition> conditionMap = new HashMap<String, Condition>();
 	private boolean setWhitespaceCondition = false;
 	/**
 	 * The grammar of conditions at the end of rules.
@@ -161,7 +161,7 @@ final class Compiler {
 				}
 			}
 		}
-		Map<Label, SequenceFragment> map = new HashMap<Label, SequenceFragment>();
+		Map<Label, SyntacticParse> map = new HashMap<Label, SyntacticParse>();
 		Label r = null;
 		RuleParser parser = new RuleParser(reader);
 		try {
@@ -176,14 +176,17 @@ final class Compiler {
 				}
 				if (parsed.c != null) {
 					ConditionFragment cf = parsed.c;
-					String cnd = cf.id.trim();
-					Match m = parseCondition(parsed.text, cnd);
-					conditionMap.put(l, m);
+					cf.id = cf.id.trim();
+					if (!conditionMap.containsKey(cf.id)) {
+						Match m = parseCondition(parsed.text, cf.id);
+						Condition c = LogicalCondition.manufacture(m);
+						conditionMap.put(cf.id, c);
+					}
 				}
 				if (map.containsKey(l))
 					throw new GrammarException("rule " + l
 							+ " redefined at line " + parser.getLineNumber());
-				map.put(l, parsed.f);
+				map.put(l, parsed);
 			}
 		} catch (IOException e1) {
 			throw new GrammarException(e1);
@@ -197,41 +200,36 @@ final class Compiler {
 		Set<Label> terminals = new HashSet<Label>(map.size() * 2);
 		int gen = 1;
 		// first we extract all the terminals we can
-		for (Iterator<Entry<Label, SequenceFragment>> i = map.entrySet()
+		for (Iterator<Entry<Label, SyntacticParse>> i = map.entrySet()
 				.iterator(); i.hasNext();) {
-			Entry<Label, SequenceFragment> e = i.next();
+			Entry<Label, SyntacticParse> e = i.next();
 			Label label = e.getKey();
 			if (!(label.ws == Whitespace.none || rules.containsKey(Space.l)))
 				rules.put(Space.l, new Space());
-			SequenceFragment body = e.getValue();
+			SyntacticParse sp = e.getValue();
+			SequenceFragment body = sp.f;
 			RuleFragment rf = body.get(0);
 			if (body.size() == 1
 					&& (rf instanceof Regex || rf instanceof LiteralFragment)) {
-				// TODO I can't recall why literal fragments are treated
-				// differently here; should make sure this can't be simplified
-				if (rf instanceof LiteralFragment
-						&& !((RepeatableRuleFragment) rf).rep.redundant())
+				if (!((RepeatableRuleFragment) rf).rep.redundant())
 					continue;
 				Label l = e.getKey();
-				Match condition = conditionMap.get(l);
-				i.remove();
 				Type t = Type.explicit;
 				l = new Label(t, l.id);
 				terminals.add(l);
 				Rule ru;
-				if (rf instanceof Regex) {
-					Regex rx = (Regex) rf;
-					if (rx.rep.redundant()) {
+				if (sp.c == null) {
+					if (rf instanceof Regex) {
+						Regex rx = (Regex) rf;
 						ru = new LeafRule(l, rx.re, rx.reversible);
 					} else {
-						Label rxl = new Label(Type.implicit, rx.toString());
-						Rule rxr = new LeafRule(rxl, rx.re, rx.reversible);
-						ru = new RepetitionRule(l, rxr, rx.rep, EMPTY_STR_SET);
+						ru = new LiteralRule(l, ((LiteralFragment) rf).literal);
 					}
 				} else {
-					ru = new LiteralRule(l, ((LiteralFragment) rf).literal);
+					ru = makeSingle(rf, Collections.EMPTY_MAP);
+					ru = new ConditionalRule(l, ru, conditionMap.get(sp.c.id));
 				}
-				ru = setCondition(condition, ru, false);
+				i.remove();
 				ru.generation = gen;
 				rules.put(l, ru);
 			}
@@ -244,7 +242,8 @@ final class Compiler {
 			knownIds.add(l.id);
 		for (Label l : rules.keySet())
 			knownIds.add(l.id);
-		for (SequenceFragment list : map.values()) {
+		for (SyntacticParse sp : map.values()) {
+			SequenceFragment list = sp.f;
 			Set<Label> labels = allLabels(list);
 			for (Label l : labels) {
 				if (l.t == Type.indeterminate && !knownIds.contains(l.id)) {
@@ -266,8 +265,9 @@ final class Compiler {
 			}
 		}
 		// create dependency map
-		for (Entry<Label, SequenceFragment> e : map.entrySet()) {
-			Set<Label> dependents = new HashSet<Label>(allLabels(e.getValue()));
+		for (Entry<Label, SyntacticParse> e : map.entrySet()) {
+			Set<Label> dependents = new HashSet<Label>(
+					allLabels(e.getValue().f));
 			dependents.retainAll(map.keySet());
 			if (!dependents.isEmpty()) {
 				dependencyMap.put(e.getKey(), dependents);
@@ -279,11 +279,11 @@ final class Compiler {
 			int size = map.size();
 			// we process rules by generation, from less dependent to more, in
 			// order to optimize the cache
-			List<Entry<Label, SequenceFragment>> generation = new LinkedList<Entry<Label, SequenceFragment>>();
-			for (Iterator<Entry<Label, SequenceFragment>> i = map.entrySet()
+			List<Entry<Label, SyntacticParse>> generation = new LinkedList<Entry<Label, SyntacticParse>>();
+			for (Iterator<Entry<Label, SyntacticParse>> i = map.entrySet()
 					.iterator(); i.hasNext();) {
-				Entry<Label, SequenceFragment> e = i.next();
-				Set<Label> labels = allLabels(e.getValue());
+				Entry<Label, SyntacticParse> e = i.next();
+				Set<Label> labels = allLabels(e.getValue().f);
 				boolean defined = true;
 				for (Label l : labels) {
 					if (!rules.containsKey(l)) {
@@ -310,13 +310,13 @@ final class Compiler {
 			// first we sort them to ensure those rules which are likely to be
 			// components of others are handled first
 			class Sorter implements Comparable<Sorter> {
-				final Entry<Label, SequenceFragment> e;
+				final Entry<Label, SyntacticParse> e;
 				final int length;
 
-				Sorter(Entry<Label, SequenceFragment> e2) {
+				Sorter(Entry<Label, SyntacticParse> e2) {
 					int i = 0;
 					this.e = e2;
-					for (RuleFragment r : e2.getValue().sequence)
+					for (RuleFragment r : e2.getValue().f.sequence)
 						i += r.toString().length() + 1;
 					length = i;
 				}
@@ -328,14 +328,14 @@ final class Compiler {
 
 			}
 			List<Sorter> sorters = new ArrayList<Sorter>(generation.size());
-			for (Entry<Label, SequenceFragment> e : generation)
+			for (Entry<Label, SyntacticParse> e : generation)
 				sorters.add(new Sorter(e));
 			Collections.sort(sorters);
 			// now we make the rules
 			for (Sorter s : sorters) {
 				Label l = s.e.getKey();
-				SequenceFragment body = s.e.getValue();
-				Rule ru = parseRule(l, body, null);
+				SequenceFragment body = s.e.getValue().f;
+				Rule ru = parseRule(l, body, null, s.e.getValue().c);
 				if (redundancyTest(body)) {
 					Label l2 = (Label) body.get(0);
 					ru.addLabel(l2);
@@ -389,7 +389,7 @@ final class Compiler {
 	 * 
 	 * @param map
 	 */
-	private void resolveRecursions(Map<Label, SequenceFragment> map,
+	private void resolveRecursions(Map<Label, SyntacticParse> map,
 			int generation) {
 		for (Iterator<Entry<Label, Set<Label>>> i = dependencyMap.entrySet()
 				.iterator(); i.hasNext();) {
@@ -399,13 +399,13 @@ final class Compiler {
 			else
 				i.remove();
 		}
-		Map<Label, SequenceFragment> copy = new HashMap<Label, SequenceFragment>(
+		Map<Label, SyntacticParse> copy = new HashMap<Label, SyntacticParse>(
 				map);
 		removeStrictlyDominating(copy);
-		List<List<Entry<Label, SequenceFragment>>> cycles = separateCycles(copy);
-		for (List<Entry<Label, SequenceFragment>> cycle : cycles) {
+		List<List<Entry<Label, SyntacticParse>>> cycles = separateCycles(copy);
+		for (List<Entry<Label, SyntacticParse>> cycle : cycles) {
 			processCycle(cycle, generation);
-			for (Entry<Label, SequenceFragment> e : cycle)
+			for (Entry<Label, SyntacticParse> e : cycle)
 				map.remove(e.getKey());
 		}
 	}
@@ -416,18 +416,19 @@ final class Compiler {
 	 * @param cycle
 	 * @param generation
 	 */
-	private void processCycle(List<Entry<Label, SequenceFragment>> cycle,
+	private void processCycle(List<Entry<Label, SyntacticParse>> cycle,
 			int generation) {
 		testCycle(cycle);
 		Map<Label, CyclicRule> cycleMap = new HashMap<Label, CyclicRule>(
 				cycle.size() * 2);
-		for (Entry<Label, SequenceFragment> e : cycle) {
+		for (Entry<Label, SyntacticParse> e : cycle) {
 			CyclicRule ddr = new CyclicRule(new Label(Type.explicit,
 					e.getKey().id));
 			cycleMap.put(e.getKey(), ddr);
 		}
-		for (Entry<Label, SequenceFragment> e : cycle) {
-			Rule r = parseRule(e.getKey(), e.getValue(), cycleMap);
+		for (Entry<Label, SyntacticParse> e : cycle) {
+			Rule r = parseRule(e.getKey(), e.getValue().f, cycleMap,
+					e.getValue().c);
 			r.generation = generation;
 			cycleMap.get(e.getKey()).setRule(r);
 			rules.put(e.getKey(), r);
@@ -439,18 +440,18 @@ final class Compiler {
 	 * 
 	 * @param cycle
 	 */
-	private void testCycle(List<Entry<Label, SequenceFragment>> cycle) {
+	private void testCycle(List<Entry<Label, SyntacticParse>> cycle) {
 		Set<Label> set = new HashSet<Label>(cycle.size() * 2);
-		for (Entry<Label, SequenceFragment> e : cycle)
+		for (Entry<Label, SyntacticParse> e : cycle)
 			set.add(e.getKey());
-		for (Entry<Label, SequenceFragment> e : cycle) {
+		for (Entry<Label, SyntacticParse> e : cycle) {
 			if (findEscape(e, set))
 				return;
 		}
 		StringBuilder b = new StringBuilder();
 		b.append("cycle found in rules: ");
 		boolean nonInitial = false;
-		for (Entry<Label, SequenceFragment> e : cycle) {
+		for (Entry<Label, SyntacticParse> e : cycle) {
 			if (nonInitial)
 				b.append(", ");
 			else
@@ -466,9 +467,9 @@ final class Compiler {
 	 * @return whether there is some way to escape from a mutual dependency
 	 *         cycle in this rule
 	 */
-	private boolean findEscape(Entry<Label, SequenceFragment> e, Set<Label> set) {
-		SequenceFragment list = e.getValue();
-		for (RuleFragment r : list.sequence) {
+	private boolean findEscape(Entry<Label, SyntacticParse> e, Set<Label> set) {
+		SyntacticParse list = e.getValue();
+		for (RuleFragment r : list.f.sequence) {
 			if (!set.contains(r))
 				return true;
 			if (((RepeatableRuleFragment) r).rep.bottom == 0)
@@ -477,26 +478,26 @@ final class Compiler {
 		return false;
 	}
 
-	private List<List<Entry<Label, SequenceFragment>>> separateCycles(
-			Map<Label, SequenceFragment> copy) {
-		List<List<Entry<Label, SequenceFragment>>> cycles = new LinkedList<List<Entry<Label, SequenceFragment>>>();
+	private List<List<Entry<Label, SyntacticParse>>> separateCycles(
+			Map<Label, SyntacticParse> copy) {
+		List<List<Entry<Label, SyntacticParse>>> cycles = new LinkedList<List<Entry<Label, SyntacticParse>>>();
 		while (true) {
 			// first, we find the entry with the fewest dependencies
-			List<Entry<Label, SequenceFragment>> list = new ArrayList<Entry<Label, SequenceFragment>>(
+			List<Entry<Label, SyntacticParse>> list = new ArrayList<Entry<Label, SyntacticParse>>(
 					copy.entrySet());
 			Collections.sort(list,
-					new Comparator<Entry<Label, SequenceFragment>>() {
+					new Comparator<Entry<Label, SyntacticParse>>() {
 						@Override
-						public int compare(Entry<Label, SequenceFragment> o1,
-								Entry<Label, SequenceFragment> o2) {
+						public int compare(Entry<Label, SyntacticParse> o1,
+								Entry<Label, SyntacticParse> o2) {
 							return dependencyMap.get(o1.getKey()).size()
 									- dependencyMap.get(o2.getKey()).size();
 						}
 					});
-			Entry<Label, SequenceFragment> least = list.get(0);
+			Entry<Label, SyntacticParse> least = list.get(0);
 			Set<Label> set = new HashSet<Label>();
 			set.add(least.getKey());
-			List<Entry<Label, SequenceFragment>> cycle = new LinkedList<Entry<Label, SequenceFragment>>();
+			List<Entry<Label, SyntacticParse>> cycle = new LinkedList<Entry<Label, SyntacticParse>>();
 			LinkedList<Label> searchQueue = new LinkedList<Label>(
 					dependencyMap.get(least.getKey()));
 			while (!searchQueue.isEmpty()) {
@@ -508,9 +509,9 @@ final class Compiler {
 				}
 				set.add(l);
 			}
-			for (Iterator<Entry<Label, SequenceFragment>> i = copy.entrySet()
+			for (Iterator<Entry<Label, SyntacticParse>> i = copy.entrySet()
 					.iterator(); i.hasNext();) {
-				Entry<Label, SequenceFragment> e = i.next();
+				Entry<Label, SyntacticParse> e = i.next();
 				if (set.contains(e.getKey())) {
 					cycle.add(e);
 					i.remove();
@@ -529,11 +530,11 @@ final class Compiler {
 	 * 
 	 * @param copy
 	 */
-	private void removeStrictlyDominating(Map<Label, SequenceFragment> copy) {
+	private void removeStrictlyDominating(Map<Label, SyntacticParse> copy) {
 		while (true) {
 			Set<Label> required = new HashSet<Label>(copy.size() * 2);
-			for (SequenceFragment list : copy.values())
-				required.addAll(allLabels(list));
+			for (SyntacticParse list : copy.values())
+				required.addAll(allLabels(list.f));
 			boolean changed = false;
 			for (Iterator<Label> i = copy.keySet().iterator(); i.hasNext();) {
 				if (!required.contains(i.next())) {
@@ -547,18 +548,18 @@ final class Compiler {
 	}
 
 	private Rule parseRule(Label label, SequenceFragment fragments,
-			Map<Label, CyclicRule> cycleMap) {
+			Map<Label, CyclicRule> cycleMap, ConditionFragment cf) {
 		Rule r;
 		if (fragments.size() == 1) {
 			RuleFragment rf = fragments.get(0);
 			if (isNamedCapture(rf)) {
 				GroupFragment gf = (GroupFragment) rf;
-				r = parseRule(label, gf.alternates.get(0), cycleMap);
+				r = parseRule(label, gf.alternates.get(0), cycleMap, cf);
 				r.setLabels(gf.alternateTags);
 			} else
-				r = makeSingle(label, fragments.get(0), cycleMap);
+				r = makeSingle(label, fragments.get(0), cycleMap, cf);
 		} else
-			r = makeSequence(label, fragments, cycleMap);
+			r = makeSequence(label, fragments, cycleMap, cf);
 		return r;
 	}
 
@@ -571,11 +572,14 @@ final class Compiler {
 	}
 
 	private Rule makeSingle(Label label, RuleFragment ruleFragment,
-			Map<Label, CyclicRule> cycleMap) {
+			Map<Label, CyclicRule> cycleMap, ConditionFragment cf) {
 		if (rules.containsKey(label))
 			return rules.get(label);
-		Rule r = makeSingle(ruleFragment, cycleMap, conditionMap.get(label));
-		r = fixLabel(label, r, conditionMap.get(label));
+		Rule r = makeSingle(ruleFragment, cycleMap);
+		if (cf == null)
+			r = fixLabel(label, r);
+		else
+			r = new ConditionalRule(label, r, conditionMap.get(cf.id));
 		return r;
 	}
 
@@ -584,10 +588,9 @@ final class Compiler {
 	 * 
 	 * @param label
 	 * @param r
-	 * @param match
 	 * @return named {@link Rule}
 	 */
-	Rule fixLabel(Label label, Rule r, Match match) {
+	Rule fixLabel(Label label, Rule r) {
 		Rule ru = null;
 		Set<String> labels = r.labels;
 		if (r instanceof AlternationRule) {
@@ -627,12 +630,6 @@ final class Compiler {
 		if (ru == null)
 			throw new GrammarException("unanticipated rule type: "
 					+ r.getClass().getName());
-		setCondition(match, ru, false);
-
-		if (match != null && r.condition == null) {
-			ru = ru.conditionalize(LogicalCondition.manufacture(match),
-					match.group());
-		}
 		if (labels != null) {
 			if (ru.labels == null)
 				ru.labels = labels;
@@ -650,11 +647,10 @@ final class Compiler {
 	 * @param whitespaceCondition
 	 * @return
 	 */
-	private Rule makeSingle(RuleFragment rf, Map<Label, CyclicRule> cycleMap,
-			Match condition) {
+	private Rule makeSingle(RuleFragment rf, Map<Label, CyclicRule> cycleMap) {
 		if (rf instanceof AssertionFragment) {
 			AssertionFragment af = (AssertionFragment) rf;
-			Rule sr = makeSingle(af.rf, cycleMap, null);
+			Rule sr = makeSingle(af.rf, cycleMap);
 			String subDescription = null;
 			if (!af.forward) {
 				StringBuilder b = new StringBuilder();
@@ -681,31 +677,21 @@ final class Compiler {
 			Rule r = rules.get(l);
 			if (r == null)
 				r = cycleMap.get(l);
-			if (l.rep.redundant()) {
-				if (condition != null) {
-					String cnd = condition.group();
-					Label label = new Label(Type.implicit, l + "(" + cnd + ")");
-					r = new ConditionalizedLabel(label, r);
-					r.condition = cnd;
-				}
-			} else {
+			if (!l.rep.redundant()) {
 				Label label = new Label(Type.implicit, new Label(Type.explicit,
 						l.id) + l.rep.toString());
 				r = new RepetitionRule(label, r, l.rep, EMPTY_STR_SET);
 			}
-			setCondition(condition, r, false);
 			return r;
 		} else if (rf instanceof LiteralFragment) {
 			LiteralFragment lf = (LiteralFragment) rf;
 			Label l = new Label(Type.implicit, '"' + lf.literal + '"');
 			Rule r = new LiteralRule(l, lf.literal);
 			if (lf.rep.redundant()) {
-				setCondition(condition, r, false);
 				return r;
 			}
 			l = new Label(Type.implicit, lf.toString());
 			r = new RepetitionRule(l, r, lf.rep, EMPTY_STR_SET);
-			setCondition(condition, r, false);
 			return r;
 		} else if (rf instanceof BackReferenceFragment) {
 			BackReferenceFragment brf = (BackReferenceFragment) rf;
@@ -730,12 +716,10 @@ final class Compiler {
 			Label l = new Label(Type.implicit, rf.toString());
 			Rule r = new LeafRule(l, rx.re, rx.reversible);
 			if (rx.rep.redundant()) {
-				setCondition(condition, r, false);
 				return r;
 			}
 			l = new Label(Type.implicit, rx.toString() + rx.rep);
 			r = new RepetitionRule(l, r, rx.rep, EMPTY_STR_SET);
-			setCondition(condition, r, false);
 			return r;
 		}
 		GroupFragment gf = (GroupFragment) rf;
@@ -744,10 +728,10 @@ final class Compiler {
 		if (gf.alternates.size() == 1) {
 			// repeated rule with capture
 			if (gf.alternates.get(0).size() == 1) {
-				r = makeSingle(gf.alternates.get(0).get(0), cycleMap, null);
+				r = makeSingle(gf.alternates.get(0).get(0), cycleMap);
 			} else {
 				// repeated sequence
-				r = makeSequence(gf.alternates.get(0), cycleMap, null);
+				r = makeSequence(gf.alternates.get(0), cycleMap);
 			}
 		} else {
 			// repeated alternation
@@ -768,14 +752,14 @@ final class Compiler {
 							if (gfInner.alternates.get(0).size() == 1)
 								r = makeSingle(
 										gfInner.alternates.get(0).get(0),
-										cycleMap, null);
+										cycleMap);
 							else
 								r = makeSequence(gfInner.alternates.get(0),
-										cycleMap, null);
+										cycleMap);
 						} else
-							r = makeSingle(rfInner, cycleMap, null);
+							r = makeSingle(rfInner, cycleMap);
 					} else {
-						r = makeSingle(rfInner, cycleMap, null);
+						r = makeSingle(rfInner, cycleMap);
 					}
 					String id = r.uniqueId();
 					if (tagMap.containsKey(id)) {
@@ -787,7 +771,7 @@ final class Compiler {
 								0) : innerTags);
 					}
 				} else {
-					r = makeSequence(alternate, cycleMap, null);
+					r = makeSequence(alternate, cycleMap);
 					tagMap.put(r.uniqueId(), EMPTY_STR_SET);
 				}
 				alternates.add(r);
@@ -802,58 +786,12 @@ final class Compiler {
 			r = new AlternationRule(l, alternates.toArray(new Rule[alternates
 					.size()]), tagMap);
 			if (gf.rep.redundant()) { // TODO confirm that this won't be true
-				setCondition(condition, r, false);
 				return r;
 			}
 		}
 		if (!gf.rep.redundant()) {
 			Label l = new Label(Type.implicit, r.label().toString() + gf.rep);
 			r = new RepetitionRule(l, r, gf.rep, tags);
-		}
-		setCondition(condition, r, false);
-		return r;
-	}
-
-	private Rule setCondition(Match condition, Rule r,
-			boolean whitespaceCondition) {
-		// keep track of whether the whitespace condition is ever required
-		setWhitespaceCondition |= whitespaceCondition;
-
-		if (condition != null) {
-			String cnd = whitespaceCondition ? SpaceCondition.ID + " ("
-					+ condition.group() + ')' : condition.group();
-			if (cnd.equals(r.condition))
-				return r;
-			r.condition = cnd;
-			Condition c;
-			Condition lc = LogicalCondition.manufacture(condition);
-			if (whitespaceCondition) {
-				LeafCondition leaf = new LeafCondition(SpaceCondition.ID);
-				List<Condition> list = new ArrayList<Condition>(2);
-				list.add(leaf);
-				list.add(lc);
-				c = new ConjunctionCondition(list);
-			} else
-				c = lc;
-			r = r.conditionalize(c, r.condition);
-		} else if (whitespaceCondition) {
-			r.condition = SpaceCondition.ID;
-			LeafCondition c = new LeafCondition(SpaceCondition.ID);
-			r = r.conditionalize(c, r.condition);
-		}
-		if (whitespaceCondition || condition != null) {
-			// String id = r.uniqueId();
-			Set<String> set = undefinedConditions.get(r.condition);
-			if (set == null) {
-				set = new TreeSet<String>();
-				undefinedConditions.put(r.condition, set);
-			}
-			if (whitespaceCondition)
-				set.add(SpaceCondition.ID);
-			if (condition != null) {
-				for (Match m : condition.get("cnd"))
-					set.add(m.group());
-			}
 		}
 		return r;
 	}
@@ -918,11 +856,11 @@ final class Compiler {
 			String s = rcs.toString();
 			Label l = new Label(Type.implicit, id);
 			ru = new LiteralRule(l, s);
-		} else if (sr instanceof ConditionalizedLabel) {
-			ConditionalizedLabel cl = (ConditionalizedLabel) sr;
+		} else if (sr instanceof ConditionalRule) {
+			ConditionalRule cl = (ConditionalRule) sr;
 			Rule rr = reverse(cl.r);
-			ConditionalizedLabel cl2 = new ConditionalizedLabel(new Label(
-					Type.implicit, id), rr);
+			ConditionalRule cl2 = new ConditionalRule(new Label(Type.implicit,
+					id), rr, cl.c);
 			ru = cl2;
 		} else if (sr instanceof RepetitionRule) {
 			RepetitionRule rr = (RepetitionRule) sr;
@@ -970,56 +908,24 @@ final class Compiler {
 		} else {
 			ru = sr.reverse(id);
 		}
-		if (sr.condition != null) {
-			ru.condition = sr.condition;
-			ru = adjustCondition(ru, sr);
-		}
 		ru.unreversed = sr;
 		return ru;
 	}
 
-	private Rule adjustCondition(Rule nr, Rule r) {
-		if (r instanceof AlternationRule) {
-			AlternationRule ar = (AlternationRule) r, ar2 = (AlternationRule) nr;
-			ar2.c = duplicateCondition(ar.c);
-		} else if (r instanceof SequenceRule) {
-			SequenceRule sr = (SequenceRule) r, sr2 = (SequenceRule) nr;
-			sr2.c = duplicateCondition(sr.c);
-		} else if (r instanceof ConditionalizedLabel) {
-			ConditionalizedLabel cl = (ConditionalizedLabel) r;
-			ConditionalizedLabel cl2 = (ConditionalizedLabel) nr;
-			cl2.c = duplicateCondition(cl.c);
-		} else if (r instanceof RepetitionRule) {
-			RepetitionRule rr = (RepetitionRule) r, rr2 = (RepetitionRule) nr;
-			rr2.c = duplicateCondition(rr.c);
-		} else if (r instanceof ConditionalLeafRule) {
-			ConditionalLeafRule clr = (ConditionalLeafRule) r;
-			LeafRule lr = (LeafRule) nr;
-			return lr.conditionalize(duplicateCondition(clr.c), clr.condition);
-		} else if (r instanceof LiteralRule) {
-			LiteralRule lr = (LiteralRule) r, lr2 = (LiteralRule) nr;
-			lr2.c = duplicateCondition(lr.c);
-		}
-		return nr;
-	}
-
-	private Condition duplicateCondition(Condition c) {
-		if (c instanceof LogicalCondition)
-			return ((LogicalCondition) c).duplicate();
-		return c;
-	}
-
 	private Rule makeSequence(Label label, SequenceFragment fragments,
-			Map<Label, CyclicRule> cycleMap) {
+			Map<Label, CyclicRule> cycleMap, ConditionFragment cf) {
 		if (rules.containsKey(label))
 			return rules.get(label);
-		Rule r = makeSequence(fragments, cycleMap, conditionMap.get(label));
-		r = fixLabel(label, r, conditionMap.get(label));
+		Rule r = makeSequence(fragments, cycleMap);
+		if (cf == null)
+			r = fixLabel(label, r);
+		else
+			r = new ConditionalRule(label, r, conditionMap.get(cf.id));
 		return r;
 	}
 
 	private Rule makeSequence(SequenceFragment value,
-			Map<Label, CyclicRule> cycleMap, Match condition) {
+			Map<Label, CyclicRule> cycleMap) {
 		if (value.size() == 1)
 			throw new GrammarException(
 					"logic error in compiler; no singleton lists should arrive at this point");
@@ -1039,18 +945,17 @@ final class Compiler {
 					if (gf.alternates.size() == 1) {
 						if (gf.alternates.get(0).size() == 1)
 							r = makeSingle(gf.alternates.get(0).get(0),
-									cycleMap, null);
+									cycleMap);
 						else
-							r = makeSequence(gf.alternates.get(0), cycleMap,
-									null);
+							r = makeSequence(gf.alternates.get(0), cycleMap);
 					}
 				} else {
 					tagSet = EMPTY_STR_SET;
-					r = makeSingle(rf, cycleMap, null);
+					r = makeSingle(rf, cycleMap);
 				}
 			} else {
 				tagSet = EMPTY_STR_SET;
-				r = makeSingle(rf, cycleMap, null);
+				r = makeSingle(rf, cycleMap);
 			}
 			if (nonInitial)
 				b.append(' ');
@@ -1063,7 +968,12 @@ final class Compiler {
 		b.append(']');
 		Label l = new Label(Type.implicit, b.toString());
 		Rule r = new SequenceRule(l, sequence, tagList);
-		setCondition(condition, r, value.getSpaceRequired());
+		if (value.getSpaceRequired()) {
+			Condition c = new SpaceCondition();
+			l = new Label(Type.implicit, b.append('(').append(c.describe(true))
+					.append(')').toString());
+			r = new ConditionalRule(l, r, c);
+		}
 		return r;
 	}
 

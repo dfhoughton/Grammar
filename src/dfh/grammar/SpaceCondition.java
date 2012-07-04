@@ -14,6 +14,9 @@ public class SpaceCondition extends Condition {
 	 * Identifier for this condition.
 	 */
 	public static final String ID = ".s";
+	{
+		name = ID;
+	}
 
 	@Override
 	public boolean passes(Match n, Matcher m, CharSequence s) {

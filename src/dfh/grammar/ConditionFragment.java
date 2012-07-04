@@ -26,7 +26,7 @@ package dfh.grammar;
  * 
  */
 public class ConditionFragment implements RuleFragment {
-	protected final String id;
+	protected String id;
 
 	/**
 	 * Generates a fragment representing the specified condition.
