@@ -554,8 +554,6 @@ public class Grammar implements Serializable {
 		undefinedConditions = c.undefinedConditions();
 		knownConditions = new HashMap<String, Set<Rule>>(
 				undefinedConditions.size() * 2);
-		if (c.setWhitespaceCondition())
-			defineCondition(SpaceCondition.ID, new SpaceCondition());
 	}
 
 	/**
@@ -1462,41 +1460,18 @@ public class Grammar implements Serializable {
 	 */
 	public synchronized void defineCondition(String label, Condition c) {
 		boolean cantFind = true;
-		Map<String, List<ConditionalRule>> idMap = new HashMap<String, List<ConditionalRule>>(
-				rules().size() * 2);
 		for (Rule r : rules()) {
 			if (!(r instanceof ConditionalRule))
 				continue;
 			ConditionalRule cr = (ConditionalRule) r;
-			String condition = cr.c.describe(true);
-			List<ConditionalRule> list = idMap.get(condition);
-			if (list == null) {
-				list = new ArrayList<ConditionalRule>();
-				idMap.put(condition, list);
-			}
-			list.add(cr);
-		}
-		for (Iterator<Entry<String, Set<String>>> i = undefinedConditions
-				.entrySet().iterator(); i.hasNext();) {
-			Entry<String, Set<String>> e = i.next();
-			String condition = e.getKey();
-			Set<String> conditions = e.getValue();
-			if (conditions.contains(label)) {
-				cantFind = false;
-				List<ConditionalRule> list = idMap.get(condition);
-				if (list == null)
-					list = Collections.emptyList();
-				for (ConditionalRule r : list) {
-					if (r.c instanceof LeafCondition) {
-						r.c = c;
-					} else if (r.c instanceof LogicalCondition) {
-						LogicalCondition lc = (LogicalCondition) r.c;
-						lc.replace(label, c);
-					}
+			if (cr.c instanceof LeafCondition) {
+				if (cr.c.getName().equals(label)) {
+					cantFind = false;
+					cr.c = c;
 				}
-				conditions.remove(label);
-				if (conditions.isEmpty())
-					i.remove();
+			} else if (cr.c instanceof LogicalCondition) {
+				LogicalCondition lc = (LogicalCondition) cr.c;
+				cantFind |= lc.replace(label, c);
 			}
 		}
 		if (cantFind)

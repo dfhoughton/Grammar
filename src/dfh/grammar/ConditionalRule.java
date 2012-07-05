@@ -102,4 +102,22 @@ public class ConditionalRule extends Rule {
 		return cr;
 	}
 
+	@Override
+	protected void subRules(Set<Rule> set, Set<Rule> all, boolean explicit) {
+		if (!all.contains(this)) {
+			all.add(this);
+			if (!set.contains(this)) {
+				if (explicit) {
+					if (generation > -1) {
+						set.add(this);
+					}
+					if (unreversed != null)
+						unreversed.subRules(set, all, explicit);
+				} else
+					set.add(this);
+				r.subRules(set, all, explicit);
+			}
+		}
+	}
+
 }
