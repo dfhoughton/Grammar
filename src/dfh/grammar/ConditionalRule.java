@@ -1,5 +1,6 @@
 package dfh.grammar;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,7 +12,9 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class ConditionalRule extends Rule implements NonterminalRule {
+public class ConditionalRule extends Rule implements NonterminalRule,
+		Serializable {
+	private static final long serialVersionUID = 1L;
 
 	private class ConditionalMatcher extends NonterminalMatcher {
 

@@ -142,6 +142,7 @@ final class Compiler {
 	 * @throws GrammarException
 	 * @throws IOException
 	 */
+	@SuppressWarnings("unchecked")
 	Compiler(LineReader reader, Map<String, Rule> precompiledRules)
 			throws GrammarException {
 		if (precompiledRules == null)
