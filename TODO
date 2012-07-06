@@ -23,6 +23,7 @@ section at the end of the document.
 . replace := with .= and ::= with :=
 . create . explicit whitespace rule
 . make sure xor conditions aren't being improperly normalized -- "a^(b^c)" != "a^b^c"
+. make sure all rules are serializable
 
 COMPLETED
 =========
