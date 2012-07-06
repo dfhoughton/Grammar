@@ -235,13 +235,6 @@ public class TokenRule<K extends Token> extends Rule implements Cloneable,
 		return r;
 	}
 
-//	@Override
-//	public Rule conditionalize(Condition c, String id) {
-//		this.c = c;
-//		this.condition = id;
-//		return this;
-//	}
-
 	@Override
 	public String description(boolean withinBrackets) {
 		StringBuilder b = new StringBuilder(label.toString());

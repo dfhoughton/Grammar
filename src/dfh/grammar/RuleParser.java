@@ -153,7 +153,7 @@ final class RuleParser {
 					// * need to treat assertion and the following fragment
 					// as a single unit
 					// * need to avoid inserting delimiters between an
-					// assertion and the constituents its going to be
+					// assertion and the constituents it's going to be
 					// testing
 					do {
 						AssertionFragment af = (AssertionFragment) rf;

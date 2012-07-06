@@ -373,30 +373,6 @@ public class RepetitionRule extends Rule implements Serializable,
 		return r.zeroWidth() || repetition.bottom == 0;
 	}
 
-//	@Override
-//	public Rule conditionalize(Condition c, String id) {
-//		if (this.c == null) {
-//			this.c = c;
-//			this.condition = id;
-//		} else {
-//			if (this.c instanceof LogicalCondition) {
-//				if (!((LogicalCondition) this.c).replace(id, c))
-//					throw new GrammarException("could not define " + id
-//							+ " in this condition");
-//			} else if (this.c instanceof LeafCondition) {
-//				LeafCondition lc = (LeafCondition) this.c;
-//				if (lc.cnd.equals(id))
-//					this.c = c;
-//				else
-//					throw new GrammarException("rule " + this
-//							+ " does not carry condition " + id);
-//			} else
-//				throw new GrammarException("condition on rule " + this
-//						+ " cannot be redefined");
-//		}
-//		return this;
-//	}
-
 	@Override
 	protected void addLabels(Match match, Set<String> labels) {
 		labels.addAll(alternateTags);
@@ -488,13 +464,6 @@ public class RepetitionRule extends Rule implements Serializable,
 			}
 		}
 	}
-
-//	@Override
-//	public Set<String> conditionNames() {
-//		if (c != null)
-//			return c.conditionNames();
-//		return super.conditionNames();
-//	}
 
 	@Override
 	public Rule deepCopy(Label l, String nameBase, Map<String, Rule> cycleMap,
