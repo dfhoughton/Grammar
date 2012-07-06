@@ -1471,7 +1471,7 @@ public class Grammar implements Serializable {
 				}
 			} else if (cr.c instanceof LogicalCondition) {
 				LogicalCondition lc = (LogicalCondition) cr.c;
-				cantFind |= lc.replace(label, c);
+				cantFind &= !lc.replace(label, c);
 			}
 		}
 		if (cantFind)

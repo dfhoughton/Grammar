@@ -10,6 +10,7 @@ import java.util.Set;
  * @author David F. Houghton - Jul 4, 2012
  * 
  */
+@Reversible
 public class ConditionalRule extends Rule {
 
 	private class ConditionalMatcher extends NonterminalMatcher {
@@ -27,6 +28,8 @@ public class ConditionalRule extends Rule {
 			next = null;
 			while (m.mightHaveNext()) {
 				Match n = m.match();
+				if (n == null)
+					break;
 				Match child = new Match(ConditionalRule.this, n.start(),
 						n.end());
 				Match[] children = { n };
@@ -118,6 +121,36 @@ public class ConditionalRule extends Rule {
 				r.subRules(set, all, explicit);
 			}
 		}
+	}
+
+	@Override
+	protected void setCacheIndex(Map<String, Integer> uids) {
+		if (cacheIndex == -1) {
+			Integer i = uids.get(uid());
+			if (i == null) {
+				i = uids.size();
+				uids.put(uid(), i);
+			}
+			cacheIndex = i;
+			r.setCacheIndex(uids);
+		}
+	}
+
+	@Override
+	protected int maxCacheIndex(int currentMax, Set<Rule> visited) {
+		if (visited.contains(this))
+			return currentMax;
+		visited.add(this);
+		int max = Math.max(cacheIndex, currentMax);
+		return r.maxCacheIndex(max, visited);
+	}
+
+	@Override
+	public Match checkCacheSlip(int i, Match m) {
+		Rule ru = r;
+		while (ru instanceof DeferredDefinitionRule)
+			ru = ((DeferredDefinitionRule) r).r;
+		return new Match(ru, m.start(), m.end());
 	}
 
 }
