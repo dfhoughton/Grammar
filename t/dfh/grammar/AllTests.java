@@ -55,7 +55,8 @@ import org.junit.runners.Suite;
 		TokenizationTest.class,//
 		OptionsTest.class,//
 		LoggingTest.class,//
-		MultilineRuleTest.class //
+		MultilineRuleTest.class,//
+		WhitespaceDelimiterTest.class //
 })
 public class AllTests {
 }

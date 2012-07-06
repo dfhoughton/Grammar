@@ -83,4 +83,24 @@ public class WhitespaceDelimiterTest {
 		assertTrue(s.indexOf(".s") == -1);
 	}
 
+	@SuppressWarnings("serial")
+	@Test
+	public void condition() {
+		Grammar g = new Grammar("rule := 'a' /\\d++/ 'b' (lt10)");
+		g.defineCondition("lt10", new Condition() {
+			@Override
+			public boolean passes(Match m, CharSequence c) {
+				Match[] sequence = nonconditionalMatch(m).children();
+				Match num = sequence[2];
+				Integer i = Integer.parseInt(c.subSequence(num.start(),
+						num.end()).toString());
+				return i < 10;
+			}
+		});
+		Matcher m = g.find(" a 100 b a 1 b ");
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertEquals(1, count);
+	}
 }
