@@ -20,7 +20,7 @@ import java.io.Serializable;
  */
 public class Label extends RepeatableRuleFragment implements Comparable<Label>,
 		Serializable, Cloneable {
-	private static final long serialVersionUID = 7L;
+	private static final long serialVersionUID = 8L;
 
 	/**
 	 * Type of {@link Rule} associated with {@link Label}.

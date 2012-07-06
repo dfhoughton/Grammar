@@ -25,7 +25,7 @@ import dfh.grammar.Label.Type;
 @Reversible
 public class BacktrackingBarrier extends Rule implements Serializable,
 		NonterminalRule {
-	private static final long serialVersionUID = 7L;
+	private static final long serialVersionUID = 8L;
 	/**
 	 * {@link Label} used by all : barriers.
 	 */

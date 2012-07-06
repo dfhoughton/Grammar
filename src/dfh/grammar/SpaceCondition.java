@@ -9,7 +9,7 @@ package dfh.grammar;
  * 
  */
 public class SpaceCondition extends Condition {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	/**
 	 * Identifier for this condition.
 	 */

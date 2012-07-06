@@ -27,10 +27,10 @@ import dfh.grammar.util.Dotify;
  */
 public abstract class LogicalCondition extends Condition implements
 		Serializable {
-	private static final long serialVersionUID = 7L;
+	private static final long serialVersionUID = 8L;
 	protected final Condition[] subconditions;
 	public static final MatchTest expOrGroupTest = new MatchTest() {
-		private static final long serialVersionUID = 2L;
+		private static final long serialVersionUID = 3L;
 
 		@Override
 		public boolean test(Match m) {

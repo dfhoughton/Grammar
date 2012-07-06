@@ -39,11 +39,11 @@ import dfh.grammar.Label.Type;
  */
 @Reversible
 public class Space extends RepetitionRule {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	@Reversible
 	private static class SS extends LeafRule {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
 		public static final Pattern p = Pattern.compile("\\s");
 		public static final Label lss = new Label(Type.implicit, ".ss");
 		private static final String fixedIdSS = '/' + p.toString() + "/r";

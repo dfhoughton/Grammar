@@ -18,7 +18,7 @@ import java.util.List;
  * 
  */
 public class NegationCondition extends LogicalCondition {
-	private static final long serialVersionUID = 7L;
+	private static final long serialVersionUID = 8L;
 
 	public NegationCondition(List<Condition> conditions) {
 		super(conditions);

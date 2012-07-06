@@ -23,7 +23,7 @@ import java.io.IOException;
  * 
  */
 public class GrammarException extends RuntimeException {
-	private static final long serialVersionUID = 7L;
+	private static final long serialVersionUID = 8L;
 
 	public GrammarException(String message) {
 		super(message);

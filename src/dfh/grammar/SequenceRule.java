@@ -28,7 +28,7 @@ import java.util.Set;
  */
 @Reversible
 public class SequenceRule extends Rule implements Serializable, NonterminalRule {
-	private static final long serialVersionUID = 7L;
+	private static final long serialVersionUID = 8L;
 	final Rule[] sequence;
 	protected Condition c;
 	final List<Set<String>> tagList;

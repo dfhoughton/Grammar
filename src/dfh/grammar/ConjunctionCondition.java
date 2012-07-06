@@ -18,7 +18,7 @@ import java.util.List;
  * 
  */
 public class ConjunctionCondition extends LogicalCondition {
-	private static final long serialVersionUID = 7L;
+	private static final long serialVersionUID = 8L;
 
 	public ConjunctionCondition(List<Condition> conditions) {
 		super(conditions);

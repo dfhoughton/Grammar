@@ -22,7 +22,7 @@ import java.util.Set;
  */
 @Reversible
 public class Assertion extends Rule implements Serializable, NonterminalRule {
-	private static final long serialVersionUID = 7L;
+	private static final long serialVersionUID = 8L;
 	/**
 	 * suffix added to {@link Rule#uid} of reversed rules to signal their
 	 * reversal.
