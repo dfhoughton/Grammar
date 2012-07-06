@@ -73,6 +73,7 @@ public class ConditionalRule extends Rule {
 	public String description(boolean bool) {
 		if (c.visible()) {
 			StringBuilder b = new StringBuilder(r.description(bool));
+			b = new StringBuilder(wrap(b));
 			b.append(" (").append(c.describe(false)).append(')');
 			return b.toString();
 		}
