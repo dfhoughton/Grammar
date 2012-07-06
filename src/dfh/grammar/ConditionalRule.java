@@ -11,7 +11,7 @@ import java.util.Set;
  * 
  */
 @Reversible
-public class ConditionalRule extends Rule {
+public class ConditionalRule extends Rule implements NonterminalRule {
 
 	private class ConditionalMatcher extends NonterminalMatcher {
 

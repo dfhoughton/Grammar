@@ -205,14 +205,6 @@ public class LeafRule extends Rule implements Serializable {
 		return false;
 	}
 
-//	@Override
-//	public Rule conditionalize(Condition c, String id) {
-//		ConditionalLeafRule clr = new ConditionalLeafRule(this, c, id);
-//		if (labels != null)
-//			clr.labels = new TreeSet<String>(labels);
-//		return clr;
-//	}
-
 	@Override
 	protected Boolean mayBeZeroWidth(Map<String, Boolean> cache) {
 		// because you can have patterns like /(?<=\w)|./, it is quite difficult
