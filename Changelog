@@ -11,6 +11,7 @@
   * added missing logging of assertions
   * added .= and := assignments for rules allowing or requiring whitespace
     between tokens, respectively
+  * refactored condition handling, moving conditions into a distinct rule
 
 2.06, 15 June 2012
   * turned off default studying for find()
