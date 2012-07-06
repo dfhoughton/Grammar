@@ -51,7 +51,7 @@ public class WhitespaceDelimiterTest {
 	@Test
 	public void required2() {
 		Grammar g = new Grammar("rule := 'the' 'cat'");
-		Matcher m = g.matches("thecat");
+		Matcher m = g.matches("thecat", new Options().log(System.err));
 		Match n = m.match();
 		assertNull(n);
 	}

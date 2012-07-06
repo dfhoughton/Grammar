@@ -606,10 +606,15 @@ public class Grammar implements Serializable {
 		String oldId = r.uniqueId();
 		Label l = new Label(Type.explicit, label);
 		LeafRule lr = new LeafRule(l, p, false);
-		if (c != null) {
-			lr = (LeafRule) conditionCheck(id, c, lr);
+		Rule ru;
+		if (c == null)
+			ru = lr;
+		else {
+			lr = new LeafRule(new Label(Type.implicit, lr.uniqueId()), lr.p,
+					lr.reversible);
+			ru = conditionCheck(id, c, lr);
 		}
-		redefinitionCheck(r, lr);
+		redefinitionCheck(r, ru);
 		fixAlternationTags(oldId, r);
 	}
 
@@ -1413,9 +1418,15 @@ public class Grammar implements Serializable {
 		String oldId = r.uniqueId();
 		Label l = new Label(Type.explicit, label);
 		LiteralRule lr = new LiteralRule(l, literal);
-		if (c != null)
-			lr = (LiteralRule) conditionCheck(label, c, lr);
-		redefinitionCheck(r, lr);
+		Rule ru;
+		if (c == null)
+			ru = lr;
+		else {
+			lr = new LiteralRule(new Label(Type.implicit, lr.uniqueId()),
+					literal);
+			ru = conditionCheck(label, c, lr);
+		}
+		redefinitionCheck(r, ru);
 		fixAlternationTags(oldId, r);
 	}
 
