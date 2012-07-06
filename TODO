@@ -24,6 +24,7 @@ section at the end of the document.
 . create . explicit whitespace rule
 . make sure xor conditions aren't being improperly normalized -- "a^(b^c)" != "a^b^c"
 . make sure all rules are serializable
+. clean up compiler code to remove vestiges of old "<ROOT>" convention
 
 COMPLETED
 =========
