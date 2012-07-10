@@ -89,7 +89,8 @@ final class RuleParser {
 				Whitespace ws;
 				String g3 = m.group(3);
 				if (g3.length() == 1)
-					ws = g3.charAt(0) == ':' ? Whitespace.required : Whitespace.maybe;
+					ws = g3.charAt(0) == ':' ? Whitespace.required
+							: Whitespace.maybe;
 				else
 					ws = Whitespace.none;
 				String remainder = m.group(4);
@@ -128,17 +129,21 @@ final class RuleParser {
 	private void addWhitespaceDelimiters(SequenceFragment body, boolean required) {
 		if (body.size() > 1) {
 			boolean needDelimiter = false;
-			boolean add = false;
+			boolean add = false, visibleSpace = false;
 			int addCount = 0;
 			for (RuleFragment rf : body.sequence) {
 				if (!(rf instanceof BarrierFragment || rf instanceof AssertionFragment)) {
+					if (rf == Space.VISIBLE_SPACE) {
+						visibleSpace = true;
+						continue;
+					}
 					addCount++;
 					add = true;
 					if (addCount > 1)
 						break;
 				}
 			}
-			if (addCount > 1)
+			if (visibleSpace || addCount > 1)
 				body.setSpaceRequired(required);
 			boolean findFollower = true;
 			OUTER: for (int i = 0; i < body.size(); i++) {
@@ -183,12 +188,14 @@ final class RuleParser {
 					i--;
 				} else {
 					if (needDelimiter) {
-						if (add) {
-							body.sequence.add(i, Space.l);
+						if (rf == Space.VISIBLE_SPACE) {
+							needDelimiter = false;
+						} else if (add) {
+							body.sequence.add(i, Space.HIDDEN_SPACE);
 							i++;
 						}
 					} else
-						needDelimiter = true;
+						needDelimiter = rf != Space.VISIBLE_SPACE;
 				}
 			}
 		}
@@ -224,9 +231,9 @@ final class RuleParser {
 		SequenceFragment sf = gf.alternates.get(0);
 		sf.setSpaceRequired(required);
 		if (af.forward)
-			sf.add(0, Space.l);
+			sf.add(0, Space.HIDDEN_SPACE);
 		else
-			sf.add(Space.l);
+			sf.add(Space.HIDDEN_SPACE);
 		af.rf = gf;
 	}
 
@@ -383,6 +390,16 @@ final class RuleParser {
 				ConditionFragment cond = getCondition(body, offset);
 				parse.add(cond);
 				break OUTER;
+			case '.':
+				RuleFragment last = last(parse, gf);
+				if (last != null && last instanceof Label) {
+					Label l = (Label) last;
+					if (l.id.equals(Space.VISIBLE_SPACE.id))
+						throw new GrammarException("two consecutive dots");
+				}
+				offset[0]++;
+				add(parse, gf, Space.VISIBLE_SPACE);
+				break;
 			case ':':
 				BarrierFragment bf = getBarrier(body, offset);
 				if (bf.id.equals(":")) {
@@ -468,6 +485,11 @@ final class RuleParser {
 			throw new GrammarException("empty rule body: " + body);
 		if (gf != null)
 			gf.done();
+		if (parse.size() == 1 && parse.get(0) == Space.VISIBLE_SPACE
+				|| parse.size() == 2 && parse.get(0) == Space.VISIBLE_SPACE
+				&& parse.get(1) instanceof ConditionFragment)
+			throw new GrammarException(
+					"dot can only be used as part of a sequence");
 		completeAssertions(parse, b.toString());
 		return parse;
 	}
@@ -631,6 +653,12 @@ final class RuleParser {
 			parse.add(r);
 		else
 			gf.add(r);
+	}
+
+	private static RuleFragment last(SequenceFragment parse, GroupFragment gf) {
+		if (gf == null)
+			return parse.last();
+		return gf.last();
 	}
 
 	/**

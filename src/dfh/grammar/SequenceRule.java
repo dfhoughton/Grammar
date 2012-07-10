@@ -30,7 +30,6 @@ import java.util.Set;
 public class SequenceRule extends Rule implements Serializable, NonterminalRule {
 	private static final long serialVersionUID = 8L;
 	final Rule[] sequence;
-	protected Condition c;
 	final List<Set<String>> tagList;
 
 	class SequenceMatcher extends NonterminalMatcher {
@@ -160,7 +159,7 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 		int index = -1;
 		for (Rule r : sequence) {
 			index++;
-			if (r.label().equals(Space.l))
+			if (r.label().equals(Space.HIDDEN_SPACE))
 				continue;
 			boolean hasTags = !tagList.get(index).isEmpty();
 			if (nonInitial)
@@ -196,10 +195,7 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 					b.append(']');
 			}
 		}
-		b = new StringBuilder(wrap(b));
-		if (c != null && c.visible())
-			b.append(" (").append(c.describe()).append(')');
-		return b.toString();
+		return wrap(b);
 	}
 
 	@Override

@@ -51,8 +51,8 @@ public class AlternationRule extends Rule implements Serializable,
 				// check condition
 				while (test) {
 					child = mostRecent.match();
-					if (child != null) 
-							break OUTER;
+					if (child != null)
+						break OUTER;
 					test = mostRecent.mightHaveNext();
 				}
 				if (++index == alternates.length)
@@ -72,7 +72,6 @@ public class AlternationRule extends Rule implements Serializable,
 
 	protected final Rule[] alternates;
 	Map<String, Set<String>> tagMap;
-	protected Condition c;
 
 	/**
 	 * Generates a rule from the given label and alternates.
@@ -107,8 +106,6 @@ public class AlternationRule extends Rule implements Serializable,
 			b.append(r.uniqueId());
 		}
 		b.append(']');
-		if (c != null)
-			b.append('(').append(c.describe()).append(')');
 		return b.toString();
 	}
 
@@ -148,10 +145,7 @@ public class AlternationRule extends Rule implements Serializable,
 				b.append(" ]");
 			}
 		}
-		b = new StringBuilder(wrap(b));
-		if (c != null && c.visible())
-			b.append(" (").append(c.describe()).append(')');
-		return b.toString();
+		return wrap(b);
 	}
 
 	@Override
@@ -283,12 +277,12 @@ public class AlternationRule extends Rule implements Serializable,
 		}
 	}
 
-//	@Override
-//	public Set<String> conditionNames() {
-//		if (c != null)
-//			return c.conditionNames();
-//		return super.conditionNames();
-//	}
+	// @Override
+	// public Set<String> conditionNames() {
+	// if (c != null)
+	// return c.conditionNames();
+	// return super.conditionNames();
+	// }
 
 	@Override
 	protected Rule deepCopy(Label l, String nameBase,

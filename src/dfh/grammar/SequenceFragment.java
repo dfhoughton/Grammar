@@ -64,7 +64,7 @@ public class SequenceFragment extends RepeatableRuleFragment {
 	public RuleFragment first() {
 		return sequence.peek();
 	}
-
+	
 	public void addAll(SequenceFragment sf) {
 		sequence.addAll(sf.sequence);
 	}

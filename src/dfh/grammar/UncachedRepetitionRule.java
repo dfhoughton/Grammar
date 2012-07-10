@@ -154,8 +154,7 @@ public class UncachedRepetitionRule extends RepetitionRule {
 					next.setChildren(children);
 					next.setEnd(matched.isEmpty() ? offset : matched.peekLast()
 							.end());
-					if (c == null || c.passes(next, this, s))
-						break;
+					break;
 				}
 			}
 		}
@@ -235,7 +234,7 @@ public class UncachedRepetitionRule extends RepetitionRule {
 					matchers = null;
 					matched = null;
 					break;
-				} else if (c == null || c.passes(next, this, s))
+				} else
 					break;
 			}
 		}
@@ -260,11 +259,6 @@ public class UncachedRepetitionRule extends RepetitionRule {
 					next.setChildren(children);
 					next.setEnd(matched.isEmpty() ? offset : matched.peekLast()
 							.end());
-					if (!(c == null || c.passes(next, this, s))) {
-						next = null;
-						done = true;
-						matched = null;
-					}
 				} else {
 					done = true;
 					matched = null;

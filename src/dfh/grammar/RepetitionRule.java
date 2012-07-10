@@ -28,7 +28,6 @@ public class RepetitionRule extends Rule implements Serializable,
 	private static final long serialVersionUID = 8L;
 	Rule r;
 	final Repetition repetition;
-	protected Condition c;
 	final Set<String> alternateTags;
 
 	private abstract class RepetitionMatcher extends NonterminalMatcher {
@@ -326,8 +325,11 @@ public class RepetitionRule extends Rule implements Serializable,
 	public String description(boolean inBrackets) {
 		StringBuilder b = new StringBuilder();
 		boolean hasTags = !(alternateTags == null || alternateTags.isEmpty());
-		boolean requiresBrackets = r instanceof SequenceRule
-				|| r instanceof AlternationRule || hasTags && !inBrackets;
+		Rule ru = r;
+		while (ru instanceof ConditionalRule)
+			ru = ((ConditionalRule) ru).r;
+		boolean requiresBrackets = ru instanceof SequenceRule
+				|| ru instanceof AlternationRule || hasTags && !inBrackets;
 		if (requiresBrackets)
 			b.append('[');
 		if (hasTags) {
@@ -343,22 +345,19 @@ public class RepetitionRule extends Rule implements Serializable,
 			b.append("} ");
 		} else if (requiresBrackets)
 			b.append(' ');
-		if (r.generation == -1) {
-			if ((r instanceof SequenceRule || r instanceof AlternationRule)
+		if (ru.generation == -1) {
+			if ((ru instanceof SequenceRule || ru instanceof AlternationRule)
 					&& !(inBrackets && repetition.redundant())) {
-				String d = r.description(true);
+				String d = ru.description(true);
 				b.append(d);
 			} else
-				b.append(r.description(false));
+				b.append(ru.description(false));
 		} else
-			b.append(r.label());
+			b.append(ru.label());
 		if (requiresBrackets)
 			b.append(" ]");
 		b.append(repetition);
-		b = new StringBuilder(wrap(b));
-		if (c != null && c.visible())
-			b.append(" (").append(c.describe()).append(')');
-		return b.toString();
+		return wrap(b);
 	}
 
 	@Override

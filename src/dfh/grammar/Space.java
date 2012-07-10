@@ -60,15 +60,31 @@ public class Space extends RepetitionRule {
 	}
 
 	private static final Set<String> noTags = Collections.emptySet();
-	public static final Label l = new Label(Type.implicit, ".s");
+	/**
+	 * The label for a space rule when it is not to show up in a description.
+	 * The value which will be displayed in logs and so forth is <code>.s</code>
+	 * . .
+	 */
+	public static final Label HIDDEN_SPACE = new Label(Type.implicit, ".s");
+	/**
+	 * The label for a space rule when it is to show up in a description. The
+	 * value which will be displayed is <code>.</code> -- a single dot.
+	 */
+	public static final Label VISIBLE_SPACE = new Label(Type.implicit, ".");
 	private static final String fixedId = SS.fixedIdSS + Repetition.ASTERISK;
 
-	Space() {
-		super(l, new SS(), Repetition.ASTERISK, noTags);
+	Space(boolean hidden) {
+		super(hidden ? HIDDEN_SPACE : VISIBLE_SPACE, new SS(),
+				Repetition.ASTERISK, noTags);
 	}
 
 	@Override
 	protected String uniqueId() {
 		return fixedId;
+	}
+
+	@Override
+	public String description(boolean inBrackets) {
+		return (label.id == VISIBLE_SPACE.id) ? VISIBLE_SPACE.id : "";
 	}
 }

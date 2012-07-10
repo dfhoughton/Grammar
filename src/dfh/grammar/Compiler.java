@@ -205,10 +205,14 @@ final class Compiler {
 				.iterator(); i.hasNext();) {
 			Entry<Label, SyntacticParse> e = i.next();
 			Label label = e.getKey();
-			if (!(label.ws == Whitespace.none || rules.containsKey(Space.l)))
-				rules.put(Space.l, new Space());
+			// handling for .s
+			if (!(label.ws == Whitespace.none || rules
+					.containsKey(Space.HIDDEN_SPACE)))
+				rules.put(Space.HIDDEN_SPACE, new Space(true));
 			SyntacticParse sp = e.getValue();
 			SequenceFragment body = sp.f;
+			// handling for .
+			checkForVisibleSpace(body);
 			RuleFragment rf = body.get(0);
 			if (body.size() == 1
 					&& (rf instanceof Regex || rf instanceof LiteralFragment)) {
@@ -350,6 +354,26 @@ final class Compiler {
 		terminalLabelMap = new HashMap<String, Label>(terminals.size() * 2);
 		for (Label l : terminals)
 			terminalLabelMap.put(l.id, l);
+	}
+
+	private void checkForVisibleSpace(SequenceFragment body) {
+		if (!rules.containsKey(Space.VISIBLE_SPACE)) {
+			for (RuleFragment rf : body.sequence) {
+				if (rf instanceof Label) {
+					Label l = (Label) rf;
+					if (l.id.equals(Space.VISIBLE_SPACE.id)) {
+						rules.put(Space.VISIBLE_SPACE, new Space(false));
+						return;
+					}
+				} else if (rf instanceof GroupFragment) {
+					for (SequenceFragment sf : ((GroupFragment) rf).alternates) {
+						checkForVisibleSpace(sf);
+						if (rules.containsKey(Space.VISIBLE_SPACE))
+							return;
+					}
+				}
+			}
+		}
 	}
 
 	private boolean redundancyTest(SequenceFragment body) {
@@ -598,18 +622,15 @@ final class Compiler {
 			AlternationRule ar = (AlternationRule) r;
 			AlternationRule ar2 = new AlternationRule(label, ar.alternates,
 					ar.tagMap);
-			ar2.c = ar.c;
 			ru = ar2;
 		} else if (r instanceof RepetitionRule) {
 			RepetitionRule rr = (RepetitionRule) r;
 			RepetitionRule rr2 = new RepetitionRule(label, rr.r, rr.repetition,
 					new HashSet<String>(rr.alternateTags));
-			rr2.c = rr.c;
 			ru = rr2;
 		} else if (r instanceof SequenceRule) {
 			SequenceRule sr = (SequenceRule) r;
 			SequenceRule sr2 = new SequenceRule(label, sr.sequence, sr.tagList);
-			sr2.c = sr.c;
 			ru = sr2;
 		} else if (r instanceof LiteralRule) {
 			LiteralRule lr = (LiteralRule) r;

@@ -44,6 +44,13 @@ public class GroupFragment extends RepeatableRuleFragment {
 	}
 
 	/**
+	 * @return last fragment added
+	 */
+	public RuleFragment last() {
+		return currentSequence.last();
+	}
+
+	/**
 	 * Called when we find a pipe character.
 	 * 
 	 * @throws GrammarException
