@@ -24,7 +24,8 @@ public class SpaceCondition extends Condition {
 		// check each match in the conditionalized sequence in turn
 		Match[] sequence = n.children()[0].children();
 		for (Match c : sequence) {
-			if (c.rule() instanceof Space) {
+			if (c.rule() instanceof HiddenSpace
+					|| c.rule() instanceof VisibleSpace) {
 				// if this node represents whitespace, we stop needing space
 				needS &= c.end() == c.start();
 			} else if (c.end() > c.start()) {

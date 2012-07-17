@@ -201,14 +201,24 @@ final class Compiler {
 		Set<Label> terminals = new HashSet<Label>(map.size() * 2);
 		int gen = 1;
 		// first we extract all the terminals we can
+		boolean addedAS = false, addedS = false; // to speed things up a bit
 		for (Iterator<Entry<Label, SyntacticParse>> i = map.entrySet()
 				.iterator(); i.hasNext();) {
 			Entry<Label, SyntacticParse> e = i.next();
 			Label label = e.getKey();
-			// handling for .s
-			if (!(label.ws == Whitespace.none || rules
-					.containsKey(Space.HIDDEN_SPACE)))
-				rules.put(Space.HIDDEN_SPACE, new Space(true));
+			// handling for .s and .as
+			if (!(label.ws == Whitespace.none || addedAS && addedS)) {
+				for (Label l : e.getValue().getHiddenSpaces()) {
+					if (l == HiddenSpace.ASSERTION_LABEL) {
+						rules.put(HiddenSpace.ASSERTION_LABEL,
+								HiddenSpace.assertion());
+						addedAS = true;
+					} else {
+						rules.put(HiddenSpace.LABEL, HiddenSpace.ordinary());
+						addedS = true;
+					}
+				}
+			}
 			SyntacticParse sp = e.getValue();
 			SequenceFragment body = sp.f;
 			// handling for .
@@ -357,18 +367,18 @@ final class Compiler {
 	}
 
 	private void checkForVisibleSpace(SequenceFragment body) {
-		if (!rules.containsKey(Space.VISIBLE_SPACE)) {
+		if (!rules.containsKey(VisibleSpace.LABEL)) {
 			for (RuleFragment rf : body.sequence) {
 				if (rf instanceof Label) {
 					Label l = (Label) rf;
-					if (l.id.equals(Space.VISIBLE_SPACE.id)) {
-						rules.put(Space.VISIBLE_SPACE, new Space(false));
+					if (l.id.equals(VisibleSpace.LABEL.id)) {
+						rules.put(VisibleSpace.LABEL, new VisibleSpace());
 						return;
 					}
 				} else if (rf instanceof GroupFragment) {
 					for (SequenceFragment sf : ((GroupFragment) rf).alternates) {
 						checkForVisibleSpace(sf);
-						if (rules.containsKey(Space.VISIBLE_SPACE))
+						if (rules.containsKey(VisibleSpace.LABEL))
 							return;
 					}
 				}

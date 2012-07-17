@@ -133,7 +133,7 @@ final class RuleParser {
 			int addCount = 0;
 			for (RuleFragment rf : body.sequence) {
 				if (!(rf instanceof BarrierFragment || rf instanceof AssertionFragment)) {
-					if (rf == Space.VISIBLE_SPACE) {
+					if (rf == VisibleSpace.LABEL) {
 						visibleSpace = true;
 						continue;
 					}
@@ -188,14 +188,14 @@ final class RuleParser {
 					i--;
 				} else {
 					if (needDelimiter) {
-						if (rf == Space.VISIBLE_SPACE) {
+						if (rf == VisibleSpace.LABEL) {
 							needDelimiter = false;
 						} else if (add) {
-							body.sequence.add(i, Space.HIDDEN_SPACE);
+							body.sequence.add(i, HiddenSpace.LABEL);
 							i++;
 						}
 					} else
-						needDelimiter = rf != Space.VISIBLE_SPACE;
+						needDelimiter = rf != VisibleSpace.LABEL;
 				}
 			}
 		}
@@ -231,9 +231,10 @@ final class RuleParser {
 		SequenceFragment sf = gf.alternates.get(0);
 		sf.setSpaceRequired(required);
 		if (af.forward)
-			sf.add(0, Space.HIDDEN_SPACE);
+			sf.add(0, HiddenSpace.ASSERTION_LABEL);
+
 		else
-			sf.add(Space.HIDDEN_SPACE);
+			sf.add(HiddenSpace.ASSERTION_LABEL);
 		af.rf = gf;
 	}
 
@@ -394,11 +395,11 @@ final class RuleParser {
 				RuleFragment last = last(parse, gf);
 				if (last != null && last instanceof Label) {
 					Label l = (Label) last;
-					if (l.id.equals(Space.VISIBLE_SPACE.id))
+					if (l.id.equals(VisibleSpace.LABEL.id))
 						throw new GrammarException("two consecutive dots");
 				}
 				offset[0]++;
-				add(parse, gf, Space.VISIBLE_SPACE);
+				add(parse, gf, VisibleSpace.LABEL);
 				break;
 			case ':':
 				BarrierFragment bf = getBarrier(body, offset);
@@ -485,8 +486,8 @@ final class RuleParser {
 			throw new GrammarException("empty rule body: " + body);
 		if (gf != null)
 			gf.done();
-		if (parse.size() == 1 && parse.get(0) == Space.VISIBLE_SPACE
-				|| parse.size() == 2 && parse.get(0) == Space.VISIBLE_SPACE
+		if (parse.size() == 1 && parse.get(0) == VisibleSpace.LABEL
+				|| parse.size() == 2 && parse.get(0) == VisibleSpace.LABEL
 				&& parse.get(1) instanceof ConditionFragment)
 			throw new GrammarException(
 					"dot can only be used as part of a sequence");

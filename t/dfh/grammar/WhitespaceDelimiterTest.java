@@ -134,4 +134,14 @@ public class WhitespaceDelimiterTest {
 		String s = g.describe();
 		assertTrue(s.indexOf('.') > -1);
 	}
+
+	@Test
+	public void droppingMarginalSpace() {
+		Grammar g = new Grammar("rule .= 'a'? 'b'");
+		Matcher m = g.find("a b", new Options().allowOverlap(true));
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertEquals(2, count);
+	}
 }

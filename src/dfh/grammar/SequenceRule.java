@@ -159,7 +159,7 @@ public class SequenceRule extends Rule implements Serializable, NonterminalRule 
 		int index = -1;
 		for (Rule r : sequence) {
 			index++;
-			if (r.label().equals(Space.HIDDEN_SPACE))
+			if (r instanceof HiddenSpace)
 				continue;
 			boolean hasTags = !tagList.get(index).isEmpty();
 			if (nonInitial)
