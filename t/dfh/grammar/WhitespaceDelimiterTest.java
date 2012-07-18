@@ -174,4 +174,45 @@ public class WhitespaceDelimiterTest {
 			count++;
 		assertEquals(2, count);
 	}
+
+	@Test
+	public void visibleMarginDot1() {
+		Grammar g = new Grammar("rule = . 'a' .");
+		Match m = g.matches("a").match();
+		assertNotNull(m);
+	}
+
+	@Test
+	public void visibleMarginDot2() {
+		Grammar g = new Grammar("rule .= . 'a' .");
+		Match m = g.matches("a").match();
+		assertNotNull(m);
+	}
+
+	@Test
+	public void visibleMarginDot3() {
+		Grammar g = new Grammar("rule := . 'a' .");
+		Match m = g.matches("a").match();
+		assertNotNull(m);
+	}
+	@Test
+	public void visibleMarginDot4() {
+		Grammar g = new Grammar("rule = . 'a' .");
+		Match m = g.matches(" a ").match();
+		assertNotNull(m);
+	}
+
+	@Test
+	public void visibleMarginDot5() {
+		Grammar g = new Grammar("rule .= . 'a' .");
+		Match m = g.matches(" a ").match();
+		assertNotNull(m);
+	}
+
+	@Test
+	public void visibleMarginDot6() {
+		Grammar g = new Grammar("rule := . 'a' .");
+		Match m = g.matches(" a ").match();
+		assertNotNull(m);
+	}
 }

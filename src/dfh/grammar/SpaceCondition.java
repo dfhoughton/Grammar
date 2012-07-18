@@ -20,16 +20,20 @@ public class SpaceCondition extends Condition {
 
 	@Override
 	public boolean passes(Match n, Matcher m, CharSequence s) {
-		boolean needS = false, foundNothing = true;
+		boolean needS = false, foundNothing = true, lastVisible = false;
 		// check each match in the conditionalized sequence in turn
 		Match[] sequence = n.children()[0].children();
 		for (Match c : sequence) {
 			if (c.rule() instanceof HiddenSpace
 					|| c.rule() instanceof VisibleSpace) {
 				// if this node represents whitespace, we stop needing space
-				needS &= c.end() == c.start();
+				if (c.end() > c.start()) {
+					needS = false;
+					if (c.rule() instanceof VisibleSpace)
+						lastVisible = true;
+				}
 			} else if (c.end() > c.start()) {
-				foundNothing = false;
+				lastVisible = foundNothing = false;
 				// do we need space? If so, can some be found either in the
 				// preceding non-trivial nodes or the node itself?
 				if (needS && !Character.isWhitespace(s.charAt(c.start())))
@@ -39,7 +43,7 @@ public class SpaceCondition extends Condition {
 				needS = !Character.isWhitespace(s.charAt(c.end() - 1));
 			}
 		}
-		return foundNothing || needS;
+		return foundNothing || needS || lastVisible;
 	}
 
 	@Override
