@@ -136,8 +136,38 @@ public class WhitespaceDelimiterTest {
 	}
 
 	@Test
-	public void droppingMarginalSpace() {
+	public void droppingMarginalSpace1() {
 		Grammar g = new Grammar("rule .= 'a'? 'b'");
+		Matcher m = g.find("a b", new Options().allowOverlap(true));
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertEquals(2, count);
+	}
+
+	@Test
+	public void droppingMarginalSpace2() {
+		Grammar g = new Grammar("rule := 'a'? 'b'");
+		Matcher m = g.find("a b", new Options().allowOverlap(true));
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertEquals(2, count);
+	}
+
+	@Test
+	public void droppingMarginalSpace3() {
+		Grammar g = new Grammar("rule .= 'a' 'b'?");
+		Matcher m = g.find("a b", new Options().allowOverlap(true));
+		int count = 0;
+		while (m.match() != null)
+			count++;
+		assertEquals(2, count);
+	}
+
+	@Test
+	public void droppingMarginalSpace4() {
+		Grammar g = new Grammar("rule := 'a' 'b'?");
 		Matcher m = g.find("a b", new Options().allowOverlap(true));
 		int count = 0;
 		while (m.match() != null)
