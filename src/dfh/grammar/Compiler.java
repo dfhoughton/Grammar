@@ -1000,8 +1000,9 @@ final class Compiler {
 		b.append(']');
 		Label l = new Label(Type.implicit, b.toString());
 		Rule r = new SequenceRule(l, sequence, tagList);
-		if (value.getSpaceRequired()) {
-			Condition c = new SpaceCondition();
+		if (value.getSpaceRequired() != Label.Whitespace.none) {
+			Condition c = value.getSpaceRequired() == Label.Whitespace.required ? new SpaceCondition()
+					: new MaybeSpaceCondition();
 			l = new Label(Type.implicit, b.append('(').append(c.describe(true))
 					.append(')').toString());
 			r = new ConditionalRule(l, r, c);

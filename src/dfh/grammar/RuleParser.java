@@ -112,7 +112,7 @@ final class RuleParser {
 				checkUplevelBackReferences(line, body, 0, 0);
 				checkBarriers(body);
 				if (ws != Whitespace.none)
-					addWhitespaceDelimiters(body, ws == Whitespace.required);
+					addWhitespaceDelimiters(body, ws);
 				return new SyntacticParse(line, l, body, cf);
 			} else
 				throw new GrammarException("ill-formed rule: " + line);
@@ -126,7 +126,8 @@ final class RuleParser {
 	 * @param body
 	 * @param required
 	 */
-	private void addWhitespaceDelimiters(SequenceFragment body, boolean required) {
+	private void addWhitespaceDelimiters(SequenceFragment body,
+			Whitespace required) {
 		if (body.size() > 1) {
 			boolean needDelimiter = false;
 			boolean add = false, visibleSpace = false;
@@ -214,7 +215,7 @@ final class RuleParser {
 	 * @param af
 	 * @param add
 	 */
-	private void addSpaceToAssertion(AssertionFragment af, boolean required) {
+	private void addSpaceToAssertion(AssertionFragment af, Whitespace required) {
 		GroupFragment gf = null;
 		if (af.rf instanceof GroupFragment) {
 			GroupFragment ogf = (GroupFragment) af.rf;

@@ -1,4 +1,4 @@
-2.07
+2.07, 19 July 2012
   * fixed issue with cached terminal matches being assigned to the wrong rule
     when the grammar contains functionally identical rules
   * multi-line rules now enabled; e.g.,

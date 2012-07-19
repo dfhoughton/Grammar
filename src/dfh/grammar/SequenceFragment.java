@@ -11,6 +11,8 @@ package dfh.grammar;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import dfh.grammar.Label.Whitespace;
+
 /**
  * Represents a sequence of rules such as
  * 
@@ -28,7 +30,7 @@ import java.util.LinkedList;
  */
 public class SequenceFragment extends RepeatableRuleFragment {
 	LinkedList<RuleFragment> sequence;
-	private boolean spaceRequired;
+	private Label.Whitespace spaceRequired = Label.Whitespace.none;
 
 	public SequenceFragment() {
 		sequence = new LinkedList<RuleFragment>();
@@ -64,7 +66,7 @@ public class SequenceFragment extends RepeatableRuleFragment {
 	public RuleFragment first() {
 		return sequence.peek();
 	}
-	
+
 	public void addAll(SequenceFragment sf) {
 		sequence.addAll(sf.sequence);
 	}
@@ -101,14 +103,14 @@ public class SequenceFragment extends RepeatableRuleFragment {
 	 * @param required
 	 *            whether this sequence required {@link SpaceCondition}
 	 */
-	public void setSpaceRequired(boolean required) {
+	public void setSpaceRequired(Whitespace required) {
 		this.spaceRequired = required;
 	}
 
 	/**
 	 * @return whether this sequence required {@link SpaceCondition}
 	 */
-	public boolean getSpaceRequired() {
+	public Whitespace getSpaceRequired() {
 		return spaceRequired;
 	}
 }
