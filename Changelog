@@ -1,4 +1,6 @@
 2.08
+  * fixed some bugs in ConditionalRule that only appeared in backwards
+    assertions
 
 2.07, 19 July 2012
   * fixed issue with cached terminal matches being assigned to the wrong rule

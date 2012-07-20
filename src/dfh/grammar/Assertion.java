@@ -131,17 +131,19 @@ public class Assertion extends Rule implements Serializable, NonterminalRule {
 						.end()) + 1, options.rcs.translate(n.start()) + 1);
 				if (n.children() != null) {
 					Match[] children = new Match[n.children().length];
-					int half = children.length % 2 == 1 ? children.length / 2
-							: -1;
-					for (int i = 0, lim = children.length / 2; i <= lim; i++) {
-						Match m1 = reverse(n.children()[i]);
-						if (i == half)
-							children[i] = m1;
-						else {
-							int j = children.length - i - 1;
-							Match m2 = reverse(n.children()[j]);
-							children[i] = m2;
-							children[j] = m1;
+					if (children.length > 0) {
+						int half = children.length % 2 == 1 ? children.length / 2
+								: -1;
+						for (int i = 0, lim = children.length / 2; i <= lim; i++) {
+							Match m1 = reverse(n.children()[i]);
+							if (i == half)
+								children[i] = m1;
+							else {
+								int j = children.length - i - 1;
+								Match m2 = reverse(n.children()[j]);
+								children[i] = m2;
+								children[j] = m1;
+							}
 						}
 					}
 					reversed.setChildren(children);

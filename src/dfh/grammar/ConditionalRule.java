@@ -97,7 +97,14 @@ public class ConditionalRule extends Rule implements NonterminalRule,
 
 	@Override
 	protected Boolean mayBeZeroWidth(Map<String, Boolean> cache) {
-		return r.mayBeZeroWidth(cache);
+		if (cache.containsKey(uid())) {
+			return cache.get(uid());
+		} else {
+			cache.put(uid(), null);
+			Boolean b = r.mayBeZeroWidth(cache);
+			cache.put(uid(), b);
+			return b;
+		}
 	}
 
 	@Override
