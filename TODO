@@ -18,10 +18,6 @@ section at the end of the document.
 . implement automatic space insertion in sequences upon specification
 . document multi-line rules
 . document semantics of xor operator in conditions
-- ensure proper handling of rule ::= 'foo' ['bar' 'quux']+
-* factor condition handling into ConditionalRule
-* replace := with .= and ::= with :=
-* create . explicit whitespace rule
 . make sure xor conditions aren't being improperly normalized -- "a^(b^c)" != "a^b^c"
 . make sure all rules are serializable
 . clean up compiler code to remove vestiges of old "<ROOT>" convention
@@ -95,3 +91,7 @@ COMPLETED
 * implement multi-line rules
 * create ConditionalizedReference rule to handle rule = <a> (c)
 - change log text "result for <ROOT>" to "result for <ROOT> n", where n is the offset being tested
+- ensure proper handling of rule ::= 'foo' ['bar' 'quux']+
+* factor condition handling into ConditionalRule
+* replace := with .= and ::= with :=
+* create . explicit whitespace rule
