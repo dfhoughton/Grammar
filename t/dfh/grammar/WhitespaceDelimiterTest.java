@@ -83,6 +83,17 @@ public class WhitespaceDelimiterTest {
 		assertTrue(s.indexOf(".s") == -1);
 	}
 
+	@Test
+	public void description2() {
+		String[] rules = { "foo .= not after <bar> <quux>",//
+				"bar .= 'the' 'cat'",//
+				"quux .= 'the' 'dog'",//
+		};
+		Grammar g = new Grammar(rules);
+		String s = g.describe();
+		assertTrue(s.indexOf(".s") == -1);
+	}
+
 	@SuppressWarnings("serial")
 	@Test
 	public void condition() {
@@ -195,6 +206,7 @@ public class WhitespaceDelimiterTest {
 		Match m = g.matches("a").match();
 		assertNotNull(m);
 	}
+
 	@Test
 	public void visibleMarginDot4() {
 		Grammar g = new Grammar("rule = . 'a' .");

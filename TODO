@@ -21,6 +21,7 @@ section at the end of the document.
 . make sure xor conditions aren't being improperly normalized -- "a^(b^c)" != "a^b^c"
 . make sure all rules are serializable
 . clean up compiler code to remove vestiges of old "<ROOT>" convention
+. create True and False conditions to simplify turning conditions to always on or always off
 
 COMPLETED
 =========
