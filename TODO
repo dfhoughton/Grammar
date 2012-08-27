@@ -2,7 +2,7 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 From time to time I will move the set of completed or discarded items to the COMPLETED
 section at the end of the document.
 
-. add zero-width optimizations to conditionalized leaf rules (I don't remember what
+- add zero-width optimizations to conditionalized leaf rules (I don't remember what
   I was thinking with this. Were the optimizations good? Gah. Will probably deprecate
   this one.)
 . allow notation to selectively disable studying of certain expressions
