@@ -2,9 +2,6 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 From time to time I will move the set of completed or discarded items to the COMPLETED
 section at the end of the document.
 
-- add zero-width optimizations to conditionalized leaf rules (I don't remember what
-  I was thinking with this. Were the optimizations good? Gah. Will probably deprecate
-  this one.)
 . allow notation to selectively disable studying of certain expressions
 . clean up uid() uniqueId() business
 . make sure conditionalized terminals are being cached properly
@@ -19,10 +16,8 @@ section at the end of the document.
 . document multi-line rules
 . document semantics of xor operator in conditions
 . make sure xor conditions aren't being improperly normalized -- "a^(b^c)" != "a^b^c"
-- make sure all rules are serializable
 . clean up compiler code to remove vestiges of old "<ROOT>" convention
 . create True and False conditions to simplify turning conditions to always on or always off
-* add a child(int) method to Match so one can say n.child(0) instead of n.children()[0]
 
 COMPLETED
 =========
@@ -97,3 +92,8 @@ COMPLETED
 * factor condition handling into ConditionalRule
 * replace := with .= and ::= with :=
 * create . explicit whitespace rule
+- add zero-width optimizations to conditionalized leaf rules (I don't remember what
+  I was thinking with this. Were the optimizations good? Gah. Will probably deprecate
+  this one.)
+- make sure all rules are serializable
+* add a child(int) method to Match so one can say n.child(0) instead of n.children()[0]
