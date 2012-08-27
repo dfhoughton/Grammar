@@ -235,10 +235,26 @@ public class Match {
 	}
 
 	/**
+	 * Returns the array of children of this node.
+	 * 
 	 * @return matches nested inside this one
 	 */
 	public Match[] children() {
 		return children;
+	}
+
+	/**
+	 * Returns the ith child of this node. It is essentially a null-safe version
+	 * of <code>children()[i]</code>.
+	 * 
+	 * @param i
+	 *            index of child sought
+	 * @return ith child of this node
+	 */
+	public Match child(int i) {
+		if (children == null || i >= children.length)
+			return null;
+		return children[i];
 	}
 
 	@Override
