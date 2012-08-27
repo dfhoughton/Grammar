@@ -19,7 +19,7 @@ section at the end of the document.
 . document multi-line rules
 . document semantics of xor operator in conditions
 . make sure xor conditions aren't being improperly normalized -- "a^(b^c)" != "a^b^c"
-. make sure all rules are serializable
+- make sure all rules are serializable
 . clean up compiler code to remove vestiges of old "<ROOT>" convention
 . create True and False conditions to simplify turning conditions to always on or always off
 * add a child(int) method to Match so one can say n.child(0) instead of n.children()[0]
