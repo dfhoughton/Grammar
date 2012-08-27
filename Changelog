@@ -1,4 +1,5 @@
 2.09
+  * added child(int) to Match
 
 2.08, 20 July 2012
   * fixed some bugs in ConditionalRule that only appeared in backwards
