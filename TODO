@@ -17,7 +17,7 @@ section at the end of the document.
 . document semantics of xor operator in conditions
 . make sure xor conditions aren't being improperly normalized -- "a^(b^c)" != "a^b^c"
 . clean up compiler code to remove vestiges of old "<ROOT>" convention
-. create True and False conditions to simplify turning conditions to always on or always off
+* create True and False conditions to simplify turning conditions to always on or always off
 
 COMPLETED
 =========

@@ -25,6 +25,38 @@ public abstract class Condition implements Serializable {
 	public String name;
 
 	/**
+	 * Convenience method that generates a condition that is always true.
+	 * 
+	 * @return a condition that is always true
+	 */
+	public static Condition TRUE() {
+		return new Condition() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean passes(Match n, Matcher m, CharSequence s) {
+				return true;
+			}
+		};
+	}
+
+	/**
+	 * Convenience method that generates a condition that is always false.
+	 * 
+	 * @return a condition that is always false
+	 */
+	public static Condition FALSE() {
+		return new Condition() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean passes(Match n, Matcher m, CharSequence s) {
+				return false;
+			}
+		};
+	}
+
+	/**
 	 * Returns whether the {@link Match} meets the given condition.
 	 * <em>Note</em>: a condition should have no mutable state or side effects,
 	 * or at least none that affect the possibility of future matches. To the
