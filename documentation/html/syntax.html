@@ -29,51 +29,54 @@
 		<code>dfh.grammar</code>
 		expressed in its own formalism:
 	</div>
-	<pre>                grammar = &lt;padding&gt;*+ &lt;rule&gt; &lt;definitions&gt;?+
+	<pre>                grammar  = [ &lt;padding&gt; ]* [ &lt;rule&gt; [ &lt;padding&gt; ]* ]+
 
-            definitions = [ &lt;rule&gt; | &lt;padding&gt; ]++
-                   rule = &lt;rule_name&gt; &lt;rule_body&gt; &lt;nl&gt;
-              rule_body = &lt;s&gt; "=" &lt;s&gt; [ &lt;unbracketed_sequence&gt; | &lt;unbracketed_alternation&gt; ] &lt;condition&gt;?+ &lt;non_rule&gt;
-              condition = &lt;s&gt; &lt;cnd_group&gt;
-unbracketed_alternation = &lt;element&gt; [ &lt;s&gt; "|" &lt;s&gt; &lt;element&gt; ]++
-   unbracketed_sequence = ![ &lt;backref&gt; | &lt;ul_backref&gt; ] &lt;element&gt; [ &lt;s&gt; &lt;element&gt; ]*+
-            alternation = "[" &lt;tags&gt;?+ &lt;s&gt; &lt;element&gt; [ &lt;s&gt; "|" &lt;s&gt; &lt;element&gt; ]++ &lt;s&gt; "]"
-              assertion = &lt;assertion_type&gt; &lt;s&gt; &lt;element&gt;
-            cnd_element = &lt;identifier&gt; | &lt;cnd_group&gt;
-              cnd_group = "(" &lt;s&gt; &lt;cnd_element&gt; [ &lt;cnd_separator&gt; &lt;cnd_element&gt; ]*+ &lt;s&gt; ")"
-                element = &lt;sequence&gt; | &lt;alternation&gt; | &lt;repetition&gt; | &lt;zero_width&gt; | &lt;label&gt; | &lt;regex&gt; | &lt;literal&gt;
-             repetition = &lt;element&gt; &lt;repetition_suffix&gt;
-               sequence = "[" &lt;tags&gt;?+ &lt;s&gt; !&lt;backref&gt; &lt;element&gt; [ &lt;s&gt; &lt;element&gt; ]*+ &lt;s&gt; "]"
-             zero_width = &lt;barrier&gt; | &lt;assertion&gt;
-         assertion_type = &lt;short_at&gt; | &lt;long_at&gt;
-                padding = &lt;non_rule&gt; &lt;nl&gt;
-          cnd_separator = &lt;space&gt; | &lt;s&gt; /[&amp;|^]/ &lt;s&gt;
-                long_at = [ &lt;not&gt; &lt;s&gt; ]?+ &lt;preposition&gt;
-               non_rule = &lt;s&gt; &lt;comment&gt;?+
-      repetition_suffix = [ &lt;repetition_symbol&gt; | &lt;limits&gt; ] &lt;repetition_modifier&gt;?+
-                barrier = ":"{1,2}
-                  label = "&lt;" &lt;identifier&gt; "&gt;"
-                 limits = "{" / \d++ | \d++,\d*+ | ,\d++ /x "}"
-                literal = &lt;single_quoted&gt; | &lt;double_quoted&gt;
-                    not = "not" | "!"
-            preposition = "before" | "after"
-                  regex = /\/ (?: \\ [^\n\r\f] | [^\n\r\f\/] )++ \//x &lt;regex_modifiers&gt;
-    repetition_modifier = "+" | "?"
-      repetition_symbol = "*" | "+" | "?"
-              rule_name = "&lt;"?+ &lt;identifier&gt; 1
-                      s = &lt;space&gt;?+
-                   tags = "{" &lt;identifier&gt; [ "," &lt;identifier&gt; ]*+ "}"
-             ul_backref = &lt;backref&gt; "^"
-                backref = /\d++/
-                comment = /#.*/
-          double_quoted = /" (?: \\ [^\n\r\f] | [^\n\r\f"] )++ "/x
-             identifier = /\w++/
-                        # newline according to http://en.wikipedia.org/wiki/Newline, omitting QNX pre-POSIX
-                     nl = /\r\f|\f\r|\r|\f/
-        regex_modifiers = /[rimsdux]++/
-               short_at = /~[+-]?+|![+-]/
-          single_quoted = /' (?: \\ [^\n\r\f] | [^\n\r\f'] )++ '/x
-                  space = /[\s&amp;&amp;[^\n\r\f]]++/</pre>
+                   rule .= /^/m &lt;rule_name&gt; &lt;eq&gt; &lt;rule_body&gt;
+              rule_body  = [ &lt;unbracketed_sequence&gt; | &lt;unbracketed_alternation&gt; ] [ &lt;s&gt; &lt;condition&gt; ]? &lt;rule_end&gt;
+unbracketed_alternation  = &lt;element&gt; [ &lt;s&gt; "|" &lt;s&gt; &lt;element&gt; ]+
+   unbracketed_sequence  = !&lt;backref&gt; &lt;sequence_element&gt; [ &lt;s&gt; !&lt;up_level_br&gt; &lt;sequence_element&gt; ]*
+            alternation  = "[" [ &lt;tags&gt; ]? &lt;s&gt; &lt;element&gt; [ &lt;s&gt; "|" &lt;s&gt; &lt;element&gt; ]+ &lt;s&gt; "]"
+              assertion  = &lt;assertion_type&gt; &lt;s&gt; &lt;element&gt;
+         assertion_type  = &lt;short_a&gt; | &lt;long_a&gt;
+            cnd_element  = &lt;identifier&gt; | &lt;condition&gt;
+              condition  = "(" &lt;space&gt;? &lt;cnd_element&gt; [ &lt;cnd_separator&gt; &lt;cnd_element&gt; ]*+ &lt;space&gt;? ")"
+                    dot .= "." !&lt;dot&gt;
+                element  = &lt;sequence&gt; | &lt;alternation&gt; | &lt;repetition&gt; | &lt;label&gt; | &lt;regex&gt; | &lt;literal&gt; | &lt;up_level_br&gt;
+                 long_a  = [ &lt;not&gt; &lt;s&gt; ]? &lt;preposition&gt;
+             repetition  = &lt;element&gt; &lt;repetition_suffix&gt;
+               rule_end  = [ &lt;s&gt; &lt;comment&gt; ]+ | &lt;space&gt;? &lt;nl&gt;
+                      s  = [ &lt;space&gt; | &lt;space&gt;? "\\" &lt;rule_end&gt; ]?
+               sequence  = "[" [ &lt;tags&gt; ]?+ &lt;s&gt; !&lt;br&gt; &lt;sequence_element&gt; [ &lt;s&gt; &lt;sequence_element&gt; ]* &lt;s&gt; "]"
+       sequence_element  = &lt;element&gt; | &lt;br&gt; | &lt;zero_width&gt; | &lt;dot&gt;
+             zero_width  = &lt;barrier&gt; | &lt;assertion&gt;
+                backref  = &lt;br&gt; | &lt;up_level_br&gt;
+                padding  = &lt;blank_line&gt; | &lt;comment&gt;
+      repetition_suffix  = [ &lt;repetition_symbol&gt; | &lt;limits&gt; ] [ &lt;repetition_modifier&gt; ]?
+                barrier  = ":"{1,2}
+             blank_line .= /^/m &lt;nl&gt;
+          cnd_separator  = &lt;space&gt; | &lt;space&gt;? /[&amp;|^]/ &lt;space&gt;?
+                comment .= /^/m? /#.*/ &lt;nl&gt;
+                  label  = "&lt;" &lt;identifier&gt; "&gt;"
+                 limits  = "{" / \d++ | \d++,\d*+ | ,\d++ /x "}"
+                literal  = &lt;single_quoted&gt; | &lt;double_quoted&gt;
+                    not  = /\bnot/ | "!"
+                  regex  = /\/ (?: \\ [^\n\r\f] | [^\n\r\f\/] )++ \//x &lt;regex_modifiers&gt;
+    repetition_modifier  = "+" | "?"
+      repetition_symbol  = "*" | "+" | "?"
+              rule_name  = "&lt;"? &lt;identifier&gt; 1
+                   tags  = "{" &lt;identifier&gt; [ "," &lt;identifier&gt; ]* "}"
+            up_level_br  = &lt;br&gt; "^"
+                     br  = /\d++/
+          double_quoted  = /" (?: \\ [^\n\r\f] | [^\n\r\f"] )++ "/x
+                     eq  = /[.:]?=/
+             identifier  = /\w++/
+                         # newline according to http://en.wikipedia.org/wiki/Newline, omitting QNX pre-POSIX
+                     nl  = /\r\f|\f\r|\r|\f/
+            preposition  = /\b(?:before|after)\b/
+        regex_modifiers  = /[rimsdux]++/
+                short_a  = /[~!][+-]?/
+          single_quoted  = /' (?: \\ [^\n\r\f] | [^\n\r\f'] )++ '/x
+                  space  = /[\s&amp;&amp;[^\n\r\f]]++/</pre>
 	<p>Basically, a grammar expects a set of rules, each of which may
 		define a terminal character pattern or a set of constituent rules. The
 		matching is top-down: the grammar attempts to match a master rule,
