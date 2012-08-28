@@ -596,7 +596,8 @@ final class RuleParser {
 				for (SequenceFragment list : gf.alternates)
 					completeAssertions(list, body);
 			}
-			if (previous != null && previous instanceof AssertionFragment) {
+			if (previous != null && previous instanceof AssertionFragment
+					&& ((AssertionFragment) previous).rf == null) {
 				if (rf instanceof AssertionFragment)
 					throw new GrammarException(
 							"two consecutive assertion markers in " + body);

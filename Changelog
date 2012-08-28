@@ -2,6 +2,7 @@
   * added child(int) to Match
   * added Condition.TRUE() and Condition.FALSE() to generate constant
     conditions.
+  * fixed bug in assertion parsing
 
 2.08, 20 July 2012
   * fixed some bugs in ConditionalRule that only appeared in backwards
