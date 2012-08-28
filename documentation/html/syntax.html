@@ -59,7 +59,7 @@ unbracketed_alternation  = &lt;element&gt; [ &lt;s&gt; "|" &lt;s&gt; &lt;element
                   label  = "&lt;" &lt;identifier&gt; "&gt;"
                  limits  = "{" / \d++ | \d++,\d*+ | ,\d++ /x "}"
                 literal  = &lt;single_quoted&gt; | &lt;double_quoted&gt;
-                    not  = /\bnot/ | "!"
+                    not  = "not" | "!"
                   regex  = /\/ (?: \\ [^\n\r\f] | [^\n\r\f\/] )++ \//x &lt;regex_modifiers&gt;
     repetition_modifier  = "+" | "?"
       repetition_symbol  = "*" | "+" | "?"
@@ -72,7 +72,7 @@ unbracketed_alternation  = &lt;element&gt; [ &lt;s&gt; "|" &lt;s&gt; &lt;element
              identifier  = /\w++/
                          # newline according to http://en.wikipedia.org/wiki/Newline, omitting QNX pre-POSIX
                      nl  = /\r\f|\f\r|\r|\f/
-            preposition  = /\b(?:before|after)\b/
+            preposition  = "before" | "after"
         regex_modifiers  = /[rimsdux]++/
                 short_a  = /[~!][+-]?/
           single_quoted  = /' (?: \\ [^\n\r\f] | [^\n\r\f'] )++ '/x
