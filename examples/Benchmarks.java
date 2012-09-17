@@ -75,7 +75,7 @@ public class Benchmarks {
 		trials = cli.integer("trials");
 		warmup = cli.integer("warmup");
 		group = cli.integer("group");
-		trim = cli.number("trim").doubleValue();
+		trim = cli.dbl("trim");
 		cache = cli.string("cache");
 		test1();
 		test2();
