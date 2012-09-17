@@ -69,13 +69,13 @@ public class Benchmarks {
 						{ "match cache type; one of {tree,hash,array}" },
 						{ new StrSet("array", "tree", "hash") } },//
 		};
-		Cli cli = new Cli(spec, Cli.Mod.HELP);
+		Cli cli = new Cli(spec);
 		cli.parse(args);
 		System.out.println(cli.dump());
 		trials = cli.integer("trials");
 		warmup = cli.integer("warmup");
 		group = cli.integer("group");
-		trim = cli.number("trim").doubleValue();
+		trim = cli.dbl("trim");
 		cache = cli.string("cache");
 		test1();
 		test2();
