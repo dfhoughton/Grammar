@@ -87,22 +87,59 @@ unbracketed_alternation  = &lt;element&gt; [ &lt;s&gt; "|" &lt;s&gt; &lt;element
 		match the pattern
 		<code>/&lt;\w+&gt;|\w+/</code>
 		, that is, a sequence of word characters, optionally surrounded by
-		angle brackets. The label is separated from the body by the
-		<code>=</code>
-		character. The rule body consists of a list of constituent rules and
-		may optionally end in a post-match condition and/or comment. If a
+		angle brackets. The label is separated from the body by one of
+	<table class="dictionary_table">
+		<tr>
+			<td><code>=</code></td>
+			<td>ordinary rule</td>
+		</tr>
+		<tr>
+			<td><code>.=</code></td>
+			<td>optional whitespace between constituents</td>
+		</tr>
+		<tr>
+			<td><code>:=</code></td>
+			<td>whitespace required between constituents</td>
+		</tr>
+	</table>
+	That is
+	<pre>foo  = 'a' 'b'</pre>
+	matches
+	<i>ab</i>,
+	<pre>foo .= 'a' 'b'</pre>
+	matches
+	<i>ab</i> or
+	<i>a b</i>
+	<span class="fn">or <i>a b</i> or <i>a<br />b
+	</i>, etc.
+	</span>, and
+	<pre>foo := 'a' 'b'</pre>
+	will match only
+	<i>a b</i>. Note that one can reproduce the effect of
+	<code>.=</code>
+	and
+	<code>:=</code>
+	in an ordinary rule via explicit whitepace handling rules. In fact,
+	this is likely to be more efficient. The advantage of the two special
+	whitespace variants is purely in rule syntax clarity. See below for
+	more comments regarding whitespace.
+	</p>
+	<p>The rule body consists of a list of constituent rules and may
+		optionally end in a post-match condition and/or comment. If a
 		constituent rule is a labeled rule, it is referred to by its label
 		inside angle brackets. Some examples:
 	<pre>&lt;r1&gt; = 'a'
  r2  = &lt;r1&gt; 'b'
 &lt;r3&gt; = /\b regex \b/ix
-&lt;r4&gt; = "alt" | "ernation" # a comment
+&lt;r4&gt; = "alt"          \ # a multi-line rule
+       |              \
+       "ernation"       # a comment
 &lt;r5&gt; = 'c' (condition)</pre>
 	</p>
 	<p>Except in quoting expressions -- a sequence inside a pair of
 		angle brackets, single quotes, double quotes, or forward slashes --
-		whitespace is ignored, so you can format your rules however you wish;
-		but every rule definition must fit on a single line.</p>
+		whitespace is ignored, so you can format your rules however you wish.
+		However, you must in effect escape newlines (see the 4th rule above).</p>
 	<h3>Root</h3>
 	<pre>&lt;label&gt; = 'some' 'rule'</pre>
 	<p>Every grammar has a master, or root, rule. This is the rule the
@@ -686,6 +723,44 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 		separator inside the brackets is the comma. This allows you to
 		multiply categorize matches -- both dates and numbers, say.
 	</p>
+	<h2>Special Whitespace Handling</h2>
+	<h3>
+		<code>.=</code>
+		and
+		<code>:=</code>
+	</h3>
+	<p>As described above, you can specify how to handle whitespace
+		between tokens by varying the assignment symbol after the rule name:</p>
+	<pre>foo  <b>=</b> 'a' 'b' # ordinary rule;       matches 'ab'
+bar <b>.=</b> 'a' 'b' # optional whitespace; matches 'ab' or 'a b'
+baz <b>:=</b> 'a' 'b' # required whitespace; matches 'a b'</pre>
+	<p>This is a convenience feature that facilitates writing clear,
+		uncluttered rules. Ordinary rules will be more efficient.</p>
+	<h3>The Dot</h3>
+	<p>The whitespace magic extends into rule sub-rules. The rule</p>
+	<pre>foo .= 'a' [ 'b' | 'c' 'd' ]</pre>
+	<p>
+		matches <i>ab</i>, <i>a b</i>, <i>acd</i>, <i>a cd</i>, <i>ac d</i>,
+		or <i>a c d</i>. However, funny things go on when you add a
+		quantifier.
+	</p>
+	<pre>Grammar g = new Grammar("foo := 'a' 'b'+");
+for (String s : new String[] { "ab", "a b", "abb", "a bb", "ab b", "a b b" }) {
+    System.out.print(s + ' ');
+    System.out.println(g.find(s).match() != null);
+}</pre>
+	<pre class="results">ab false
+a b true
+abb false
+<b>a bb true</b>
+ab b false
+<b>a b b true</b>
+	</pre>
+	<p>The grammar isn't sure what you want to do with the quantified
+		token. Is it supposed to be a &ldquo;word&rdquo; of variable length or
+		a variable length sequence or words? It accepts either. If you want to
+		force the sequence interpretation, there is a special symbol which
+		represents some quantity of whitespace: the dot.</p>
 	<h2>Options</h2>
 	<pre>Matcher m = g.find(s);                                               // <b>use all defaults</b>
 ...
