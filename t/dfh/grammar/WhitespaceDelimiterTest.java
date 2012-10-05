@@ -124,6 +124,38 @@ public class WhitespaceDelimiterTest {
 	}
 
 	@Test
+	public void dot1b() {
+		Grammar g = new Grammar("rule := 'a' [ . 'b' ]+");
+		String s = "a bb";
+		Match n = g.matches(s).match();
+		assertNull(n);
+	}
+
+	@Test
+	public void dot1c() {
+		Grammar g = new Grammar("rule .= 'a' [ . 'b' ]+");
+		String s = "a bb";
+		Match n = g.matches(s).match();
+		assertNotNull(n);
+	}
+
+	@Test
+	public void dot1d() {
+		Grammar g = new Grammar("rule := [ 'b' . ]+ 'a'");
+		String s = "bb a";
+		Match n = g.matches(s).match();
+		assertNull(n);
+	}
+
+	@Test
+	public void dot1e() {
+		Grammar g = new Grammar("rule .= [ 'b' . ]+ 'a'");
+		String s = "bb a";
+		Match n = g.matches(s).match();
+		assertNotNull(n);
+	}
+
+	@Test
 	public void dot2() {
 		Grammar g = new Grammar("rule := 'a' [ . 'b' 'c' ]+");
 		String s = "a b c b c";

@@ -24,13 +24,21 @@ public class SpaceCondition extends Condition {
 		// check each match in the conditionalized sequence in turn
 		Match[] sequence = n.children()[0].children();
 		for (Match c : sequence) {
-			if (c.rule() instanceof HiddenSpace
-					|| c.rule() instanceof VisibleSpace) {
+			Rule ru = c.rule();
+			if (ru instanceof HiddenSpace || ru instanceof VisibleSpace) {
 				// if this node represents whitespace, we stop needing space
 				if (c.end() > c.start()) {
 					needS = false;
-					if (c.rule() instanceof VisibleSpace)
+					if (ru instanceof VisibleSpace)
 						lastVisible = true;
+				} else if (ru instanceof VisibleSpace) {
+					// dot marginal to sequence
+					if ((c.start() == n.start() || c.end() == n.end())
+							&& c.start() > 0 && c.end() < s.length()) {
+						if (!(Character.isWhitespace(c.start()) || Character
+								.isWhitespace(s.charAt(c.start() - 1))))
+							return false;
+					}
 				}
 			} else if (c.end() > c.start()) {
 				lastVisible = foundNothing = false;
