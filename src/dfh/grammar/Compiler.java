@@ -45,7 +45,7 @@ final class Compiler {
 	private Collection<Label> undefinedRules = new HashSet<Label>();
 	private Map<Label, Set<Label>> dependencyMap = new HashMap<Label, Set<Label>>();
 	private Map<Label, Rule> reversedCyclicRuleMap = new HashMap<Label, Rule>();
-	private final Label root;
+	private Label root;
 	private Map<String, Set<String>> undefinedConditions = new HashMap<String, Set<String>>();
 	private Map<String, Condition> conditionMap = new HashMap<String, Condition>();
 	private boolean setWhitespaceCondition = false;
@@ -163,17 +163,16 @@ final class Compiler {
 			}
 		}
 		Map<Label, SyntacticParse> map = new HashMap<Label, SyntacticParse>();
-		Label r = null;
 		RuleParser parser = new RuleParser(reader);
 		try {
 			SyntacticParse parsed;
 			while ((parsed = parser.next()) != null) {
 				Label l = parsed.l;
-				if (r == null) {
+				if (root == null) {
 					if (l.t != Type.explicit) {
 						l = new Label(Type.explicit, l.id);
 					}
-					r = l;
+					root = l;
 				}
 				if (parsed.c != null) {
 					ConditionFragment cf = parsed.c;
@@ -192,9 +191,8 @@ final class Compiler {
 		} catch (IOException e1) {
 			throw new GrammarException(e1);
 		}
-		if (r == null)
+		if (root == null)
 			throw new GrammarException("no root rule found");
-		this.root = r;
 
 		// make space for anonymous rules
 		rules = new HashMap<Label, Rule>(map.size() * 2);

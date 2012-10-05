@@ -15,7 +15,7 @@ section at the end of the document.
 * document multi-line rules
 . document semantics of xor operator in conditions
 . make sure xor conditions aren't being improperly normalized -- "a^(b^c)" != "a^b^c"
-. clean up compiler code to remove vestiges of old "<ROOT>" convention
+* clean up compiler code to remove vestiges of old "<ROOT>" convention
 . flesh out performance section of documentation; suggest combining index or regex and grammars
 * document new whitespace rules
 
