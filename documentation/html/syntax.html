@@ -375,8 +375,7 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 		Grammar g = new Grammar(rules);
 		g.defineRule("q", Pattern.compile("[\"']")); // <b>deferred regular expression</b>
 		g.defineRule("text", whateverRule);          // <b>deferred arbitrary rule</b>
-		g.defineRule("bar","quux");                  // <b>deferred string literal</b>
-	</pre>
+		g.defineRule("bar","quux");                  // <b>deferred string literal</b> </pre>
 	As you can see from this example, deferred rule definition is somewhat
 	more convenient than pre-loaded rules. For one thing, it is more
 	concise and hence easier to read. For another, there are convenience
@@ -736,31 +735,104 @@ bar <b>.=</b> 'a' 'b' # optional whitespace; matches 'ab' or 'a b'
 baz <b>:=</b> 'a' 'b' # required whitespace; matches 'a b'</pre>
 	<p>This is a convenience feature that facilitates writing clear,
 		uncluttered rules. Ordinary rules will be more efficient.</p>
-	<h3>The Dot</h3>
-	<p>The whitespace magic extends into rule sub-rules. The rule</p>
+	<p>Note that the whitespace magic extends into rule sub-rules. The
+		rule</p>
 	<pre>foo .= 'a' [ 'b' | 'c' 'd' ]</pre>
 	<p>
 		matches <i>ab</i>, <i>a b</i>, <i>acd</i>, <i>a cd</i>, <i>ac d</i>,
-		or <i>a c d</i>. However, funny things go on when you add a
-		quantifier.
+		or <i>a c d</i>.
 	</p>
+	<h3>The Dot</h3>
+	<p>Funny things go on in these special whitespace rules when you
+		add a quantifier.</p>
 	<pre>Grammar g = new Grammar("foo := 'a' 'b'+");
 for (String s : new String[] { "ab", "a b", "abb", "a bb", "ab b", "a b b" }) {
     System.out.print(s + ' ');
-    System.out.println(g.find(s).match() != null);
+    System.out.println(g.matches(s).match() != null);
 }</pre>
 	<pre class="results">ab false
 a b true
 abb false
 <b>a bb true</b>
 ab b false
-<b>a b b true</b>
-	</pre>
-	<p>The grammar isn't sure what you want to do with the quantified
-		token. Is it supposed to be a &ldquo;word&rdquo; of variable length or
-		a variable length sequence or words? It accepts either. If you want to
-		force the sequence interpretation, there is a special symbol which
-		represents some quantity of whitespace: the dot.</p>
+<b>a b b false</b> </pre>
+	<p>The grammar treats the quantified token as a &ldquo;word&rdquo;
+		of variable length rather than as a variable length sequence of words.
+		If you want to force the sequence interpretation, there is a special
+		symbol which represents some quantity of whitespace: the dot.</p>
+	<pre>Grammar g = new Grammar("foo := 'a' [ <b>.</b> 'b' ]+");
+for (String s : new String[] { "ab", "a b", "abb", "a bb", "ab b", "a b b" }) {
+    System.out.print(s + ' ');
+    System.out.println(g.matches(s).match() != null);
+}</pre>
+	<pre class="results">ab false
+a b true
+abb false
+<b>a bb false</b>
+ab b false
+<b>a b b true</b> </pre>
+	<p>
+		The dot represents some quantity of space. With
+		<code>.=</code>
+		it allows space to be present:
+	<pre>Grammar g = new Grammar("foo <b>.=</b> 'a' <b>[ . 'b' ]+</b>");
+for (String s : new String[] { "ab", "a b", "abb", "a bb", "ab b", "a b b" }) {
+    System.out.print(s + ' ');
+    System.out.println(g.matches(s).match() != null);
+}</pre>
+	<pre class="results">ab true
+a b true
+abb true
+a bb true
+ab b true
+a b b true</pre>
+	versus
+	<pre>Grammar g = new Grammar("foo <b>.=</b> 'a' <b>'b'+</b>");
+for (String s : new String[] { "ab", "a b", "abb", "a bb", "ab b", "a b b" }) {
+    System.out.print(s + ' ');
+    System.out.println(g.matches(s).match() != null);
+}</pre>
+	<pre class="results">ab true
+a b true
+abb true
+a bb true
+ab b false
+a b b false</pre>
+	With
+	<code>:=</code>
+	, as illustrated above, it requires space to be present.
+	</p>
+	<p>
+		The dot isn't precisely equivalent to
+		<code>/\s*/</code>
+		or
+		<code>/\s+/</code>
+		. For one thing, it can be backtracked into. The rule
+	<pre>foo = 'a' . ' b'</pre>
+	can match, whereas
+	<pre>foo = 'a' /\s*/ ' b'</pre>
+	cannot. The regular expression in the latter consumes all available
+	whitespace and cannot give any up, so
+	<code>' b'</code>
+	, which has a leading space, can never match.
+	</p>
+	<p>
+		For another thing, the dot does not need to consume any space, it need
+		only be adjacent to space <em>or the ends of the sequence matched
+			against</em>.
+	<pre>foo = 'a' . ' b'</pre>
+	can match against
+	<i>a&nbsp;b</i>, where there is a single space between the characters.
+	<pre>foo := . 'a' .</pre>
+	can match against
+	<i>a</i>, even though it contains no whitespace.
+	</p>
+	<p>
+		Note that in these examples the dot is used in ordinary rules. In this
+		case, it is equivalent to the expression
+		<code>/\s/r*</code>
+		.
+	</p>
 	<h2>Options</h2>
 	<pre>Matcher m = g.find(s);                                               // <b>use all defaults</b>
 ...
@@ -996,5 +1068,6 @@ opt.trace().println(10);                     // 10</pre>
 		overhead, but due to the exponential complexity of matching it is
 		often the best way to debug a grammar.
 	</p>
+
 </body>
 </html>
