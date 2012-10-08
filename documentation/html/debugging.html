@@ -154,7 +154,7 @@ at a b: b</pre>
 
 	convert dfh.grammar matches to GraphViz graphs
 
-	--grammar | -g   &lt;file&gt;  grammar file; required
+	--grammar | -g   &lt;file&gt;  grammar file; REQUIRED
 	--out | -o       &lt;file&gt;  file to receive output
 	
 	--help | -? | -h         print usage information
@@ -182,10 +182,21 @@ If no output file is provided, it will write its output to STDOUT.</pre>
 		<code>dfh.grammar.util.Dotify</code>
 		itself. The former is just a wrapper for the latter. The code for
 		<code>MatchToDot</code>
-		is a mere 133 lines including imports, blank lines, and comments, so
+		is a mere 132 lines including imports, blank lines, and comments, so
 		it would be a good place to start if you're thinking of using
 		<code>Dotify</code>
 		programmatically.
+	</p>
+	<h2>
+		<code>Match.dot()</code>
+	</h2>
+	<p>
+		This method is like a
+		<code>toString</code>
+		method whose output is readable by graphviz. It's handy for ad hoc
+		debugging via
+		<code>System.out.println(String)</code>
+		.
 	</p>
 </body>
 </html>

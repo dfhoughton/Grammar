@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import dfh.cli.Cli;
 import dfh.cli.Cli.Opt;
+import dfh.cli.coercions.FileCoercion;
 import dfh.grammar.Grammar;
 import dfh.grammar.GrammarException;
 import dfh.grammar.Match;
@@ -49,11 +50,9 @@ public class MatchToDot {
 				//
 				{ { Opt.NAME, MatchToDot.class.getName() } },//
 				{ { Opt.ARGS, "file", Opt.STAR } },//
-				{ { "grammar", 'g', String.class },
-						{ "grammar file; required", "file" },
+				{ { "grammar", 'g', FileCoercion.C }, { "grammar file" },
 						{ Cli.Res.REQUIRED } },//
-				{ { "out", 'o', String.class },
-						{ "file to receive output", "file" } },//
+				{ { "out", 'o', FileCoercion.C }, { "file to receive output" } },//
 				{ {
 						Opt.USAGE,
 						"convert dfh.grammar matches to GraphViz graphs",
@@ -65,12 +64,11 @@ public class MatchToDot {
 		Cli cli = new Cli(spec);
 		cli.parse(args);
 		Grammar g = null;
-		File gf = new File(cli.string("grammar"));
+		File gf = (File) cli.object("grammar");
 		try {
 			g = new Grammar(gf);
 		} catch (Exception e) {
-			cli.error("could not compile grammar: " + e);
-			cli.usage(1);
+			cli.die("could not compile grammar: " + e);
 		}
 		StringBuilder b;
 		if (cli.argList().isEmpty()) {
@@ -109,8 +107,8 @@ public class MatchToDot {
 			}
 		}
 		endDot(b);
-		if (cli.string("out") != null) {
-			File outf = new File(cli.string("out"));
+		if (cli.isSet("out")) {
+			File outf = (File) cli.object("out");
 			BufferedWriter writer = new BufferedWriter(new FileWriter(outf));
 			writer.write(b.toString());
 			writer.close();
