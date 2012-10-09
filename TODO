@@ -10,7 +10,7 @@ section at the end of the document.
 . add option to turn off condition testing
 . bail out of recursion via exception rather than the current laborious and expensive reeling in of failed tries
 . added unit tests for Match.hasLabel(String), which appears to have a latent bug having to do with alternations
-. fix typos in documentation
+* fix typos in documentation
 * edit grammar grammar in documentation
 * document multi-line rules
 * document semantics of xor operator in conditions
