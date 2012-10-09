@@ -18,11 +18,13 @@ import dfh.grammar.SequenceRule.SequenceMatcher;
  * The object implementing rules such as
  * 
  * <pre>
- * &lt;a&gt; = &lt;b&gt; 'foo' 1
+ * {@code
+ * <a> = <b> 'foo' 1
+ * }
  * </pre>
  * 
  * where 1 in this case refers back to whatever string was matched by
- * <code>&lt;b&gt;</code>. Note that back reference matching can't easily be
+ * {@code <b>}. Note that back reference matching can't easily be
  * cached because it isn't truly context free. A given back reference may or may
  * not match at a given offset depending on the rule of which it is a component.
  * <p>

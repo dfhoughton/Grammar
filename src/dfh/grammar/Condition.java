@@ -102,7 +102,7 @@ public abstract class Condition implements Serializable {
 
 	/**
 	 * Whether the character subsequence matched meets the given condition.
-	 * Unless overridden, this method will always return <code>true</code>. See
+	 * Unless overridden, this method will always return {@code true}. See
 	 * {@link #passes(Match, Matcher, CharSequence)} for caveats.
 	 * 
 	 * @param s
@@ -121,13 +121,15 @@ public abstract class Condition implements Serializable {
 	 * assertions as in
 	 * 
 	 * <pre>
-	 * a = ~- &lt;b&gt; 'foo' &lt;b&gt;
+	 * {@code 
+	 * a = ~- <b> 'foo' <b>
 	 * b = /\d++/r (greater_than_5)
+	 * }
 	 * </pre>
 	 * 
 	 * Without correcting for reversion, <i>10foo10</i> would fail to match
-	 * <code>&lt;a&gt;</code> because the condition would see <i>01</i> rather
-	 * than <i>10</i> when tested for the first <code>&lt;b&gt;</code>.
+	 * {@code <a>} because the condition would see <i>01</i> rather than
+	 * <i>10</i> when tested for the first {@code <b>}.
 	 * 
 	 * @param n
 	 *            {@link Match} found in character sequence
@@ -172,7 +174,7 @@ public abstract class Condition implements Serializable {
 
 	/**
 	 * Required by {@link Grammar#describe()}. Delegates to
-	 * {@link #describe(boolean)} with the parameter <code>false</code>.
+	 * {@link #describe(boolean)} with the parameter {@code false}.
 	 * 
 	 * @return string representing condition
 	 */
@@ -182,12 +184,12 @@ public abstract class Condition implements Serializable {
 
 	/**
 	 * Returns string representing condition, showing hidden sub-conditions only
-	 * if <code>showAll</code> is <code>true</code>.
+	 * if {@code showAll} is {@code true}.
 	 * 
 	 * @param showAll
 	 *            whether to show even hidden conditions
 	 * @return string representing condition, showing hidden sub-conditions only
-	 *         if <code>showAll</code> is <code>true</code>
+	 *         if {@code showAll} is {@code true}
 	 */
 	protected String describe(boolean showAll) {
 		if (visible())

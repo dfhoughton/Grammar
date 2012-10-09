@@ -52,7 +52,7 @@ final class RuleParser {
 	private static final Pattern basePattern = Pattern.compile("\\s*+"
 			+ leftValuePattern + "\\s*+([:.]?)=\\s*+(.*?)\\s*+");
 	/**
-	 * Pattern of repetition symbols such as <code>*</code>.
+	 * Pattern of repetition symbols such as {@code *}.
 	 */
 	private static final Pattern repetitionPattern = Pattern
 			.compile("(?:([?*+]|\\{\\d*+(?:,\\d*+)?\\})([+?]?+))?+");
@@ -538,7 +538,9 @@ final class RuleParser {
 	 * Parses out tags after square brackets. E.g.,
 	 * 
 	 * <pre>
-	 *   &lt;a&gt; = [{foo} 'a'++ 'b' ] | [{quux} 'c'++ 'd']
+	 * {@code 
+	 *   <a> = [{foo} 'a'++ 'b' ] | [{quux} 'c'++ 'd']
+	 * }
 	 * </pre>
 	 * 
 	 * @param body

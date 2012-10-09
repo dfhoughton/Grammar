@@ -12,18 +12,20 @@ import java.util.regex.Pattern;
 
 /**
  * Repetition to be attached to a rule. All the patterns understood by
- * {@link Pattern} are possible as well as <code>{,n}</code>, which is the same
- * as <code>{0,n}</code>.
+ * {@link Pattern} are possible as well as {@code ,n}}, which is the same as
+ * {@code 0,n}}.
  * <p>
- * <b>NOTE:</b> the repetition suffix <code>{1}+</code> will have the same
- * effect as the <code>(?>...)</code> non-backtracking pattern, which isn't
- * otherwise representable. This means
+ * <b>NOTE:</b> the repetition suffix {@code 1}+} will have the same effect as
+ * the {@code (?>...)} non-backtracking pattern, which isn't otherwise
+ * representable. This means
  * 
  * <pre>
- * &lt;a&gt; = [ 'a' | 'b' ]{1}+ [ 'c' 'd'* ]{1}+
+ * {@code 
+ * <a> = [ 'a' | 'b' ]{1}+ [ 'c' 'd'* ]{1}+
+ * }
  * </pre>
  * 
- * matches the same sequences as <code>(?>a|b)(?>cd*)</code>.
+ * matches the same sequences as {@code (?>a|b)(?>cd*)}.
  * <p>
  * <b>Creation date:</b> Mar 10, 2011
  * 
@@ -58,45 +60,45 @@ public class Repetition {
 	 */
 	public static final Repetition NONE = new Repetition(Type.greedy, 1, 1);
 	/**
-	 * <code>*</code>
+	 * {@code *}
 	 */
 	public static final Repetition ASTERISK = new Repetition(Type.greedy, 0,
 			Integer.MAX_VALUE);
 	/**
-	 * <code>+</code>
+	 * {@code +}
 	 */
 	public static final Repetition PLUS = new Repetition(Type.greedy, 1,
 			Integer.MAX_VALUE);
 	/**
-	 * <code>?</code>
+	 * {@code ?}
 	 */
 	public static final Repetition QMARK = new Repetition(Type.greedy, 0, 1);
 	/**
-	 * <code>*?</code>
+	 * {@code *?}
 	 */
 	public static final Repetition ASTERISK_Q = new Repetition(Type.stingy, 0,
 			Integer.MAX_VALUE);
 	/**
-	 * <code>+?</code>
+	 * {@code +?}
 	 */
 	public static final Repetition PLUS_Q = new Repetition(Type.stingy, 1,
 			Integer.MAX_VALUE);
 	/**
-	 * <code>??</code>
+	 * {@code ??}
 	 */
 	public static final Repetition QMARK_Q = new Repetition(Type.stingy, 0, 1);
 	/**
-	 * <code>*+</code>
+	 * {@code *+}
 	 */
 	public static final Repetition ASTERISK_P = new Repetition(Type.possessive,
 			0, Integer.MAX_VALUE);
 	/**
-	 * <code>++</code>
+	 * {@code ++}
 	 */
 	public static final Repetition PLUS_P = new Repetition(Type.possessive, 1,
 			Integer.MAX_VALUE);
 	/**
-	 * <code>?+</code>
+	 * {@code ?+}
 	 */
 	public static final Repetition QMARK_P = new Repetition(Type.possessive, 0,
 			1);

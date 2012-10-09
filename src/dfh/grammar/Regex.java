@@ -14,9 +14,9 @@ import java.util.regex.Pattern;
 /**
  * {@link RuleFragment} for a rule such as
  * 
- * <pre>
- * &lt;a&gt; = /foo/i
- * </pre>
+ * <pre>{@code 
+ * <a> = /foo/i
+ * }</pre>
  * 
  * <b>Creation date:</b> Apr 1, 2011
  * 

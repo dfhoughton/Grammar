@@ -12,7 +12,9 @@ package dfh.grammar;
  * Represents a portion of a rule that may have a repetition modifier. E.g.,
  * 
  * <pre>
- * &lt;a&gt; = 'foo'+
+ * {@code 
+ * <a> = 'foo'+
+ * }
  * </pre>
  * <p>
  * <b>Creation date:</b> Mar 10, 2011

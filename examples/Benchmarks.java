@@ -22,24 +22,26 @@ public class Benchmarks {
 
 	/**
 	 * <pre>
+	 * {@code
 	 * USAGE: EXECUTABLE [options]
 	 * 
 	 *   A basic set of benchmark tests comparing grammars using various parameters to 
 	 *   equivalent regular expressions.
 	 * 
-	 *     --group -g   &lt;val&gt;  number or iterations to time together to overcome the
+	 *     --group -g   <val>  number or iterations to time together to overcome the
 	 *                         limitations of millisecond time granularity; default: 
 	 *                         2000
-	 *     --trials -t  &lt;val&gt;  number of groups to time; default: 50
-	 *     --trim       &lt;val&gt;  fraction of time-sorted trials to discard from the high
+	 *     --trials -t  <val>  number of groups to time; default: 50
+	 *     --trim       <val>  fraction of time-sorted trials to discard from the high
 	 *                         and low ends of the sort to eliminate outliers; default:
 	 *                         0.1
-	 *     --warmup -w  &lt;val&gt;  number to iterations to warm up the JIT compiler;
+	 *     --warmup -w  <val>  number to iterations to warm up the JIT compiler;
 	 *                         default: 50000
-	 *     --cache -c   &lt;val&gt;  match cache type; one of {tree,hash,array} default:
+	 *     --cache -c   <val>  match cache type; one of {tree,hash,array} default:
 	 *                         array
 	 * 
 	 *     --help -? -h        print usage information
+	 * }
 	 * </pre>
 	 * 
 	 * @param args

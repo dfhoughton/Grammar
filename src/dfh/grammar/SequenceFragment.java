@@ -17,7 +17,9 @@ import dfh.grammar.Label.Whitespace;
  * Represents a sequence of rules such as
  * 
  * <pre>
- * &lt;a&gt; = &lt;b&gt; &lt;c&gt;
+ * {@code 
+ * <a> = <b> <c>
+ * }
  * </pre>
  * 
  * <p>

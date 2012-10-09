@@ -19,7 +19,9 @@ import java.util.Set;
  * The object implementing rules such as
  * 
  * <pre>
- * &lt;a&gt; = &lt;b&gt; | &lt;c&gt;
+ * {@code
+ * <a> = <b> | <c>
+ * }
  * </pre>
  * 
  * @author David Houghton

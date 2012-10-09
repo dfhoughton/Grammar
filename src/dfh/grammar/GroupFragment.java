@@ -17,7 +17,9 @@ import java.util.TreeSet;
  * Represents a set of alternates such as
  * 
  * <pre>
- * &lt;a&gt; = &lt;b&gt; | &lt;c&gt;
+ * {@code 
+ * <a> = <b> | <c>
+ * }
  * </pre>
  * 
  * This is a companion to {@link AlternationRule}.
