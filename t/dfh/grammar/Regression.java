@@ -136,4 +136,24 @@ public class Regression {
 			assertTrue(success[0]);
 		}
 	}
+
+	@Test
+	public void descriptionOfIncompleteGrammar() {
+		String[] rules = {
+				//
+				"time = <at_time> | <full_time> | <otime>",//
+				"o_time = [{hour} <phour>] [<period> | <oclock>]",//
+				"oclock = /\\s*+o'?+clock/i",//
+				"at_time = <at> <partial_time>",//
+				"at = /(?:@|at)\\s*+/i",//
+				"partial_time = [{hour} <phour>] [ ':' <minute> ]? <period>?",//
+				"phour = /t(?>w(?>o|elve)|hree|en)|s(?>ix|even)|one|nine|f(?>our|ive)|e(?>leven|ight)|9|8|7|6|5|4|3|2|1[0-2]?+|0/i",//
+				"full_time = [{hour} <fhour>] ':' <minute> <period>?",//
+				"fhour = /\\d{1,2}/",//
+				"minute = /\\d{2}/",//
+				"period = /\\s*+[ap]m?+/i",//
+		};
+		Grammar g = new Grammar(rules);
+		g.describe();
+	}
 }
