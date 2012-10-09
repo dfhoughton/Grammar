@@ -18,7 +18,7 @@ section at the end of the document.
 * clean up compiler code to remove vestiges of old "<ROOT>" convention
 * flesh out performance section of documentation; suggest combining index or regex and grammars
 * document new whitespace rules
-. clean up javadocs
+* clean up javadocs
 * check for bugs when calling describe with incomplete grammar
 
 COMPLETED
