@@ -10,15 +10,6 @@ section at the end of the document.
 . add option to turn off condition testing
 . bail out of recursion via exception rather than the current laborious and expensive reeling in of failed tries
 . added unit tests for Match.hasLabel(String), which appears to have a latent bug having to do with alternations
-. fix typos in documentation
-* edit grammar grammar in documentation
-* document multi-line rules
-. document semantics of xor operator in conditions
-. make sure xor conditions aren't being improperly normalized -- "a^(b^c)" != "a^b^c"
-* clean up compiler code to remove vestiges of old "<ROOT>" convention
-. flesh out performance section of documentation; suggest combining index or regex and grammars
-* document new whitespace rules
-. clean up javadocs
 
 COMPLETED
 =========
@@ -100,3 +91,13 @@ COMPLETED
 * add a child(int) method to Match so one can say n.child(0) instead of n.children()[0]
 * implement automatic space insertion in sequences upon specification
 * create True and False conditions to simplify turning conditions to always on or always off
+* fix typos in documentation
+* edit grammar grammar in documentation
+* document multi-line rules
+* document semantics of xor operator in conditions
+* make sure xor conditions aren't being improperly normalized -- "a^(b^c)" != "a^b^c"
+* clean up compiler code to remove vestiges of old "<ROOT>" convention
+* flesh out performance section of documentation; suggest combining index or regex and grammars
+* document new whitespace rules
+* clean up javadocs
+* check for bugs when calling describe with incomplete grammar

@@ -144,7 +144,7 @@ public class Match {
 	public static final Match DUMMY = new Match();
 
 	/**
-	 * Makes a DUMMY node. This serves as the opposite of <code>null</code> in
+	 * Makes a DUMMY node. This serves as the opposite of {@code null} in
 	 * matching caches.
 	 */
 	private Match() {
@@ -245,7 +245,7 @@ public class Match {
 
 	/**
 	 * Returns the ith child of this node. It is essentially a null-safe version
-	 * of <code>children()[i]</code>.
+	 * of {@code children()[i]}.
 	 * 
 	 * @param i
 	 *            index of child sought
@@ -397,14 +397,14 @@ public class Match {
 
 	/**
 	 * Returns set of strings to which {@link #hasLabel(String)} will return
-	 * <code>true</code> for this {@link Match}. This method is useful for
-	 * debugging but not optimized for speed.
+	 * {@code true} for this {@link Match}. This method is useful for debugging
+	 * but not optimized for speed.
 	 * <p>
 	 * Cannot be used in {@link Condition}; {@link GrammarException} will be
 	 * thrown.
 	 * 
 	 * @return set of strings to which {@link #hasLabel(String)} will return
-	 *         <code>true</code> for this {@link Match}
+	 *         {@code true} for this {@link Match}
 	 */
 	public synchronized Set<String> labels() {
 		if (done) {
@@ -674,8 +674,8 @@ public class Match {
 
 	/**
 	 * Returns whether {@link Match} corresponds to a region with no width. For
-	 * example, <code>(?=fred)</code> and <code>'fred'*</code> can both produce
-	 * zero-width matches.
+	 * example, {@code (?=fred)} and {@code 'fred'*} can both produce zero-width
+	 * matches.
 	 * 
 	 * @return whether {@link Match} corresponds to a region with no width
 	 */
@@ -688,13 +688,14 @@ public class Match {
 	 * as opposed to an implicit rule. For example, in
 	 * 
 	 * <pre>
-	 * &lt;ROOT&gt; = &lt;fred&gt;++
-	 * &lt;fred&gt; = 'fred' | 'Fred'
+	 * {@code 
+	 * <ROOT> = <fred>++
+	 * <fred> = 'fred' | 'Fred'
+	 * }
 	 * </pre>
 	 * 
-	 * <code>&lt;ROOT&gt;</code> and <code>&lt;fred&gt;</code> are explicit
-	 * while <code>'fred'</code>, <code>&lt;fred&gt;++</code> and so forth are
-	 * implicit.
+	 * {@code <ROOT>} and {@code <fred>} are explicit while {@code 'fred'},
+	 * {@code <fred>++} and so forth are implicit.
 	 * <p>
 	 * Any rule defined on its own line with its own label to the left of the
 	 * equals sign is an explicit rule.

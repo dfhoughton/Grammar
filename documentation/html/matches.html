@@ -17,7 +17,7 @@
 		more limited: you can enclose parts of the pattern in parentheses,
 		creating matching groups. This is one respect in which
 		<code>dfh.grammar.Match</code>
-		objects shine: they represent the entire match tree. The problem them
+		objects shine: they represent the entire match tree. The problem then
 		is how to extract this information from the object. This section
 		explores the techniques available.
 	</p>
@@ -82,7 +82,7 @@
 	<h2>Walking the Match Tree</h2>
 	<p>If you wish to study the structure of the match, if you are
 		using a grammar for parsing rather than simple validation or text
-		extraction, you have to walk match tree. The match object provides
+		extraction, you have to walk the match tree. The match object provides
 		numerous methods to facilitate this. Here are the principle ones.</p>
 	<h3>match tree walking methods</h3>
 	<h4>
@@ -233,24 +233,14 @@
 				return m.hasLabel(rule);
 			}
 		});
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	} 
 	</pre>
 	<p>
 		You can gain some efficiency by pre-compiling all the
 		<code>MatchTests</code>
 		you need. The
 		<code>dfh.grammar.Match</code>
-		test itself provides a number of useful tests precompiled.
+		class itself provides a number of useful tests precompiled.
 	</p>
 	<h4>
 		<code>Match.ALL</code>
@@ -263,7 +253,6 @@
 	<p>Use this test to obtain a list of all the nodes in the match
 		tree that are defined in the course of defining another rule. In</p>
 	<pre>ROOT = "a" | "b"</pre>
-	,
 	<code>&lt;ROOT&gt;</code>
 	is named and
 	<code>"a"</code>

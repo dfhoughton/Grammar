@@ -453,5 +453,19 @@ ROOT = "cat" | "dog" | "monkey"
 
 with studying
 1.53474 milliseconds per sequence</pre>
+	<h2>Conclusion</h2>
+	<p>
+		Don't use a
+		<code>dfh.grammar.Grammar</code>
+		where you can use a
+		<code>java.util.regex.Pattern</code>
+		if you're concerned about speed. A compromise I sometimes use it to
+		use a regex or string index method to find a region of interest and
+		then
+		<code>Grammar.lookingAt()</code>
+		or
+		<code>Grammar.matches()</code>
+		to parse it.
+	</p>
 </body>
 </html>

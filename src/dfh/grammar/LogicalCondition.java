@@ -147,9 +147,10 @@ public abstract class LogicalCondition extends Condition implements
 
 	/**
 	 * TODO the motivation for this system is lost in the mists of time; must
-	 * determine whether this is useful complexity
+	 * determine whether this is useful complexity. Why is it not called
+	 * {@code clone}?
 	 * 
-	 * @return
+	 * @return a clone of this logical condition
 	 */
 	protected abstract Condition duplicate();
 
@@ -159,7 +160,7 @@ public abstract class LogicalCondition extends Condition implements
 	protected abstract String describe(boolean showAll);
 
 	/**
-	 * Used to implement {@link #describe(boolean))} for various logical
+	 * Used to implement {@link #describe(boolean)} for various logical
 	 * condition subtypes.
 	 * 
 	 * @param operator
@@ -180,7 +181,8 @@ public abstract class LogicalCondition extends Condition implements
 				initial = false;
 			else
 				b.append(operator);
-			if ((showAll && subconditions.length > 1 || visibleConditions > 1) && cnd instanceof LogicalCondition)
+			if ((showAll && subconditions.length > 1 || visibleConditions > 1)
+					&& cnd instanceof LogicalCondition)
 				// special treatment of hidden conditions
 				b.append('(').append(cnd.describe(showAll)).append(')');
 			else

@@ -14,21 +14,24 @@ package dfh.grammar;
  * Used in rules such as
  * 
  * <pre>
- * &lt;a&gt; = &lt;b&gt; &lt;c&gt; : &lt;d&gt;
+ * {@code
+ * <a> = <b> <c> : <d>
+ * }
  * </pre>
  * 
- * where <code>:</code> means "given that <code>&lt;b&gt;</code> has matched
- * somehow or other, if we can't find a match for <code>&lt;d&gt;</code> don't
- * tinker with the first two elements any further: the whole rule fails."
- * Similarly,
+ * where {@code :} means "given that {@code <b>} has matched somehow or other,
+ * if we can't find a match for {@code <d>} don't tinker with the first two
+ * elements any further: the whole rule fails." Similarly,
  * 
  * <pre>
- * &lt;a&gt; = &lt;b&gt; &lt;c&gt; :: &lt;d&gt;
+ * {@code 
+ * <a> = <b> <c> :: <d>
+ * }
  * </pre>
  * 
- * where we have <code>::</code> instead of <code>:</code>, means that if we
- * can't continue the match after the barrier then the entire grammar fails to
- * match at the offset it is now considering.
+ * where we have {@code ::} instead of {@code :}, means that if we can't
+ * continue the match after the barrier then the entire grammar fails to match
+ * at the offset it is now considering.
  * <p>
  * <b>Creation date:</b> Apr 6, 2011
  * 

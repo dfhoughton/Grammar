@@ -40,15 +40,17 @@ import dfh.grammar.Label.Type;
  * A {@link Grammar} is constructed from a set of rules such as
  * 
  * <pre>
- * &lt;ROOT&gt; = &lt;a&gt; | &lt;b&gt;
+ * {@code 
+ * <ROOT> = <a> | <b>
  * 
- *    &lt;a&gt; = &lt;foo&gt; &lt;s&gt; &lt;bar&gt;
- *    &lt;b&gt; = &lt;quux&gt; &lt;s&gt; &lt;baz&gt;
- *  &lt;bar&gt; = /bar/
- *  &lt;baz&gt; = /baz/
- *  &lt;foo&gt; = /foo/
- * &lt;quux&gt; = /quux/
- *    &lt;s&gt; = /\s++/
+ *    <a> = <foo> <s> <bar>
+ *    <b> = <quux> <s> <baz>
+ *  <bar> = /bar/
+ *  <baz> = /baz/
+ *  <foo> = /foo/
+ * <quux> = /quux/
+ *    <s> = /\s++/
+ * }
  * </pre>
  * 
  * And in turn constructs {@link Matcher} objects that can be applied to a
@@ -131,7 +133,7 @@ public class Grammar implements Serializable {
 
 		/**
 		 * Callback that fixes up rightmost match, if any, before returning
-		 * <code>null</code> when grammar fails to match.
+		 * {@code null} when grammar fails to match.
 		 * 
 		 * @param m
 		 *            {@link Matcher} that failed to match
@@ -366,7 +368,7 @@ public class Grammar implements Serializable {
 
 	/**
 	 * Delegates to {@link #Grammar(String[], Map)}, setting the second
-	 * parameter to <code>null</code>.
+	 * parameter to {@code null}.
 	 * 
 	 * @param lines
 	 *            rule source
@@ -394,7 +396,7 @@ public class Grammar implements Serializable {
 
 	/**
 	 * Delegates to {@link #Grammar(File, Map)}, setting the second parameter to
-	 * <code>null</code>.
+	 * {@code null}.
 	 * 
 	 * @param f
 	 *            rule source
@@ -424,7 +426,7 @@ public class Grammar implements Serializable {
 
 	/**
 	 * Delegates to {@link #Grammar(InputStream, Map)}, setting the second
-	 * parameter to <code>null</code>.
+	 * parameter to {@code null}.
 	 * 
 	 * @param is
 	 *            rule source
@@ -452,7 +454,7 @@ public class Grammar implements Serializable {
 
 	/**
 	 * Delegates to {@link #Grammar(Reader, Map)}, setting the second parameter
-	 * to <code>null</code>.
+	 * to {@code null}.
 	 * 
 	 * @param r
 	 *            rule source
@@ -480,7 +482,7 @@ public class Grammar implements Serializable {
 
 	/**
 	 * Delegates to {@link #Grammar(BufferedReader, Map)}, setting the second
-	 * parameter to <code>null</code>.
+	 * parameter to {@code null}.
 	 * 
 	 * @param r
 	 *            rule source
@@ -508,7 +510,7 @@ public class Grammar implements Serializable {
 
 	/**
 	 * Delegates to {@link #Grammar(LineReader, Map)}, setting the second
-	 * parameter to <code>null</code>.
+	 * parameter to {@code null}.
 	 * 
 	 * @param reader
 	 *            rule source
@@ -522,14 +524,14 @@ public class Grammar implements Serializable {
 	/**
 	 * Creates a {@link Compiler} to parse the rules, intializing a
 	 * {@link Grammar} with which to generate {@link Matcher} objects. The
-	 * optional <code>precompiledRules</code> parameter contains implementations
-	 * of what would other wise be {@link DeferredDefinitionRule} objects --
-	 * rules whose body is not specified in the grammar. It is necessary to
-	 * provide this parameter if you wish to use your own {@link Reversible}
+	 * optional {@code precompiledRules} parameter contains implementations of
+	 * what would other wise be {@link DeferredDefinitionRule} objects -- rules
+	 * whose body is not specified in the grammar. It is necessary to provide
+	 * this parameter if you wish to use your own {@link Reversible}
 	 * {@link Rule} in a backwards {@link Assertion}, as rules defined by
 	 * {@link #defineRule(String, Rule)} cannot be used in backwards assertions
-	 * -- assertions equivalent to <code>(?&lt;=...)</code> and
-	 * <code>(?&lt;!...)</code> in ordinary Java regular expressions.
+	 * -- assertions equivalent to {@code (?<=...)} and {@code (?<!...)}
+	 * in ordinary Java regular expressions.
 	 * <p>
 	 * <em>NOTE:</em> precompiled rules must implement {@link Cloneable}. They
 	 * will be cloned. This protects state variables such as
@@ -575,7 +577,7 @@ public class Grammar implements Serializable {
 
 	/**
 	 * Delegates to {@link #Grammar(String, Map)}, setting the second parameter
-	 * to <code>null</code>.
+	 * to {@code null}.
 	 * 
 	 * @param multiline
 	 *            rule source
@@ -713,8 +715,8 @@ public class Grammar implements Serializable {
 	 * sequence (or at the offset specified in the {@link Options} object) and
 	 * ending on the last character.
 	 * 
-	 * {@link Options#study()} is set to <code>false</code>. If different
-	 * behavior is desired, use {@link #matches(CharSequence, Options)}.
+	 * {@link Options#study()} is set to {@code false}. If different behavior is
+	 * desired, use {@link #matches(CharSequence, Options)}.
 	 * 
 	 * @param s
 	 * @return {@link Matcher} iterating over matches
@@ -777,8 +779,8 @@ public class Grammar implements Serializable {
 	 * Generates iterator over matches whose start offset is the beginning of
 	 * the given {@link CharSequence}.
 	 * 
-	 * {@link Options#study()} is set to <code>false</code>. If different
-	 * behavior is desired, use {@link #lookingAt(CharSequence, Options)}.
+	 * {@link Options#study()} is set to {@code false}. If different behavior is
+	 * desired, use {@link #lookingAt(CharSequence, Options)}.
 	 * 
 	 * @param s
 	 * @return iterator over matches
@@ -892,8 +894,8 @@ public class Grammar implements Serializable {
 	 * Creates iterator over matches occurring anywhere in given
 	 * {@link CharSequence}.
 	 * 
-	 * {@link Options#study()} is set to <code>true</code>. If different
-	 * behavior is desired, use {@link #find(CharSequence, Options)}.
+	 * {@link Options#study()} is set to {@code true}. If different behavior is
+	 * desired, use {@link #find(CharSequence, Options)}.
 	 * 
 	 * @param s
 	 * @return object iterating over matches
@@ -976,11 +978,11 @@ public class Grammar implements Serializable {
 	/**
 	 * Prints out nicely formatted rule definitions for grammar, ordering the
 	 * rules in descending order by independence. The least independent rule is
-	 * <code>ROOT</code>, which is listed first. The most independent rules are
-	 * the terminal rules, which are listed last.
+	 * {@code ROOT}, which is listed first. The most independent rules are the
+	 * terminal rules, which are listed last.
 	 * 
 	 * This method delegates to {@link #describe(boolean)}, setting the
-	 * <code>alphabetized</code> parameter to <code>false</code>.
+	 * {@code alphabetized} parameter to {@code false}.
 	 * 
 	 * @return pretty-printed grammar definition
 	 */
@@ -1105,7 +1107,9 @@ public class Grammar implements Serializable {
 	 * Reassigns tags in structures such as
 	 * 
 	 * <pre>
-	 * foo = [{bar} &lt;a&gt; ] | 'b'
+	 * {@code 
+	 * foo = [{bar} <a> ] | 'b'
+	 * }
 	 * </pre>
 	 * 
 	 * where a tag is assigned to a {@link DeferredDefinitionRule}.
@@ -1494,7 +1498,7 @@ public class Grammar implements Serializable {
 	/**
 	 * Assign a complete grammar to an undefined symbol. Delegates to
 	 * {@link #defineRule(String, Grammar, String, Condition)}, using
-	 * <code>null</code> for last two parameters.
+	 * {@code null} for last two parameters.
 	 * 
 	 * @param label
 	 * @param g
@@ -1506,7 +1510,7 @@ public class Grammar implements Serializable {
 	/**
 	 * For defining a terminal rule left undefined by the initial rule set.
 	 * Delegates to {@link #defineRule(String, Pattern, String, Condition)},
-	 * using <code>null</code> for last two parameters.
+	 * using {@code null} for last two parameters.
 	 * 
 	 * @param label
 	 * @param p
@@ -1520,7 +1524,7 @@ public class Grammar implements Serializable {
 	/**
 	 * For defining a terminal rule left undefined by the initial rule set.
 	 * Delegates to {@link #defineRule(String, String, String, Condition)},
-	 * using <code>null</code> for last two parameters.
+	 * using {@code null} for last two parameters.
 	 * 
 	 * @param label
 	 *            id of undefined rule

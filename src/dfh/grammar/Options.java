@@ -49,10 +49,12 @@ public class Options implements Cloneable {
 	 * grammar like
 	 * 
 	 * <pre>
-	 * &lt;ROOT&gt; = &lt;AP&gt;
+	 * {@code 
+	 * <ROOT> = <AP>
 	 * 
-	 *   &lt;AP&gt; = &lt;DP&gt;? "a"
-	 *   &lt;DP&gt; = &lt;AP&gt; "s"
+	 *   <AP> = <DP>? "a"
+	 *   <DP> = <AP> "s"
+	 * }
 	 * </pre>
 	 * 
 	 * which produces left-branching parse trees like
@@ -73,7 +75,7 @@ public class Options implements Cloneable {
 	 * 
 	 * this value determines how deep the tree can grow. Without some limit like
 	 * this the grammar will recurse infinitely while trying to determine how to
-	 * match <code>&lt;AP&gt;</code>.
+	 * match {@code <AP>}.
 	 * 
 	 * The smaller this recursion limit, the faster recursive patterns will
 	 * match (and the less chance one has of overflowing the stack). However,
@@ -299,8 +301,7 @@ public class Options implements Cloneable {
 
 	/**
 	 * This is equivalent to setting {@link #longestMatch(boolean)} to
-	 * <code>false</code> and {@link #allowOverlap(boolean)} to
-	 * <code>true</code>.
+	 * {@code false} and {@link #allowOverlap(boolean)} to {@code true}.
 	 * 
 	 * @return self to allow chaining of methods
 	 */

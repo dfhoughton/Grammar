@@ -17,7 +17,9 @@ import java.util.Set;
  * rules must be defined in two steps. For example:
  * 
  * <pre>
- * &lt;a&gt; = '(' [ '*' | &lt;a&gt; ] ')'
+ * {@code 
+ * <a> = '(' [ '*' | <a> ] ')'
+ * }
  * </pre>
  * 
  * which will match <i>(*)</i>, <i>((*))</i>, <i>(((*)))</i>, etc.

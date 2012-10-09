@@ -14,11 +14,13 @@ package dfh.grammar;
  * Used in rules such as
  * 
  * <pre>
- *    &lt;a&gt; = ~ '1' &lt;rule&gt;
- *    &lt;b&gt; = ! '1' &lt;rule&gt;
- *    &lt;c&gt; = ~ [ '1' | '2'] &lt;rule&gt;
- *    &lt;d&gt; = ~ '1' &lt;rule&gt;
- * &lt;rule&gt; = /\b\d++/
+ * {@code
+ *    <a> = ~ '1' <rule>
+ *    <b> = ! '1' <rule>
+ *    <c> = ~ [ '1' | '2'] <rule>
+ *    <d> = ~ '1' <rule>
+ * <rule> = /\b\d++/
+ * }
  * </pre>
  * 
  * The <code>~</code> and <code>!</code> mark positive and negative assertions,

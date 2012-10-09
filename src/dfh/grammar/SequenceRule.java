@@ -20,7 +20,9 @@ import java.util.Set;
  * Matches a sequence of sub-rules. E.g.,
  * 
  * <pre>
- * &lt;a&gt; = &lt;b&gt; &lt;c&gt;
+ * {@code 
+ * <a> = <b> <c>
+ * }
  * </pre>
  * 
  * @author David Houghton

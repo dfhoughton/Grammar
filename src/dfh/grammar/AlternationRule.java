@@ -19,7 +19,9 @@ import java.util.Set;
  * The object implementing rules such as
  * 
  * <pre>
- * &lt;a&gt; = &lt;b&gt; | &lt;c&gt;
+ * {@code
+ * <a> = <b> | <c>
+ * }
  * </pre>
  * 
  * @author David Houghton
@@ -117,9 +119,10 @@ public class AlternationRule extends Rule implements Serializable,
 			Set<String> tags;
 			if (r instanceof CyclicRule)
 				tags = tagMap.get(((CyclicRule) r).r.uniqueId());
-			else if (r instanceof DeferredDefinitionRule)
-				tags = tagMap.get(((DeferredDefinitionRule) r).r.uniqueId());
-			else
+			else if (r instanceof DeferredDefinitionRule) {
+				DeferredDefinitionRule ddr = (DeferredDefinitionRule) r;
+				tags = tagMap.get(ddr.r == null ? ddr.uniqueId() : ddr.r.uniqueId());
+			} else
 				tags = tagMap.get(r.uniqueId());
 			if (nonInitial)
 				b.append(" | ");

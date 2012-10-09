@@ -14,12 +14,11 @@ package dfh.grammar;
  * Used in rules such as
  * 
  * <pre>
- * &lt;a&gt; = /\d++/ (less_than_20)
+ * {@code
+ * <a> = /\d++/ (less_than_20)
+ * }
  * </pre>
  * 
- * where <code>{less_than_20}</code> must later be defined by invoking
- * {@link LeafRule#conditionalize(Condition, String)}.
- * <p>
  * <b>Creation date:</b> Apr 5, 2011
  * 
  * @author David Houghton

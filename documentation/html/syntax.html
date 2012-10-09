@@ -504,6 +504,51 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 		. Logical conditions short circuit, so it's best to test your cheap
 		conditions before your expensive ones.
 	</p>
+	<h4>
+		The &ldquo;exclusive or&rdquo;
+		<code>^</code>
+	</h4>
+	<p>
+		The exclusive or operator for logical conditions is better thought of
+		as an <em>exists-one operator</em>. That is, it is true if one and
+		only one of its operands is true. When it has only two operands, this
+		is equivalent to logical exclusive or (&oplus;). If it has more than
+		two, it is not. If <i>p</i>, <i>q</i>, and <i>r</i> are true, <i>p</i>&nbsp;&oplus;&nbsp;<i>q</i>&nbsp;&oplus;&nbsp;<i>r</i>
+		is true: <i>p</i>&nbsp;&oplus;&nbsp;<i>q</i>&nbsp;&oplus;&nbsp;<i>r</i>
+		= (<i>p</i>&nbsp;&oplus;&nbsp;<i>q</i>)&nbsp;&oplus;&nbsp;<i>r</i> =
+		<code>false</code>
+		&nbsp;&oplus;&nbsp;
+		<code>true</code>
+		=
+		<code>true</code>
+		; <i>p</i>&nbsp;^&nbsp;<i>q</i>&nbsp;^&nbsp;<i>r</i>, however, where ^
+		is the operator used in
+		<code>dfh.grammar</code>
+		's conditions, is false, because three, not one, of the operands is
+		true. If we add parentheses, however, they are again equivalent: (<i>p</i>&nbsp;^&nbsp;<i>q</i>)&nbsp;^&nbsp;<i>r</i>
+		=
+		<code>false</code>
+		&nbsp;^&nbsp;
+		<code>true</code>
+		=
+		<code>true</code>
+		. The key thing to remember is that <i>p</i>&nbsp;&oplus;&nbsp;<i>q</i>&nbsp;&oplus;&nbsp;<i>r</i>
+		= (<i>p</i>&nbsp;&oplus;&nbsp;<i>q</i>)&nbsp;&oplus;&nbsp;<i>r</i> but
+		<i>p</i>&nbsp;^&nbsp;<i>q</i>&nbsp;^&nbsp;<i>r</i> &ne; (<i>p</i>&nbsp;^&nbsp;<i>q</i>)&nbsp;^&nbsp;<i>r</i>.
+		In other words, &oplus; is an ordinary binary operator but ^ is an
+		n-ary operator masquerading as in infix binary operator. A sequence of
+		operands joined by ^ will be evaluated jointly, not in pairs.
+	</p>
+	<p>Why do things this way? Isn't this confusing? Well, I figure an
+		exists-one operator is much more useful in the case where one has more
+		than one operand. Logical exclusive or then tells you when the number
+		of true operands is odd, which is seldom what you want. The exists-one
+		operator tells you whether there is a unique true condition, which is
+		more frequently what you want to know. And in any case, most often you
+		just have two operands anyway, and when you don't you can always add
+		in parentheses to restore the logical xor semantics. Couldn't this be
+		done by adding a separate n-ary operator convention? Yes. I guess I
+		value concision over consistency.</p>
 	<h2>Assertions</h2>
 	<p>Assertions are in effect special conditions that may appear
 		anywhere in a rule. They do not move the character matching offset but
@@ -875,7 +920,7 @@ System.out.println(opt.end());       // 10</pre>
 		is the counterpart of
 		<code>start</code>
 		: if you do not wish any matches to include indices beyond a
-		particular offset, you must send the
+		particular offset, you must set the
 		<code>end</code>
 		.
 	</p>
@@ -992,7 +1037,7 @@ System.out.println(opt.maxRecursionDepth());       // 10</pre>
 		alternate and tries the next.
 	</p>
 	<h3>study</h3>
-	<pre>Options opt = new Options().study(false); // <b>default: true</b>
+	<pre>Options opt = new Options().study(true); // <b>default: false</b>
 System.out.println(opt.study());          // false</pre>
 	<p>
 		One way to accelerate matching is to &ldquo;study&rdquo; the character
@@ -1006,11 +1051,7 @@ System.out.println(opt.study());          // false</pre>
 		and
 		<code>lookingAt</code>
 		methods both consider only a single offset, so most of the work done
-		studying is wasted. If you call
-		<code>find</code>
-		without any options, the sequence will be studied. Likewise, if you
-		call the other two without specifying any options the sequence will
-		not be studied.
+		studying is wasted.
 	</p>
 	<h3>fat memory</h3>
 	<pre>Options opt = new Options().fatMemory(true); // <b>default: false</b>

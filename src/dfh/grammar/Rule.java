@@ -19,13 +19,12 @@ import java.util.TreeSet;
 import dfh.grammar.Assertion.AssertionMatcher;
 
 /**
- * A {@link Matcher} generator. <code>Rules</code> generate
- * <code>Matchers</code> with properly initialized state but have no dynamic
- * state of their own. It is convenient to define <code>Matchers</code> as inner
- * classes of their <code>Rules</code>, since one generally doesn't interact
- * with them apart from their rules and they need access to the
- * <code>Rule</code> that generated them in order to include a reference to it
- * in the {@link Match} nodes they generate.
+ * A {@link Matcher} generator. {@code Rules} generate {@code Matchers} with
+ * properly initialized state but have no dynamic state of their own. It is
+ * convenient to define {@code Matchers} as inner classes of their {@code Rules}
+ * , since one generally doesn't interact with them apart from their rules and
+ * they need access to the {@code Rule} that generated them in order to include
+ * a reference to it in the {@link Match} nodes they generate.
  * <p>
  * <b>Creation date:</b> Feb 19, 2011
  * 
@@ -34,8 +33,8 @@ import dfh.grammar.Assertion.AssertionMatcher;
 public abstract class Rule {
 
 	/**
-	 * The rule's name. Though it is not <code>final</code>, it should be
-	 * treated as such.
+	 * The rule's name. Though it is not {@code final}, it should be treated as
+	 * such.
 	 */
 	protected Label label;
 	/**
@@ -57,8 +56,10 @@ public abstract class Rule {
 	 * labels are assigned like so:
 	 * 
 	 * <pre>
+	 * {@code 
 	 * foo = [{bar,quux} "the rule" ]
 	 * baz = "qux" [{twiddle} /in line regex/ ]
+	 * }
 	 * </pre>
 	 * 
 	 * That is, it is a pure "named capture".
@@ -71,7 +72,7 @@ public abstract class Rule {
 	 */
 	Rule unreversed;
 	/**
-	 * Set to <code>true</code> by {@link CyclicRule#setRule(Rule)} to enable
+	 * Set to {@code true} by {@link CyclicRule#setRule(Rule)} to enable
 	 * checking for maximum cycle depth.
 	 */
 	protected boolean cycle = false;
@@ -104,10 +105,10 @@ public abstract class Rule {
 	}
 
 	/**
-	 * Unique tag associated with the <code>Rule</code>. The label corresponds
-	 * to the part of a rule definition to the left of the "=".
+	 * Unique tag associated with the {@code Rule}. The label corresponds to the
+	 * part of a rule definition to the left of the "=".
 	 * 
-	 * @return unique tag associated with the <code>Rule</code>
+	 * @return unique tag associated with the {@code Rule}
 	 */
 	public Label label() {
 		return label;
@@ -369,8 +370,8 @@ public abstract class Rule {
 	/**
 	 * Returns whether this rule can match the null string. This method is used
 	 * in {@link #study(CharSequence, Map[], GlobalState) studying} in
-	 * {@link CharSequence}. When in doubt, default to <code>true</code>. This
-	 * may make the matching less efficient but is less likely to cause the
+	 * {@link CharSequence}. When in doubt, default to {@code true}. This may
+	 * make the matching less efficient but is less likely to cause the
 	 * {@link Grammar} to miss a match.
 	 * <p>
 	 * Note that {@link LiteralRule} and {@link LeafRule} both return false.
@@ -401,9 +402,9 @@ public abstract class Rule {
 
 	/**
 	 * Returns a {@link Rule} that matches the mirror image of the strings
-	 * matched by this. If this {@link Rule} matches <code>ab+</code>, its
-	 * reverse will match <code>b+a</code>. If it matches <code>abc</code>, it's
-	 * reverse will match <code>cba</code>.
+	 * matched by this. If this {@link Rule} matches {@code ab+}, its reverse
+	 * will match {@code b+a}. If it matches {@code abc}, it's reverse will
+	 * match {@code cba}.
 	 * <p>
 	 * Reversed rules are necessary for variable length backwards look-behind
 	 * assertions. They need not, and should not, implement studying or make any
@@ -490,8 +491,8 @@ public abstract class Rule {
 
 	/**
 	 * find {@link AlternationRule} rules and fix {@link AlternationRule#tagMap}
-	 * so that there is mapping from {@link CyclicRule#r#uid()} or
-	 * {@link DeferredDefinitionRule#r#uid()}to the proper tag set.
+	 * so that there is mapping from a {@link CyclicRule} {@code r.uid()} or
+	 * {@link DeferredDefinitionRule} {@code r.uid()} to the proper tag set.
 	 * <p>
 	 * This really need only be overridden in non-terminal rules.
 	 */
@@ -691,7 +692,9 @@ public abstract class Rule {
 	 * *left-headed* cycle, that is, a rule such as
 	 * 
 	 * <pre>
-	 * a = &lt;a&gt; 'b' | 'c'
+	 * {@code 
+	 * a = <a> 'b' | 'c'
+	 * }
 	 * </pre>
 	 * 
 	 * where the match graph can potentially branch leftward forever without
@@ -722,7 +725,7 @@ public abstract class Rule {
 	 * 
 	 * @param i
 	 * @param m
-	 * @return
+	 * @return a terminal node with the correct offsets and rule
 	 */
 	public Match checkCacheSlip(int i, Match m) {
 		return null;

@@ -14,11 +14,13 @@ package dfh.grammar;
  * Used in rules such as
  * 
  * <pre>
- * &lt;a&gt; = &lt;b&gt; 'foo' 1
+ * {@code
+ * <a> = <b> 'foo' 1
+ * }
  * </pre>
  * 
  * where 1 in this case refers back to whatever string was matched by
- * <code>&lt;b&gt;</code>.
+ * {@code <b>}.
  * <p>
  * <b>Creation date:</b> Mar 22, 2011
  * 

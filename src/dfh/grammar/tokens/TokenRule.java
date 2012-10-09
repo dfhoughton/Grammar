@@ -219,6 +219,7 @@ public class TokenRule<K extends Token> extends Rule implements Cloneable,
 	/**
 	 * See {@link #mayBeZeroWidth(Map)}
 	 */
+	@Override
 	public boolean zeroWidth() {
 		return false;
 	}

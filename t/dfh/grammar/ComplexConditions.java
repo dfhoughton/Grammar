@@ -82,6 +82,31 @@ public class ComplexConditions {
 	}
 
 	@Test
+	public void complexXor1() {
+		String[] rules = {
+		//
+		"ROOT = /\\d++/ (eq5 ^ eq5 ^ lt100)",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("eq5", eq5);
+		g.defineCondition("lt100", lt100);
+		assertNull("complex xor acts like exists-one", g.matches("5").match());
+	}
+
+	@Test
+	public void complexXor2() {
+		String[] rules = {
+		//
+		"ROOT = /\\d++/ ((eq5 ^ eq5) ^ lt100)",//
+		};
+		Grammar g = new Grammar(rules);
+		g.defineCondition("eq5", eq5);
+		g.defineCondition("lt100", lt100);
+		assertNotNull("xor acts like logical xor when binary", g.matches("5")
+				.match());
+	}
+
+	@Test
 	public void simpleXorNeg() {
 		String[] rules = {
 		//
