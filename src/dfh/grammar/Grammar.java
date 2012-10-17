@@ -237,15 +237,19 @@ public class Grammar implements Serializable {
 				boolean ltm) {
 			super(options);
 			this.startOffsets = startOffsets;
-			this.cache = cache;
 			this.ltm = ltm;
-			index = options.study && !startOffsets.isEmpty() ? startOffsets
-					.removeFirst() : options.start;
-			firstMatch = true;
-			m = root.matcher(index, cache, this);
-			if (ltm)
-				ltmm = new LTMMatcher(m);
-			next = fetchNext();
+			if (options.indexed && startOffsets.isEmpty()) {
+				next = null;
+			} else {
+				this.cache = cache;
+				index = options.indexed ? startOffsets.removeFirst()
+						: options.start;
+				firstMatch = true;
+				m = root.matcher(index, cache, this);
+				if (ltm)
+					ltmm = new LTMMatcher(m);
+				next = fetchNext();
+			}
 		}
 
 		@Override
@@ -259,7 +263,7 @@ public class Grammar implements Serializable {
 		}
 
 		private Match fetchNext() {
-			if (options.study && index == -1)
+			if (options.indexed && index == -1)
 				return null;
 			boolean firstNull = true;
 			while (true) {
@@ -280,7 +284,7 @@ public class Grammar implements Serializable {
 				}
 				if (n != null) {
 					if (!options.allowOverlap) {
-						if (options.study) {
+						if (options.indexed) {
 							index = -1;
 							while (!startOffsets.isEmpty()) {
 								index = startOffsets.removeFirst();
@@ -295,7 +299,7 @@ public class Grammar implements Serializable {
 					return n;
 				}
 				if (!(firstNull && !options.allowOverlap)) {
-					if (options.study) {
+					if (options.indexed) {
 						if (startOffsets.isEmpty())
 							break;
 						index = startOffsets.removeFirst();
@@ -530,8 +534,8 @@ public class Grammar implements Serializable {
 	 * this parameter if you wish to use your own {@link Reversible}
 	 * {@link Rule} in a backwards {@link Assertion}, as rules defined by
 	 * {@link #defineRule(String, Rule)} cannot be used in backwards assertions
-	 * -- assertions equivalent to {@code (?<=...)} and {@code (?<!...)}
-	 * in ordinary Java regular expressions.
+	 * -- assertions equivalent to {@code (?<=...)} and {@code (?<!...)} in
+	 * ordinary Java regular expressions.
 	 * <p>
 	 * <em>NOTE:</em> precompiled rules must implement {@link Cloneable}. They
 	 * will be cloned. This protects state variables such as
@@ -826,7 +830,7 @@ public class Grammar implements Serializable {
 
 			@Override
 			public synchronized boolean mightHaveNext() {
-				if (options.study && startOffsets.isEmpty())
+				if (options.indexed && startOffsets.isEmpty())
 					return false;
 				try {
 					return matchedOnce ? false : (ltm ? ltmm.hasNext() : m
@@ -839,7 +843,7 @@ public class Grammar implements Serializable {
 			@Override
 			public synchronized Match match() {
 				Match n = null;
-				if (!(matchedOnce || options.study && startOffsets.isEmpty())) {
+				if (!(matchedOnce || options.indexed && startOffsets.isEmpty())) {
 					matchedOnce = true;
 					try {
 						n = ltm ? ltmm.match() : m.match();
@@ -856,38 +860,39 @@ public class Grammar implements Serializable {
 				return m.rightmost;
 			}
 
-		} : new LookingAtMatcher() {
+		}
+				: new LookingAtMatcher() {
 
-			@Override
-			public synchronized boolean mightHaveNext() {
-				if (options.study && startOffsets.isEmpty())
-					return false;
-				try {
-					return ltm ? ltmm.hasNext() : m.mightHaveNext();
-				} catch (DoubleColonBarrier e) {
-					return false;
-				}
-			}
+					@Override
+					public synchronized boolean mightHaveNext() {
+						if (options.indexed && startOffsets.isEmpty())
+							return false;
+						try {
+							return ltm ? ltmm.hasNext() : m.mightHaveNext();
+						} catch (DoubleColonBarrier e) {
+							return false;
+						}
+					}
 
-			@Override
-			public synchronized Match match() {
-				Match n = null;
-				if (!(options.study && startOffsets.isEmpty())) {
-					try {
-						n = ltm ? ltmm.match() : m.match();
-					} catch (DoubleColonBarrier e) {
+					@Override
+					public synchronized Match match() {
+						Match n = null;
+						if (!(options.indexed && startOffsets.isEmpty())) {
+							try {
+								n = ltm ? ltmm.match() : m.match();
+							} catch (DoubleColonBarrier e) {
+								return bad(m);
+							}
+							return maybeGood(n, m);
+						}
 						return bad(m);
 					}
-					return maybeGood(n, m);
-				}
-				return bad(m);
-			}
 
-			@Override
-			public Match rightmostMatch() {
-				return m.rightmost;
-			}
-		};
+					@Override
+					public Match rightmostMatch() {
+						return m.rightmost;
+					}
+				};
 	}
 
 	/**
@@ -1165,13 +1170,13 @@ public class Grammar implements Serializable {
 
 			@Override
 			public boolean mightHaveNext() {
-				if (options.study && startOffsets.isEmpty())
+				if (options.indexed && startOffsets.isEmpty())
 					return false;
 				return !options.allowOverlap && matchedOnce || next != null;
 			}
 
 			private Match fetchNext() {
-				if (options.study && startOffsets.isEmpty())
+				if (options.indexed && startOffsets.isEmpty())
 					return null;
 				Match n;
 				try {
@@ -1269,6 +1274,11 @@ public class Grammar implements Serializable {
 					}
 				}
 			}
+		}
+		if (options.indexer != null) {
+			startOffsets.clear();
+			startOffsets.addAll(options.indexer.index(options.cs,
+					options.start, options.end));
 		}
 		return startOffsets;
 	}

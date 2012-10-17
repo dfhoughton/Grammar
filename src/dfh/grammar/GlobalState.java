@@ -22,7 +22,7 @@ import java.io.PrintStream;
  * 
  */
 public class GlobalState {
-	public final boolean allowOverlap, study, keepRightmost;
+	public final boolean allowOverlap, study, keepRightmost, indexed;
 	public final int start, end, rcsEnd;
 	public final PrintStream trace;
 	public final boolean debug;
@@ -31,6 +31,7 @@ public class GlobalState {
 	public final ReversedCharSequence rcs;
 	public final boolean isReversed;
 	public final int length;
+	public final Indexer indexer;
 
 	/**
 	 * Constructor called in {@link Grammar} only.
@@ -41,7 +42,8 @@ public class GlobalState {
 	GlobalState(CharSequence cs, Options o) {
 		this(cs, new ReversedCharSequence(cs), false, o.allowOverlap, o.start,
 				o.end == -1 || o.end > cs.length() ? cs.length() : o.end,
-				o.maxRecursionDepth, o.trace, o.study, o.keepRightmost);
+				o.maxRecursionDepth, o.trace, o.study, o.keepRightmost,
+				o.indexer);
 	}
 
 	/**
@@ -61,12 +63,13 @@ public class GlobalState {
 		keepRightmost = gs.keepRightmost;
 		debug = gs.debug;
 		rcsEnd = gs.rcsEnd;
-		study = false;
+		indexed = study = false;
 		length = gs.length;
+		indexer = null;
 	}
 
 	/**
-	 * Used for creating global state with studing turned off slightly more
+	 * Used for creating global state with studying turned off slightly more
 	 * efficiently.
 	 * 
 	 * @param gs
@@ -83,8 +86,9 @@ public class GlobalState {
 		keepRightmost = gs.keepRightmost;
 		debug = gs.debug;
 		rcsEnd = gs.rcsEnd;
-		study = false;
+		indexed = study = false;
 		length = gs.length;
+		indexer = null;
 	}
 
 	/**
@@ -104,7 +108,7 @@ public class GlobalState {
 	private GlobalState(CharSequence cs, ReversedCharSequence rcs,
 			boolean isReversed, boolean allowOverlap, int start, int end,
 			int maxDepth, PrintStream trace, boolean study,
-			boolean keepRightmost) {
+			boolean keepRightmost, Indexer indexer) {
 		this.cs = cs;
 		this.rcs = rcs;
 		this.isReversed = isReversed;
@@ -118,6 +122,8 @@ public class GlobalState {
 		this.rcsEnd = rcs.translate(start) + 1;
 		this.study = study;
 		this.length = end - start;
+		this.indexer = indexer;
+		this.indexed = study || indexer != null;
 	}
 
 	/**

@@ -125,6 +125,28 @@ public class Options implements Cloneable {
 	int end = -1;
 	int longStringLength = LONG_STRING_LENGTH;
 	int maxRecursionDepth = MAX_RECURSION_DEPTH;
+	Indexer indexer;
+
+	/**
+	 * Gets {@link Indexer} to be used to accelerate matching.
+	 * 
+	 * @return {@link Indexer}, if any, used to accelerate matching
+	 */
+	public Indexer indexer() {
+		return indexer;
+	}
+
+	/**
+	 * Sets {@link Indexer} to be used to accelerate matching.
+	 * 
+	 * @param indexer
+	 *            {@link Indexer} to be used to accelerate matching
+	 * @return self to allow chaining of methods
+	 */
+	public Options indexer(Indexer indexer) {
+		this.indexer = indexer;
+		return this;
+	}
 
 	/**
 	 * @return see {@link #MAX_RECURSION_DEPTH}
