@@ -1,4 +1,5 @@
 2.10
+  * added Indexer to accelerate matching
 
 2.09, 5 October 2012
   * added child(int) to Match
