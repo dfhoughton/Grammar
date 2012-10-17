@@ -10,7 +10,9 @@ section at the end of the document.
 . add option to turn off condition testing
 . bail out of recursion via exception rather than the current laborious and expensive reeling in of failed tries
 . added unit tests for Match.hasLabel(String), which appears to have a latent bug having to do with alternations
-. add option to discover start offsets for matches via some index expression
+* add option to discover start offsets for matches via some index expression
+. create benchmarks for indexers
+. document indexers in performance and syntax portions of HTML documentation
 
 COMPLETED
 =========
