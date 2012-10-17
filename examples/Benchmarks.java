@@ -25,20 +25,18 @@ public class Benchmarks {
 	 * {@code
 	 * USAGE: EXECUTABLE [options]
 	 * 
-	 *   A basic set of benchmark tests comparing grammars using various parameters to 
-	 *   equivalent regular expressions.
+	 *   A basic set of benchmark tests comparing grammar matching speed with and 
+	 *   without indexers.
 	 * 
-	 *     --group -g   <val>  number or iterations to time together to overcome the
-	 *                         limitations of millisecond time granularity; default: 
-	 *                         2000
-	 *     --trials -t  <val>  number of groups to time; default: 50
-	 *     --trim       <val>  fraction of time-sorted trials to discard from the high
-	 *                         and low ends of the sort to eliminate outliers; default:
-	 *                         0.1
-	 *     --warmup -w  <val>  number to iterations to warm up the JIT compiler;
-	 *                         default: 50000
-	 *     --cache -c   <val>  match cache type; one of {tree,hash,array} default:
-	 *                         array
+	 *     --group -g   <int>  number or iterations to time together to overcome the
+	 *                         limitations of millisecond time granularity; value must 
+	 *                         be > 0; default: 2000
+	 *     --trials -t  <int>  number of groups to time; value must be > 0; default: 50
+	 *     --trim       <fp>   fraction of time-sorted trials to discard from the high
+	 *                         and low ends of the sort to eliminate outliers; value 
+	 *                         must be in interval [0, 0.25); default: 0.1
+	 *     --warmup -w  <int>  number to iterations to warm up the JIT compiler; value
+	 *                         must be >= 0; default: 50000
 	 * 
 	 *     --help -? -h        print usage information
 	 * }
