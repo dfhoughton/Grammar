@@ -6,19 +6,21 @@ import java.util.regex.Pattern;
 
 import dfh.cli.Cli;
 import dfh.cli.rules.Range;
-import dfh.cli.rules.StrSet;
+import dfh.grammar.CharacterIndexer;
 import dfh.grammar.Grammar;
 import dfh.grammar.GrammarException;
+import dfh.grammar.Indexer;
 import dfh.grammar.Matcher;
 import dfh.grammar.Options;
+import dfh.grammar.PatternIndexer;
+import dfh.grammar.StringIndexer;
 
-public class Benchmarks {
+public class IndexBenchmarks {
 
 	private static int warmup;
 	private static Integer trials;
 	private static Integer group;
 	private static double trim;
-	private static String cache;
 
 	/**
 	 * <pre>
@@ -37,8 +39,6 @@ public class Benchmarks {
 	 *                         0.1
 	 *     --warmup -w  <val>  number to iterations to warm up the JIT compiler;
 	 *                         default: 50000
-	 *     --cache -c   <val>  match cache type; one of {tree,hash,array} default:
-	 *                         array
 	 * 
 	 *     --help -? -h        print usage information
 	 * }
@@ -67,9 +67,6 @@ public class Benchmarks {
 				{ { "warmup", 'w', Integer.class, 50000 },
 						{ "number to iterations to warm up the JIT compiler" },
 						{ Range.nonNegative() } },//
-				{ { "cache", 'c', String.class, "array" },
-						{ "match cache type" },
-						{ new StrSet("array", "tree", "hash") } },//
 		};
 		Cli cli = new Cli(spec);
 		cli.parse(args);
@@ -78,12 +75,10 @@ public class Benchmarks {
 		warmup = cli.integer("warmup");
 		group = cli.integer("group");
 		trim = cli.dbl("trim");
-		cache = cli.string("cache");
 		test1();
 		test2();
 		test3();
 		test4();
-		test5();
 		longStringTest();
 	}
 
@@ -92,62 +87,116 @@ public class Benchmarks {
 		//
 		"<ROOT> = 'a' | 'b'",//
 		};
-		Pattern p = Pattern.compile("[ab]");
+		CharacterIndexer p = new CharacterIndexer('a');
+		StringIndexer q = new StringIndexer("a");
+		PatternIndexer r = new PatternIndexer(Pattern.compile("a"));
 		String s = "qewrqewrqewraqwreqewr";
 		Grammar g = new Grammar(rules);
-		iterate(p, g, s, false);
+		iterate(p, q, r, g, s, false);
 	}
 
-	private static void iterate(Pattern p, Grammar g, String s,
-			boolean allMatches) {
+	private static void test2() {
+		String[] rules = {
+				//
+				"<ROOT> = <a> | <b>", //
+				"<a> = <foo> <s> <bar>",//
+				"<b> = <quux> <s> <baz>",//
+				"<s> = /\\s++/",//
+				"<foo> = /foo/",//
+				"<bar> = /bar/",//
+				"<quux> = /quux/",//
+				"<baz> = /baz/",//
+		};
+		String s = "foo bar";
+		Grammar g = new Grammar(rules);
+		iterate(null, null, new PatternIndexer(Pattern.compile("foo|quux")), g,
+				s, false);
+	}
+
+	private static void test3() {
+		String[] rules = {
+				//
+				"<ROOT> = [ <c> | <d> ]{2} <d>",//
+				"<c> = <a>{,2}",//
+				"<d> = <a> <b>",//
+				"<a> = /a/",//
+				"<b> = /b/",//
+		};
+		CharacterIndexer p = new CharacterIndexer('a');
+		StringIndexer q = new StringIndexer("a");
+		PatternIndexer r = new PatternIndexer(Pattern.compile("a"));
+		String s = "aabb";
+		Grammar g = new Grammar(rules);
+		iterate(p, q, r, g, s, false);
+	}
+
+	private static void longStringTest() throws IOException {
+		String[] rules = {
+		//
+		"<ROOT> = 'cat' | 'dog' | 'monkey'",//
+		};
+		Pattern p = Pattern.compile("cat|dog|monkey");
+		StringBuilder b = new StringBuilder();
+		for (int i = 0; i < 1000; i++) {
+			b.append("__________");
+			switch (i % 3) {
+			case 0:
+				b.append("cat");
+				break;
+			case 1:
+				b.append("dog");
+				break;
+			case 2:
+				b.append("monkey");
+			}
+		}
+		String s = b.toString();
+		Grammar g = new Grammar(rules);
+		iterate(null, null, new PatternIndexer(p), g, s, false);
+	}
+
+	private static void iterate(CharacterIndexer p, StringIndexer q,
+			PatternIndexer r, Grammar g, String s, boolean allMatches) {
+		Options opt = new Options();
+		opt.fatMemory(true);
+		opt.longestMatch(false);
 		System.out.println("=============\n");
 		System.out.println("string: "
 				+ (s.length() > 60 ? s.substring(0, 60) + "... (length "
 						+ s.length() + ")" : s));
 		System.out.println();
-		System.out.println("pattern: " + p);
-		for (int i = 0; i < warmup; i++) {
-			if (allMatches) {
-				java.util.regex.Matcher m = p.matcher(s);
-				while (m.find())
-					;
-			} else {
-				p.matcher(s).find();
-			}
-		}
-		List<Long> times = new ArrayList<Long>();
-		for (int i = 0; i < trials; i++) {
-			long t1 = System.currentTimeMillis();
-			for (int j = 0; j < group; j++) {
-				if (allMatches) {
-					java.util.regex.Matcher m = p.matcher(s);
-					while (m.find())
-						;
-				} else {
-					p.matcher(s).find();
-				}
-			}
-			times.add(System.currentTimeMillis() - t1);
-		}
-		trimmedMean(times);
-		times.clear();
-		Options opt = new Options();
-		if (cache.equals("array"))
-			opt.fatMemory(true);
-		else if (cache.equals("hash"))
-			opt.longStringLength(1);
-		else if (cache.equals("tree"))
-			opt.leanMemory(true);
-		opt.longestMatch(false);
 		System.out.println(g.describe());
+		iterate(g, s, allMatches, opt, p);
+		iterate(g, s, allMatches, opt, q);
+		iterate(g, s, allMatches, opt, r);
+	}
+
+	private static void iterate(Grammar g, String s, boolean allMatches,
+			Options opt, Indexer i) {
+		if (i == null)
+			return;
+		System.out.println();
+		System.out.println("indexer: " + i);
+		System.out.println();
+		List<Long> times = new ArrayList<Long>();
 		System.out.println("with studying");
-		timeGrammar(g, s, allMatches, times, opt);
+		timeGrammar(g, s, allMatches, times, opt, i);
 		System.out.println("without studying");
-		timeGrammar(g, s, allMatches, times, opt);
+		timeGrammar(g, s, allMatches, times, opt, i);
 		System.out.println("with studying using LTM");
 		opt.study(true);
 		opt.longestMatch(true);
+		timeGrammar(g, s, allMatches, times, opt, i);
+	}
+
+	private static void timeGrammar(Grammar g, String s, boolean allMatches,
+			List<Long> times, Options opt, Indexer p) {
+		Options indexed = new Options(opt);
+		indexed.indexer(p);
 		timeGrammar(g, s, allMatches, times, opt);
+		System.out.println("with index");
+		timeGrammar(g, s, allMatches, times, indexed);
+		System.out.println();
 	}
 
 	private static void timeGrammar(Grammar g, String s, boolean allMatches,
@@ -189,40 +238,7 @@ public class Benchmarks {
 		System.out.printf("%.5f milliseconds per sequence%n", avg);
 	}
 
-	private static void test2() throws IOException {
-		String[] rules = {
-				//
-				"<ROOT> = <a> | <b>", //
-				"<a> = <foo> <s> <bar>",//
-				"<b> = <quux> <s> <baz>",//
-				"<s> = /\\s++/",//
-				"<foo> = /foo/",//
-				"<bar> = /bar/",//
-				"<quux> = /quux/",//
-				"<baz> = /baz/",//
-		};
-		Pattern p = Pattern.compile("foo\\s++bar|quux\\s++baz");
-		String s = "foo bar";
-		Grammar g = new Grammar(rules);
-		iterate(p, g, s, false);
-	}
-
-	private static void test3() throws IOException {
-		String[] rules = {
-				//
-				"<ROOT> = [ <c> | <d> ]{2} <d>",//
-				"<c> = <a>{,2}",//
-				"<d> = <a> <b>",//
-				"<a> = /a/",//
-				"<b> = /b/",//
-		};
-		Pattern p = Pattern.compile("(?:a{0,2}|a{0,2}b){2}b");
-		String s = "aabb";
-		Grammar g = new Grammar(rules);
-		iterate(p, g, s, false);
-	}
-
-	private static void test4() throws IOException {
+	private static void test4() {
 		String[] rules = {
 				//
 				"<ROOT> = <c> | <d>",//
@@ -232,45 +248,6 @@ public class Benchmarks {
 		Pattern p = Pattern.compile("[ab]");
 		String s = "qewrqewrqewraqwreqewr";
 		Grammar g = new Grammar(rules);
-		iterate(p, g, s, false);
-	}
-
-	private static void test5() throws IOException {
-		String[] rules = {
-				//
-				"<ROOT> = [ <a> | <b> ]{2} <b>",//
-				"<a> = 'a'{,2}",//
-				"<b> = 'ab'",//
-		};
-		Pattern p = Pattern.compile("(?:a{0,2}|ab){2}ab");
-		String s = "aabb";
-		Grammar g = new Grammar(rules);
-		iterate(p, g, s, false);
-	}
-
-	private static void longStringTest() throws IOException {
-		String[] rules = {
-		//
-		"<ROOT> = 'cat' | 'dog' | 'monkey'",//
-		};
-		Pattern p = Pattern.compile("cat|dog|monkey");
-		StringBuilder b = new StringBuilder();
-		for (int i = 0; i < 1000; i++) {
-			b.append("__________");
-			switch (i % 3) {
-			case 0:
-				b.append("cat");
-				break;
-			case 1:
-				b.append("dog");
-				break;
-			case 2:
-				b.append("monkey");
-			}
-		}
-		String s = b.toString();
-		Grammar g = new Grammar(rules);
-		iterate(p, g, s, true);
-
+		iterate(null, null, new PatternIndexer(p), g, s, false);
 	}
 }

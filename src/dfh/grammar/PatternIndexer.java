@@ -27,6 +27,11 @@ public class PatternIndexer implements Indexer {
 		this.p = p;
 	}
 
+	@Override
+	public String toString() {
+		return PatternIndexer.class.getSimpleName() + '(' + p + ')';
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

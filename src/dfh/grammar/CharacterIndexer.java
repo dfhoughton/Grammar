@@ -26,6 +26,11 @@ public class CharacterIndexer implements Indexer {
 		this.clue = clue;
 	}
 
+	@Override
+	public String toString() {
+		return CharacterIndexer.class.getSimpleName() + '(' + clue + ')';
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

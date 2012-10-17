@@ -26,6 +26,11 @@ public class StringIndexer implements Indexer {
 		this.clue = clue;
 	}
 
+	@Override
+	public String toString() {
+		return StringIndexer.class.getSimpleName() + '(' + clue + ')';
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
