@@ -80,8 +80,8 @@
 		<code>*?</code>
 		,
 		<code>{1,2}</code>
-		, etc. -- indicate repetitions. Constituents may be grouped with angle
-		brackets --
+		, etc. -- indicate repetitions. Constituents may be grouped with
+		square brackets --
 		<code> [ &lt;a&gt; &lt;b&gt; ]+ </code>
 		. Alternates are marked with
 		<code>|</code>
@@ -99,7 +99,7 @@
 		<code>&lt;ROOT&gt;</code>
 		. That is to say, we call it
 		<code>&lt;ROOT&gt;</code>
-		in the documentation, but in the grammar it may have any name: it is
+		in the documentation, but in the grammar it may have any name; it is
 		just the first rule listed. For the grammar to match a character
 		sequence the root rule must match. Constituent rules are invoked as
 		needed by other rules.
@@ -146,7 +146,7 @@
 		<ul>
 			<li>Because they are built up compositionally, they are easier
 				to read.
-			<li>You can iterate over all possible matches of a patter
+			<li>You can iterate over all possible matches of a pattern
 				against a sequence, not just non-overlapping matches.
 			<li>You can create your own arbitrary extensions to <code>dfh.grammar.Rule</code>,
 				allowing matches against character sequences conditioned on
@@ -171,7 +171,7 @@
 		The examples below are just that: examples. For a more complete survey
 		of how grammars can be instantiated, manipulated, and used, see the
 		code in the test directory,
-		<code>/</code>
+		<code>t/</code>
 		, or the examples directory,
 		<code>examples/</code>
 		.
@@ -190,7 +190,11 @@
 		second, some prefix of the sequence, and the third, anywhere.
 	</div>
 	<div>
-		<pre>		String[] rules = {
+		<pre>		String[] rules = {                  # <span class="fn"><code>dfh.grammar.Grammar</code> has several constructors. 
+		Generally in this documentation I show the constructor that takes an array of strings as its parameter. 
+		For longer grammars one should write the grammar in an external file and pass the constructor a file object 
+		or a reader. One can also construct a grammar from a single string, which will be extremely useful when Java 
+		finally supports multi-line strings.</span>
 				"&lt;ROOT&gt; = &lt;c&gt; &lt;d&gt;",
 				"&lt;c&gt; = &lt;a&gt;++",
 				"&lt;d&gt; = &lt;a&gt; &lt;b&gt;",
