@@ -459,13 +459,19 @@ with studying
 		<code>dfh.grammar.Grammar</code>
 		where you can use a
 		<code>java.util.regex.Pattern</code>
-		if you're concerned about speed. A compromise I sometimes use it to
-		use a regex or string index method to find a region of interest and
-		then
-		<code>Grammar.lookingAt()</code>
-		or
-		<code>Grammar.matches()</code>
-		to parse it.
+		if you're concerned about speed. If you have a complicated grammar
+		that seldom matches, you can accelerate a
+		<code>find()</code>
+		somewhat by using an
+		<code>dfh.grammar.Indexer</code>
+		to identify potential match positions. In effect this gives you
+		grammar parse trees with something more like regex matching speed.
+		Note that not all matching can be accelerated this way. See
+		<code>IndexerBenchmarks</code>
+		in
+		<code>examples/</code>
+		for performance gains or losses for various combinations of indexer,
+		grammar, and string.
 	</p>
 </body>
 </html>

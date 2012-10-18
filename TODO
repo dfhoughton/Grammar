@@ -12,7 +12,7 @@ section at the end of the document.
 . added unit tests for Match.hasLabel(String), which appears to have a latent bug having to do with alternations
 * add option to discover start offsets for matches via some index expression
 * create benchmarks for indexers
-. document indexers in performance and syntax portions of HTML documentation
+* document indexers in performance and syntax portions of HTML documentation
 
 COMPLETED
 =========

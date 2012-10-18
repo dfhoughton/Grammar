@@ -1038,7 +1038,7 @@ System.out.println(opt.maxRecursionDepth());       // 10</pre>
 	</p>
 	<h3>study</h3>
 	<pre>Options opt = new Options().study(true); // <b>default: false</b>
-System.out.println(opt.study());          // false</pre>
+System.out.println(opt.study());         // false</pre>
 	<p>
 		One way to accelerate matching is to &ldquo;study&rdquo; the character
 		sequence. Studying consists of finding all the positions at which
@@ -1052,6 +1052,53 @@ System.out.println(opt.study());          // false</pre>
 		<code>lookingAt</code>
 		methods both consider only a single offset, so most of the work done
 		studying is wasted.
+	</p>
+	<h3>indexer</h3>
+	<pre>Options opt = new Options().indexer(new CharacterIndexer('z')); // <b>default: null</b>
+System.out.println(opt.indexer());                              // CharacterIndexer(z)</pre>
+	<p>
+		Another way to accelerate matching is to use a
+		<code>dfh.grammar.Indexer</code>
+		. This is an object that chooses character offsets which might be the
+		start offset of a match. This is like studying but instead of caching
+		all terminal matches and determining possible start offsets, indexing
+		just finds the start offsets. If you do both (not generally wise),
+		studying will cache all terminal matches but indexing will generate
+		the start offsets tried.
+	</p>
+	<p>There are three indexers to choose from unless you write your
+		own:</p>
+	<dl>
+		<dt>
+			<code>CharacterIndexer</code>
+		</dt>
+		<dd>Any offset holding the character parameter will be tried.</dd>
+		<dt>
+			<code>StringIndexer</code>
+		</dt>
+		<dd>Any offset will be tried that begins the character sequence
+			represented by the string parameter.</dd>
+		<dt>
+			<code>PatternIndexer</code>
+		</dt>
+		<dd>A regular expression is matched against the character
+			sequence. Wherever it matches -- overlapping matches will be tried --
+			the grammar will be applied.</dd>
+	</dl>
+	<p>
+		The only indexer which is more or less guaranteed to accelerate
+		matching is the
+		<code>CharacterIndexer</code>
+		, but it is also the least likely to be applicable to most problems.
+		The
+		<code>PatternIndexer</code>
+		is by far the most flexible but incurs such overhead on its own that
+		it is unlikely to provide much acceleration except where the grammar
+		is complicated and seldom matches. See the
+		<code>IndexerBenchmarks</code>
+		class in
+		<code>examples/</code>
+		.
 	</p>
 	<h3>fat memory</h3>
 	<pre>Options opt = new Options().fatMemory(true); // <b>default: false</b>
