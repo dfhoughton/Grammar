@@ -2,7 +2,6 @@ Desired items are preceded by a '.'; completed items, by a '*'; discarded items,
 From time to time I will move the set of completed or discarded items to the COMPLETED
 section at the end of the document.
 
-- allow notation to selectively disable studying of certain expressions
 . clean up uid() uniqueId() business
 . make sure conditionalized terminals are being cached properly
 . profile some matching to figure out what could be optimized
@@ -10,9 +9,7 @@ section at the end of the document.
 . add option to turn off condition testing
 . bail out of recursion via exception rather than the current laborious and expensive reeling in of failed tries
 . added unit tests for Match.hasLabel(String), which appears to have a latent bug having to do with alternations
-* add option to discover start offsets for matches via some index expression
-* create benchmarks for indexers
-* document indexers in performance and syntax portions of HTML documentation
+. fix stingy matching regression
 
 COMPLETED
 =========
@@ -104,3 +101,7 @@ COMPLETED
 * document new whitespace rules
 * clean up javadocs
 * check for bugs when calling describe with incomplete grammar
+- allow notation to selectively disable studying of certain expressions
+* add option to discover start offsets for matches via some index expression
+* create benchmarks for indexers
+* document indexers in performance and syntax portions of HTML documentation
