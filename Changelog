@@ -1,6 +1,7 @@
 2.11
   * make LeafRule cloneable to facilitate adding precompiled reversed rules to
     grammars
+  * reporting line number of parsing errors in all cases
 
 2.10, 18 October 2012
   * added Indexer to accelerate matching

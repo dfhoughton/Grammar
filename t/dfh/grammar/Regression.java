@@ -156,4 +156,13 @@ public class Regression {
 		Grammar g = new Grammar(rules);
 		g.describe();
 	}
+	
+	@Test
+	public void stingySequence() {
+		Grammar g = new Grammar("foo = 'a'*?");
+		String s = "aaaa";
+		Matcher m = g.matches(s);
+		Match n = m.match();
+		assertNotNull(n);
+	}
 }
