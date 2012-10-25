@@ -159,18 +159,9 @@ public class Regression {
 	
 	@Test
 	public void stingySequence() {
-		String[] rules = {
-			//	
-				"station = <id_news> <subtitle>",//
-				"subtitle = <sep> <name>",//
-				"name = <word> [ ' ' <word> ]*?",//
-				"id_news = <word> [ ' ' <word> ]*?",//
-				"sep = ': '",//
-				"word = 'a'",//
-		};
-		Grammar g = new Grammar(rules);
-		String s = "a: a a a a";
-		Matcher m = g.matches(s, new Options().log(System.out));
+		Grammar g = new Grammar("foo = 'a'*?");
+		String s = "aaaa";
+		Matcher m = g.matches(s);
 		Match n = m.match();
 		assertNotNull(n);
 	}
