@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  * @author David Houghton
  */
 @Reversible
-public class LeafRule extends Rule implements Serializable {
+public class LeafRule extends Rule implements Serializable, Cloneable {
 	/**
 	 * For normalizing the unique ids of regexes that allow comments.
 	 */
@@ -219,6 +219,11 @@ public class LeafRule extends Rule implements Serializable {
 			Set<String> knownLabels, Set<String> knownConditions) {
 		LeafRule lr = new LeafRule(l, p, reversible);
 		return lr;
+	}
+
+	@Override
+	public Object clone() {
+		return new LeafRule(label, p, reversible);
 	}
 
 	@Override

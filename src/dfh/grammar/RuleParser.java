@@ -102,7 +102,15 @@ final class RuleParser {
 				Label l = new Label(t, id);
 				l.ws = ws;
 				int[] offset = { 0 };
-				SequenceFragment body = parseBody(remainder, offset, (char) 0);
+				SequenceFragment body;
+				try {
+					body = parseBody(remainder, offset, (char) 0);
+				} catch (Exception e) {
+					GrammarException ge = new GrammarException(
+							"could not parse line " + lineNumber);
+					ge.initCause(e);
+					throw ge;
+				}
 				RuleFragment lf = body.last();
 				ConditionFragment cf = null;
 				if (lf instanceof ConditionFragment) {
