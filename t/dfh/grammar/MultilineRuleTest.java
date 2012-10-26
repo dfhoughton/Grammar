@@ -77,8 +77,8 @@ public class MultilineRuleTest {
 			new Grammar("rule = 'a' \\ 'this should not be ignored' \n 'b'");
 			fail("should have thrown exception");
 		} catch (GrammarException e) {
-			assertTrue(e.getMessage().startsWith(
-					"significant characters after \\"));
+			assertTrue(e.getCause().getMessage()
+					.startsWith("significant characters after \\"));
 		}
 	}
 }

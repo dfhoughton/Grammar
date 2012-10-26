@@ -39,8 +39,8 @@ public class UplevelBackreferenceTest {
 			new Grammar(new String[] { "ROOT = /[ab]/ 'foo' [ 0^ | 'c' ]" });
 			fail("should have thrown exception");
 		} catch (GrammarException e) {
-			assertTrue(e.getMessage().equals(
-					"back references must be greater than 0"));
+			assertTrue(e.getCause().getMessage()
+					.equals("back references must be greater than 0"));
 		}
 	}
 

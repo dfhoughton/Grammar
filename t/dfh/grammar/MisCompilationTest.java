@@ -1,5 +1,8 @@
 package dfh.grammar;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.regex.Pattern;
 
 import org.junit.Test;
@@ -31,10 +34,10 @@ public class MisCompilationTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover redefinition");
+			fail("did not discover redefinition");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue("found redefinition", e.getMessage()
-					.indexOf("rule <b> redefined") > -1);
+			assertTrue("found redefinition",
+					e.getMessage().indexOf("rule <b> redefined") > -1);
 		}
 	}
 
@@ -54,10 +57,10 @@ public class MisCompilationTest {
 			Grammar g = new Grammar(rules);
 			g.defineRule("s", Pattern.compile("\\s++"));
 			g.defineRule("s", Pattern.compile("\\s++"));
-			org.junit.Assert.fail("did not discover missing rule");
+			fail("did not discover missing rule");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue("found redefinition", e.getMessage()
-					.indexOf("already defined") > -1);
+			assertTrue("found redefinition",
+					e.getMessage().indexOf("already defined") > -1);
 		}
 	}
 
@@ -76,10 +79,10 @@ public class MisCompilationTest {
 		try {
 			Grammar g = new Grammar(rules);
 			g.defineRule("x", Pattern.compile("\\s++"));
-			org.junit.Assert.fail("did not discover missing rule");
+			fail("did not discover missing rule");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue("unknown terminal rule", e.getMessage()
-					.indexOf("unknown terminal rule") > -1);
+			assertTrue("unknown terminal rule",
+					e.getMessage().indexOf("unknown terminal rule") > -1);
 		}
 	}
 
@@ -99,13 +102,10 @@ public class MisCompilationTest {
 			Grammar g = new Grammar(rules);
 			g.find("foo bar");
 			g.defineRule("x", Pattern.compile("\\s++"));
-			org.junit.Assert.fail("did not discover missing rule");
+			fail("did not discover missing rule");
 		} catch (Exception e) {
-			org.junit.Assert
-					.assertTrue(
-							"terminal rules remaining undefined",
-							e.getMessage().indexOf(
-									"terminal rules remaining undefined") > -1);
+			assertTrue("terminal rules remaining undefined", e.getMessage()
+					.indexOf("terminal rules remaining undefined") > -1);
 		}
 	}
 
@@ -121,10 +121,10 @@ public class MisCompilationTest {
 			Grammar g = new Grammar(rules);
 			g.find("foo bar");
 			g.defineRule("x", Pattern.compile("\\s++"));
-			org.junit.Assert.fail("did not discover missing rule");
+			fail("did not discover missing rule");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue("cycle found in rules", e.getMessage()
-					.indexOf("cycle found in rules") > -1);
+			assertTrue("cycle found in rules",
+					e.getMessage().indexOf("cycle found in rules") > -1);
 		}
 	}
 
@@ -139,10 +139,10 @@ public class MisCompilationTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not ill-formed rule");
+			fail("did not ill-formed rule");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue("ill-formed rule", e.getMessage()
-					.indexOf("ill-formed rule") > -1);
+			assertTrue("ill-formed rule",
+					e.getCause().getMessage().indexOf("ill-formed rule") > -1);
 		}
 	}
 
@@ -157,10 +157,10 @@ public class MisCompilationTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover empty group");
+			fail("did not discover empty group");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue("empty rule body", e.getMessage()
-					.indexOf("empty rule body") > -1);
+			assertTrue("empty rule body",
+					e.getCause().getMessage().indexOf("empty rule body") > -1);
 		}
 	}
 
@@ -175,10 +175,10 @@ public class MisCompilationTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover empty group");
+			fail("did not discover empty group");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue("empty rule body", e.getMessage()
-					.indexOf("no rule body provided in") > -1);
+			assertTrue("empty rule body",
+					e.getMessage().indexOf("no rule body provided in") > -1);
 		}
 	}
 
@@ -193,12 +193,12 @@ public class MisCompilationTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover back reference miscount");
+			fail("did not discover back reference miscount");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue(
+			assertTrue(
 					"back references must be greater than 0",
-					e.getMessage().indexOf(
-							"back references must be greater than 0") > -1);
+					e.getCause().getMessage()
+							.indexOf("back references must be greater than 0") > -1);
 		}
 	}
 
@@ -213,10 +213,10 @@ public class MisCompilationTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover back reference miscount");
+			fail("did not discover back reference miscount");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue("back reference too big", e
-					.getMessage().indexOf("too big") > -1);
+			assertTrue("back reference too big", e.getCause().getMessage()
+					.indexOf("too big") > -1);
 		}
 	}
 
@@ -231,12 +231,12 @@ public class MisCompilationTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover back reference miscount");
+			fail("did not discover back reference miscount");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue(
+			assertTrue(
 					"back references must be greater than 0",
-					e.getMessage().indexOf(
-							"back references must be greater than 0") > -1);
+					e.getCause().getMessage()
+							.indexOf("back references must be greater than 0") > -1);
 		}
 	}
 
@@ -251,10 +251,10 @@ public class MisCompilationTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover back reference miscount");
+			fail("did not discover back reference miscount");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue("back reference too big", e
-					.getMessage().indexOf("too big") > -1);
+			assertTrue("back reference too big", e.getCause().getMessage()
+					.indexOf("too big") > -1);
 		}
 	}
 
@@ -269,10 +269,10 @@ public class MisCompilationTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover missing bracket");
+			fail("did not discover missing bracket");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue("could not find closing", e
-					.getMessage().indexOf("could not find closing") > -1);
+			assertTrue("could not find closing", e.getCause().getMessage()
+					.indexOf("could not find closing") > -1);
 		}
 	}
 
@@ -287,9 +287,9 @@ public class MisCompilationTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover missing quote");
+			fail("did not discover missing quote");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue("could not find closing quote", e
+			assertTrue("could not find closing quote", e.getCause()
 					.getMessage().indexOf("could not find closing") > -1);
 		}
 	}
@@ -305,10 +305,10 @@ public class MisCompilationTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover bad curly repetition");
+			fail("did not discover bad curly repetition");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue("bad repetition modifier", e
-					.getMessage().indexOf("bad repetition modifier") > -1);
+			assertTrue("bad repetition modifier", e.getCause().getMessage()
+					.indexOf("bad repetition modifier") > -1);
 		}
 	}
 
@@ -323,10 +323,10 @@ public class MisCompilationTest {
 		try {
 			@SuppressWarnings("unused")
 			Grammar g = new Grammar(rules);
-			org.junit.Assert.fail("did not discover bad curly repetition");
+			fail("did not discover bad curly repetition");
 		} catch (Exception e) {
-			org.junit.Assert.assertTrue("bad repetition modifier", e
-					.getMessage().indexOf("bad repetition modifier") > -1);
+			assertTrue("bad repetition modifier", e.getCause().getMessage()
+					.indexOf("bad repetition modifier") > -1);
 		}
 	}
 

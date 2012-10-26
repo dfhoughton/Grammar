@@ -74,8 +74,8 @@ public class BackReferenceTest {
 			new Grammar(rules);
 			fail("should have throw exception");
 		} catch (GrammarException e) {
-			assertTrue(e.getMessage().equals(
-					"back references must be greater than 0"));
+			assertTrue(e.getCause().getMessage()
+					.equals("back references must be greater than 0"));
 		}
 	}
 
@@ -89,7 +89,8 @@ public class BackReferenceTest {
 			new Grammar(rules);
 			fail("should have throw exception");
 		} catch (GrammarException e) {
-			assertTrue(e.getMessage().equals("back reference 3 is too big"));
+			assertTrue(e.getCause().getMessage()
+					.equals("back reference 3 is too big"));
 		}
 	}
 
@@ -143,8 +144,8 @@ public class BackReferenceTest {
 			new Grammar(rules);
 			fail("should have throw exception");
 		} catch (GrammarException e) {
-			assertTrue(e
-					.getMessage()
+			String s2 = e.getCause().getMessage();
+			assertTrue(s2
 					.equals("simple back reference cannot be modified with repetition suffix; use uplevel backreference; e.g., 1^{2,}"));
 		}
 	}

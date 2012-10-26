@@ -5,7 +5,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
 import org.junit.Test;
+
+import dfh.grammar.Label.Type;
 
 public class Regression {
 
@@ -156,7 +162,7 @@ public class Regression {
 		Grammar g = new Grammar(rules);
 		g.describe();
 	}
-	
+
 	@Test
 	public void stingySequence() {
 		Grammar g = new Grammar("foo = 'a'*?");
@@ -164,5 +170,16 @@ public class Regression {
 		Matcher m = g.matches(s);
 		Match n = m.match();
 		assertNotNull(n);
+	}
+
+	@Test
+	public void grammarDescriptionWithPredefinedRules() {
+		Rule r = new LeafRule(new Label(Type.explicit, "foo"),
+				Pattern.compile("a"), true);
+		Map<String, Rule> predefinedRules = new HashMap<String, Rule>();
+		predefinedRules.put("foo", r);
+		Grammar g = new Grammar("bar = after <a> 'b'", predefinedRules);
+		String s = g.describe();
+		assertTrue(s.indexOf('/') > -1);
 	}
 }
