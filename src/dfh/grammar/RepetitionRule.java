@@ -167,6 +167,8 @@ public class RepetitionRule extends Rule implements Serializable,
 			matched = new LinkedList<Match>();
 			goal = repetition.bottom;
 			seekGoal();
+			if (goal == 0)
+				goal = 1;
 			if (next == null) {
 				done = true;
 				matched = null;
@@ -192,18 +194,11 @@ public class RepetitionRule extends Rule implements Serializable,
 						// some juice left
 						while (true) {
 							while (!matchers.peekLast().mightHaveNext()) {
-								if (matchers.size() == 1) {
-									// nothing left to try; give up
+								matchers.removeLast();
+								matched.removeLast();
+								if (matchers.isEmpty()) {
 									found = false;
-									done = true;
-									matchers = null;
-									matched = null;
 									break OUTER;
-								} else {
-									// jettisom the last matcher and the match
-									// it was responsible for
-									matchers.removeLast();
-									matched.removeLast();
 								}
 							}
 							// found juice?
@@ -223,18 +218,17 @@ public class RepetitionRule extends Rule implements Serializable,
 				next.setChildren(children);
 				if (matched.isEmpty())
 					next.setEnd(offset);
-				else
-					next.setEnd(matched.peekLast().end());
+				else {
+					// clear out last match at the same time -- we won't use it
+					// again
+					next.setEnd(matched.removeLast().end());
+				}
 			}
 		}
 
 		@Override
 		protected void fetchNext() {
 			while (true) {
-				if (goal == 0)
-					goal = 1;
-				else
-					matched.removeLast();
 				while (goal <= repetition.top) {
 					seekGoal();
 					if (done)

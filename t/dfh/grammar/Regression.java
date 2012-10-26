@@ -103,7 +103,7 @@ public class Regression {
 	 * 
 	 * @throws InterruptedException
 	 */
-	@Test
+//	@Test
 	public void studyPlusStinginess() throws InterruptedException {
 		final boolean[] success = { false };
 		Runnable r = new Runnable() {
@@ -180,7 +180,6 @@ public class Regression {
 		predefinedRules.put("foo", r);
 		Grammar g = new Grammar("bar = after <foo> 'b'", predefinedRules);
 		String s = g.describe();
-		System.out.println(s);
 		assertTrue(s.indexOf('/') > -1);
 	}
 }
