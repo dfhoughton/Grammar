@@ -9,7 +9,7 @@ section at the end of the document.
 . add option to turn off condition testing
 . bail out of recursion via exception rather than the current laborious and expensive reeling in of failed tries
 . added unit tests for Match.hasLabel(String), which appears to have a latent bug having to do with alternations
-. fix stingy matching regression
+* fix stingy matching regression
 . get reversed leaf rules added apart from grammar compilation to print during description
 
 COMPLETED
