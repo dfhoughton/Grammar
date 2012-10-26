@@ -1,4 +1,4 @@
-2.11
+2.11, 26 October 2012
   * make LeafRule cloneable to facilitate adding precompiled reversed rules to
     grammars
   * reporting line number of parsing errors in all cases
