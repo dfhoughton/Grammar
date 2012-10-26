@@ -174,12 +174,13 @@ public class Regression {
 
 	@Test
 	public void grammarDescriptionWithPredefinedRules() {
-		Rule r = new LeafRule(new Label(Type.explicit, "foo"),
+		LeafRule r = new LeafRule(new Label(Type.explicit, "foo"),
 				Pattern.compile("a"), true);
 		Map<String, Rule> predefinedRules = new HashMap<String, Rule>();
 		predefinedRules.put("foo", r);
-		Grammar g = new Grammar("bar = after <a> 'b'", predefinedRules);
+		Grammar g = new Grammar("bar = after <foo> 'b'", predefinedRules);
 		String s = g.describe();
+		System.out.println(s);
 		assertTrue(s.indexOf('/') > -1);
 	}
 }

@@ -262,6 +262,7 @@ final class Compiler {
 				if (l.t == Type.indeterminate && !knownIds.contains(l.id)) {
 					if (precompiledRules.containsKey(l.id)) {
 						Rule ru = precompiledRules.get(l.id);
+						ru.generation = Integer.MAX_VALUE;
 						ru.setLabel(l.id);
 						rules.put(ru.label(), ru);
 						terminals.add(ru.label());
