@@ -45,7 +45,7 @@ public class RepetitionRule extends Rule implements Serializable,
 		 * @return whether this attempt failed -- true if no repetition could be
 		 *         added
 		 */
-		protected boolean grab() {
+		protected boolean grabFails() {
 			int start = matched.isEmpty() ? offset : matched.peekLast().end();
 			Matcher m;
 			if (matchers.size() > matched.size())
@@ -84,7 +84,7 @@ public class RepetitionRule extends Rule implements Serializable,
 			matched = new LinkedList<Match>();
 			matchers = new LinkedList<Matcher>();
 			while (matched.size() < repetition.top) {
-				if (grab())
+				if (grabFails())
 					break;
 			}
 			if (matched.size() < repetition.bottom) {
@@ -127,7 +127,7 @@ public class RepetitionRule extends Rule implements Serializable,
 					// see if we can find some other way forward
 					if (matchers.peekLast().mightHaveNext()) {
 						while (!(matchers.isEmpty() || matched.size() == repetition.top)) {
-							if (grab())
+							if (grabFails())
 								break;
 						}
 					} else {
@@ -180,7 +180,7 @@ public class RepetitionRule extends Rule implements Serializable,
 			boolean found = true;
 			next = null;
 			OUTER: while (matched.size() < goal) {
-				if (grab()) {
+				if (grabFails()) {
 					// could not get a repetition with current matcher, try to
 					// get a new one
 					if (matchers.isEmpty()) {
@@ -190,19 +190,28 @@ public class RepetitionRule extends Rule implements Serializable,
 					} else {
 						// clear out exhausted matchers looking for one with
 						// some juice left
-						while (!matchers.peekLast().mightHaveNext()) {
-							if (matchers.size() == 1) {
-								// nothing left to try; give up
-								found = false;
-								done = true;
-								matchers = null;
-								matched = null;
-								break OUTER;
-							} else {
-								// jettisom the last matcher and the match it
-								// was responsible for
-								matchers.removeLast();
+						while (true) {
+							while (!matchers.peekLast().mightHaveNext()) {
+								if (matchers.size() == 1) {
+									// nothing left to try; give up
+									found = false;
+									done = true;
+									matchers = null;
+									matched = null;
+									break OUTER;
+								} else {
+									// jettisom the last matcher and the match
+									// it was responsible for
+									matchers.removeLast();
+									matched.removeLast();
+								}
+							}
+							// found juice?
+							Match n = matchers.peekLast().match();
+							if (n != null) {
 								matched.removeLast();
+								matched.add(n);
+								break;
 							}
 						}
 					}
@@ -247,7 +256,7 @@ public class RepetitionRule extends Rule implements Serializable,
 					break;
 				} else {
 					neverMatched = false;
-						break;
+					break;
 				}
 			}
 		}
