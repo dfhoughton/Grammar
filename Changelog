@@ -1,5 +1,6 @@
 2.12
   * changed order of precompiled rules relative to rest in default description
+  * removed redundant brackets from description of explicit sub-rules
 
 2.11, 26 October 2012
   * make LeafRule cloneable to facilitate adding precompiled reversed rules to

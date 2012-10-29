@@ -1,6 +1,7 @@
 package dfh.grammar;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -103,7 +104,7 @@ public class Regression {
 	 * 
 	 * @throws InterruptedException
 	 */
-//	@Test
+	// @Test
 	public void studyPlusStinginess() throws InterruptedException {
 		final boolean[] success = { false };
 		Runnable r = new Runnable() {
@@ -182,9 +183,19 @@ public class Regression {
 		String s = g.describe();
 		assertTrue(s.indexOf('/') > -1);
 	}
-	
+
 	@Test
 	public void multipleAssertions() {
 		new Grammar("foo = !- 'a' 'b' ! ['c' [ 'd' | ! 'e']]");
+	}
+
+	@Test
+	public void repeatedSequenceDescription() {
+		String[] rules = {
+				//
+				"foo = <arg>+",//
+				"arg = 'a' 'b'" };
+		Grammar g = new Grammar(rules);
+		assertFalse(g.describe().indexOf("]+") > -1);
 	}
 }

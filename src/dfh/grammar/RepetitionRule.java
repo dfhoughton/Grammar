@@ -14,6 +14,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import dfh.grammar.Label.Type;
+
 /**
  * Rule to handle all the various repetition options.
  * <p>
@@ -331,8 +333,9 @@ public class RepetitionRule extends Rule implements Serializable,
 		Rule ru = r;
 		while (ru instanceof ConditionalRule)
 			ru = ((ConditionalRule) ru).r;
-		boolean requiresBrackets = ru instanceof SequenceRule
-				|| ru instanceof AlternationRule || hasTags && !inBrackets;
+		boolean requiresBrackets = ru.label.t == Type.implicit
+				&& (ru instanceof SequenceRule || ru instanceof AlternationRule || hasTags
+						&& !inBrackets);
 		if (requiresBrackets)
 			b.append('[');
 		if (hasTags) {
