@@ -595,9 +595,12 @@ final class RuleParser {
 	 * @param parse
 	 */
 	private static void completeAssertions(SequenceFragment parse, String body) {
-		if (parse.last() instanceof AssertionFragment)
-			throw new GrammarException("no rule after assertion marker in "
-					+ body);
+		if (parse.last() instanceof AssertionFragment) {
+			AssertionFragment af = (AssertionFragment) parse.last();
+			if (af.rf == null)
+				throw new GrammarException("no rule after assertion marker in "
+						+ body);
+		}
 		RuleFragment previous = null;
 		for (Iterator<RuleFragment> i = parse.iterator(); i.hasNext();) {
 			RuleFragment rf = i.next();

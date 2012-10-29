@@ -182,4 +182,9 @@ public class Regression {
 		String s = g.describe();
 		assertTrue(s.indexOf('/') > -1);
 	}
+	
+	@Test
+	public void multipleAssertions() {
+		new Grammar("foo = !- 'a' 'b' ! ['c' [ 'd' | ! 'e']]");
+	}
 }
