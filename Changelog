@@ -1,4 +1,4 @@
-2.12
+2.12, 29 October 2012
   * changed order of precompiled rules relative to rest in default description
   * removed redundant brackets from description of explicit sub-rules
 
