@@ -42,7 +42,7 @@ public abstract class BarrierException extends GrammarException {
 	 */
 	@Override
 	public Throwable fillInStackTrace() {
-		return null;
+		return this;
 	}
 
 }
