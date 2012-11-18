@@ -1,4 +1,5 @@
 2.13
+  * added all() method to Matcher to facilitate iterating over matches
 
 2.12, 29 October 2012
   * changed order of precompiled rules relative to rest in default description

@@ -8,6 +8,8 @@
  */
 package dfh.grammar;
 
+import java.util.Iterator;
+
 /**
  * An object associated with a {@link Rule} that can iterate over and return all
  * the possible parse trees meeting the matching conditions (pattern and start
@@ -40,6 +42,7 @@ public abstract class Matcher {
 	 * Rightmost match found by this {@link Matcher} or any of its descendants.
 	 */
 	protected Match rightmost = null;
+
 	/**
 	 * Generate a {@link Matcher} with the given state.
 	 * 
@@ -125,5 +128,73 @@ public abstract class Matcher {
 				master.register(m);
 		}
 		return m;
+	}
+
+	/**
+	 * Convenience method to allow the following syntax:
+	 * 
+	 * <pre>
+	 * {@code
+	 * for (Match m: grammar.find().all()) {
+	 *    // do something with m
+	 * }
+	 * }
+	 * </pre>
+	 * 
+	 * The {@link Iterable} returned can only be used once. I.e., you cannot do
+	 * this:
+	 * 
+	 * <pre>
+	 * {@code
+	 * Iterable<Match> i = grammar.find().all();
+	 * for (int j = 0; j < 3; j++) {
+	 *    for (Match m: i)
+	 *       System.out.println(m.group());
+	 * }
+	 * }
+	 * </pre>
+	 * 
+	 * The first pass over the matches will work but the second will throw an
+	 * exception.
+	 * 
+	 * @return an {@link Iterable} over the matches
+	 */
+	public Iterable<Match> all() {
+		return new Iterable<Match>() {
+			boolean used = false;
+
+			@Override
+			public Iterator<Match> iterator() {
+				if (used) {
+					throw new UnsupportedOperationException(
+							"matches() returns a single-use Iterable and this one has already been used; you must create a mew Matcher on the same sequence to repeat the matches");
+				}
+				used = true;
+				return new Iterator<Match>() {
+					Match next = match();
+
+					@Override
+					public void remove() {
+						throw new UnsupportedOperationException(
+								"match sequence is immutable");
+					}
+
+					@Override
+					public Match next() {
+						if (next != null) {
+							Match m = next;
+							next = match();
+							return m;
+						}
+						return null;
+					}
+
+					@Override
+					public boolean hasNext() {
+						return next != null;
+					}
+				};
+			}
+		};
 	}
 }
