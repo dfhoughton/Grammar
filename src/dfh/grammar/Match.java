@@ -184,6 +184,17 @@ public class Match {
 	}
 
 	/**
+	 * Equivalent to {@code rule().label().id.equals(id)}.
+	 * 
+	 * @param id
+	 *            rule id
+	 * @return whether the rule generating this node has the specified id
+	 */
+	public boolean labelId(String id) {
+		return r.label.id.equals(id);
+	}
+
+	/**
 	 * @return index of first character at which the {@link Match} matches
 	 */
 	public int start() {

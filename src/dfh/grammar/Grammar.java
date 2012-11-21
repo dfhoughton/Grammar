@@ -582,6 +582,35 @@ public class Grammar implements Serializable {
 	/**
 	 * Delegates to {@link #Grammar(String, Map)}, setting the second parameter
 	 * to {@code null}.
+	 * <p>
+	 * This constructor is particularly handy in Scala, which has multi-line
+	 * strings with disabled escaping. For example, the following Scala
+	 * application will run:
+	 * 
+	 * <pre>
+	 * {@code
+	 * import dfh.grammar.Grammar
+	 * import scala.collection.JavaConverters._
+	 * 
+	 * object GrammarExperiment extends App {
+	 *   val g = new Grammar("""
+	 *     root .= <foo>? <bar>
+	 *     foo   = /\d+/
+	 *     bar   = /[\w&&[^\d]]+/
+	 *       """)
+	 *   val s =
+	 *     """123 
+	 *       abc 1qwerty
+	 *       """
+	 *   for (n <- g.find(s).all.asScala) {
+	 *     def showMatch(r: String) = printf("<%s> = %s%n", r, n.first(r).group)
+	 *     showMatch("foo")
+	 *     showMatch("bar")
+	 *     println
+	 *   }
+	 * }
+	 * }
+	 * </pre>
 	 * 
 	 * @param multiline
 	 *            rule source
