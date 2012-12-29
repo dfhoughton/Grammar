@@ -198,5 +198,224 @@ If no output file is provided, it will write its output to STDOUT.</pre>
 		<code>System.out.println(String)</code>
 		.
 	</p>
+	<h2>Winnowing</h2>
+	<p>A problem I frequently encounter is that I'll have a grammar
+		which has become complex and a string which it should match but
+		doesn't. In this case in order to find the bug quickly I iteratively
+		simplify the grammar down to just those rules relevant to the problem
+		match.</p>
+	<p>To Illustrate, suppose I have the grammar</p>
+	<pre>    problem = &lt;name_first&gt; | &lt;name_middle&gt; | &lt;name_last&gt;
+
+  name_last = [ &lt;r7&gt; | &lt;r8&gt; | &lt;r9&gt; ] &lt;s&gt; &lt;name&gt;
+name_middle = &lt;r4&gt; | &lt;r5&gt; | &lt;r6&gt;
+ name_first = &lt;name&gt; &lt;s&gt; [ &lt;r1&gt; | &lt;r2&gt; | &lt;r3&gt; ]
+         r4 = "by" &lt;s&gt; &lt;name&gt; "," &lt;s&gt; "the" &lt;s&gt; &lt;word&gt; &lt;s&gt; "actor"
+         r5 = "by " &lt;s&gt; &lt;name&gt; ", the director"
+         r6 = "from" &lt;s&gt; &lt;name&gt; &lt;s&gt; ",who wrote"
+         r7 = "director" &lt;s&gt; &lt;name&gt;
+         r8 = "actor" &lt;s&gt; &lt;name&gt;
+         r9 = "writer" &lt;s&gt; &lt;name&gt;
+       name = &lt;name_part&gt; [ &lt;s&gt; &lt;name_part&gt; ]*
+  name_part = &lt;initial&gt; | &lt;full&gt;
+       full = /\b\p{Lu}(?:\p{L}|['-]\p{L})*+\b/
+    initial = /\b\p{Lu}\./
+         r1 = "directed"
+         r2 = "wrote"
+         r3 = "performed"
+          s = /\s+/
+       word = /\b\p{L}(?:\p{L}|['-]\p{L})++\b/</pre>
+	<p>
+		And my problem string is <i>by Fred, the director</i>. First I make a
+		copy of the grammar I can modify. Call it
+		<code>debug_grammar.txt</code>
+		. Then I write a little test class, call it
+		<code>Winnow</code>
+		<span class="fn">This class and the grammar to test it with are
+			in the <code>examples/</code> subdirectory in the downloadable
+			tarball.
+		</span> .
+	</p>
+	<pre>import java.io.File;
+import dfh.grammar.Grammar;
+
+public class Winnow {
+
+	public static void main(String[] args) throws Exception {
+		String problem = "by Fred, the director";
+		Grammar g = new Grammar(new File("debug_grammar.txt"));
+		System.out.println(g.describe());
+		System.out.println("# success? " + test(problem, g));
+	}
+
+	/**
+	 * replace this with the appropriate test
+	 */
+	private static Object test(String problem, Grammar g) {
+		return g.matches(problem).match() != null;
+	}
+
+}</pre>
+	<p>If we run this we get</p>
+	<pre class="results">    problem = &lt;name_first&gt; | &lt;name_middle&gt; | &lt;name_last&gt;
+
+  name_last = [ &lt;r7&gt; | &lt;r8&gt; | &lt;r9&gt; ] &lt;s&gt; &lt;name&gt;
+name_middle = &lt;r4&gt; | &lt;r5&gt; | &lt;r6&gt;
+ name_first = &lt;name&gt; &lt;s&gt; [ &lt;r1&gt; | &lt;r2&gt; | &lt;r3&gt; ]
+         r4 = "by" &lt;s&gt; &lt;name&gt; "," &lt;s&gt; "the" &lt;s&gt; &lt;word&gt; &lt;s&gt; "actor"
+         r5 = "by " &lt;s&gt; &lt;name&gt; ", the director"
+         r6 = "from" &lt;s&gt; &lt;name&gt; &lt;s&gt; ",who wrote"
+         r7 = "director" &lt;s&gt; &lt;name&gt;
+         r8 = "actor" &lt;s&gt; &lt;name&gt;
+         r9 = "writer" &lt;s&gt; &lt;name&gt;
+       name = &lt;name_part&gt; [ &lt;s&gt; &lt;name_part&gt; ]*
+  name_part = &lt;initial&gt; | &lt;full&gt;
+       full = /\b\p{Lu}(?:\p{L}|['-]\p{L})*+\b/
+    initial = /\b\p{Lu}\./
+         r1 = "directed"
+         r2 = "wrote"
+         r3 = "performed"
+          s = /\s+/
+       word = /\b\p{L}(?:\p{L}|['-]\p{L})++\b/
+
+# <b>success? false</b>	</pre>
+	<p>
+		This is a grammar functionally equivalent to the one used. We can copy
+		and paste it into
+		<code>debug_grammar.txt</code>
+		and get the same results, which is more or less our procedure. At each
+		iteration we copy the results into
+		<code>debug_grammar.txt</code>
+		and then eliminate some unused alternates. So, in the examples below I
+		will step through, highlighting the alternates I eliminate and showing
+		the results.
+	</p>
+	<pre class="results">    problem = <b>&lt;name_first&gt; |</b> &lt;name_middle&gt; <b>| &lt;name_last&gt;</b>
+
+  name_last = [ &lt;r7&gt; | &lt;r8&gt; | &lt;r9&gt; ] &lt;s&gt; &lt;name&gt;
+name_middle = &lt;r4&gt; | &lt;r5&gt; | &lt;r6&gt;
+ name_first = &lt;name&gt; &lt;s&gt; [ &lt;r1&gt; | &lt;r2&gt; | &lt;r3&gt; ]
+         r4 = "by" &lt;s&gt; &lt;name&gt; "," &lt;s&gt; "the" &lt;s&gt; &lt;word&gt; &lt;s&gt; "actor"
+         r5 = "by " &lt;s&gt; &lt;name&gt; ", the director"
+         r6 = "from" &lt;s&gt; &lt;name&gt; &lt;s&gt; ",who wrote"
+         r7 = "director" &lt;s&gt; &lt;name&gt;
+         r8 = "actor" &lt;s&gt; &lt;name&gt;
+         r9 = "writer" &lt;s&gt; &lt;name&gt;
+       name = &lt;name_part&gt; [ &lt;s&gt; &lt;name_part&gt; ]*
+  name_part = &lt;initial&gt; | &lt;full&gt;
+       full = /\b\p{Lu}(?:\p{L}|['-]\p{L})*+\b/
+    initial = /\b\p{Lu}\./
+         r1 = "directed"
+         r2 = "wrote"
+         r3 = "performed"
+          s = /\s+/
+       word = /\b\p{L}(?:\p{L}|['-]\p{L})++\b/
+
+# success? false</pre>
+	<p>
+		In <i>by Fred, the director</i> the name is in the middle, so we
+		eliminate the other two alternates. This gives us
+	</p>
+	<pre class="results">  problem = <b>[{name_middle}</b> &lt;r4&gt; | &lt;r5&gt; | &lt;r6&gt; <b>]</b>
+
+       r4 = "by" &lt;s&gt; &lt;name&gt; "," &lt;s&gt; "the" &lt;s&gt; &lt;word&gt; &lt;s&gt; "actor"
+       r5 = "by " &lt;s&gt; &lt;name&gt; ", the director"
+       r6 = "from" &lt;s&gt; &lt;name&gt; &lt;s&gt; ",who wrote"
+     name = &lt;name_part&gt; <b>[ &lt;s&gt; &lt;name_part&gt; ]*</b>
+name_part = &lt;initial&gt; | &lt;full&gt;
+     full = /\b\p{Lu}(?:\p{L}|['-]\p{L})*+\b/
+  initial = /\b\p{Lu}\./
+        s = /\s+/
+     word = /\b\p{L}(?:\p{L}|['-]\p{L})++\b/
+
+# success? false</pre>
+	<p>
+		We can eliminate the extraneous
+		<code>name_middle</code>
+		tag. Also, <i>Fred</i> is a simple name, so let's not worry about
+		multiple parts. This gives us
+	</p>
+	<pre class="results">problem = &lt;r4&gt; | &lt;r5&gt; | &lt;r6&gt;
+
+     r4 = "by" &lt;s&gt; &lt;name&gt; "," &lt;s&gt; "the" &lt;s&gt; &lt;word&gt; &lt;s&gt; "actor"
+     r5 = "by " &lt;s&gt; &lt;name&gt; ", the director"
+     r6 = "from" &lt;s&gt; &lt;name&gt; &lt;s&gt; ",who wrote"
+   name = <b>[{name_part} &lt;initial&gt; |</b> &lt;full&gt; <b>]</b>
+   full = /\b\p{Lu}(?:\p{L}|['-]\p{L})*+\b/
+initial = /\b\p{Lu}\./
+      s = /\s+/
+   word = /\b\p{L}(?:\p{L}|['-]\p{L})++\b/
+
+# success? false</pre>
+	<p>Again we eliminate the tag. Also, we don't need to worry about
+		initials. This gives us</p>
+	<pre class="results">problem = <b>&lt;r4&gt; |</b> &lt;r5&gt; <b>| &lt;r6&gt;</b>
+
+     r4 = "by" &lt;s&gt; &lt;name&gt; "," &lt;s&gt; "the" &lt;s&gt; &lt;word&gt; &lt;s&gt; "actor"
+     r5 = "by " &lt;s&gt; &lt;name&gt; ", the director"
+     r6 = "from" &lt;s&gt; &lt;name&gt; &lt;s&gt; ",who wrote"
+   name = <b>[{full}</b> /\b\p{Lu}(?:\p{L}|['-]\p{L})*+\b/ <b>]</b>
+      s = /\s+/
+   word = /\b\p{L}(?:\p{L}|['-]\p{L})++\b/
+
+# success? false</pre>
+	<p>
+		Get rid of the tag. And the alternate that should match is
+		<code>&lt;r5&gt;</code>
+		, so we eliminate the others. This gives us
+	</p>
+	<pre class="results">problem = <b>[{r5}</b> "by " &lt;s&gt; &lt;name&gt; ", the director" <b>]</b>
+
+   name = /\b\p{Lu}(?:\p{L}|['-]\p{L})*+\b/
+      s = /\s+/
+
+# success? false</pre>
+	<p>
+		Eliminating the tag brings us to just the rules relevant to the
+		problem at hand, the failure to match <i>by Fred, the director</i>.
+	</p>
+	<pre>problem = "by " &lt;s&gt; &lt;name&gt; ", the director"
+
+   name = /\b\p{Lu}(?:\p{L}|['-]\p{L})*+\b/
+      s = /\s+/</pre>
+	<p>
+		Now the problem should be obvious: an extra space after <i>by</i> in
+		<code>&lt;problem&gt;</code>
+		. Does it work if we take this out?
+	</p>
+	<pre class="results">problem = "by" &lt;s&gt; &lt;name&gt; ", the director"
+
+   name = /\b\p{Lu}(?:\p{L}|['-]\p{L})*+\b/
+      s = /\s+/
+
+# success? <b>true</b> </pre>
+	<p>
+		Yes! So we copy the original grammar into
+		<code>debug_grammar.txt</code>
+		, make the necessary change, and test again.
+	</p>
+	<pre class="results">    problem = &lt;name_first&gt; | &lt;name_middle&gt; | &lt;name_last&gt;
+
+  name_last = [ &lt;r7&gt; | &lt;r8&gt; | &lt;r9&gt; ] &lt;s&gt; &lt;name&gt;
+name_middle = &lt;r4&gt; | &lt;r5&gt; | &lt;r6&gt;
+ name_first = &lt;name&gt; &lt;s&gt; [ &lt;r1&gt; | &lt;r2&gt; | &lt;r3&gt; ]
+         r4 = "by" &lt;s&gt; &lt;name&gt; "," &lt;s&gt; "the" &lt;s&gt; &lt;word&gt; &lt;s&gt; "actor"
+         r5 = "by" &lt;s&gt; &lt;name&gt; ", the director"
+         r6 = "from" &lt;s&gt; &lt;name&gt; &lt;s&gt; ",who wrote"
+         r7 = "director" &lt;s&gt; &lt;name&gt;
+         r8 = "actor" &lt;s&gt; &lt;name&gt;
+         r9 = "writer" &lt;s&gt; &lt;name&gt;
+       name = &lt;name_part&gt; [ &lt;s&gt; &lt;name_part&gt; ]*
+  name_part = &lt;initial&gt; | &lt;full&gt;
+       full = /\b\p{Lu}(?:\p{L}|['-]\p{L})*+\b/
+    initial = /\b\p{Lu}\./
+         r1 = "directed"
+         r2 = "wrote"
+         r3 = "performed"
+          s = /\s+/
+       word = /\b\p{L}(?:\p{L}|['-]\p{L})++\b/
+
+# success? <b>true</b> </pre>
+	<p>Problem debugged.</p>
 </body>
 </html>

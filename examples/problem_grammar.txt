@@ -1,0 +1,22 @@
+# a grammar for testing out Winnow
+
+    problem = <name_first> | <name_middle> | <name_last>
+
+  name_last = [ <r7> | <r8> | <r9> ] <s> <name>
+name_middle = <r4> | <r5> | <r6>
+ name_first = <name> <s> [ <r1> | <r2> | <r3> ]
+         r4 = "by" <s> <name> "," <s> "the" <s> <word> <s> "actor"
+         r5 = "by " <s> <name> ", the director"
+         r6 = "from" <s> <name> <s> ",who wrote"
+         r7 = "director" <s> <name>
+         r8 = "actor" <s> <name>
+         r9 = "writer" <s> <name>
+       name = <name_part> [ <s> <name_part> ]*
+  name_part = <initial> | <full>
+       full = /\b\p{Lu}(?:\p{L}|['-]\p{L})*+\b/
+    initial = /\b\p{Lu}\./
+         r1 = "directed"
+         r2 = "wrote"
+         r3 = "performed"
+          s = /\s+/
+       word = /\b\p{L}(?:\p{L}|['-]\p{L})++\b/
