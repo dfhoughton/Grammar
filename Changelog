@@ -1,3 +1,7 @@
+2.14, 12 January 2013
+  * added some methods to Match that might be graph-theoretically useful:
+    size(), depth(), width(), height()
+
 2.13, 21 November 2012
   * added all() method to Matcher to facilitate iterating over matches
   * added ruleId() method to Match to facilitate working with parse trees
