@@ -1,4 +1,4 @@
-2.14
+2.14, 12 January 2013
   * added some methods to Match that might be graph-theoretically useful:
     size(), depth(), width(), height()
 
