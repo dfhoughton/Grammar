@@ -11,6 +11,7 @@ section at the end of the document.
 . added unit tests for Match.hasLabel(String), which appears to have a latent bug having to do with alternations
 * fix stingy matching regression
 * get reversed leaf rules added apart from grammar compilation to print during description
+. clean up docs for dfh.Match
 
 COMPLETED
 =========
