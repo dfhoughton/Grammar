@@ -1032,4 +1032,64 @@ public class Match {
 			}
 		}
 	}
+
+	/**
+	 * Returns number of leaves under this node; 1 if the node itself is a leaf.
+	 * 
+	 * @return number of leaves under this node; 1 if the node itself is a leaf
+	 */
+	public int width() {
+		if (isTerminal())
+			return 1;
+		int width = 0;
+		for (Match n : children)
+			width += n.width();
+		return width;
+	}
+
+	/**
+	 * @return number of steps from this node to the root of the match tree
+	 */
+	public int depth() {
+		if (!done)
+			new GrammarException(
+					"Match.done() not yet called; method unavailable");
+		Match n = this;
+		int depth = -1;
+		do {
+			depth++;
+			n = n.parent();
+		} while (n != null);
+		return depth;
+	}
+
+	/**
+	 * Returns number of steps from this node to its deepest leaf; 1 if the node
+	 * itself is a leaf.
+	 * 
+	 * @return number of steps from this node to its deepest leaf; 1 if the node
+	 *         itself is a leaf
+	 */
+	public int height() {
+		if (isTerminal())
+			return 1;
+		int max = 0;
+		for (Match n : children)
+			max = Math.max(max, n.height());
+		return max + 1;
+	}
+
+	/**
+	 * Returns number of nodes in match tree rooted at this node.
+	 * 
+	 * @return number of nodes in match tree rooted at this node
+	 */
+	public int size() {
+		if (isTerminal())
+			return 1;
+		int size = 1;
+		for (Match n : children)
+			size += n.size();
+		return size;
+	}
 }

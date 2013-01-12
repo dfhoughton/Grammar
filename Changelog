@@ -1,4 +1,6 @@
 2.14
+  * added some methods to Match that might be graph-theoretically useful:
+    size(), depth(), width(), height()
 
 2.13, 21 November 2012
   * added all() method to Matcher to facilitate iterating over matches
