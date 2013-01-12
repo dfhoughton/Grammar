@@ -6,31 +6,14 @@ import java.util.Set;
 import dfh.grammar.Label.Type;
 
 /**
- * Rule representing space that may occur between non-trivial constituents in a
- * rule such as
+ * Rule representing space associated with the '.' in a rule such as
  * 
  * <pre/>
- * rule ::= 'my'? 'cat'
+ * rule  := [ 'la' . ]+ 'di' 'da'
  * </pre>
  * 
- * which becomes equivalent to
- * 
- * <pre/>
- * rule   = ['my' /\s++/r]? 'cat'
- * </pre>
- * 
- * or
- * 
- * <pre/>
- * rule  := 'my'? 'cat'
- * </pre>
- * 
- * which becomes equivalent to
- * 
- * <pre/>
- * rule   = 'my'? /\s++/r? 'cat'
- * </pre>
- * 
+ * which would match <i>la di da</i> and <i>la la di da</i> but not <i>lala
+ * di da</i>.
  * <p>
  * 
  * @author David F. Houghton - Jun 18, 2012
