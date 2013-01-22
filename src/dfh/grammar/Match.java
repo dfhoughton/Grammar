@@ -195,6 +195,15 @@ public class Match {
 	}
 
 	/**
+	 * Returns id of rule generating match.
+	 * 
+	 * @return id of rule generating match
+	 */
+	public String labelId() {
+		return r.label.id;
+	}
+
+	/**
 	 * @return index of first character at which the {@link Match} matches
 	 */
 	public int start() {
