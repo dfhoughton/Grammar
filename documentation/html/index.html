@@ -267,9 +267,15 @@ aab</pre>
 		.
 	</div>
 	<h3>Applying Arbitrary Conditions to Rules</h3>
-	<div>One of the more powerful features of grammars is that you
-		can apply arbitrary conditions to rules, validating sub-portions of a
-		match mid-match.</div>
+	<div>
+		One of the more powerful features of grammars is that you can apply
+		arbitrary conditions to rules, validating sub-portions of a match
+		mid-match.<span class="fn">This is equivalent to the
+			conditional expression <code>(?(?{!condition()})(?!))</code> in Perl
+			-- <code>condition</code> in this case is a bit of code that, if
+			false, will cause the match to fail.
+		</span>
+	</div>
 	<div>
 		<pre>                String[] rules = { 
                                 "&lt;ROOT&gt; = &lt;year&gt; '/' &lt;month&gt; '/' &lt;day&gt; (is_date)",
