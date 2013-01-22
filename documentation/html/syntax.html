@@ -406,10 +406,20 @@ rule2 = <b>"</b>'foo'<b>"</b> </pre>
 		Match n;
 		while ((n = m.match()) != null)
 			System.out.println(s.substring(n.start(), n.end()));</pre>
-	<p>Conditions are perhaps the most powerful feature grammars have
-		beyond those they share with regular expressions. These are arbitrary
-		tests that can be applied after a rule has matched. The example above
-		produces
+	<p>
+		Conditions are perhaps the most powerful feature grammars have beyond
+		those they share with regular expressions.<span class="fn">This
+			is equivalent to the conditional expression <code>(?(?{!condition()})(?!))</code>
+			in Perl -- <code>condition</code> in this case is a bit of code that,
+			if false, will cause the match to fail. The Perl expression has the
+			advantage that it can be put anywhere and the disadvantage that it's
+			hard to see at a glance what it's doing. Also, in the Perl case one
+			has to do a bit of work to gather up information about the current
+			matching state that one might want as arguments to <code>condition</code>.
+			<a href="https://metacpan.org/module/Regexp::Grammars">Regexp::Grammars</a>
+			improves the situation for Perl a good deal.
+		</span> These are arbitrary tests that can be applied after a rule has
+		matched. The example above produces
 	<pre class="results">99</pre>
 	</p>
 	<p>Caution should be taken when using conditions. In particular,
